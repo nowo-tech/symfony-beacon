@@ -6,6 +6,8 @@
 
 To keep development data clean, use a **second Compose project** on schema `app_e2e` (Redis DB index `1`, HTTPS `:9460` by default). Dogfood on `:9447` can stay up in parallel — run Playwright against `:9460` without stopping development.
 
+Isolation notes: `.env.e2e.local` sets `REDIS_URL=…/1` and `MESSENGER_TRANSPORT_DSN=…?dbindex=1` (Redis **path** on the Messenger DSN is the stream name from `messenger.yaml`, not the DB index). `compose.e2e.yaml` uses `env_file: !override` so an empty/dogfood-sourced shell `DATABASE_URL` / `REDIS_URL` / `MESSENGER_TRANSPORT_DSN` cannot wipe the E2E file. After pulling Messenger DSN fixes, re-run `make up-e2e` (regenerates via `.scripts/ensure-e2e-env.sh`).
+
 ```bash
 make up              # dogfood stack stays up (:9447)
 make up-e2e          # create app_e2e + start symfony-beacon-e2e (php/messenger*)

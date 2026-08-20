@@ -30,8 +30,8 @@ CI already builds this target (`.github/workflows/ci.yml`).
 - `DATABASE_URL` (or Compose-equivalent MySQL vars)
 - `MESSENGER_TRANSPORT_DSN` if you run async workers (default Redis: `redis://redis-8.10.0:6379` — stream names come from `messenger.yaml`; do **not** append `/messages` on shared Redis. Drain Doctrine `messenger_messages` before switching)
 - `REDIS_URL` (sessions, `cache.app` / rate limits, Messenger streams)
-- `SITE_SETUP_TOKEN` — unique secret for `/setup?token=…` (never leave empty; never reuse historically known local values)
-- `SITE_BACKUP_PASSWORD_HASH` — bcrypt/argon hash for `/_site_backup` (generate with `nowo:site-backup:hash-password`; never commit)
+- `SITE_SETUP_TOKEN` — unique secret for `/setup?token=…` (never leave empty; never reuse historically known local values). Under `APP_ENV=prod`, SiteBackup **`setup.enabled` is false** — finish the wizard (or CLI / `make ready`) before promoting to prod.
+- `SITE_BACKUP_PASSWORD_HASH` — bcrypt/argon hash for `/_site_backup` (generate with `nowo:site-backup:hash-password`; never commit). Prod also requires kit admin UIs under `/admin` to be `ROLE_ADMIN` (Symfony catch-all + bundle `access_roles`).
 - Optional: `FRANKENPHP_MODE`, `FRANKENPHP_WORKER_NUM`, `FRANKENPHP_LOOP_MAX`, `FRANKENPHP_RESET_KERNEL`
 
 `App\Setup\SiteBackupSecurityDefaultsGuard` **refuses HTTP (and most console) boots outside local `dev`/`test`** (including `prod`, `staging`, and any other `APP_ENV`) if `SITE_SETUP_TOKEN` is empty or a historically known local value, `SITE_BACKUP_PASSWORD_HASH` is empty or a historically known local hash, `APP_SECRET` is empty / still `ChangeMePleaseUseARealSecret` / shorter than 16 characters, or `MERCURE_JWT_SECRET` is set to the documented `.env.dist` placeholder / shorter than 32 characters when non-empty. Empty `MERCURE_JWT_SECRET` is allowed when Mercure is unused (admin DB override may still apply). `compose.prod.yaml` also requires secrets via `${VAR:?…}`.

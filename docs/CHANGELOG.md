@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.23.3] - 2026-08-20
+
+### Changed
+
+- **Composer pins** (`nowo-tech/*` patch/minor refresh): audit-kit **1.1.14**, auth-kit **1.17.4**, beacon-bundle **1.7.7**, breadcrumb-kit **2.1.6**, cookie-consent **1.9.4**, dashboard-menu **2.1.8**, doctrine-encrypt **2.3.11**, form-kit **2.4.4**, http-log **1.1.4**, login-throttle **3.1.2**, maintenance-mode **1.5.6**, migrations-kit **2.0.20**, password-policy **1.4.2**, password-strength **2.2.2**, password-toggle **2.1.3**, phone-input **1.3.2**, pwa **1.3.2**, routing-kit **1.4.3**, select-all-choice **1.5.3**, site-backup **1.13.6**, tag-input **1.1.2**, ui-kit **1.8.2**, user-kit **1.1.8**. Dev: hot-reload **1.4.1**, twig-inspector **1.1.3**, phpstan-frankenphp **1.1.2**, composer-update-helper **2.0.35**, php-cs-fixer **3.95.20**, rector **2.6.3**. Transitive: `paragonie/sodium_compat` **2.5.2**.
+- **Prod kit hardening** (`when@prod`): HttpLog turns off JSON body capture, caps body size / export / retention (14d), and requires `ROLE_ADMIN`; MaintenanceMode disables anonymous 503 preview; SiteBackup disables `/setup`, enables password protection, and requires `ROLE_ADMIN`; Dashboard Menu reaffirms admin-only access.
+- **Security access control**: catch-all `^/admin` → `ROLE_ADMIN` (defense in depth alongside per-bundle checkers; previously unmatched `/admin/*` fell through to `ROLE_USER`).
+
+### Fixed
+
+- **Isolated E2E stack**: `MESSENGER_TRANSPORT_DSN` uses Redis `?dbindex=N` (path is the stream name, not the DB index). `compose.e2e.yaml` uses `env_file: !override` and stops re-interpolating `DATABASE_URL` / `REDIS_URL` / `MESSENGER_TRANSPORT_DSN` / `BEACON_DSN` from the process environment (empty or dogfood-sourced shell vars were wiping `.env.e2e.local`). Make `DC_E2E` forces Redis DSNs on the process env. Spec `104` / REQ-MESSENGER-001.
+
+### Notes for integrators
+
+- No Doctrine migrations.
+- After pull: `composer install`.
+- **Production**: SiteBackup setup UI is off (`setup.enabled: false`); finish cold-start before flipping `APP_ENV=prod`, or use CLI/`make ready`. HttpLog no longer stores JSON response bodies in prod (less forensics, less PII). Ensure operators who need kit admin UIs under `/admin` have `ROLE_ADMIN`.
+- **Local E2E**: regenerate `.env.e2e.local` (`make up-e2e` / `ensure-e2e-env`) so Messenger DSNs pick up `?dbindex=`.
+
 ## [1.23.2] - 2026-08-18
 
 ### Fixed
@@ -1469,7 +1488,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.23.2...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.23.3...HEAD
+[1.23.3]: https://github.com/nowo-tech/symfony-beacon/compare/v1.23.2...v1.23.3
 [1.23.2]: https://github.com/nowo-tech/symfony-beacon/compare/v1.23.1...v1.23.2
 [1.23.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.23.0...v1.23.1
 [1.23.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.22.0...v1.23.0

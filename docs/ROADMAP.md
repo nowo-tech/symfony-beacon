@@ -428,6 +428,7 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v1.23.0** | Kit polish + first-run gate (`6.56`): hot-reload-bundle 1.3.2; PWA `install_links` vendor-only; AuthKit gated until setup (`056` FR-014); PhoneInput theme bridge; BP-004 / ENGINEERING-AUDIT close |
 | **v1.23.1** | Pin refresh + Composer DX: hot-reload **1.4.0** (`nowo:hot-reload:check`); FormKit **2.4.1**; password-strength **2.2.0**; password-toggle **2.1.1**; Mercure **0.5.0**; Symfony **8.1.4**; `make update-deps` runs helper `--run` |
 | **v1.23.2** | CI Quality: drop removed Rector `SymfonySetList::SYMFONY_81`; keep Symfony code-quality sets only (`091`) |
+| **v1.23.3** | Kit pin refresh + prod hardening (`when@prod` HttpLog/Maintenance/SiteBackup/Dashboard Menu; `/admin` → `ROLE_ADMIN`); E2E Messenger `?dbindex=` + Compose `env_file: !override` (`104`) |
 | **Next** | Later Phase 6+ (SSO/SAML, WebAuthn, QR SMS OTP, Hotwire Native `008`, …) when specified |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
@@ -439,4 +440,4 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 1. Pull items from **Later** when prioritized.
 2. Mark rows **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-08-18 (Rector 2.6.2 Symfony set-constant drop in **v1.23.2**).
+Last updated: 2026-08-20 (kit pins + prod hardening + E2E Messenger DB isolation in **v1.23.3**).

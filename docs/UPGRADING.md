@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.23.2)](#unreleased-main-after-1232)
+- [Unreleased (main after 1.23.3)](#unreleased-main-after-1233)
+- [Upgrading from 1.23.2 to 1.23.3](#upgrading-from-1232-to-1233)
 - [Upgrading from 1.23.1 to 1.23.2](#upgrading-from-1231-to-1232)
 - [Upgrading from 1.23.0 to 1.23.1](#upgrading-from-1230-to-1231)
 - [Upgrading from 1.22.0 to 1.23.0](#upgrading-from-1220-to-1230)
@@ -89,9 +90,27 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.23.2)
+## Unreleased (main after 1.23.3)
 
 No operator steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) when entries appear.
+
+## Upgrading from 1.23.2 to 1.23.3
+
+Kit pin refresh + prod hardening + isolated E2E Messenger Redis DB fix. **No migrations.**
+
+1. Pull / checkout `v1.23.3`.
+
+2. `composer install` — pins include auth-kit **1.17.4**, beacon-bundle **1.7.7**, http-log **1.1.4**, maintenance-mode **1.5.6**, site-backup **1.13.6**, dashboard-menu **2.1.8**, and related `nowo-tech/*` patch bumps (see [CHANGELOG.md](CHANGELOG.md) `[1.23.3]`).
+
+3. **Production operators**
+   - SiteBackup **`setup.enabled: false`** under `when@prod` — the `/setup` wizard is off. Cold-start before `APP_ENV=prod`, or use CLI / `make ready`.
+   - HttpLog in prod no longer captures JSON response bodies (`response_body_by_type.json: false`); retention defaults to **14** days; export sync capped.
+   - MaintenanceMode **preview** is disabled in prod.
+   - Symfony access control: any path under **`/admin`** requires **`ROLE_ADMIN`** (catch-all in addition to the existing `/admin/(api/doc|_routing|http-log|maintenance)` rule).
+
+4. **Local E2E** (optional): regenerate `.env.e2e.local` so `MESSENGER_TRANSPORT_DSN` uses `?dbindex=` (Redis path is the stream name). Then `make up-e2e` / `make ready-e2e`. See [e2e/README.md](../e2e/README.md).
+
+See [CHANGELOG.md](CHANGELOG.md) `[1.23.3]`.
 
 ## Upgrading from 1.23.1 to 1.23.2
 
