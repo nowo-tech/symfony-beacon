@@ -134,7 +134,7 @@
 
         {# Consent modal only on public routes (skip_render_routes omits app/admin shells). #}
         {% if nowo_cookie_consent_should_render() %}
-            {{ render(path('nowo_cookie_consent.show')) }}
+            {{ nowo_cookie_consent_render() }}
         {% endif %}
     </body>
 </html>

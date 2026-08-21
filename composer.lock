@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0ff72acc1832339344a00d5a944778c8",
+    "content-hash": "cd511243feee2fc81ef9ae64ea14c1d4",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -2319,16 +2319,16 @@
         },
         {
             "name": "nowo-tech/cookie-consent-bundle",
-            "version": "v1.9.4",
+            "version": "v1.9.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/CookieConsentBundle.git",
-                "reference": "edc6ad9d4d13ea9b4e181d8d29f174fa6622d228"
+                "reference": "4103ad3c34098e0862efae3b9663719b3f238097"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/CookieConsentBundle/zipball/edc6ad9d4d13ea9b4e181d8d29f174fa6622d228",
-                "reference": "edc6ad9d4d13ea9b4e181d8d29f174fa6622d228",
+                "url": "https://api.github.com/repos/nowo-tech/CookieConsentBundle/zipball/4103ad3c34098e0862efae3b9663719b3f238097",
+                "reference": "4103ad3c34098e0862efae3b9663719b3f238097",
                 "shasum": ""
             },
             "require": {
@@ -2399,7 +2399,7 @@
                 "issues": "https://github.com/nowo-tech/CookieConsentBundle/issues",
                 "source": "https://github.com/nowo-tech/CookieConsentBundle"
             },
-            "time": "2026-08-20T08:07:34+00:00"
+            "time": "2026-08-21T16:46:21+00:00"
         },
         {
             "name": "nowo-tech/dashboard-menu-bundle",
