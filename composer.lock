@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "161bde303dd02d38729b4cb525980b38",
+    "content-hash": "0ff72acc1832339344a00d5a944778c8",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -3692,16 +3692,16 @@
         },
         {
             "name": "nowo-tech/site-backup-bundle",
-            "version": "v1.13.6",
+            "version": "v1.13.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/SiteBackupBundle.git",
-                "reference": "b3908973c4cd0de061fa09a0749d98a5a8224bda"
+                "reference": "3f5ff75354bcd6223cc6d37aea9b95390bac201e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/SiteBackupBundle/zipball/b3908973c4cd0de061fa09a0749d98a5a8224bda",
-                "reference": "b3908973c4cd0de061fa09a0749d98a5a8224bda",
+                "url": "https://api.github.com/repos/nowo-tech/SiteBackupBundle/zipball/3f5ff75354bcd6223cc6d37aea9b95390bac201e",
+                "reference": "3f5ff75354bcd6223cc6d37aea9b95390bac201e",
                 "shasum": ""
             },
             "require": {
@@ -3785,7 +3785,7 @@
                 "issues": "https://github.com/nowo-tech/SiteBackupBundle/issues",
                 "source": "https://github.com/nowo-tech/SiteBackupBundle"
             },
-            "time": "2026-08-20T12:45:02+00:00"
+            "time": "2026-08-21T16:37:58+00:00"
         },
         {
             "name": "nowo-tech/tag-input-bundle",
