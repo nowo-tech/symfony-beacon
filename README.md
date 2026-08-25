@@ -33,7 +33,7 @@ This application is **FrankenPHP worker mode friendly**.
 
 - Dashboard login with project-scoped memberships (`owner` / `admin` / `member` / `viewer`)
 - Password or **magic login** / **password reset** via AuthKit (`/login/magic`, `/reset-password`) — only when Administration → Mailer has a deliverable encrypted DSN; project **share links** for time-limited viewer access (project-wide or issue-scoped)
-- **First-user registration** via [`nowo-tech/auth-kit-bundle`](https://packagist.org/packages/nowo-tech/auth-kit-bundle) (`registration_mode: first_user_only`)
+- **First-user registration** via [`nowo-tech/auth-kit-bundle`](https://packagist.org/packages/nowo-tech/auth-kit-bundle) **1.20** (`registration_mode: first_user_only`) with optional **slide-to-confirm** consent ([`slide-to-confirm-bundle`](https://packagist.org/packages/nowo-tech/slide-to-confirm-bundle)) and **device intelligence** on AuthKit pages ([`device-intelligence-bundle`](https://packagist.org/packages/nowo-tech/device-intelligence-bundle) — Device ID is not a credential; new-browser email when Mailer is configured)
 - Login brute-force protection via [`nowo-tech/login-throttle-bundle`](https://packagist.org/packages/nowo-tech/login-throttle-bundle) (5 attempts / 15 minutes on AuthKit `main`)
 - **i18n** UI locales: `en`, `es`, `de`, `nl`, `fr`, `it`, `pt`; AuthKit dual URLs (bare for `DEFAULT_LOCALE`, prefixed for others — see [ADDING-LOCALES.md](docs/dev/ADDING-LOCALES.md)); remember me; password toggle + strength; password history/expiry via [`nowo-tech/password-policy-bundle`](https://packagist.org/packages/nowo-tech/password-policy-bundle)
 - Account enable/disable + online presence via [`nowo-tech/user-kit-bundle`](https://packagist.org/packages/nowo-tech/user-kit-bundle); audit timestamps/blame via [`nowo-tech/audit-kit-bundle`](https://packagist.org/packages/nowo-tech/audit-kit-bundle)
@@ -41,10 +41,10 @@ This application is **FrankenPHP worker mode friendly**.
 - **Administration → Mailer** (`/admin/mailer`): encrypted Symfony Mailer DSN + From; **Send sample email**; gates magic login — local catcher: `make mailpit` ([docs/ops/MAILPIT.md](docs/ops/MAILPIT.md))
 - **Administration → Mercure** (`/admin/mercure`): optional live member-issue toasts (hub + JWT); preference-filtered per user — see [docs/ops/MERCURE.md](docs/ops/MERCURE.md)
 - Declarative Doctrine migrations via [`nowo-tech/migrations-kit-bundle`](https://packagist.org/packages/nowo-tech/migrations-kit-bundle) (MDK + `migrations/FieldDictionary/`)
-- Account Display: theme, density, motion, font scale, contrast, sidebar, collapsed-panel prefs via [`nowo-tech/tag-input-bundle`](https://packagist.org/packages/nowo-tech/tag-input-bundle) (Tagify); **product tours** (Select all); **member alert matrix** (Mercure + Web Push events/scope/projects) + optional **browser Web Push** device opt-in; PWA install
+- Account Display: theme, density, motion, font scale, contrast, sidebar, collapsed-panel prefs via [`nowo-tech/tag-input-bundle`](https://packagist.org/packages/nowo-tech/tag-input-bundle) (Tagify); **product tours** (Select all); **member alert matrix** (Mercure + Web Push events/scope/projects) + optional **browser Web Push** device opt-in; PWA install; Account → Security **trusted browsers** (Device Intelligence, explicit grant)
 - Install seed layers + **SiteBackup** setup wizard (`/setup`; auto-redirect when catalogs/schema need bootstrap); ops panel `/_site_backup`; contextual **product tour** (driver.js) on first dashboard / project Issues / admin visit
 - Projects with rotatable / revocable **API keys** and Envelope-compatible **DSN** (human-friendly key names in Settings)
-- Project **Settings**: API keys, members, **governance** (retention / rate / daily quota), **notification destinations** (Slack / Discord / Teams / Telegram / email / HTTP; quiet hours + digests + thresholds), **health** (Messenger + delivery history), and danger zone (clear history, **transfer ownership**, delete)
+- Project **Settings**: API keys, members, **governance** (retention / rate / daily quota), **notification destinations** (Slack / Discord / Teams / Telegram / email / HTTP; quiet hours + digests + thresholds), **health** (Messenger + delivery history), and danger zone (clear history with slide-to-confirm, **transfer ownership**, delete)
 - Issue list with filters (level, status, environment, **release**, assignee, tag, URL, user), **priority**, similarity fingerprint, SQL-backed 24h / 7d / 30d windows, **FULLTEXT** search, **saved views**, **CSV/JSON export**, and a **DataTables** responsive table (server-side sort + page in the URL)
 - Issue detail: structured layout, collapsible panels, stack source context + copy path, breadcrumbs, request/tags/contexts, **Copy for AI** (`beacon-ai-export/v1` Markdown/JSON — [docs/product/AI-EXPORT.md](docs/product/AI-EXPORT.md)), **assignee**, **priority**, **comments**, **mark duplicate** (optional event merge), **resolve/reopen/ignore**, and **assignment & status history**
 - `POST /api/{project_id}/envelope/` ingest (`X-Beacon-Auth` / envelope `dsn`; query auth **deprecated**); per-project suspend + daily quota; secret always required
@@ -141,7 +141,7 @@ Modular Symfony (not full DDD). **Why this shape** and **Mermaid flows:** [docs/
 
 | Module | Responsibility |
 |--------|----------------|
-| `Identity` | Users (AuthKit login/register), account prefs, magic login, seed command |
+| `Identity` | Users (AuthKit login/register), account prefs, magic login, device observation, seed command |
 | `Project` | Projects, API keys, memberships (`viewer` + share links), Settings / danger zone / admin project ops |
 | `Ingest` | Envelope API + OTLP adapters + async pipeline |
 | `Issues` | Grouping, list/filter, FULLTEXT, assignee, status + history, event detail |

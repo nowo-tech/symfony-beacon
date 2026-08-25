@@ -241,7 +241,8 @@ Do **not** use `@!Nowo…` bang namespaces — kit TwigPathsPass does not regist
 
 | File | Why |
 |------|-----|
-| `layout.html.twig` | Guest shell + brand hero; vendor pages fill `auth_panel`. Loads AuthKit + password-toggle assets; cookie preferences bubble when enabled. |
+| `layout.html.twig` | Guest shell + brand hero; vendor pages fill `auth_panel`. Loads AuthKit + password-toggle + slide-to-confirm + device-intelligence assets; cookie preferences bubble when enabled. |
+| `_device_intelligence_assets.html.twig` | CSP nonce on the collect() boot script (vendor partial is un-nonced). |
 | `security/reset_request.html.twig` | Host `form/_fields.html.twig` + brand title pattern. |
 | `security/magic_login_confirm.html.twig` | Confirm flow in host auth panel. |
 | `security/qr_login_show.html.twig` | QR challenge UI + Stimulus controller hooks / i18n. |

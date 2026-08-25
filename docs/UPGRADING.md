@@ -92,7 +92,31 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Unreleased (main after 1.23.3)
 
-No operator steps yet. See `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) when entries appear.
+AuthKit **1.20.0** + SlideToConfirm **1.1.0** + Device Intelligence **1.1.0**. **Has a Doctrine migration.**
+
+1. Pull `main` / the next tag.
+
+2. `composer install` — pins `nowo-tech/auth-kit-bundle` **1.20.0**, `nowo-tech/slide-to-confirm-bundle` **1.1.0**, `nowo-tech/device-intelligence-bundle` **1.1.0**, `nowo-tech/otp-input-bundle` (password-reset code boxes).
+
+3. `php bin/console doctrine:migrations:migrate -n` — creates `device_intelligence_*` tables.
+
+4. `php bin/console assets:install` (or `make ready`) so `/bundles/nowoslidetoconfirm`, `/bundles/nowodeviceintelligence`, and `/bundles/nowootpinput` exist.
+
+5. Re-seed cookie inventory so `di_obs` appears in `/legal/cookies`: `make seed-platform` (or Setup → platform).
+
+6. **Behaviour**
+   - AuthKit registration (when it is actually shown) uses a **gate** slide for terms consent. After the first user exists, `/register` still redirects to login.
+   - Guest AuthKit pages call `POST /_device/collect` (public; origin CSRF). Privacy mode is **strict** (no canvas/webgl/audio/fonts).
+   - After password/magic/social/QR login from a **new** device cluster, AuthKit sets session flag `nowo_auth_kit.new_device` and sends `auth.magic.new_device_email_*` when instance Mailer is configured.
+   - QR **Approve** remains a normal button (`qr_login_approve: false`) so UC-AUTH-22 stays a click. `approve_require_trusted` stays false (no auto-trust).
+   - **Account → Security → Trusted browsers** (`/account/security/devices`) lists explicit Device Intelligence grants. Login never auto-trusts; operators must tap **Trust this browser**. Collect runs on that page (CSP nonce).
+   - Project Settings **clear history** uses a `danger` slide-to-confirm (UX only). Delete project / transfer ownership / anonymize stay type-to-confirm. API key rotate/revoke, config import, and magic-login confirm stay click submits so existing E2E keep working.
+   - Password-reset **code** completion (`/reset-password/complete`) uses `OtpType` when `otp_input.enabled` is true. Hidden field value is still a single string; server `hash_equals` / attempt limits are unchanged. Phone SMS OTP stays Later.
+   - Device Intelligence collect is excluded from SiteBackup setup redirect, HttpLog, MaintenanceMode 503, PWA runtime cache, and `ROLE_USER` catch-all.
+
+7. **Kit pin refresh (no extra migrations)** — `composer install` also pins FormKit **2.5.1**, SiteBackup **1.13.8**, Symfony **8.1.5** (components that shipped that patch), and the rest of the `nowo-tech/*` patch bumps in [CHANGELOG.md](CHANGELOG.md) Unreleased. Host YAML: drop `nowo_form_kit.type_map.search`; keep `setup.short_circuit_when_done: true`. PWA operators pick up `cache_version` **v6** after the next asset/SW deploy.
+
+Device ID is not a login factor. Keep LoginThrottle / CSRF / remember-me.
 
 ## Upgrading from 1.23.2 to 1.23.3
 

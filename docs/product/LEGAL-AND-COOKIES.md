@@ -95,6 +95,7 @@ make seed-platform
 | `Cookie_Consent_Key` | required | Anonymous audit key (bundle) |
 | `Cookie_Category_analytics` | required | Category choice flag (bundle; not a tracker) |
 | `Cookie_Category_preferences` | required | Category choice flag (bundle) |
+| `di_obs` | required | Device Intelligence observation pointer (HttpOnly; account security, not a credential) |
 
 YAML `cookie_inventory` remains a fallback until the DB inventory exists. Re-run `app:seed-platform` (or Setup → platform) after upgrading the cookie-consent bundle so legacy `CookieConsent` / `CookieConsentKey` names are renamed.
 

@@ -124,8 +124,8 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ACC-13 | Member alert matrix (Live / Push / scope / projects) | ✅ Covered | `account/member-alerts.spec.ts` |
 | UC-ACC-14 | Web Push subscribe / unsubscribe | ✅ Covered | `flows/use-cases-oos-closing.spec.ts` (unavailable shell without VAPID); live browser Push permission Out of scope |
 | UC-ACC-15 | Mercure realtime config endpoint | ✅ Covered | `account/use-cases-account-chrome.spec.ts` |
-| UC-ACC-16 | PWA manifest / SW / offline | ✅ Covered | `smoke/misc.spec.ts` |
-| UC-ACC-17 | Save profile (display name / phone / Slack user id) | ✅ Covered | `account/use-cases-account-mutations.spec.ts` (phone: kit country ISO + national number → E.164; `100`) |
+| UC-ACC-16 | PWA manifest / SW / offline | ✅ Covered | `smoke/misc.spec.ts` (reachability + manifest without `Set-Cookie`) |
+| UC-ACC-17 | Save profile display name | ✅ Covered | `account/use-cases-account-mutations.spec.ts` (display name); Slack user id via hooks happy-path profile linkage |
 | UC-ACC-18 | Change email with current-password confirm | ✅ Covered | `account/use-cases-account-mutations.spec.ts` (reject without current password) |
 | UC-ACC-19 | Change password from security | ✅ Covered | `account/use-cases-account-mutations.spec.ts` (wrong current + weak password rejected; no demo-password round-trip — strong policy blocks restoring `admin123`) |
 | UC-ACC-20 | Account index / preferences redirects | ✅ Covered | `admin/use-cases-legal-mutations.spec.ts` |
@@ -134,6 +134,8 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ACC-23 | Push subscribe/unsubscribe HTTP when VAPID set | ✅ Covered | `smoke/use-cases-remaining-oos.spec.ts` (FCM-shaped endpoint; skips without VAPID); browser Push permission still external |
 | UC-ACC-24 | Password expiry date shown on profile | ✅ Covered | `flows/use-cases-atomic-gaps.spec.ts` |
 | UC-ACC-25 | Linked social accounts panel on security | ✅ Covered | `flows/use-cases-atomic-gaps.spec.ts` |
+| UC-ACC-26 | Morphicons chrome (theme / content-width / sidebar / password) | ✅ Covered | `account/use-cases-morphicons-chrome.spec.ts` (`is-morph-ready` + SVG morph hosts) |
+| UC-ACC-27 | Profile PhoneInput (country + national → E.164) | ✅ Covered | `account/use-cases-account-mutations.spec.ts` (kit country ISO + national number; restore after save) |
 
 ---
 
@@ -179,7 +181,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-PROJ-14 | Mint / revoke read API token | ✅ Covered | `flows/mutations.spec.ts` |
 | UC-PROJ-15 | Member-alerts project override save | ✅ Covered | `account/member-alerts.spec.ts` |
 | UC-PROJ-16 | Config export / import (project) | ✅ Covered | `project/project-config.spec.ts` |
-| UC-PROJ-17 | Clear history (danger zone) | ✅ Covered | `flows/use-cases-destructive-safe.spec.ts` (ephemeral project) |
+| UC-PROJ-17 | Clear history (danger zone) | ✅ Covered | `flows/use-cases-destructive-safe.spec.ts` (ephemeral project; slide-to-confirm) |
 | UC-PROJ-18 | Transfer ownership | ✅ Covered | `flows/use-cases-destructive-safe.spec.ts` (ephemeral project + second member) |
 | UC-PROJ-19 | Delete project | ✅ Covered | `flows/use-cases-destructive-safe.spec.ts` (ephemeral project; type-to-confirm) |
 | UC-PROJ-20 | Notification help page | ✅ Covered | `project/project-settings-deep.spec.ts` |
@@ -373,6 +375,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-SETUP-04 | Setup progress / advance APIs | ✅ Covered | `smoke/use-cases-setup-warm.spec.ts` (GET progress + POST-only advance; durable_done may 302 `/setup/api/*` to home on warm installs — accepted) |
 | UC-SETUP-05 | Setup done page | ✅ Covered | `smoke/use-cases-setup-warm.spec.ts` (`/setup/done` on warm install) |
 | UC-SETUP-06 | Incomplete-setup banner on dashboard (admin) | ✅ Covered | `flows/use-cases-atomic-gaps.spec.ts` (instance-config import toggles `setup_completed`) |
+| UC-SETUP-07 | AuthKit gated until SiteBackup setup finishes (`/login`+`/register` → `/setup`) | ❌ Out of scope | Same incomplete-catalog fixture cost as UC-SETUP-02; covered by `tests/Unit/Setup/PlatformCatalogsSetupRedirectSubscriberTest.php` |
 
 ---
 
@@ -382,6 +385,8 @@ Membership roles: see [ROLES.md](ROLES.md).
 |----|----------|--------|-------|
 | UC-LATER-01 | Hotwire Native / UX Native client | ❌ Out of scope | Roadmap Later (`008-ux-native`) |
 | UC-LATER-02 | Self-Beacon dogfood client UI | ❌ Out of scope | Env/DSN ops; not operator UI |
+| UC-LATER-03 | Multi-event dogfood probe suite CLI (`make beacon-suite`) | ❌ Out of scope | Ops CLI; PHPUnit covers `BeaconDogfoodProbeSuite` |
+| UC-LATER-04 | FrankenPHP hot-reload (dev WDT / CSP) | ❌ Out of scope | Dev-only (`nowo-tech/hot-reload-bundle`) |
 
 ---
 
@@ -389,7 +394,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 **Definition complete:** every primary product route family and operator mutation above has a `UC-*` row (surface catalog ≈ 100% of application product surface).
 
-**Automation status (2026-08-16):** ~259 Covered / ~0 Partial / ~0 Gap / ~5 Out of scope (264 rows). Remaining Out of scope: empty-DB first user (AUTH-10), incomplete platform catalog fixture (SETUP-02), SiteBackup restore (OPS-14), roadmap Later (Native / dogfood UI). Browser Push *permission* prompt remains external. Cold `/setup` wizard + POST advance stay intentionally unexercised on seeded installs. Local Playwright uses `retries: 1` and hardened `gotoStable` (WSL `ERR_NETWORK_CHANGED` / `chrome-error`).
+**Automation status (2026-08-20):** ~261 Covered / ~0 Partial / ~0 Gap / ~8 Out of scope. Remaining Out of scope: empty-DB first user (AUTH-10), incomplete platform catalog fixture (SETUP-02 / SETUP-07), SiteBackup restore (OPS-14), roadmap Later (Native / dogfood UI / dogfood suite CLI / hot-reload). Browser Push *permission* prompt remains external. Cold `/setup` wizard + POST advance stay intentionally unexercised on seeded installs. Local Playwright uses `retries: 1` and hardened `gotoStable` (WSL `ERR_NETWORK_CHANGED` / `chrome-error`).
 
 **Closed Gap batches:**
 
@@ -406,6 +411,8 @@ Membership roles: see [ROLES.md](ROLES.md).
 11. ~~SETUP-04/05 + NOTIF-17~~ → Covered (`smoke/use-cases-setup-warm.spec.ts`, `notifications/use-cases-digest-flush.spec.ts`).
 12. ~~Atomic definition gaps AUTH-25/26, ACC-24/25, DASH-15, OPS-12/13, SETUP-06, ADM-38..42, PROJ-27~~ → Covered (`flows/use-cases-atomic-gaps.spec.ts`); OPS-14 remains Out of scope.
 13. ~~Security denials UC-SEC-01..12~~ → Covered (`security/access-denials.spec.ts`, `security/auth-gates.spec.ts`).
+14. ~~Morphicons + PhoneInput + PWA cookie-free manifest UC-ACC-26/27 (+ UC-ACC-16 assert)~~ → Covered (`account/use-cases-morphicons-chrome.spec.ts`, `account/use-cases-account-mutations.spec.ts`, `smoke/misc.spec.ts`).
+15. Document SETUP-07 / LATER-03 / LATER-04 as Out of scope (unit/CLI/dev owners).
 
 When adding a case: give it a **UC-*** ID here, set status, and name the spec file under `e2e/<domain>/`.
 

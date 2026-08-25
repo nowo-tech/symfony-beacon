@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **AuthKit 1.20.0** with optional kits: [`nowo-tech/slide-to-confirm-bundle`](https://packagist.org/packages/nowo-tech/slide-to-confirm-bundle) **1.1.0** (registration consent slider, profile `gate`; **clear history** in project Settings uses the `danger` profile), [`nowo-tech/device-intelligence-bundle`](https://packagist.org/packages/nowo-tech/device-intelligence-bundle) **1.1.0** (collect on AuthKit pages, new-device email, extra device-keyed rate limit on register/reset/magic, **Account → Security → Trusted browsers**), and [`nowo-tech/otp-input-bundle`](https://packagist.org/packages/nowo-tech/otp-input-bundle) on `/reset-password/complete` (`otp_input.enabled`, multi-box `OtpType`; server OTP checks unchanged). Device ID is **not** a credential; AuthKit never auto-trusts a device after login. QR approve stays a button (UC-AUTH-22). Cookie `di_obs` is inventoried as required account-security. Migration `Version20260824120000`. Phone SMS verification remains ROADMAP Later.
+
+### Changed
+
+- Guest AuthKit layout loads slide-to-confirm, device-intelligence, and OTP-input assets; device collect boot uses the CSP nonce (vendor inline script would be blocked).
+- **Composer pins** (`nowo-tech/*` patch + FormKit minor): audit-kit **1.1.15**, beacon-bundle **1.7.8**, breadcrumb-kit **2.1.7**, cookie-consent **1.9.6**, dashboard-menu **2.1.9**, doctrine-encrypt **2.3.12**, form-kit **2.5.1**, http-log **1.1.5**, login-throttle **3.1.4**, maintenance-mode **1.5.7**, migrations-kit **2.0.21**, password-policy **1.4.3**, password-strength **2.2.3**, password-toggle **2.1.4**, phone-input **1.3.3**, pwa **1.3.3**, routing-kit **1.4.4**, select-all-choice **1.5.4**, site-backup **1.13.8**, tag-input **1.1.3**, ui-kit **1.8.3**, user-kit **1.1.9**. Symfony **8.1.5** where that patch exists (console/form/framework/http-client/mailer/messenger/translation/uid/validator/yaml + browser-kit/css-selector/web-profiler). Dev: php-cs-fixer **3.95.22**, composer-update-helper **2.0.36**, hot-reload **1.4.2**, phpstan-frankenphp **1.1.3**, twig-inspector **1.1.4**, phpstan **2.2.9**.
+- **FormKit 2.5.1**: drop host `nowo_form_kit.type_map.search` (built-in since 2.4.0); project **clear history** uses `addSlideToConfirmField()` (`mapped: false` is the type default).
+- **Device collect while gated**: MaintenanceMode excludes `/_device`; PWA `deny_cache_patterns` includes `/_device` (`cache_version` **v6**). SiteBackup documents `setup.short_circuit_when_done: true` (1.13.7+ default — Beacon detectors must not re-open the wizard after done).
+
 ## [1.23.3] - 2026-08-20
 
 ### Changed
