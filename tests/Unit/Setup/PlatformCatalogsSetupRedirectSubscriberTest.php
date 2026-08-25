@@ -85,6 +85,10 @@ final class PlatformCatalogsSetupRedirectSubscriberTest extends TestCase
         $health = $this->event('/health/live', route: 'health_live');
         $subscriber->onKernelRequest($health);
         self::assertNull($health->getResponse());
+
+        $device = $this->event('/_device/collect');
+        $subscriber->onKernelRequest($device);
+        self::assertNull($device->getResponse());
     }
 
     public function testSkipsUnsafeMethodsAndExcludedRoutesOnOpenPaths(): void

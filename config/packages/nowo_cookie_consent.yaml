@@ -176,3 +176,15 @@ nowo_cookie_consent:
               es:
                   provider: Beacon (primera parte)
                   purpose: Almacena si la categoría de preferencias fue aceptada o rechazada (mecanismo de consentimiento).
+        - name: di_obs
+          duration: 1 hour
+          category: required
+          type: first_party
+          sort_order: 60
+          translations:
+              en:
+                  provider: Beacon (first-party)
+                  purpose: HttpOnly device-observation pointer used to recognise returning browsers for account security (abuse prevention). It is not a login credential.
+              es:
+                  provider: Beacon (primera parte)
+                  purpose: Puntero HttpOnly de observación de dispositivo para reconocer navegadores conocidos (seguridad de la cuenta). No es una credencial de acceso.

@@ -1,0 +1,11 @@
+# nowo-tech/otp-input-bundle — multi-box OTP FormType (single string value).
+# AuthKit password-reset complete: nowo_auth_kit.profiles.default.otp_input.
+# Phone SMS verification remains ROADMAP Later (Account → Profile status only).
+# Assets: otp-input.js via named package nowo_otp_input (AuthKit layout partial).
+# Form theme: @NowoOtpInputBundle/Form/otp_input_theme.html.twig (twig.yaml + AuthKit form_theme).
+# Host chrome: assets/styles/_otp_input.scss (app.scss) — kit digit boxes → Beacon .input tokens.
+nowo_otp_input:
+    length: 6
+    numeric_only: true
+    uppercase: true
+    form_theme: 'form_div_layout.html.twig'

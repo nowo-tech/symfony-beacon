@@ -197,6 +197,8 @@ auth:
 
 
       %link%'
+    new_device_email_subject: Nuovo browser su Beacon
+    new_device_email_body: 'Un nuovo browser ha effettuato l’accesso al tuo account Beacon (%email%). Se non sei stato tu, cambia la password in Account → Sicurezza.'
   reset:
     email_subject: Reimposta la password Beacon
     email_body: 'Usa questo link per scegliere una nuova password:
@@ -277,6 +279,10 @@ flash:
     password_saved: Password aggiornata.
     display_saved: Preferenze di visualizzazione salvate.
     locale_saved: Lingua aggiornata.
+    device_trusted: Questo browser è ora attendibile per il tuo account.
+    device_revoked: Browser attendibile rimosso.
+    device_missing: Beacon non ha ancora osservato questo browser. Resta un attimo su questa pagina, aggiorna e riprova.
+    device_unknown: Quel browser non è più noto. Non è stato modificato nulla.
     member_alerts_invalid: Impossibile salvare le preferenze di avviso. Controlla il modulo e riprova.
     member_alerts_project_saved: Preferenze di avviso del progetto salvate.
   users:
@@ -478,6 +484,9 @@ project:
     clear_body: Questa operazione eliminerà definitivamente problemi, eventi, dati sulle prestazioni e
       analisi per questo progetto. Le chiavi e i membri API vengono conservati.
     clear_confirm: Sì, cancella la cronologia
+    clear_slide: Scorri per cancellare la cronologia
+    clear_slid: La cronologia verrà cancellata
+    clear_slide_hint: Completa lo scorrimento per eliminare definitivamente issue, eventi e dati di performance.
     delete_open: Elimina progetto...
     delete_title: Eliminare questo progetto in modo permanente?
     delete_body: Ciò elimina permanentemente "%name%" e tutti i suoi dati (problemi, eventi, prestazioni,
@@ -1066,6 +1075,7 @@ preferences:
     password: Cambia password
     password_history: Cronologia modifiche
     security_activity: Attività
+    devices: Browser attendibili
     area_label: Sezioni dell’account
     display: Display
     appearance: Aspetto
@@ -1156,6 +1166,15 @@ preferences:
     activity_title: Attività di sicurezza
     activity_intro: Eventi recenti di reset password e magic login per il tuo account.
     activity_empty: Nessun evento di sicurezza registrato.
+    devices_title: Browser attendibili
+    devices_intro: Ricorda questo browser per futuri controlli aggiuntivi. Un Device ID non è una password, una sessione o un fattore MFA — la fiducia registra solo una concessione esplicita.
+    devices_current: Questo browser
+    devices_observe: Beacon non ha ancora riconosciuto questo browser. Tieni aperta questa pagina un attimo (osserva il cluster), poi aggiorna.
+    devices_already_trusted: Questo browser è già attendibile.
+    devices_trust: Considera attendibile questo browser
+    devices_empty: Nessun browser attendibile.
+    devices_this_browser: Questo browser
+    devices_revoke: Rimuovi
   display:
     title: Display
     intro: Scegli lingua, tema, densità, dimensione testo, contrasto, barra laterale,
@@ -1938,14 +1957,15 @@ setup:
     email: Email
     password: Password
   token:
-    title: Ehi — senza la chiave di setup non si passa
-    lead: Niente di rotto. Il setup è bloccato così nessuno configura l'istanza a
-      caso.
-    body: Apri %path% con il SITE_SETUP_TOKEN del tuo ambiente.
-    step_env: Cerca SITE_SETUP_TOKEN nel tuo .env (genera un valore casuale se
-      vuoto — vedi docs/INSTALL.md).
-    step_url: Apri %path% nel browser — sostituisci … con quel token.
-    step_header: Oppure invia l'header X-Setup-Token con lo stesso valore.
+    title: Apri l'assistente di setup
+    lead: Il setup è chiuso di proposito. Incolla il valore di SITE_SETUP_TOKEN per continuare.
+    field_label: Token di setup
+    field_placeholder: SITE_SETUP_TOKEN
+    submit: Continua
+    howto: Come ottenere il token
+    step_env: Copialo da SITE_SETUP_TOKEN nel tuo .env.local (genera un valore casuale se vuoto).
+    step_url: Puoi anche aprire %path% sostituendo … con il token.
+    step_header: Negli script, invia l'header X-Setup-Token con lo stesso valore.
   reason:
     heading: Il setup e richiesto
     db_connection: Il database non e raggiungibile con l'attuale DATABASE_URL (manca,

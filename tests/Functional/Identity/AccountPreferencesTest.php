@@ -433,6 +433,7 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
         self::assertSelectorTextContains('[data-testid="account-area-nav"]', 'Display');
         self::assertSelectorExists('[data-testid="linked-social-accounts"]');
         self::assertSelectorTextContains('.preferences-nav', 'Activity');
+        self::assertSelectorTextContains('.preferences-nav', 'Trusted browsers');
 
         $client->request(Request::METHOD_GET, '/account/display');
         self::assertResponseIsSuccessful();

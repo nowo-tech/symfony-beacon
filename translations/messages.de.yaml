@@ -200,6 +200,8 @@ auth:
 
 
       %link%'
+    new_device_email_subject: Neue Browser-Anmeldung bei Beacon
+    new_device_email_body: 'Ein neuer Browser hat sich bei Ihrem Beacon-Konto angemeldet (%email%). Falls das nicht Sie waren, ändern Sie das Passwort unter Konto → Sicherheit.'
   reset:
     email_subject: Setzen Sie Ihr Beacon-Passwort zurück
     email_body: 'Verwenden Sie diesen Link, um ein neues Passwort zu wählen:
@@ -281,6 +283,10 @@ flash:
     password_saved: Passwort aktualisiert.
     display_saved: Anzeigeeinstellungen gespeichert.
     locale_saved: Sprache aktualisiert.
+    device_trusted: Dieser Browser ist jetzt für Ihr Konto vertrauenswürdig.
+    device_revoked: Vertrauenswürdiger Browser entfernt.
+    device_missing: Beacon hat diesen Browser noch nicht beobachtet. Bleiben Sie kurz auf dieser Seite, laden Sie neu und versuchen Sie es erneut.
+    device_unknown: Dieser Browser ist nicht mehr bekannt. Es wurde nichts geändert.
     member_alerts_invalid: Alert-Einstellungen konnten nicht gespeichert werden. Formular prüfen und erneut versuchen.
     member_alerts_project_saved: Projekt-Alert-Einstellungen gespeichert.
   users:
@@ -488,6 +494,9 @@ project:
     clear_body: Dadurch werden Probleme, Ereignisse, Leistungsdaten und Analysen für dieses Projekt dauerhaft
       gelöscht. API-Schlüssel und Mitglieder bleiben erhalten.
     clear_confirm: Ja, Verlauf löschen
+    clear_slide: Schieben, um den Verlauf zu löschen
+    clear_slid: Verlauf wird gelöscht
+    clear_slide_hint: Schließen Sie die Geste ab, um Issues, Events und Performance-Daten dauerhaft zu löschen.
     delete_open: Projekt löschen…
     delete_title: Dieses Projekt endgültig löschen?
     delete_body: Dadurch werden „%name%“ und alle seine Daten (Probleme, Ereignisse, Leistung, Analysen,
@@ -1078,6 +1087,7 @@ preferences:
     password: Passwort ändern
     password_history: Änderungshistorie
     security_activity: Aktivität
+    devices: Vertrauenswürdige Browser
     area_label: Kontenbereiche
     display: Anzeige
     appearance: Darstellung
@@ -1169,6 +1179,15 @@ preferences:
     activity_title: Sicherheitsaktivität
     activity_intro: Aktuelle Passwort-Reset- und Magic-Login-Ereignisse für Ihr Konto.
     activity_empty: Noch keine Sicherheitsereignisse erfasst.
+    devices_title: Vertrauenswürdige Browser
+    devices_intro: Merken Sie diesen Browser für spätere Step-up-Prüfungen. Eine Device-ID ist kein Passwort, keine Sitzung und kein MFA-Faktor — Vertrauen speichert nur eine explizite Freigabe.
+    devices_current: Dieser Browser
+    devices_observe: Beacon hat diesen Browser noch nicht erkannt. Lassen Sie diese Seite kurz offen (sie beobachtet den Cluster) und laden Sie neu.
+    devices_already_trusted: Dieser Browser ist bereits vertrauenswürdig.
+    devices_trust: Diesem Browser vertrauen
+    devices_empty: Noch keine vertrauenswürdigen Browser.
+    devices_this_browser: Dieser Browser
+    devices_revoke: Entfernen
   display:
     title: Anzeige
     intro: Wählen Sie Sprache, Theme, Dichte, Textgröße, Kontrast, Seitenleiste, Bewegung
@@ -1954,14 +1973,15 @@ setup:
     email: E-Mail
     password: Passwort
   token:
-    title: Hey — ohne Setup-Schlüssel geht es nicht weiter
-    lead: Alles in Ordnung. Setup ist gesperrt, damit Fremde die Instanz nicht konfigurieren
-      können.
-    body: Öffnen Sie %path% mit dem SITE_SETUP_TOKEN aus Ihrer Umgebung.
-    step_env: Finden Sie SITE_SETUP_TOKEN in Ihrer .env (bei leerem Wert zufällig
-      erzeugen — siehe docs/INSTALL.md).
-    step_url: Öffnen Sie %path% im Browser — ersetzen Sie … durch diesen Token.
-    step_header: Oder senden Sie den Header X-Setup-Token mit demselben Wert.
+    title: Öffnen Sie den Setup-Assistenten
+    lead: Setup ist absichtlich gesperrt. Fügen Sie den Wert von SITE_SETUP_TOKEN ein, um fortzufahren.
+    field_label: Setup-Token
+    field_placeholder: SITE_SETUP_TOKEN
+    submit: Weiter
+    howto: So erhalten Sie den Token
+    step_env: Kopieren Sie SITE_SETUP_TOKEN aus Ihrer .env.local (bei leerem Wert zufällig erzeugen).
+    step_url: Sie können auch %path% öffnen und … durch den Token ersetzen.
+    step_header: In Skripten senden Sie den Header X-Setup-Token mit demselben Wert.
   reason:
     heading: Setup ist erforderlich
     db_connection: Die Datenbank ist mit der aktuellen DATABASE_URL nicht erreichbar

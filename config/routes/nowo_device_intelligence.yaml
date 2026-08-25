@@ -1,0 +1,3 @@
+# Device Intelligence collect endpoint (#[Route] on CollectController)
+nowo_device_intelligence:
+    resource: '@NowoDeviceIntelligenceBundle/Resources/config/routes.php'

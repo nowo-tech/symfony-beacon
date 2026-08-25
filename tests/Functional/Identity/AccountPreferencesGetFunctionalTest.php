@@ -53,6 +53,14 @@ final class AccountPreferencesGetFunctionalTest extends DatabaseWebTestCase
         self::assertSelectorExists('[data-testid="security-activity"]');
         self::assertSelectorTextContains('[data-testid="security-activity"]', 'No security events recorded yet');
 
+        $client->request(Request::METHOD_GET, '/account/security/devices');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('[data-testid="trusted-devices"]');
+        self::assertSelectorExists('[data-testid="trusted-devices-current"]');
+        self::assertSelectorTextContains('[data-testid="trusted-devices-current"]', 'has not recognized');
+        self::assertSelectorExists('[data-testid="trusted-devices-empty"]');
+        self::assertSelectorTextContains('.preferences-nav', 'Trusted browsers');
+
         $client->request(Request::METHOD_GET, '/account/display/tours');
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('form[name="user_preferences"]');
@@ -65,5 +73,8 @@ final class AccountPreferencesGetFunctionalTest extends DatabaseWebTestCase
         $client->request(Request::METHOD_GET, '/account/profile');
         self::assertTrue($client->getResponse()->isRedirection());
         self::assertMatchesRegularExpression('#/(en/)?login$#', (string) $client->getResponse()->headers->get('Location'));
+
+        $client->request(Request::METHOD_GET, '/account/security/devices');
+        self::assertTrue($client->getResponse()->isRedirection());
     }
 }

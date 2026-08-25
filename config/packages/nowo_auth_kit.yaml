@@ -51,6 +51,33 @@ nowo_auth_kit:
                 - email
                 - displayName
                 - password
+                - name: terms
+                  type: checkbox
+                  required: true
+                  slide_to_confirm: true
+
+            # AuthKit 1.18 — optional nowo-tech/slide-to-confirm-bundle (UX only; CSRF/authz stay on the form).
+            slide_to_confirm:
+                enabled: true
+                registration_consent: gate
+                # Keep the QR Approve button: UC-AUTH-22 E2E clicks submit. Enable `danger` when that spec is updated.
+                qr_login_approve: false
+
+            # AuthKit 1.19 — optional nowo-tech/device-intelligence-bundle (Device ID is not a credential).
+            device_intelligence:
+                enabled: true
+                collect_on_auth_pages: true
+                collect_endpoint: /_device/collect
+                new_device_notify: true
+                device_rate_limit: true
+                qr_login:
+                    # Requires an explicit trust grant; AuthKit never auto-trusts after login.
+                    approve_require_trusted: false
+
+            # AuthKit 1.20 — nowo-tech/otp-input-bundle on /reset-password/complete (UX only).
+            otp_input:
+                enabled: true
+                password_reset_code: true
 
             # Persistent login cookie (Symfony firewall remember_me).
             remember_me:
@@ -76,6 +103,9 @@ nowo_auth_kit:
                 token_ttl: 3600
                 token_field: passwordResetToken
                 token_expires_field: passwordResetExpiresAt
+                # Drives OtpType length / numeric_only when otp_input is enabled.
+                code_length: 6
+                code_charset: numeric
 
             magic_login:
                 # disabled | enabled (request form + Symfony login_link check route)
@@ -127,6 +157,7 @@ nowo_auth_kit:
             templates:
                 layout: '@NowoAuthKitBundle/layout.html.twig'
                 form_theme:
+                    - '@NowoOtpInputBundle/Form/otp_input_theme.html.twig'
                     - form/password_strength_beacon_theme.html.twig
                     - form/auth_kit_theme.html.twig
                 login: '@NowoAuthKitBundle/security/login.html.twig'

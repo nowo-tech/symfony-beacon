@@ -12,6 +12,8 @@ return [
     Nowo\TwigInspectorBundle\NowoTwigInspectorBundle::class => ['dev' => true, 'test' => true],
     Nowo\HotReloadBundle\NowoHotReloadBundle::class => ['dev' => true, 'test' => true],
     Nowo\AuthKitBundle\NowoAuthKitBundle::class => ['all' => true],
+    Nowo\SlideToConfirmBundle\NowoSlideToConfirmBundle::class => ['all' => true],
+    Nowo\DeviceIntelligenceBundle\NowoDeviceIntelligenceBundle::class => ['all' => true],
     Nowo\PasswordStrengthBundle\PasswordStrengthBundle::class => ['all' => true],
     Nowo\PasswordToggleBundle\NowoPasswordToggleBundle::class => ['all' => true],
     Symfony\UX\Icons\UXIconsBundle::class => ['all' => true],
@@ -41,4 +43,5 @@ return [
     Nowo\RoutingKitBundle\NowoRoutingKitBundle::class => ['all' => true],
     Nowo\MaintenanceModeBundle\NowoMaintenanceModeBundle::class => ['all' => true],
     Nowo\PhoneInputBundle\NowoPhoneInputBundle::class => ['all' => true],
+    Nowo\OtpInputBundle\NowoOtpInputBundle::class => ['all' => true],
 ];

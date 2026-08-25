@@ -7,6 +7,7 @@ services:
 
     Nowo\AuthKitBundle\MagicLogin\MagicLoginNotifierInterface: '@App\Identity\AuthKit\AuthKitMagicLoginMailNotifier'
     Nowo\AuthKitBundle\PasswordReset\PasswordResetNotifierInterface: '@App\Identity\AuthKit\AuthKitPasswordResetMailNotifier'
+    Nowo\AuthKitBundle\DeviceIntelligence\NewDeviceLoginNotifierInterface: '@App\Identity\AuthKit\AuthKitNewDeviceLoginMailNotifier'
 
     Nowo\AuthKitBundle\MagicLogin\MagicLoginRequestHandler:
         arguments:

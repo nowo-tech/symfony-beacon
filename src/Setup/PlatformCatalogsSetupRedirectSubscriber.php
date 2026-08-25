@@ -110,6 +110,7 @@ final readonly class PlatformCatalogsSetupRedirectSubscriber implements EventSub
             '/admin/_routing',
             '/_error',
             '/health/',
+            '/_device',
         ];
         foreach ($prefixes as $prefix) {
             if ($path === rtrim($prefix, '/') || str_starts_with($path, $prefix)) {

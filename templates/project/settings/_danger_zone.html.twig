@@ -19,12 +19,14 @@
                         <h2 id="project-clear-history-title" class="confirm-dialog__title">{{ 'project.danger.clear_title'|trans }}</h2>
                         <p class="confirm-dialog__body">{{ 'project.danger.clear_body'|trans }}</p>
                     </div>
-                    <div class="confirm-dialog__content"></div>
+                    <div class="confirm-dialog__content">
+                        {{ form_row(clearHistoryForm.confirm) }}
+                        {% include 'form/_fields.html.twig' with {form: clearHistoryForm} only %}
+                    </div>
                     <div class="confirm-dialog__actions">
                         <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'project.danger.cancel'|trans }}</button>
-                        <button type="submit" class="btn-danger">{{ 'project.danger.clear_confirm'|trans }}</button>
                     </div>
-                {{ form_end(clearHistoryForm) }}
+                {{ form_end(clearHistoryForm, {render_rest: false}) }}
             {% endblock %}
         {% endembed %}
         {% endif %}

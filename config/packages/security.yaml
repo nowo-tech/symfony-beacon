@@ -87,6 +87,9 @@ security:
       roles: PUBLIC_ACCESS
     - path: ^/health/(live|ready)$
       roles: PUBLIC_ACCESS
+    # Device Intelligence collect (guest AuthKit pages call this before login).
+    - path: ^/_device/
+      roles: PUBLIC_ACCESS
     - path: ^/metrics$
       roles: PUBLIC_ACCESS
     # Assign OpenUri needs a Beacon session; must stay before the public hooks rule.

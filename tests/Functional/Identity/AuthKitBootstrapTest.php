@@ -93,6 +93,7 @@ final class AuthKitBootstrapTest extends DatabaseWebTestCase
                 'displayName' => 'Admin',
                 'password' => 'Secret123!',
                 'password_confirm' => 'Secret123!',
+                'terms' => '1',
                 '_token' => $values['registration_form']['_token'] ?? null,
             ],
         ];

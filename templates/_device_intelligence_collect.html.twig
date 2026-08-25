@@ -1,0 +1,13 @@
+{# Collect on authenticated pages that need DeviceContext (Account → Security → Devices). CSP nonce required. #}
+<script src="{{ asset('js/device-intelligence.min.js', 'nowo_device_intelligence') }}" defer></script>
+<script{% if csp_nonce() %} nonce="{{ csp_nonce() }}"{% endif %}>
+document.addEventListener('DOMContentLoaded', function () {
+    if (typeof DeviceIntelligence !== 'function') {
+        return;
+    }
+    new DeviceIntelligence({
+        endpoint: '/_device/collect',
+        timeout: 8000
+    }).collect();
+});
+</script>

@@ -1,4 +1,4 @@
-{# Security area: Change password | Change history | Activity #}
+{# Security area: Change password | Change history | Activity | Trusted browsers #}
 {% set route = app.request.attributes.get('_route') %}
 {% include 'shared/_tabs.html.twig' with {
     aria_label: 'preferences.security.tabs_label'|trans,
@@ -18,6 +18,11 @@
             label: 'preferences.nav.security_activity'|trans,
             href: path('account_security_activity'),
             current: route == 'account_security_activity',
+        },
+        {
+            label: 'preferences.nav.devices'|trans,
+            href: path('account_security_devices'),
+            current: route == 'account_security_devices',
         },
     ],
 } only %}

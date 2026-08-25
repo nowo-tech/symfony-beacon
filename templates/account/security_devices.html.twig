@@ -1,0 +1,81 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'preferences.security.devices_title'|trans }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% include '_device_intelligence_collect.html.twig' %}
+{% endblock %}
+
+{% block body %}
+<div class="mx-auto space-y-6">
+    <div>
+        <h1 class="mb-2 font-[family-name:var(--font-display)] text-2xl font-semibold">{{ 'preferences.security.title'|trans }}</h1>
+        <p class="text-xs text-[var(--color-ink)]/55">{{ 'preferences.security.intro'|trans }}</p>
+    </div>
+
+    {% include 'account/_area_nav.html.twig' %}
+    {% include 'account/_security_tabs.html.twig' %}
+
+    <section class="panel space-y-4" data-testid="trusted-devices" aria-labelledby="trusted-devices-heading">
+        <div>
+            <h2 id="trusted-devices-heading" class="text-lg font-semibold">{{ 'preferences.security.devices_title'|trans }}</h2>
+            <p class="mt-1 text-sm text-[var(--color-ink)]/65">{{ 'preferences.security.devices_intro'|trans }}</p>
+        </div>
+
+        <div class="rounded-md border border-[var(--color-sand)] p-3" data-testid="trusted-devices-current">
+            <h3 class="text-sm font-semibold">{{ 'preferences.security.devices_current'|trans }}</h3>
+            {% if not has_current_device %}
+                <p class="mt-2 text-sm text-[var(--color-ink)]/60">{{ 'preferences.security.devices_observe'|trans }}</p>
+            {% else %}
+                <p class="mt-2 text-sm">
+                    <span class="font-medium">{{ current_label }}</span>
+                    <span class="ml-2 text-xs text-[var(--color-ink)]/50">{{ current_id }}</span>
+                </p>
+                {% if current_trusted %}
+                    <p class="mt-2 text-sm text-[var(--color-moss)]" data-testid="trusted-devices-current-trusted">{{ 'preferences.security.devices_already_trusted'|trans }}</p>
+                {% else %}
+                    {% include 'form/_csrf_action.html.twig' with {
+                        form: trustForm,
+                        action: path('account_security_devices_trust'),
+                        submit_label: 'preferences.security.devices_trust'|trans,
+                        submit_class: 'btn-primary mt-3',
+                        form_attr: {'data-testid': 'trusted-devices-trust-form'},
+                        button_attr: {'data-testid': 'trusted-devices-trust'},
+                    } only %}
+                {% endif %}
+            {% endif %}
+        </div>
+
+        {% if devices is empty %}
+            <p class="text-sm text-[var(--color-ink)]/55" data-testid="trusted-devices-empty">{{ 'preferences.security.devices_empty'|trans }}</p>
+        {% else %}
+            <ul class="space-y-2">
+                {% for row in devices %}
+                    <li class="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--color-sand)] py-2 last:border-0" data-testid="trusted-device-row">
+                        <div>
+                            <p class="text-sm font-medium">
+                                {{ row.label }}
+                                {% if row.current %}
+                                    <span class="ml-1 text-xs font-normal text-[var(--color-moss)]">{{ 'preferences.security.devices_this_browser'|trans }}</span>
+                                {% endif %}
+                            </p>
+                            <p class="text-xs text-[var(--color-ink)]/50">{{ row.trustedAt|date('Y-m-d H:i') }}</p>
+                        </div>
+                        {% if revokeForms[row.deviceId] is defined %}
+                            {% include 'form/_csrf_action.html.twig' with {
+                                form: revokeForms[row.deviceId],
+                                action: path('account_security_devices_revoke', {deviceId: row.deviceId}),
+                                submit_label: 'preferences.security.devices_revoke'|trans,
+                                submit_class: 'btn-ghost btn-sm',
+                                form_attr: {'data-testid': 'trusted-devices-revoke-form'},
+                                button_attr: {'data-testid': 'trusted-devices-revoke'},
+                            } only %}
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

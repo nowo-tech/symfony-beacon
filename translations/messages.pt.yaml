@@ -197,6 +197,8 @@ auth:
 
 
       %link%'
+    new_device_email_subject: Novo browser iniciado no Beacon
+    new_device_email_body: 'Um novo browser iniciou sessão na sua conta Beacon (%email%). Se não foi você, altere a palavra-passe em Conta → Segurança.'
   reset:
     email_subject: Redefina a sua palavra-passe Beacon
     email_body: 'Utilize esta ligação para escolher uma nova palavra-passe:
@@ -275,6 +277,10 @@ flash:
     password_saved: Senha atualizada.
     display_saved: Preferências de exibição salvas.
     locale_saved: Idioma atualizado.
+    device_trusted: Este browser está agora fidedigno para a sua conta.
+    device_revoked: Browser fidedigno removido.
+    device_missing: O Beacon ainda não observou este browser. Fique nesta página um momento, atualize e tente de novo.
+    device_unknown: Esse browser já não é conhecido. Nada foi alterado.
     member_alerts_invalid: Não foi possível guardar as preferências de alerta. Verifique o formulário e tente novamente.
     member_alerts_project_saved: Preferências de alerta do projeto guardadas.
   users:
@@ -474,6 +480,9 @@ project:
     clear_body: Isso exclui permanentemente problemas, eventos, dados de desempenho e análises deste projeto.
       As chaves e os membros da API são mantidos.
     clear_confirm: Sim, limpar histórico
+    clear_slide: Deslize para limpar o histórico
+    clear_slid: O histórico será limpo
+    clear_slide_hint: Conclua o deslize para apagar definitivamente issues, eventos e dados de desempenho.
     delete_open: Excluir projeto…
     delete_title: Excluir este projeto permanentemente?
     delete_body: Isso exclui permanentemente “%name%” e todos os seus dados (problemas, eventos, desempenho,
@@ -1056,6 +1065,7 @@ preferences:
     password: Alterar palavra-passe
     password_history: Histórico de alterações
     security_activity: Atividade
+    devices: Browsers fidedignos
     area_label: Secções da conta
     display: Mostrar
     appearance: Aparência
@@ -1146,6 +1156,15 @@ preferences:
     activity_intro: Eventos recentes de reposição de palavra-passe e magic login da
       sua conta.
     activity_empty: Ainda sem eventos de segurança registados.
+    devices_title: Browsers fidedignos
+    devices_intro: Lembre este browser para controlos adicionais futuros. Um Device ID não é palavra-passe, sessão nem fator MFA — confiar apenas regista uma concessão explícita.
+    devices_current: Este browser
+    devices_observe: O Beacon ainda não reconheceu este browser. Mantenha esta página aberta um momento (observa o cluster) e atualize.
+    devices_already_trusted: Este browser já é fidedigno.
+    devices_trust: Confiar neste browser
+    devices_empty: Ainda sem browsers fidedignos.
+    devices_this_browser: Este browser
+    devices_revoke: Remover
   display:
     title: Mostrar
     intro: Escolha idioma, tema, densidade, tamanho do texto, contraste, barra lateral,
@@ -1921,14 +1940,15 @@ setup:
     email: Email
     password: Palavra-passe
   token:
-    title: Ei — sem a chave de setup não passas
-    lead: Está tudo bem. O setup está fechado para ninguém configurar a instância
-      ao acaso.
-    body: Abre %path% com o SITE_SETUP_TOKEN do teu ambiente.
-    step_env: Procura SITE_SETUP_TOKEN no teu .env (gera um valor aleatório se
-      estiver vazio — ver docs/INSTALL.md).
-    step_url: Abre %path% no browser — substitui … por esse token.
-    step_header: Ou envia o cabeçalho X-Setup-Token com o mesmo valor.
+    title: Abre o assistente de setup
+    lead: O setup está fechado de propósito. Cola o valor de SITE_SETUP_TOKEN para continuar.
+    field_label: Token de setup
+    field_placeholder: SITE_SETUP_TOKEN
+    submit: Continuar
+    howto: Como obter o token
+    step_env: Copia SITE_SETUP_TOKEN do teu .env.local (gera um valor aleatório se estiver vazio).
+    step_url: Também podes abrir %path% substituindo … pelo token.
+    step_header: Em scripts, envia o cabeçalho X-Setup-Token com o mesmo valor.
   reason:
     heading: O setup e obrigatorio
     db_connection: A base de dados nao esta acessivel com o DATABASE_URL atual (em

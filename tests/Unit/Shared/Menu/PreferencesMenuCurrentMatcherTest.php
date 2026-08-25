@@ -26,4 +26,20 @@ final class PreferencesMenuCurrentMatcherTest extends TestCase
         self::assertFalse($matcher->isCurrent($security, $request, '/account/security'));
         self::assertTrue($matcher->isCurrent($display, $request, '/account/display'));
     }
+
+    public function testMarksSecurityCurrentForDevicesSubRoute(): void
+    {
+        $matcher = new PreferencesMenuCurrentMatcher();
+
+        $security = new MenuItem();
+        $security->setRouteName('account_security');
+        $display = new MenuItem();
+        $display->setRouteName('account_display');
+
+        $request = Request::create('/account/security/devices');
+        $request->attributes->set('_route', 'account_security_devices');
+
+        self::assertTrue($matcher->isCurrent($security, $request, '/account/security'));
+        self::assertFalse($matcher->isCurrent($display, $request, '/account/display'));
+    }
 }

@@ -136,6 +136,42 @@
     </div>
 {%- endblock checkbox_row -%}
 
+{# SlideToConfirmType extends CheckboxType: checkbox_row adds .checkbox and breaks the hidden input + track layout. #}
+{%- block nowo_slide_to_confirm_row -%}
+    <div class="{{ row_attr.class|default('flex flex-col gap-2') }}">
+        {{- form_label(form) -}}
+        {{- form_widget(form) -}}
+        {{- form_errors(form) -}}
+    </div>
+{%- endblock nowo_slide_to_confirm_row -%}
+
+{%- block nowo_swipe_to_submit_row -%}
+    {{- block('nowo_slide_to_confirm_row') -}}
+{%- endblock nowo_swipe_to_submit_row -%}
+
+{%- block nowo_slide_to_confirm_widget -%}
+    {% set widget_attributes %}
+ id="{{ id }}" name="{{ full_name }}"
+ {%- if disabled %} disabled="disabled"{% endif -%}
+ {%- if required %} required="required"{% endif -%}
+ {%- for attrname, attrvalue in attr -%}
+     {%- if attrname != 'class' -%}
+     {{- ' ' -}}
+     {%- if attrvalue is same as(true) -%}
+         {{- attrname -}}="{{ attrname }}"
+     {%- elseif attrvalue is not same as(false) -%}
+         {{- attrname }}="{{ attrvalue }}"
+     {%- endif -%}
+     {%- endif -%}
+ {%- endfor -%}
+    {% endset %}
+    {{ include('@NowoSlideToConfirmBundle/Form/_slide_to_confirm_widget.html.twig', {widget_attributes: widget_attributes}) }}
+{%- endblock nowo_slide_to_confirm_widget -%}
+
+{%- block nowo_swipe_to_submit_widget -%}
+    {{- block('nowo_slide_to_confirm_widget') -}}
+{%- endblock nowo_swipe_to_submit_widget -%}
+
 {%- block checkbox_widget -%}
     {%- if 'pref-switch__input' in (attr.class|default('')) -%}
         {%- set attr = attr|merge({class: attr.class|default('')|trim}) -%}

@@ -62,6 +62,7 @@ nowo_site_backup:
             - /cookie-consent/
             - /admin/_routing
             - /_error
+            - /_device
         patterns:
             - '#^/(en|es|de|nl|fr|it|pt)/(legal|setup)(/|$|\?)#'
             - '#^/(manifest\.webmanifest|sw\.js|offline)$#'
@@ -84,6 +85,9 @@ nowo_site_backup:
         # Existing installs without setup.done stay usable; empty schema / setup.required still gate.
         # Fresh clones that must block the app until wizard finishes: set true.
         require_done_marker: false
+        # SiteBackup 1.13.7+: skip detectors on every request once setup.done / durable store is true.
+        # Keep true — Beacon's PlatformCatalogsSetupNeedDetector must not re-open the gate after done.
+        short_circuit_when_done: true
         # SiteBackup 1.12+: durable done via InstanceSettingsDurableSetupDoneStore + cold-start gate.
         durable_done:
             enabled: true

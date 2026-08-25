@@ -52,6 +52,7 @@ nowo_maintenance_mode:
             - /_profiler
             - /_error
             - /_site_backup
+            - /_device
             - /setup
             - /login
             - /register

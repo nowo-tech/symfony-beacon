@@ -1,0 +1,62 @@
+/* OTP Input host theme bridge.
+ *
+ * Kit digit boxes use nowo-otp-input__* / [data-nowo-otp-digit]. Beacon controls
+ * are `.input` + --color-* / data-theme. Map metrics and colours without forking
+ * kit Twig or JS (same approach as `_phone_input.scss`).
+ */
+
+html nowo-otp-input,
+html .nowo-otp-input,
+html [data-nowo-otp-container],
+html [data-controller~='nowo-otp-input'] {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+}
+
+html .nowo-otp-input__container,
+html .nowo-otp-input__gap,
+html [data-nowo-otp-render-target] {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+html .nowo-otp-input__digit,
+html [data-nowo-otp-digit] {
+  box-sizing: border-box;
+  width: 2.5rem;
+  min-height: 2.75rem;
+  padding: 0.35rem 0.15rem;
+  border: var(--beacon-border-width, 1px) solid var(--color-sand);
+  border-radius: var(--beacon-radius-control, 0.375rem);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-size: 1.125rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+  text-align: center;
+}
+
+html .nowo-otp-input__digit:focus,
+html [data-nowo-otp-digit]:focus {
+  border-color: var(--color-moss);
+  outline: 2px solid color-mix(in srgb, var(--color-moss) 45%, transparent);
+  outline-offset: 1px;
+}
+
+html[data-theme='dark'] .nowo-otp-input__digit,
+html[data-theme='dark'] [data-nowo-otp-digit] {
+  background: var(--color-surface);
+  border-color: color-mix(in srgb, var(--color-sand) 80%, var(--color-ink));
+}
+
+html[data-ui-density='compact'] .nowo-otp-input__digit,
+html[data-ui-density='compact'] [data-nowo-otp-digit] {
+  width: 2.15rem;
+  min-height: 2.35rem;
+  font-size: 1rem;
+}

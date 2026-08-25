@@ -197,6 +197,8 @@ auth:
 
 
       %link%'
+    new_device_email_subject: Nieuwe browser aangemeld bij Beacon
+    new_device_email_body: 'Een nieuwe browser heeft zich aangemeld bij je Beacon-account (%email%). Was jij dat niet, wijzig dan je wachtwoord onder Account → Beveiliging.'
   reset:
     email_subject: Stel uw Beacon-wachtwoord opnieuw in
     email_body: 'Gebruik deze link om een nieuw wachtwoord te kiezen:
@@ -274,6 +276,10 @@ flash:
     password_saved: Wachtwoord bijgewerkt.
     display_saved: Weergavevoorkeuren opgeslagen.
     locale_saved: Taal bijgewerkt.
+    device_trusted: Deze browser is nu vertrouwd voor je account.
+    device_revoked: Vertrouwde browser verwijderd.
+    device_missing: Beacon heeft deze browser nog niet waargenomen. Blijf even op deze pagina, vernieuw en probeer opnieuw.
+    device_unknown: Die browser is niet meer bekend. Er is niets gewijzigd.
     member_alerts_invalid: Waarschuwingsvoorkeuren konden niet worden opgeslagen. Controleer het formulier en probeer opnieuw.
     member_alerts_project_saved: Projectwaarschuwingsvoorkeuren opgeslagen.
   users:
@@ -472,6 +478,9 @@ project:
     clear_body: Hiermee worden problemen, gebeurtenissen, prestatiegegevens en analyses voor dit project
       permanent verwijderd. API-sleutels en leden worden bewaard.
     clear_confirm: Ja, duidelijke geschiedenis
+    clear_slide: Schuif om de geschiedenis te wissen
+    clear_slid: Geschiedenis wordt gewist
+    clear_slide_hint: Voltooi de schuif om issues, events en prestatiagegevens definitief te verwijderen.
     delete_open: Project verwijderen…
     delete_title: Dit project definitief verwijderen?
     delete_body: Hierdoor worden “%name%” en alle bijbehorende gegevens (problemen, gebeurtenissen, prestaties,
@@ -1061,6 +1070,7 @@ preferences:
     password: Wachtwoord wijzigen
     password_history: Wijzigingsgeschiedenis
     security_activity: Activiteit
+    devices: Vertrouwde browsers
     area_label: Accountsecties
     display: Weergave
     appearance: Weergave
@@ -1151,6 +1161,15 @@ preferences:
     activity_intro: Recente wachtwoordreset- en magic-login-gebeurtenissen voor je
       account.
     activity_empty: Nog geen beveiligingsgebeurtenissen geregistreerd.
+    devices_title: Vertrouwde browsers
+    devices_intro: Onthoud deze browser voor latere extra controles. Een Device ID is geen wachtwoord, sessie of MFA-factor — vertrouwen slaat alleen een expliciete toekenning op.
+    devices_current: Deze browser
+    devices_observe: Beacon herkent deze browser nog niet. Laat deze pagina even open (hij observeert het cluster) en vernieuw daarna.
+    devices_already_trusted: Deze browser is al vertrouwd.
+    devices_trust: Deze browser vertrouwen
+    devices_empty: Nog geen vertrouwde browsers.
+    devices_this_browser: Deze browser
+    devices_revoke: Verwijderen
   display:
     title: Weergave
     intro: Kies taal, thema, dichtheid, tekstgrootte, contrast, zijbalk, beweging
@@ -1929,14 +1948,15 @@ setup:
     email: E-mail
     password: Wachtwoord
   token:
-    title: Hé — zonder de setup-sleutel kom je er niet in
-    lead: Er is niets kapot. Setup is vergrendeld zodat vreemden de instantie niet
-      kunnen configureren.
-    body: Open %path% met de SITE_SETUP_TOKEN uit je omgeving.
-    step_env: Zoek SITE_SETUP_TOKEN in je .env (genereer een willekeurige waarde
-      als leeg — zie docs/INSTALL.md).
-    step_url: Open %path% in de browser — vervang … door die token.
-    step_header: Of stuur de header X-Setup-Token met dezelfde waarde.
+    title: Open de setup-assistent
+    lead: Setup is expres vergrendeld. Plak de waarde van SITE_SETUP_TOKEN om door te gaan.
+    field_label: Setup-token
+    field_placeholder: SITE_SETUP_TOKEN
+    submit: Doorgaan
+    howto: Zo krijg je de token
+    step_env: Kopieer SITE_SETUP_TOKEN uit je .env.local (genereer een willekeurige waarde als leeg).
+    step_url: Je kunt ook %path% openen en … vervangen door de token.
+    step_header: In scripts stuur je de header X-Setup-Token met dezelfde waarde.
   reason:
     heading: Setup is vereist
     db_connection: De database is niet bereikbaar met de huidige DATABASE_URL (ontbreekt,

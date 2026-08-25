@@ -247,9 +247,9 @@ html[data-theme='dark'][data-contrast='more'] {
 
 html[data-contrast='more'] .panel,
 html[data-contrast='more'] .input,
-html[data-contrast='more'] input[type='checkbox'].checkbox,
-html[data-contrast='more'] .confirm-dialog__check > input[type='checkbox'],
-html[data-contrast='more'] .checkbox-label > input[type='checkbox'],
+html[data-contrast='more'] input[type='checkbox'].checkbox:not(.nowo-slide-to-confirm__input),
+html[data-contrast='more'] .confirm-dialog__check > input[type='checkbox']:not(.nowo-slide-to-confirm__input),
+html[data-contrast='more'] .checkbox-label > input[type='checkbox']:not(.nowo-slide-to-confirm__input),
 html[data-contrast='more'] .nowo-ui-check > input[type='checkbox'],
 html[data-contrast='more'] .btn-ghost {
   border-width: 1.5px;
@@ -460,6 +460,26 @@ html[data-theme='dark'] .confirm-dialog::backdrop {
   padding: 1.15rem var(--cd-pad-x) 1.25rem;
   scrollbar-width: thin;
   scrollbar-color: color-mix(in srgb, var(--color-ink) 28%, transparent) transparent;
+
+  /* Slide-to-confirm (danger profile): full-width track + Beacon tokens in light/dark. */
+  .nowo-slide-to-confirm {
+    width: 100%;
+    max-width: none;
+    --nowo-slide-track-bg: color-mix(in srgb, var(--color-sand) 55%, var(--color-surface));
+    --nowo-slide-text: color-mix(in srgb, var(--color-ink) 72%, transparent);
+    --nowo-slide-thumb-bg: var(--color-moss);
+    --nowo-slide-confirmed-bg: var(--color-moss);
+  }
+
+  .nowo-slide-to-confirm--danger {
+    --nowo-slide-thumb-bg: var(--color-alert);
+    --nowo-slide-confirmed-bg: var(--color-alert);
+  }
+
+  .nowo-slide-to-confirm__hint {
+    margin-top: 0.65rem;
+    color: color-mix(in srgb, var(--color-ink) 58%, transparent);
+  }
 }
 
 .confirm-dialog__content > .confirm-dialog__label:first-child,
@@ -1335,9 +1355,9 @@ textarea.input {
 }
 
 /* Platform checkbox — same moss/sand/surface tokens as .input (native accent is browser-blue). */
-input[type='checkbox'].checkbox,
-.confirm-dialog__check > input[type='checkbox'],
-.checkbox-label > input[type='checkbox'],
+input[type='checkbox'].checkbox:not(.nowo-slide-to-confirm__input),
+.confirm-dialog__check > input[type='checkbox']:not(.nowo-slide-to-confirm__input),
+.checkbox-label > input[type='checkbox']:not(.nowo-slide-to-confirm__input),
 .nowo-ui-check > input[type='checkbox'] {
   appearance: none;
   box-sizing: border-box;
@@ -1395,7 +1415,7 @@ input[type='checkbox'].checkbox,
   align-items: flex-start;
 }
 
-.checkbox-label--start > input[type='checkbox'] {
+.checkbox-label--start > input[type='checkbox']:not(.nowo-slide-to-confirm__input) {
   margin-top: 0.2rem;
 }
 

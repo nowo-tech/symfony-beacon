@@ -1,0 +1,35 @@
+# nowo-tech/device-intelligence-bundle — probabilistic device matching + risk.
+# https://github.com/nowo-tech/DeviceIntelligenceBundle
+#
+# Device ID is not a credential. AuthKit 1.19+ collect()s on guest auth pages.
+# Privacy: strict collectors (no canvas/webgl/audio/fonts). Cookie `di_obs` is
+# account-security (required), documented in cookie inventory + /legal/cookies.
+
+nowo_device_intelligence:
+    enabled: true
+    observe_on_every_request: false
+    endpoint:
+        enabled: true
+        path: /_device/collect
+        csrf: origin
+        response:
+            device_id: true
+            confidence: true
+            risk: true
+    doctrine:
+        enabled: true
+        table_prefix: device_intelligence_
+    token_cookie:
+        name: di_obs
+        path: /
+        httponly: true
+        samesite: lax
+        secure: auto
+    profiles:
+        default:
+            privacy:
+                mode: strict
+                hash_ip: true
+                store_raw_ip: false
+                store_user_agent: true
+                high_entropy_consent: false

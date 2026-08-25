@@ -92,6 +92,11 @@ final class PasswordResetTest extends DatabaseWebTestCase
 
         $crawler = $client->request(Request::METHOD_GET, '/en/reset-password/complete');
         self::assertResponseIsSuccessful();
+        self::assertGreaterThan(
+            0,
+            $crawler->filter('nowo-otp-input, [data-controller*="nowo-otp-input"], [data-nowo-otp-digit]')->count(),
+            'Password-reset code field should render OtpType (otp-input-bundle).',
+        );
         $form = $crawler->filter('form')->form();
         $phpValues = $form->getPhpValues();
         $root = (string) array_key_first($phpValues);

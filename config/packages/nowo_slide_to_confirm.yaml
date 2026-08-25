@@ -1,0 +1,11 @@
+# nowo-tech/slide-to-confirm-bundle — confirmation UX (not authorization).
+# https://github.com/nowo-tech/SlideToConfirmBundle
+#
+# AuthKit 1.18+ loads CSS/JS on guest layouts when slide_to_confirm.enabled is true.
+# Host FormKit/Tailwind chrome: tokens in assets/styles/_auth_kit.scss.
+
+nowo_slide_to_confirm:
+    default_profile: default
+    form_theme: 'form_div_layout.html.twig'
+    translation_domain: NowoSlideToConfirmBundle
+    debug: false

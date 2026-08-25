@@ -203,6 +203,8 @@ auth:
 
 
       %link%'
+    new_device_email_subject: New browser signed in to Beacon
+    new_device_email_body: 'A new browser signed in to your Beacon account (%email%). If this was not you, change your password under Account → Security.'
   reset:
     email_subject: Reset your Beacon password
     email_body: 'Use this link to choose a new password:
@@ -295,6 +297,10 @@ flash:
     member_alerts_invalid: Could not save alert preferences. Check the form and try
       again.
     locale_saved: Language updated.
+    device_trusted: This browser is now trusted for your account.
+    device_revoked: Trusted browser removed.
+    device_missing: Beacon has not observed this browser yet. Stay on this page a moment, refresh, then try again.
+    device_unknown: That browser is no longer known. Nothing was changed.
   users:
     enabled: User account enabled.
     disabled: User account disabled.
@@ -483,6 +489,9 @@ project:
     clear_body: This permanently deletes issues, events, performance data, and analytics for this project.
       API keys and members are kept.
     clear_confirm: Yes, clear history
+    clear_slide: Slide to clear history
+    clear_slid: History will be cleared
+    clear_slide_hint: Complete the slide to permanently delete issues, events, and performance data.
     delete_open: Delete project…
     delete_title: Delete this project permanently?
     delete_body: This permanently deletes “%name%” and all of its data (issues, events, performance, analytics,
@@ -1309,6 +1318,7 @@ preferences:
     password: Change password
     password_history: Change history
     security_activity: Activity
+    devices: Trusted browsers
     area_label: Account sections
     display: Display
     appearance: Appearance
@@ -1399,6 +1409,15 @@ preferences:
     activity_title: Security activity
     activity_intro: Recent password-reset and magic-login events for your account.
     activity_empty: No security events recorded yet.
+    devices_title: Trusted browsers
+    devices_intro: Remember this browser for future step-up checks. A Device ID is not a password, session, or MFA factor — trusting only records an explicit grant.
+    devices_current: This browser
+    devices_observe: Beacon has not recognized this browser yet. Keep this page open a moment (it observes the cluster), then refresh.
+    devices_already_trusted: This browser is already trusted.
+    devices_trust: Trust this browser
+    devices_empty: No trusted browsers yet.
+    devices_this_browser: This browser
+    devices_revoke: Remove
   display:
     title: Display
     intro: Choose language, theme, layout density, text size, contrast, sidebar, motion,
@@ -1773,13 +1792,15 @@ setup:
     email: Email
     password: Password
   token:
-    title: Hey — you need the setup key to pass
-    lead: Nothing is broken. Setup is locked so strangers cannot configure this instance.
-    body: Open %path% with the SITE_SETUP_TOKEN from your environment.
-    step_env: Find SITE_SETUP_TOKEN in your .env (set a random value if empty —
-      see docs/INSTALL.md).
-    step_url: Open %path% in the browser — replace … with that token.
-    step_header: Or send the header X-Setup-Token with the same value.
+    title: Open the setup wizard
+    lead: Setup is locked on purpose. Paste the SITE_SETUP_TOKEN value to continue.
+    field_label: Setup token
+    field_placeholder: SITE_SETUP_TOKEN
+    submit: Continue
+    howto: How to get the token
+    step_env: Copy SITE_SETUP_TOKEN from your .env.local (generate a random value if it is empty).
+    step_url: You can also open %path% and replace … with the token.
+    step_header: In scripts, send the X-Setup-Token header with the same value.
   reason:
     heading: Setup is required
     db_connection: The database is not reachable with the current DATABASE_URL (missing,

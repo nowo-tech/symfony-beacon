@@ -17,7 +17,7 @@ final class PreferencesMenuCurrentMatcher extends AbstractRoutePrefixMenuCurrent
     /** @var array<string, list<string>> */
     private const array ROUTE_PREFIXES = [
         'account_profile' => ['account_profile', 'account_projects', 'account_groups', 'account_privacy'],
-        'account_security' => ['account_security'],
+        'account_security' => ['account_security', 'account_security_devices'],
         'account_display' => ['account_display'],
     ];
 

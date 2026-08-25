@@ -370,6 +370,44 @@
           "purpose": "Armazena se a categoria de preferências foi aceite ou recusada (mecanismo de consentimento)."
         }
       }
+    },
+    {
+      "name": "di_obs",
+      "duration": "1 hour",
+      "category": "required",
+      "type": "first_party",
+      "sortOrder": 60,
+      "allowedByDefault": true,
+      "translations": {
+        "en": {
+          "provider": "Beacon (first-party)",
+          "purpose": "HttpOnly device-observation pointer used to recognise returning browsers for account security (abuse prevention). It is not a login credential."
+        },
+        "es": {
+          "provider": "Beacon (primera parte)",
+          "purpose": "Puntero HttpOnly de observación de dispositivo para reconocer navegadores conocidos (seguridad de la cuenta). No es una credencial de acceso."
+        },
+        "de": {
+          "provider": "Beacon (First-Party)",
+          "purpose": "HttpOnly-Zeiger zur Gerätebeobachtung, um bekannte Browser für Kontosicherheit zu erkennen. Kein Anmelde-Geheimnis."
+        },
+        "nl": {
+          "provider": "Beacon (first-party)",
+          "purpose": "HttpOnly apparaatobservatie-pointer om terugkerende browsers te herkennen (accountbeveiliging). Dit is geen inloggegeven."
+        },
+        "fr": {
+          "provider": "Beacon (première partie)",
+          "purpose": "Pointeur HttpOnly d’observation d’appareil pour reconnaître les navigateurs connus (sécurité du compte). Ce n’est pas un identifiant de connexion."
+        },
+        "it": {
+          "provider": "Beacon (prima parte)",
+          "purpose": "Puntatore HttpOnly di osservazione dispositivo per riconoscere browser noti (sicurezza dell’account). Non è una credenziale di accesso."
+        },
+        "pt": {
+          "provider": "Beacon (primeira parte)",
+          "purpose": "Ponteiro HttpOnly de observação de dispositivo para reconhecer browsers conhecidos (segurança da conta). Não é uma credencial de início de sessão."
+        }
+      }
     }
   ]
 }

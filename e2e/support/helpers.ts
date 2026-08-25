@@ -336,3 +336,16 @@ export async function openFirstIssue(page: Page, projectUuid: string): Promise<s
   await dismissProductTour(page);
   return match?.[1] ?? null;
 }
+
+/** Complete a SlideToConfirm widget (hidden checkbox is the submitted value) and submit the form. */
+export async function completeSlideToConfirm(form: import('@playwright/test').Locator): Promise<void> {
+  const slider = form.locator('nowo-slide-to-confirm, .nowo-slide-to-confirm').first();
+  await expect(slider).toBeVisible({ timeout: 10_000 });
+  const checkbox = form.locator('input.nowo-slide-to-confirm__input[type="checkbox"]');
+  await checkbox.check({ force: true });
+  await form.evaluate((el) => {
+    if (el instanceof HTMLFormElement) {
+      el.requestSubmit();
+    }
+  });
+}

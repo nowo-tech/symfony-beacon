@@ -1393,6 +1393,25 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             level?: scalar|Param|null, // Policy level passed to PasswordStrengthType and PasswordStrength validator. // Default: "medium"
  *             policy_mode?: "level"|"conditions"|Param, // Default: "level"
  *         },
+ *         slide_to_confirm?: array{ // Optional integration with nowo-tech/slide-to-confirm-bundle for registration consent and QR approve.
+ *             enabled?: bool|Param, // When true, uses SlideToConfirmType when that bundle is installed and a field/QR option requests it. // Default: false
+ *             registration_consent?: scalar|Param|null, // SlideToConfirm profile used when a registration field sets slide_to_confirm: true (typically gate). // Default: "gate"
+ *             qr_login_approve?: mixed, // SlideToConfirm profile for QR approve (e.g. danger), or false to keep the submit button. // Default: false
+ *         },
+ *         device_intelligence?: array{ // Optional integration with nowo-tech/device-intelligence-bundle (PHP 8.3+). Device ID is not a credential.
+ *             enabled?: bool|Param, // When true, AuthKit loads collect JS and honours the flags below if the bundle is installed. // Default: false
+ *             collect_on_auth_pages?: bool|Param, // Load device-intelligence.min.js on AuthKit layouts so collect() runs before login/register/QR. // Default: true
+ *             collect_endpoint?: scalar|Param|null, // POST path for Device Intelligence collect (default /_device/collect). // Default: "/_device/collect"
+ *             new_device_notify?: bool|Param, // After LoginSuccess, set session flag and call NewDeviceLoginNotifierInterface when the cluster is new. // Default: false
+ *             device_rate_limit?: bool|Param, // Extra AuthKitAttemptLimiter consume keyed by device ULID on register / reset / magic request. // Default: false
+ *             qr_login?: array{
+ *                 approve_require_trusted?: bool|Param, // When true, QR session_step_up requires an explicit trusted device (not auto-trust on login). // Default: false
+ *             },
+ *         },
+ *         otp_input?: array{ // Optional integration with nowo-tech/otp-input-bundle for the password-reset code field. UX only; server checks stay mandatory.
+ *             enabled?: bool|Param, // When true, uses OtpType when that bundle is installed and password_reset_code is true. // Default: false
+ *             password_reset_code?: bool|Param, // Replace the reset OTP TextType with OtpType (length/charset from password_reset). // Default: true
+ *         },
  *         registration_fields?: list<mixed>,
  *         templates?: array{
  *             layout?: scalar|Param|null, // Default: "@NowoAuthKitBundle/layout.html.twig"
@@ -1538,6 +1557,109 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     default_locale?: scalar|Param|null, // Deprecated: use locale.default. // Default: "en"
  *     enabled_locales?: list<scalar|Param|null>,
  *     locale_in_path?: mixed, // Deprecated: use locale.in_path (never|always|both). Bool true/false still accepted. // Default: false
+ *     ...<string, mixed>
+ * }
+ * @psalm-type NowoSlideToConfirmConfig = array{
+ *     default_profile?: scalar|Param|null, // Name of the profile used when the form option profile is omitted. // Default: "default"
+ *     translation_domain?: scalar|Param|null, // Default translation domain for slider texts (bundle uses NowoSlideToConfirmBundle). // Default: "NowoSlideToConfirmBundle"
+ *     form_theme?: scalar|Param|null, // Base form layout template. Must match a Symfony form theme (e.g. bootstrap_5_layout.html.twig). // Default: "form_div_layout.html.twig"
+ *     debug?: bool|Param, // When true, the frontend logs debug messages to the console. // Default: false
+ *     profiles?: array<string, array{ // Default: {"default":{"text":"form.slide_to_confirm","confirmed_text":"form.confirmed","hint":"form.hint.default","variant":"default","threshold":0.85,"submit_on_confirm":true,"reset_on_release":true},"danger":{"text":"form.slide_to_delete","confirmed_text":"form.deleted","hint":"form.hint.danger","variant":"danger","threshold":0.92,"submit_on_confirm":true,"reset_on_release":true},"payment":{"text":"form.slide_to_pay","confirmed_text":"form.paid","hint":"form.hint.payment","variant":"payment","threshold":0.9,"submit_on_confirm":true,"reset_on_release":true},"legal":{"text":"form.slide_to_agree","confirmed_text":"form.agreed","hint":"form.hint.legal","variant":"legal","threshold":0.95,"submit_on_confirm":true,"reset_on_release":true},"publish":{"text":"form.slide_to_publish","confirmed_text":"form.published","hint":"form.hint.publish","variant":"success","threshold":0.85,"submit_on_confirm":true,"reset_on_release":true},"gate":{"text":"form.slide_to_unlock","confirmed_text":"form.unlocked","hint":"form.hint.gate","variant":"default","threshold":0.85,"submit_on_confirm":false,"reset_on_release":false}}
+ *         text?: scalar|Param|null, // Default: "form.slide_to_confirm"
+ *         confirmed_text?: scalar|Param|null, // Default: "form.confirmed"
+ *         hint?: scalar|Param|null, // Default: "form.hint.default"
+ *         variant?: scalar|Param|null, // Default: "default"
+ *         threshold?: float|Param, // Default: 0.85
+ *         submit_on_confirm?: bool|Param, // Default: true
+ *         reset_on_release?: bool|Param, // Default: true
+ *     }>,
+ * }
+ * @psalm-type NowoDeviceIntelligenceConfig = array{
+ *     enabled?: bool|Param, // Default: true
+ *     default_profile?: scalar|Param|null, // Default: "default"
+ *     profiles?: array<string, array{ // Default: {"default":[]}
+ *         collectors?: list<scalar|Param|null>,
+ *         matching?: array{
+ *             minimum_confidence?: float|Param, // Default: 0.75
+ *             weights?: array<string, float|Param>,
+ *             candidate_limit?: int|Param, // Default: 64
+ *             lookback?: scalar|Param|null, // Default: "P180D"
+ *             on_low_confidence?: "new_device"|"reject"|Param, // Default: "new_device"
+ *         },
+ *         risk?: array{
+ *             enabled?: bool|Param, // Default: true
+ *             levels?: array{
+ *                 low?: int|Param, // Default: 0
+ *                 medium?: int|Param, // Default: 30
+ *                 high?: int|Param, // Default: 65
+ *                 critical?: int|Param, // Default: 90
+ *             },
+ *             decisions?: array{
+ *                 observe?: int|Param, // Default: 40
+ *                 step_up?: int|Param, // Default: 70
+ *                 block?: int|Param, // Default: 90
+ *             },
+ *             rules?: array<string, array{ // Default: {"new_device":{"enabled":true,"weight":null},"multiple_accounts":{"enabled":true,"weight":null},"rapid_account_creation":{"enabled":true,"weight":null},"device_velocity":{"enabled":true,"weight":null},"fingerprint_mutation":{"enabled":true,"weight":null},"automation":{"enabled":true,"weight":null},"suspicious_login":{"enabled":true,"weight":null},"impossible_travel":{"enabled":true,"weight":null},"session_change":{"enabled":true,"weight":null},"ip_change":{"enabled":true,"weight":null},"country_change":{"enabled":true,"weight":null},"trusted_device":{"enabled":true,"weight":null}}
+ *                 enabled?: bool|Param, // Default: true
+ *                 weight?: mixed, // Default: null
+ *             }>,
+ *         },
+ *         trusted_devices?: array{
+ *             enabled?: bool|Param, // Default: true
+ *             default_ttl?: scalar|Param|null, // Default: "P90D"
+ *         },
+ *         privacy?: array{
+ *             mode?: "strict"|"balanced"|"full"|Param, // Default: "balanced"
+ *             hash_ip?: bool|Param, // Default: true
+ *             store_raw_ip?: bool|Param, // Default: false
+ *             store_user_agent?: bool|Param, // Default: true
+ *             high_entropy_consent?: bool|Param, // Default: true
+ *         },
+ *         rate_limit?: array{
+ *             policies?: array<string, array{ // Default: {"collect":{"limit":60,"interval":"1 minute"}}
+ *                 limit?: int|Param, // Default: 60
+ *                 interval?: scalar|Param|null, // Default: "1 minute"
+ *             }>,
+ *         },
+ *     }>,
+ *     endpoint?: array{
+ *         enabled?: bool|Param, // Default: true
+ *         path?: scalar|Param|null, // Default: "/_device/collect"
+ *         csrf?: "origin"|"double_submit"|"none"|Param, // Default: "origin"
+ *         max_payload_bytes?: int|Param, // Default: 65536
+ *         timestamp_skew?: int|Param, // Default: 300
+ *         replay_protection?: bool|Param, // Default: true
+ *         allowed_origins?: list<scalar|Param|null>,
+ *         response?: array{
+ *             device_id?: bool|Param, // Default: false
+ *             confidence?: bool|Param, // Default: false
+ *             risk?: bool|Param, // Default: false
+ *             token?: bool|Param, // Default: true
+ *         },
+ *     },
+ *     doctrine?: array{
+ *         enabled?: bool|Param, // Default: true
+ *         table_prefix?: scalar|Param|null, // Default: "device_intelligence_"
+ *     },
+ *     cache?: array{
+ *         pool?: scalar|Param|null, // Default: "cache.app"
+ *     },
+ *     messenger?: array{
+ *         enabled?: bool|Param, // Default: false
+ *         transport?: scalar|Param|null, // Default: null
+ *     },
+ *     profiler?: bool|Param, // Default: true
+ *     observe_on_every_request?: bool|Param, // Default: false
+ *     token_cookie?: array{
+ *         name?: scalar|Param|null, // Default: "di_obs"
+ *         path?: scalar|Param|null, // Default: "/"
+ *         domain?: scalar|Param|null, // Default: null
+ *         secure?: scalar|Param|null, // Default: "auto"
+ *         httponly?: bool|Param, // Default: true
+ *         samesite?: "lax"|"strict"|"none"|Param, // Default: "lax"
+ *     },
+ *     token_ttl?: int|Param, // Default: 3600
+ *     ip_salt?: scalar|Param|null, // Default: ""
  *     ...<string, mixed>
  * }
  * @psalm-type NowoPasswordStrengthConfig = array{
@@ -2337,8 +2459,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  * }
  * @psalm-type MercureConfig = array{
  *     hubs?: array<string, array{ // Default: []
- *         url?: scalar|Param|null, // URL of the hub's publish endpoint
- *         public_url?: scalar|Param|null, // URL of the hub's public endpoint // Default: null
+ *         url?: scalar|Param|null, // URL of the hub's publish endpoint // Default: null
+ *         public_url?: scalar|Param|null, // URL of the hub's public endpoint
  *         jwt?: Param|string|array{ // JSON Web Token configuration.
  *             value?: scalar|Param|null, // JSON Web Token to use to publish to this hub.
  *             provider?: scalar|Param|null, // The ID of a service to call to provide the JSON Web Token.
@@ -2702,6 +2824,12 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     phone_validation?: "COUNTRY"|"PREFIX"|"NONE"|Param, // Validate national numbers using country ISO (COUNTRY), dial prefix (PREFIX) or disable (NONE) // Default: "COUNTRY"
  *     use_libphonenumber?: bool|Param, // Use giggsey/libphonenumber-for-php when installed for validation // Default: true
  * }
+ * @psalm-type NowoOtpInputConfig = array{
+ *     length?: int|Param, // Default: 6
+ *     numeric_only?: bool|Param, // Default: true
+ *     uppercase?: bool|Param, // Default: true
+ *     form_theme?: scalar|Param|null, // Default: "form_div_layout.html.twig"
+ * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -2714,6 +2842,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     pentatrion_vite?: PentatrionViteConfig,
  *     security?: SecurityConfig,
  *     nowo_auth_kit?: NowoAuthKitConfig,
+ *     nowo_slide_to_confirm?: NowoSlideToConfirmConfig,
+ *     nowo_device_intelligence?: NowoDeviceIntelligenceConfig,
  *     nowo_password_strength?: NowoPasswordStrengthConfig,
  *     nowo_password_toggle?: NowoPasswordToggleConfig,
  *     ux_icons?: UxIconsConfig,
@@ -2742,6 +2872,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     nowo_routing_kit?: NowoRoutingKitConfig,
  *     nowo_maintenance_mode?: NowoMaintenanceModeConfig,
  *     nowo_phone_input?: NowoPhoneInputConfig,
+ *     nowo_otp_input?: NowoOtpInputConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -2757,6 +2888,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_twig_inspector?: NowoTwigInspectorConfig,
  *         nowo_hot_reload?: NowoHotReloadConfig,
  *         nowo_auth_kit?: NowoAuthKitConfig,
+ *         nowo_slide_to_confirm?: NowoSlideToConfirmConfig,
+ *         nowo_device_intelligence?: NowoDeviceIntelligenceConfig,
  *         nowo_password_strength?: NowoPasswordStrengthConfig,
  *         nowo_password_toggle?: NowoPasswordToggleConfig,
  *         ux_icons?: UxIconsConfig,
@@ -2785,6 +2918,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_routing_kit?: NowoRoutingKitConfig,
  *         nowo_maintenance_mode?: NowoMaintenanceModeConfig,
  *         nowo_phone_input?: NowoPhoneInputConfig,
+ *         nowo_otp_input?: NowoOtpInputConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -2798,6 +2932,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         pentatrion_vite?: PentatrionViteConfig,
  *         security?: SecurityConfig,
  *         nowo_auth_kit?: NowoAuthKitConfig,
+ *         nowo_slide_to_confirm?: NowoSlideToConfirmConfig,
+ *         nowo_device_intelligence?: NowoDeviceIntelligenceConfig,
  *         nowo_password_strength?: NowoPasswordStrengthConfig,
  *         nowo_password_toggle?: NowoPasswordToggleConfig,
  *         ux_icons?: UxIconsConfig,
@@ -2826,6 +2962,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_routing_kit?: NowoRoutingKitConfig,
  *         nowo_maintenance_mode?: NowoMaintenanceModeConfig,
  *         nowo_phone_input?: NowoPhoneInputConfig,
+ *         nowo_otp_input?: NowoOtpInputConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -2842,6 +2979,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_twig_inspector?: NowoTwigInspectorConfig,
  *         nowo_hot_reload?: NowoHotReloadConfig,
  *         nowo_auth_kit?: NowoAuthKitConfig,
+ *         nowo_slide_to_confirm?: NowoSlideToConfirmConfig,
+ *         nowo_device_intelligence?: NowoDeviceIntelligenceConfig,
  *         nowo_password_strength?: NowoPasswordStrengthConfig,
  *         nowo_password_toggle?: NowoPasswordToggleConfig,
  *         ux_icons?: UxIconsConfig,
@@ -2870,6 +3009,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_routing_kit?: NowoRoutingKitConfig,
  *         nowo_maintenance_mode?: NowoMaintenanceModeConfig,
  *         nowo_phone_input?: NowoPhoneInputConfig,
+ *         nowo_otp_input?: NowoOtpInputConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,

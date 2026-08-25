@@ -30,10 +30,11 @@ final class ProjectDangerZoneTest extends DatabaseWebTestCase
         $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/settings/danger');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('body', 'Danger zone');
-        self::assertSelectorExists('form[action$="/clear-history"]');
+        self::assertSelectorExists('form[action$="/clear-history"] nowo-slide-to-confirm');
         self::assertSelectorExists('form[action$="/delete"]');
 
         $form = $crawler->filter('form[action$="/clear-history"]')->form();
+        $form['project_clear_history[confirm]']->tick();
         $client->submit($form);
         self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings/danger');
         $client->followRedirect();

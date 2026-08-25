@@ -200,6 +200,8 @@ auth:
 
 
       %link%'
+    new_device_email_subject: Nouveau navigateur connecté à Beacon
+    new_device_email_body: 'Un nouveau navigateur s’est connecté à votre compte Beacon (%email%). Si ce n’était pas vous, changez le mot de passe sous Compte → Sécurité.'
   reset:
     email_subject: Réinitialisez votre mot de passe Beacon
     email_body: 'Utilisez ce lien pour choisir un nouveau mot de passe :
@@ -280,6 +282,10 @@ flash:
     password_saved: Mot de passe mis à jour.
     display_saved: Préférences d'affichage enregistrées.
     locale_saved: Langue mise à jour.
+    device_trusted: Ce navigateur est désormais de confiance pour votre compte.
+    device_revoked: Navigateur de confiance retiré.
+    device_missing: Beacon n’a pas encore observé ce navigateur. Restez un instant sur cette page, actualisez, puis réessayez.
+    device_unknown: Ce navigateur n’est plus connu. Rien n’a changé.
     member_alerts_invalid: Impossible d’enregistrer les préférences d’alerte. Vérifiez le formulaire et réessayez.
     member_alerts_project_saved: Préférences d’alerte du projet enregistrées.
   users:
@@ -483,6 +489,9 @@ project:
     clear_body: Cela supprime définitivement les problèmes, les événements, les données de performances
       et les analyses de ce projet. Les clés API et les membres sont conservés.
     clear_confirm: Oui, effacer l'historique
+    clear_slide: Glissez pour effacer l’historique
+    clear_slid: L’historique sera effacé
+    clear_slide_hint: Terminez le geste pour supprimer définitivement les issues, événements et données de performance.
     delete_open: Supprimer le projet…
     delete_title: Supprimer définitivement ce projet ?
     delete_body: Cela supprime définitivement « %name% » et toutes ses données (problèmes, événements,
@@ -1075,6 +1084,7 @@ preferences:
     password: Changer le mot de passe
     password_history: Historique des changements
     security_activity: Activité
+    devices: Navigateurs de confiance
     area_label: Sections du compte
     display: Afficher
     appearance: Apparence
@@ -1168,6 +1178,15 @@ preferences:
     activity_intro: Événements récents de réinitialisation de mot de passe et de connexion
       magique pour votre compte.
     activity_empty: Aucun événement de sécurité enregistré pour le moment.
+    devices_title: Navigateurs de confiance
+    devices_intro: Mémorisez ce navigateur pour de futurs contrôles renforcés. Un Device ID n’est pas un mot de passe, une session ni un facteur MFA — la confiance n’enregistre qu’une autorisation explicite.
+    devices_current: Ce navigateur
+    devices_observe: Beacon n’a pas encore reconnu ce navigateur. Laissez cette page ouverte un instant (elle observe le cluster), puis actualisez.
+    devices_already_trusted: Ce navigateur est déjà de confiance.
+    devices_trust: Faire confiance à ce navigateur
+    devices_empty: Aucun navigateur de confiance pour le moment.
+    devices_this_browser: Ce navigateur
+    devices_revoke: Retirer
   display:
     title: Afficher
     intro: Choisissez la langue, le thème, la densité, la taille du texte, le contraste,
@@ -1959,14 +1978,15 @@ setup:
     email: E-mail
     password: Mot de passe
   token:
-    title: Hé — sans la clé de setup, pas de passage
-    lead: Rien n'est cassé. Le setup est verrouillé pour empêcher une configuration
-      au hasard.
-    body: Ouvrez %path% avec le SITE_SETUP_TOKEN de votre environnement.
-    step_env: Trouvez SITE_SETUP_TOKEN dans votre .env (générez une valeur
-      aléatoire si vide — voir docs/INSTALL.md).
-    step_url: Ouvrez %path% dans le navigateur — remplacez … par ce jeton.
-    step_header: Ou envoyez l'en-tête X-Setup-Token avec la même valeur.
+    title: Ouvrez l'assistant de setup
+    lead: Le setup est verrouillé volontairement. Collez la valeur de SITE_SETUP_TOKEN pour continuer.
+    field_label: Jeton de setup
+    field_placeholder: SITE_SETUP_TOKEN
+    submit: Continuer
+    howto: Comment obtenir le jeton
+    step_env: Copiez SITE_SETUP_TOKEN depuis votre .env.local (générez une valeur aléatoire si vide).
+    step_url: Vous pouvez aussi ouvrir %path% en remplaçant … par le jeton.
+    step_header: Dans les scripts, envoyez l'en-tête X-Setup-Token avec la même valeur.
   reason:
     heading: La configuration est requise
     db_connection: La base de donnees n''est pas joignable avec la DATABASE_URL actuelle

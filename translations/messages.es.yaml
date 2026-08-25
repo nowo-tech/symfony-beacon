@@ -194,6 +194,8 @@ auth:
 
 
       %link%'
+    new_device_email_subject: Nuevo navegador en Beacon
+    new_device_email_body: 'Un navegador nuevo ha iniciado sesión en tu cuenta de Beacon (%email%). Si no fuiste tú, cambia la contraseña en Cuenta → Seguridad.'
   reset:
     email_subject: Restablece tu contraseña de Beacon
     email_body: 'Usa este enlace para elegir una contraseña nueva:
@@ -292,6 +294,10 @@ flash:
     member_alerts_invalid: No se pudieron guardar las preferencias de alertas. Revisa
       el formulario e inténtalo de nuevo.
     locale_saved: Idioma actualizado.
+    device_trusted: Este navegador ya es de confianza para tu cuenta.
+    device_revoked: Navegador de confianza eliminado.
+    device_missing: Beacon aún no ha observado este navegador. Quédate en esta página un momento, recarga e inténtalo de nuevo.
+    device_unknown: Ese navegador ya no se conoce. No se ha cambiado nada.
   users:
     enabled: Cuenta de usuario activada.
     disabled: Cuenta de usuario desactivada.
@@ -491,6 +497,9 @@ project:
     clear_body: Esto elimina de forma permanente incidencias, eventos, datos de rendimiento y analítica
       de este proyecto. Se conservan las claves API y los miembros.
     clear_confirm: Sí, vaciar historial
+    clear_slide: Desliza para vaciar el historial
+    clear_slid: Se vaciará el historial
+    clear_slide_hint: Completa el deslizamiento para borrar incidencias, eventos y datos de rendimiento de forma permanente.
     delete_open: Eliminar proyecto…
     delete_title: ¿Eliminar este proyecto de forma permanente?
     delete_body: Esto elimina de forma permanente “%name%” y todos sus datos (incidencias, eventos, rendimiento,
@@ -1260,6 +1269,7 @@ preferences:
     password: Cambiar contraseña
     password_history: Historial de cambios
     security_activity: Actividad
+    devices: Navegadores de confianza
     area_label: Secciones de la cuenta
     display: Interfaz
     appearance: Apariencia
@@ -1352,6 +1362,15 @@ preferences:
     activity_intro: Eventos recientes de restablecimiento de contraseña y magic login
       de tu cuenta.
     activity_empty: Aún no hay eventos de seguridad registrados.
+    devices_title: Navegadores de confianza
+    devices_intro: Recuerda este navegador para futuros controles adicionales. Un Device ID no es una contraseña, sesión ni factor MFA — confiar solo registra una concesión explícita.
+    devices_current: Este navegador
+    devices_observe: Beacon aún no ha reconocido este navegador. Deja esta página abierta un momento (observa el clúster) y recarga.
+    devices_already_trusted: Este navegador ya es de confianza.
+    devices_trust: Confiar en este navegador
+    devices_empty: Aún no hay navegadores de confianza.
+    devices_this_browser: Este navegador
+    devices_revoke: Quitar
   display:
     title: Interfaz
     intro: Elige idioma, tema, densidad, tamaño de texto, contraste, barra lateral,
@@ -1740,14 +1759,15 @@ setup:
     email: Correo
     password: Contraseña
   token:
-    title: Ey — sin la llave de setup no pasas
-    lead: Tranquilo, no está roto. El setup está cerrado para que nadie configure
-      la instancia al azar.
-    body: Abre %path% con el SITE_SETUP_TOKEN de tu entorno.
-    step_env: Busca SITE_SETUP_TOKEN en tu .env (genera un valor aleatorio si
-      está vacío — ver docs/INSTALL.md).
-    step_url: Abre %path% en el navegador — sustituye … por ese token.
-    step_header: O envía la cabecera X-Setup-Token con el mismo valor.
+    title: Abre el asistente de setup
+    lead: El asistente está cerrado a propósito. Pega el valor de SITE_SETUP_TOKEN para continuar.
+    field_label: Token de setup
+    field_placeholder: SITE_SETUP_TOKEN
+    submit: Continuar
+    howto: Cómo obtener el token
+    step_env: Cópialo de SITE_SETUP_TOKEN en tu .env.local (genera un valor aleatorio si está vacío).
+    step_url: También puedes abrir %path% sustituyendo … por el token.
+    step_header: En scripts, envía la cabecera X-Setup-Token con el mismo valor.
   reason:
     heading: Hace falta completar el setup
     db_connection: La base de datos no es alcanzable con el DATABASE_URL actual (falta,

@@ -2,6 +2,20 @@
 
 {% block title %}{{ settingsSection.tabLabelKey()|trans }} — {{ 'project.settings.title'|trans }} — {{ project.name }}{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    {% if settingsSection.value == 'danger' %}
+        <link rel="stylesheet" href="{{ asset('slide-to-confirm.css', 'nowo_slide_to_confirm') }}">
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% if settingsSection.value == 'danger' %}
+        <script src="{{ asset('slide-to-confirm.js', 'nowo_slide_to_confirm') }}" defer></script>
+    {% endif %}
+{% endblock %}
+
 {% block body %}
 {% include 'project/_nav.html.twig' with {project: project, current: 'settings'} %}
 

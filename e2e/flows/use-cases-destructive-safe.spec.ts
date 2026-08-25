@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import {
   DEMO_EMAIL,
   DEMO_PASSWORD,
+  completeSlideToConfirm,
   dismissCookieConsent,
   dismissProductTour,
   openFirstIssue,
@@ -125,19 +126,16 @@ test.describe('Out-of-scope closing — ephemeral / deep flows', () => {
 
     await page.goto(`/projects/${uuid}/settings/danger`);
     await dismissProductTour(page);
-    await expect(page.locator('form[action*="clear-history"], button:has-text("Clear history"), button:has-text("Vaciar historial")').first()).toBeVisible();
+    await expect(page.locator('form[action*="clear-history"] nowo-slide-to-confirm, form[action*="clear-history"] .nowo-slide-to-confirm').first()).toBeVisible();
 
     const clearOpen = page
       .locator('button[data-action="confirm-dialog#open"]')
       .filter({ hasText: /clear history|vaciar historial/i })
       .first();
     await clearOpen.click();
-    const clearSubmit = page
-      .locator('dialog[open] button[type="submit"], .confirm-dialog button[type="submit"]')
-      .filter({ hasText: /clear history|vaciar historial|yes/i })
-      .last();
-    await expect(clearSubmit).toBeVisible({ timeout: 10_000 });
-    await clearSubmit.click();
+    const clearForm = page.locator('dialog[open] form[action*="clear-history"], .confirm-dialog form[action*="clear-history"]').last();
+    await expect(clearForm).toBeVisible({ timeout: 10_000 });
+    await completeSlideToConfirm(clearForm);
     await waitForPageLoader(page);
     await expect(page).not.toHaveURL(/\/login/);
     await expect(page.locator('body')).toContainText(/cleared|vaciado|historial/i);
