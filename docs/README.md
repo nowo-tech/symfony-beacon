@@ -37,6 +37,7 @@ English operator and developer manuals for **symfony-beacon**.
 | [MERCURE.md](ops/MERCURE.md) | Live issue toasts (hub, JWT, Compose) |
 | [MAILPIT.md](ops/MAILPIT.md) | Local SMTP catcher for development |
 | [SHARED-SERVER.md](ops/SHARED-SERVER.md) | Shared MySQL/Redis (`compose.infra.yaml`) + coexistence with `server/` / little-vps |
+| [EVENT-STORAGE.md](ops/EVENT-STORAGE.md) | Event table growth: retention batches, cold path, partitioning plan |
 
 ## Development (`dev/`)
 
