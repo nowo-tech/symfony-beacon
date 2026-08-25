@@ -11,13 +11,10 @@ use App\Issues\Enum\IssuePriority;
 use App\Issues\Enum\IssueStatus;
 use App\Issues\IssueListSort;
 use App\Project\Entity\Project;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
 /**
  * Cross-project assignment list/count query builders.
- *
- * @phpstan-require-extends ServiceEntityRepository<Issue>
  */
 trait IssueAssignmentQueryTrait
 {

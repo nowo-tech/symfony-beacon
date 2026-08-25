@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace App\Issues\Repository\Query;
 
 use App\Issues\Entity\Event;
-use App\Issues\Entity\Issue;
 use App\Issues\Repository\EventTagRepository;
 use App\Project\Entity\Project;
 use App\Shared\Doctrine\SqlLikeEscaper;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\ORM\QueryBuilder;
 
@@ -17,8 +15,6 @@ use Doctrine\ORM\QueryBuilder;
  * Full-text / LIKE search and tag/url/user filters shared by list and assignment queries.
  *
  * Tag and URL filters use promoted columns / event_tag — not JSON_SEARCH on payload.
- *
- * @phpstan-require-extends ServiceEntityRepository<Issue>
  */
 trait IssueSearchFilterTrait
 {

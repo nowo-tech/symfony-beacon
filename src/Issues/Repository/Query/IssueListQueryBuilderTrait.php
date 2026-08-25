@@ -12,13 +12,10 @@ use App\Issues\Enum\IssueStatus;
 use App\Issues\IssueListSort;
 use App\Project\Entity\Project;
 use DateTimeImmutable;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
 /**
  * Project-scoped list/search query builders, sorting, and related count helpers.
- *
- * @phpstan-require-extends ServiceEntityRepository<Issue>
  */
 trait IssueListQueryBuilderTrait
 {

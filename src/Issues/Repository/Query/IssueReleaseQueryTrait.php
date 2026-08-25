@@ -6,15 +6,12 @@ namespace App\Issues\Repository\Query;
 
 use App\Issues\Entity\Issue;
 use App\Project\Entity\Project;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\QueryBuilder;
 
 /**
  * Release-scoped issue queries (new-in-release, distinct releases, first-release counts).
- *
- * @phpstan-require-extends ServiceEntityRepository<Issue>
  */
 trait IssueReleaseQueryTrait
 {

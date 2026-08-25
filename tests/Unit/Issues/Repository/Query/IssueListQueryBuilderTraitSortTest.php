@@ -8,6 +8,7 @@ use App\Issues\IssueListSort;
 use App\Issues\Repository\Query\IssueListQueryBuilderTrait;
 use DateTimeImmutable;
 use Doctrine\ORM\QueryBuilder;
+use LogicException;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 
@@ -81,5 +82,26 @@ final class IssueListQueryBuilderTraitSortHarness
     public function apply(QueryBuilder $qb, IssueListSort $sort): void
     {
         $this->applySqlSort($qb, $sort);
+    }
+
+    public function createQueryBuilder(string $alias, ?string $indexBy = null): QueryBuilder
+    {
+        throw new LogicException('createQueryBuilder is not used by applySqlSort tests');
+    }
+
+    protected function applyFullTextOrLikeQuery(QueryBuilder $qb, string $query): void
+    {
+    }
+
+    protected function applyTagFilter(QueryBuilder $qb, \App\Project\Entity\Project $project, ?string $tag): void
+    {
+    }
+
+    protected function applyUrlFilter(QueryBuilder $qb, \App\Project\Entity\Project $project, ?string $url): void
+    {
+    }
+
+    protected function applyUserFilter(QueryBuilder $qb, ?string $user): void
+    {
     }
 }
