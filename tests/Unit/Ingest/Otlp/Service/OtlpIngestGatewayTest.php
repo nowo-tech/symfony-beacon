@@ -25,6 +25,7 @@ use RuntimeException;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use App\Ingest\Service\EventQuotaUsageStore;
 
 final class OtlpIngestGatewayTest extends TestCase
 {
@@ -70,7 +71,7 @@ final class OtlpIngestGatewayTest extends TestCase
         $gate = new IngestProjectAccessGate(
             $projects,
             $keys,
-            new ProjectGovernanceResolver($events, $ops),
+            new ProjectGovernanceResolver($ops, new EventQuotaUsageStore($events, new ArrayAdapter())),
             new IngestRateLimiter(new ArrayAdapter()),
             $em,
         );
@@ -110,7 +111,7 @@ final class OtlpIngestGatewayTest extends TestCase
         $gate = new IngestProjectAccessGate(
             $projects,
             $this->createStub(ProjectApiKeyRepository::class),
-            new ProjectGovernanceResolver($events, $ops),
+            new ProjectGovernanceResolver($ops, new EventQuotaUsageStore($events, new ArrayAdapter())),
             new IngestRateLimiter(new ArrayAdapter()),
             $em,
         );

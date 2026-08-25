@@ -60,6 +60,8 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use App\Ingest\Service\EventQuotaUsageStore;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 final class ProjectSettingsPageBuilderTest extends TestCase
 {
@@ -129,7 +131,7 @@ final class ProjectSettingsPageBuilderTest extends TestCase
         $events = $this->createStub(EventRepository::class);
         $events->method('countReceivedTodayForProject')->willReturn(0);
         $events->method('countReceivedSinceForProject')->willReturn(0);
-        $governance = new ProjectGovernanceResolver($events, $ops);
+        $governance = new ProjectGovernanceResolver($ops, new EventQuotaUsageStore($events, new ArrayAdapter()));
 
         $alertPrefs = $this->createStub(MemberProjectAlertPreferenceRepository::class);
         $alertPrefs->method('findIndexedByProjectIdForUser')->willReturn([]);
@@ -297,7 +299,7 @@ final class ProjectSettingsPageBuilderTest extends TestCase
         $events = $this->createStub(EventRepository::class);
         $events->method('countReceivedTodayForProject')->willReturn(5);
         $events->method('countReceivedSinceForProject')->willReturn(9);
-        $governance = new ProjectGovernanceResolver($events, $ops);
+        $governance = new ProjectGovernanceResolver($ops, new EventQuotaUsageStore($events, new ArrayAdapter()));
 
         $alertPrefs = $this->createStub(MemberProjectAlertPreferenceRepository::class);
         $alertPrefs->method('findIndexedByProjectIdForUser')->willReturn([['enabled' => false, 'events' => [], 'hasOverrides' => true]]);
@@ -436,8 +438,8 @@ final class ProjectSettingsPageBuilderTest extends TestCase
         $settingsRepo = $this->createStub(InstanceSettingsRepository::class);
         $settingsRepo->method('getOrCreate')->willReturn(InstanceSettings::defaults());
         $governance = new ProjectGovernanceResolver(
-            $this->createStub(EventRepository::class),
             new InstanceOpsDefaults($settingsRepo),
+            new EventQuotaUsageStore($this->createStub(EventRepository::class), new ArrayAdapter()),
         );
 
         $alertPrefs = $this->createStub(MemberProjectAlertPreferenceRepository::class);
@@ -593,7 +595,7 @@ final class ProjectSettingsPageBuilderTest extends TestCase
         $events = $this->createStub(EventRepository::class);
         $events->method('countReceivedTodayForProject')->willReturn(0);
         $events->method('countReceivedSinceForProject')->willReturn(0);
-        $governanceResolver = new ProjectGovernanceResolver($events, new InstanceOpsDefaults($settingsRepo));
+        $governanceResolver = new ProjectGovernanceResolver(new InstanceOpsDefaults($settingsRepo), new EventQuotaUsageStore($events, new ArrayAdapter()));
 
         $builder = new ProjectSettingsPageBuilder(
             $formFactory,

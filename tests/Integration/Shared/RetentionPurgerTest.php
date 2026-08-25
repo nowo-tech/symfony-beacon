@@ -18,6 +18,8 @@ use App\Shared\Settings\Service\InstanceOpsDefaults;
 use App\Tests\Support\DatabaseWebTestCase;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Ingest\Service\EventQuotaUsageStore;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 final class RetentionPurgerTest extends DatabaseWebTestCase
 {
@@ -132,8 +134,11 @@ final class RetentionPurgerTest extends DatabaseWebTestCase
         $repository->method('getOrCreate')->willReturn($settings);
 
         return new ProjectGovernanceResolver(
-            self::getContainer()->get(EventRepository::class),
             new InstanceOpsDefaults($repository),
+            new EventQuotaUsageStore(
+                self::getContainer()->get(EventRepository::class),
+                self::getContainer()->get('cache.app'),
+            ),
         );
     }
 }

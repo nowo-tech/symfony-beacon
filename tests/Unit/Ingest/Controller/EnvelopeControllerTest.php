@@ -26,6 +26,7 @@ use RuntimeException;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
+use App\Ingest\Service\EventQuotaUsageStore;
 
 final class EnvelopeControllerTest extends TestCase
 {
@@ -117,7 +118,7 @@ final class EnvelopeControllerTest extends TestCase
             new IngestProjectAccessGate(
                 $this->createStub(ProjectRepository::class),
                 $this->createStub(ProjectApiKeyRepository::class),
-                new ProjectGovernanceResolver($events, $ops),
+                new ProjectGovernanceResolver($ops, new EventQuotaUsageStore($events, new ArrayAdapter())),
                 new IngestRateLimiter(new ArrayAdapter()),
                 $em,
             ),

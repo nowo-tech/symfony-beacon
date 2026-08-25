@@ -18,6 +18,7 @@ use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use App\Ingest\Service\EventQuotaUsageStore;
 
 final class IngestProjectAccessGateTest extends TestCase
 {
@@ -169,7 +170,7 @@ final class IngestProjectAccessGateTest extends TestCase
         $this->gate = new IngestProjectAccessGate(
             $this->projectRepository,
             $this->apiKeyRepository,
-            new ProjectGovernanceResolver($this->eventRepository, $ops),
+            new ProjectGovernanceResolver($ops, new EventQuotaUsageStore($this->eventRepository, new ArrayAdapter())),
             $this->rateLimiter,
             $this->entityManager,
         );

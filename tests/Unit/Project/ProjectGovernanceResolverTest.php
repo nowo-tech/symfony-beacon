@@ -11,6 +11,8 @@ use App\Tests\Support\InstanceOpsDefaultsTestTrait;
 use DateTimeImmutable;
 use DateTimeZone;
 use PHPUnit\Framework\TestCase;
+use App\Ingest\Service\EventQuotaUsageStore;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 final class ProjectGovernanceResolverTest extends TestCase
 {
@@ -36,7 +38,7 @@ final class ProjectGovernanceResolverTest extends TestCase
         });
 
         $events = $this->createStub(EventRepository::class);
-        $resolver = new ProjectGovernanceResolver($events, $ops);
+        $resolver = new ProjectGovernanceResolver($ops, new EventQuotaUsageStore($events, new ArrayAdapter()));
 
         $project = new Project();
         $project->setRetentionDays(7);
@@ -73,7 +75,7 @@ final class ProjectGovernanceResolverTest extends TestCase
         $events->method('countReceivedTodayForProject')->willReturn(80);
         $events->method('countReceivedSinceForProject')->willReturn(1000);
 
-        $resolver = new ProjectGovernanceResolver($events, $ops);
+        $resolver = new ProjectGovernanceResolver($ops, new EventQuotaUsageStore($events, new ArrayAdapter()));
         $project = new Project();
 
         self::assertTrue($resolver->isApproachingDailyQuota($project));
@@ -93,7 +95,7 @@ final class ProjectGovernanceResolverTest extends TestCase
         $events->method('countReceivedTodayForProject')->willReturn(999);
         $events->method('countReceivedSinceForProject')->willReturn(999);
 
-        $resolver = new ProjectGovernanceResolver($events, $ops);
+        $resolver = new ProjectGovernanceResolver($ops, new EventQuotaUsageStore($events, new ArrayAdapter()));
         $project = new Project();
 
         self::assertFalse($resolver->isApproachingDailyQuota($project));

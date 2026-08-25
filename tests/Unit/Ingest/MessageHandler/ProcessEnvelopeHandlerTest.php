@@ -31,6 +31,8 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use ReflectionProperty;
 use Symfony\Component\Messenger\MessageBusInterface;
+use App\Ingest\Service\EventQuotaUsageStore;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 final class ProcessEnvelopeHandlerTest extends TestCase
 {
@@ -189,7 +191,7 @@ final class ProcessEnvelopeHandlerTest extends TestCase
 
         $settingsRepo = $this->createStub(InstanceSettingsRepository::class);
         $settingsRepo->method('getOrCreate')->willReturn(InstanceSettings::defaults());
-        $governance = new ProjectGovernanceResolver($events, new InstanceOpsDefaults($settingsRepo));
+        $governance = new ProjectGovernanceResolver(new InstanceOpsDefaults($settingsRepo), new EventQuotaUsageStore($events, new ArrayAdapter()));
 
         $stats = $this->createStub(DailyProjectStatRepository::class);
         $issueWriter = new IssueEnvelopeWriter(
@@ -201,6 +203,7 @@ final class ProcessEnvelopeHandlerTest extends TestCase
             $stats,
             new IssueHistoryRecorder($em),
             $em,
+            new EventQuotaUsageStore($events, new ArrayAdapter()),
         );
         $perfWriter = new PerformanceEnvelopeWriter(new NPlusOneDetector(), $stats, $em);
 

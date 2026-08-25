@@ -19,6 +19,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
+use App\Ingest\Service\EventQuotaUsageStore;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 final class RetentionPurgerTest extends TestCase
 {
@@ -71,7 +73,7 @@ final class RetentionPurgerTest extends TestCase
                 new IssueHistoryRecorder($this->entityManager),
                 $this->entityManager,
             ),
-            new ProjectGovernanceResolver($events, $ops),
+            new ProjectGovernanceResolver($ops, new EventQuotaUsageStore($events, new ArrayAdapter())),
         );
     }
 
@@ -100,7 +102,7 @@ final class RetentionPurgerTest extends TestCase
                 new IssueHistoryRecorder($this->entityManager),
                 $this->entityManager,
             ),
-            new ProjectGovernanceResolver($events, $ops),
+            new ProjectGovernanceResolver($ops, new EventQuotaUsageStore($events, new ArrayAdapter())),
         );
 
         $totals = $this->purger->purge(new DateTimeImmutable('2026-08-13T00:00:00+00:00'));
@@ -153,7 +155,7 @@ final class RetentionPurgerTest extends TestCase
                 new IssueHistoryRecorder($this->entityManager),
                 $this->entityManager,
             ),
-            new ProjectGovernanceResolver($events, $ops),
+            new ProjectGovernanceResolver($ops, new EventQuotaUsageStore($events, new ArrayAdapter())),
         );
 
         $result = $this->purger->purgeProject($project);
@@ -181,10 +183,10 @@ final class RetentionPurgerTest extends TestCase
                 new IssueHistoryRecorder($this->entityManager),
                 $this->entityManager,
             ),
-            new ProjectGovernanceResolver($events, $this->opsDefaultsWith(static function ($settings): void {
+            new ProjectGovernanceResolver($this->opsDefaultsWith(static function ($settings): void {
                 $settings->setRetentionDays(30);
                 $settings->setRetentionMaxEvents(0);
-            })),
+            }), new EventQuotaUsageStore($events, new ArrayAdapter())),
         );
 
         $totals = $this->purger->purge(new DateTimeImmutable('2026-08-13T00:00:00+00:00'));
@@ -214,10 +216,10 @@ final class RetentionPurgerTest extends TestCase
                 new IssueHistoryRecorder($this->entityManager),
                 $this->entityManager,
             ),
-            new ProjectGovernanceResolver($events, $this->opsDefaultsWith(static function ($settings): void {
+            new ProjectGovernanceResolver($this->opsDefaultsWith(static function ($settings): void {
                 $settings->setRetentionDays(30);
                 $settings->setRetentionMaxEvents(0);
-            })),
+            }), new EventQuotaUsageStore($events, new ArrayAdapter())),
         );
 
         $totals = $this->purger->purge(new DateTimeImmutable('2026-08-13T00:00:00+00:00'));
@@ -253,10 +255,10 @@ final class RetentionPurgerTest extends TestCase
                 new IssueHistoryRecorder($this->entityManager),
                 $this->entityManager,
             ),
-            new ProjectGovernanceResolver($events, $this->opsDefaultsWith(static function ($settings): void {
+            new ProjectGovernanceResolver($this->opsDefaultsWith(static function ($settings): void {
                 $settings->setRetentionDays(30);
                 $settings->setRetentionMaxEvents(0);
-            })),
+            }), new EventQuotaUsageStore($events, new ArrayAdapter())),
         );
 
         self::assertSame(0, $this->purger->purge(new DateTimeImmutable('2026-08-13T00:00:00+00:00'))['projects']);
@@ -292,7 +294,7 @@ final class RetentionPurgerTest extends TestCase
                 new IssueHistoryRecorder($this->entityManager),
                 $this->entityManager,
             ),
-            new ProjectGovernanceResolver($events, $ops),
+            new ProjectGovernanceResolver($ops, new EventQuotaUsageStore($events, new ArrayAdapter())),
         );
 
         self::assertSame(

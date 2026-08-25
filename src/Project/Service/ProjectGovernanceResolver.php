@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Project\Service;
 
-use App\Issues\Repository\EventRepository;
+use App\Ingest\Service\EventQuotaUsageStore;
 use App\Project\Entity\Project;
 use App\Shared\Settings\Service\InstanceOpsDefaults;
 use DateTimeImmutable;
@@ -14,15 +14,16 @@ use DateTimeZone;
  * Resolves effective governance limits (project override → instance default) and quota usage.
  *
  * Monthly quotas use the UTC calendar month (FR-004).
- * Daily/monthly COUNTs rely on idx_event_project_received for ingest hot path.
+ * Daily/monthly usage prefers {@see EventQuotaUsageStore} (cache seeded from
+ * {@code idx_event_project_received} COUNTs) so ingest ACK / worker re-checks stay cheap.
  */
 final readonly class ProjectGovernanceResolver
 {
     public const float APPROACHING_QUOTA_RATIO = 0.8;
 
     public function __construct(
-        private EventRepository $eventRepository,
         private InstanceOpsDefaults $opsDefaults,
+        private EventQuotaUsageStore $quotaUsageStore,
     ) {
     }
 
@@ -53,12 +54,12 @@ final readonly class ProjectGovernanceResolver
 
     public function eventsReceivedToday(Project $project): int
     {
-        return $this->eventRepository->countReceivedTodayForProject($project);
+        return $this->quotaUsageStore->eventsReceivedToday($project);
     }
 
     public function eventsReceivedThisMonth(Project $project): int
     {
-        return $this->eventRepository->countReceivedSinceForProject($project, self::utcMonthStart());
+        return $this->quotaUsageStore->eventsReceivedThisMonth($project);
     }
 
     /**

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Issues\Service;
 
 use App\Analytics\Repository\DailyProjectStatRepository;
+use App\Ingest\Service\EventQuotaUsageStore;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\EventTag;
 use App\Issues\Entity\Issue;
@@ -32,6 +33,7 @@ final readonly class IssueEnvelopeWriter
         private DailyProjectStatRepository $dailyProjectStatRepository,
         private IssueHistoryRecorder $historyRecorder,
         private EntityManagerInterface $entityManager,
+        private EventQuotaUsageStore $quotaUsageStore,
     ) {
     }
 
@@ -111,6 +113,8 @@ final readonly class IssueEnvelopeWriter
 
         $stat = $this->dailyProjectStatRepository->findOrCreate($project, $receivedAt);
         $stat->incrementErrorCount();
+
+        $this->quotaUsageStore->recordAcceptedEvent($project, $receivedAt);
 
         $environment = isset($payload['environment']) ? (string) $payload['environment'] : null;
         $release = isset($payload['release']) ? (string) $payload['release'] : null;

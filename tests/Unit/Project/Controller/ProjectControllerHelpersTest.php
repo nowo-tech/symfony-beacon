@@ -32,6 +32,8 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use App\Ingest\Service\EventQuotaUsageStore;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 final class ProjectControllerHelpersTest extends TestCase
 {
@@ -137,11 +139,8 @@ final class ProjectControllerHelpersTest extends TestCase
         $controller = new ReflectionClass(ProjectController::class)->newInstanceWithoutConstructor();
         new ReflectionProperty(ProjectController::class, 'governanceResolver')->setValue(
             $controller,
-            new ProjectGovernanceResolver(
-                $events,
-                $this->opsDefaultsWith(static function ($settings): void {
-                }),
-            ),
+            new ProjectGovernanceResolver($this->opsDefaultsWith(static function ($settings): void {
+                }), new EventQuotaUsageStore($events, new ArrayAdapter())),
         );
 
         $session = new Session(new MockArraySessionStorage());
@@ -174,11 +173,8 @@ final class ProjectControllerHelpersTest extends TestCase
         $controller = new ReflectionClass(ProjectController::class)->newInstanceWithoutConstructor();
         new ReflectionProperty(ProjectController::class, 'governanceResolver')->setValue(
             $controller,
-            new ProjectGovernanceResolver(
-                $events,
-                $this->opsDefaultsWith(static function ($settings): void {
-                }),
-            ),
+            new ProjectGovernanceResolver($this->opsDefaultsWith(static function ($settings): void {
+                }), new EventQuotaUsageStore($events, new ArrayAdapter())),
         );
 
         $session = new Session(new MockArraySessionStorage());

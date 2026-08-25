@@ -23,6 +23,8 @@ use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use ReflectionProperty;
+use App\Ingest\Service\EventQuotaUsageStore;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 final class IssueEnvelopeWriterTest extends TestCase
 {
@@ -56,6 +58,7 @@ final class IssueEnvelopeWriterTest extends TestCase
             $stats,
             new IssueHistoryRecorder($this->entityManager),
             $this->entityManager,
+            new EventQuotaUsageStore($this->eventRepository, new ArrayAdapter()),
         );
     }
 
