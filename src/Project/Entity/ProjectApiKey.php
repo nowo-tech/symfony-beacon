@@ -133,6 +133,32 @@ class ProjectApiKey
     }
 
     /**
+     * True when the legacy Halite column still holds a value (even if a hash also exists).
+     */
+    public function hasLegacyEncryptedSecret(): bool
+    {
+        return null !== $this->secretKey && '' !== $this->secretKey;
+    }
+
+    /**
+     * Drop redundant legacy ciphertext when {@see $secretHash} is already set.
+     * Does not revoke keys that still authenticate only via {@see $secretKey}.
+     */
+    public function clearRedundantLegacySecret(): bool
+    {
+        if (null === $this->secretHash || '' === $this->secretHash) {
+            return false;
+        }
+        if (!$this->hasLegacyEncryptedSecret()) {
+            return false;
+        }
+
+        $this->secretKey = null;
+
+        return true;
+    }
+
+    /**
      * One-shot plaintext for DSN flash after create/rotate (clears after read).
      */
     public function consumeIssuedPlainSecret(): ?string
