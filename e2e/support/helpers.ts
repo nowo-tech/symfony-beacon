@@ -93,9 +93,15 @@ export function loadDemoIngestCredentials(): DemoIngestCredentials | null {
   return { projectId: ref, publicKey, secretKey, projectUuid };
 }
 
-/** Preferred HTTP ingest base (Docker clients use :9084). */
+/** Preferred HTTP ingest base (Docker clients use :9084; isolated E2E uses :9085). */
 export function ingestHttpBase(): string {
-  return process.env.PLAYWRIGHT_INGEST_BASE_URL ?? 'http://localhost:9084';
+  if (process.env.PLAYWRIGHT_INGEST_BASE_URL) {
+    return process.env.PLAYWRIGHT_INGEST_BASE_URL;
+  }
+  if (process.env.PLAYWRIGHT_ISOLATED === '1') {
+    return 'http://localhost:9085';
+  }
+  return 'http://localhost:9084';
 }
 
 export function beaconAuthHeader(publicKey: string, secretKey: string): string {

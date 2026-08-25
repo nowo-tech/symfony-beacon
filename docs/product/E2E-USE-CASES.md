@@ -192,6 +192,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-PROJ-25 | New-project form fragment (`/_new_form`) | ✅ Covered | `project/use-cases-remaining-gaps.spec.ts` |
 | UC-PROJ-26 | Inactive API key rejected on ingest | ✅ Covered | `project/use-cases-remaining-gaps.spec.ts` |
 | UC-PROJ-27 | Guest share open → login → consume project | ✅ Covered | `flows/use-cases-atomic-gaps.spec.ts` |
+| UC-PROJ-28 | Share link cannot bind an issue from another project | ✅ Covered | `security/unwanted-actions.spec.ts` |
 
 ---
 
@@ -228,6 +229,9 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ISS-27 | Illegal status transition rejected | ✅ Covered | `project/use-cases-remaining-gaps.spec.ts` |
 | UC-ISS-28 | Event detail 404 for unknown id | ✅ Covered | `project/use-cases-remaining-gaps.spec.ts` |
 | UC-ISS-29 | Environment compare apply selection | ✅ Covered | `project/use-cases-remaining-gaps.spec.ts` |
+| UC-ISS-30 | Whitespace-only comment rejected | ✅ Covered | `security/unwanted-actions.spec.ts` |
+| UC-ISS-31 | XSS payload in comment stored escaped | ✅ Covered | `security/unwanted-actions.spec.ts` (same as UC-SEC-16) |
+| UC-ISS-32 | Oversized comment (>5000) rejected | ✅ Covered | `security/edge-guards.spec.ts` (same as UC-SEC-33) |
 
 ---
 
@@ -269,6 +273,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-NOTIF-15 | Threshold rule edit form save | ✅ Covered | `notifications/use-cases-channel-matrix.spec.ts` |
 | UC-NOTIF-16 | Reject SSRF / private endpoint URL | ✅ Covered | `notifications/use-cases-channel-matrix.spec.ts` |
 | UC-NOTIF-17 | Flush digests console/cron | ✅ Covered | `notifications/use-cases-digest-flush.spec.ts` (`make test-e2e` writes `var/e2e/flush-digests.last`) |
+| UC-NOTIF-18 | Reject `javascript:` destination URL | ✅ Covered | `security/edge-guards.spec.ts` (same as UC-SEC-37) |
 
 ---
 
@@ -294,6 +299,11 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ING-16 | Unknown project / bad DSN → 401/404 | ✅ Covered | `ingest/use-cases-ingest-edges.spec.ts` |
 | UC-ING-17 | OpenAPI HTML docs UI (`/admin/api/doc`) | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` |
 | UC-ING-18 | Read API unauthorized without Bearer | ✅ Covered | `ingest/use-cases-ingest-edges.spec.ts` |
+| UC-ING-19 | Read API token cannot list another project (403) | ✅ Covered | `ingest/use-cases-ingest-abuse.spec.ts` |
+| UC-ING-20 | Empty envelope body → 400 | ✅ Covered | `ingest/use-cases-ingest-abuse.spec.ts` |
+| UC-ING-21 | Oversized envelope → 413 | ✅ Covered | `ingest/use-cases-ingest-abuse.spec.ts` |
+| UC-ING-22 | Forged Read API Bearer → 401 | ✅ Covered | `ingest/use-cases-ingest-abuse.spec.ts` |
+| UC-ING-23 | Revoked Read API Bearer → 401 | ✅ Covered | `security/edge-guards.spec.ts` |
 
 ---
 
@@ -313,6 +323,8 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-HOOK-10 | Teams / Slack action token replay rejected | ✅ Covered | `hooks/use-cases-hooks-negatives.spec.ts` |
 | UC-HOOK-11 | Inbound duplicate Message-Id idempotent | ✅ Covered | `hooks/use-cases-hooks-negatives.spec.ts` |
 | UC-HOOK-12 | Inbound From ≠ token recipient ignored | ✅ Covered | `hooks/use-cases-hooks-negatives.spec.ts` |
+| UC-HOOK-13 | Slack stale timestamp (>5 min) → 401 | ✅ Covered | `hooks/use-cases-hooks-negatives.spec.ts` |
+| UC-HOOK-14 | Slack action project UUID mismatch → 403 | ✅ Covered | `hooks/use-cases-hooks-negatives.spec.ts` |
 
 ---
 
@@ -394,7 +406,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 **Definition complete:** every primary product route family and operator mutation above has a `UC-*` row (surface catalog ≈ 100% of application product surface).
 
-**Automation status (2026-08-20):** ~261 Covered / ~0 Partial / ~0 Gap / ~8 Out of scope. Remaining Out of scope: empty-DB first user (AUTH-10), incomplete platform catalog fixture (SETUP-02 / SETUP-07), SiteBackup restore (OPS-14), roadmap Later (Native / dogfood UI / dogfood suite CLI / hot-reload). Browser Push *permission* prompt remains external. Cold `/setup` wizard + POST advance stay intentionally unexercised on seeded installs. Local Playwright uses `retries: 1` and hardened `gotoStable` (WSL `ERR_NETWORK_CHANGED` / `chrome-error`).
+**Automation status (2026-08-25):** ~316 Covered / ~0 Partial / ~0 Gap / ~8 Out of scope. Remaining Out of scope: empty-DB first user (AUTH-10), incomplete platform catalog fixture (SETUP-02 / SETUP-07), SiteBackup restore (OPS-14), roadmap Later (Native / dogfood UI / dogfood suite CLI / hot-reload). Browser Push *permission* prompt remains external. Cold `/setup` wizard + POST advance stay intentionally unexercised on seeded installs. Local Playwright uses `retries: 1` and hardened `gotoStable` (WSL `ERR_NETWORK_CHANGED` / `chrome-error`). Limit/abuse batch UC-SEC-40..57 lives in `security/limit-guards.spec.ts`.
 
 **Closed Gap batches:**
 
@@ -413,6 +425,9 @@ Membership roles: see [ROLES.md](ROLES.md).
 13. ~~Security denials UC-SEC-01..12~~ → Covered (`security/access-denials.spec.ts`, `security/auth-gates.spec.ts`).
 14. ~~Morphicons + PhoneInput + PWA cookie-free manifest UC-ACC-26/27 (+ UC-ACC-16 assert)~~ → Covered (`account/use-cases-morphicons-chrome.spec.ts`, `account/use-cases-account-mutations.spec.ts`, `smoke/misc.spec.ts`).
 15. Document SETUP-07 / LATER-03 / LATER-04 as Out of scope (unit/CLI/dev owners).
+16. ~~Unwanted-action / abuse guards UC-SEC-13..27, UC-ING-19..22, UC-HOOK-13/14, UC-ISS-30/31, UC-PROJ-28~~ → Covered (`security/unwanted-actions.spec.ts`, `ingest/use-cases-ingest-abuse.spec.ts`, `hooks/use-cases-hooks-negatives.spec.ts`).
+17. ~~Edge guards UC-SEC-28..39, UC-ISS-32, UC-NOTIF-18, UC-ING-23~~ → Covered (`security/edge-guards.spec.ts`).
+18. ~~Limit / abuse guards UC-SEC-40..57~~ → Covered (`security/limit-guards.spec.ts`).
 
 When adding a case: give it a **UC-*** ID here, set status, and name the spec file under `e2e/<domain>/`.
 
@@ -436,6 +451,51 @@ Focused suite proving **blocked** access — HTTP 403 branded gates, login redir
 | UC-SEC-10 | Disabled account cannot authenticate | ✅ Covered | `security/auth-gates.spec.ts` |
 | UC-SEC-11 | Password reset + QR/magic login stay public (no dashboard leak) | ✅ Covered | `security/auth-gates.spec.ts` |
 | UC-SEC-12 | `/register` closed when users exist | ✅ Covered | `security/auth-gates.spec.ts` |
+| UC-SEC-13 | Forged CSRF on issue comment rejected | ✅ Covered | `security/unwanted-actions.spec.ts` |
+| UC-SEC-14 | Issue UUID under another project UUID → 404 (IDOR) | ✅ Covered | `security/unwanted-actions.spec.ts` |
+| UC-SEC-15 | Login `_target_path` cannot open-redirect off-site | ✅ Covered | `security/unwanted-actions.spec.ts` |
+| UC-SEC-16 | Script / `onerror` in comments stored escaped (no execute) | ✅ Covered | `security/unwanted-actions.spec.ts` |
+| UC-SEC-17 | GET on POST-only mutations → 4xx (no mutate) | ✅ Covered | `security/unwanted-actions.spec.ts` |
+| UC-SEC-18 | Empty / SQL-injection-like login stays on `/login` | ✅ Covered | `security/unwanted-actions.spec.ts` |
+| UC-SEC-19 | Bogus password-reset code does not authenticate | ✅ Covered | `security/unwanted-actions.spec.ts` |
+| UC-SEC-20 | Last owner has no remove control; forged remove → 4xx | ✅ Covered | `security/unwanted-actions.spec.ts` |
+| UC-SEC-21 | Unknown member email rejected | ✅ Covered | `security/unwanted-actions.spec.ts` |
+| UC-SEC-22 | Duplicate member email rejected | ✅ Covered | `security/unwanted-actions.spec.ts` |
+| UC-SEC-23 | Wrong delete confirmation does not delete the project | ✅ Covered | `security/unwanted-actions.spec.ts` |
+| UC-SEC-24 | Guest POST cannot add issue comments | ✅ Covered | `security/unwanted-actions.spec.ts` |
+| UC-SEC-25 | Invalid JSON project config import rejected | ✅ Covered | `security/unwanted-actions.spec.ts` |
+| UC-SEC-26 | Disabled user cannot be added as a project member | ✅ Covered | `security/unwanted-actions.spec.ts` |
+| UC-SEC-27 | Authenticated locale switcher ignores off-site redirect | ✅ Covered | `security/unwanted-actions.spec.ts` |
+| UC-SEC-28 | Wrong transfer-ownership confirmation does not transfer | ✅ Covered | `security/edge-guards.spec.ts` |
+| UC-SEC-29 | Forged CSRF on project delete rejected | ✅ Covered | `security/edge-guards.spec.ts` |
+| UC-SEC-30 | Forged CSRF on clear-history rejected (issues remain) | ✅ Covered | `security/edge-guards.spec.ts` |
+| UC-SEC-31 | Assign non-member user id rejected | ✅ Covered | `security/edge-guards.spec.ts` |
+| UC-SEC-32 | Invalid priority value rejected | ✅ Covered | `security/edge-guards.spec.ts` |
+| UC-SEC-33 | Oversized comment rejected | ✅ Covered | `security/edge-guards.spec.ts` |
+| UC-SEC-34 | Duplicate of self / foreign UUID rejected | ✅ Covered | `security/edge-guards.spec.ts` |
+| UC-SEC-35 | Wrong admin anonymize confirmation does not anonymize | ✅ Covered | `security/edge-guards.spec.ts` |
+| UC-SEC-36 | Guest POST cannot delete a project | ✅ Covered | `security/edge-guards.spec.ts` |
+| UC-SEC-37 | `javascript:` notification endpoint rejected | ✅ Covered | `security/edge-guards.spec.ts` |
+| UC-SEC-38 | Script-like project name stored escaped | ✅ Covered | `security/edge-guards.spec.ts` |
+| UC-SEC-39 | Magic-login unknown email stays public | ✅ Covered | `security/edge-guards.spec.ts` |
+| UC-SEC-40 | Share link days out of range (0 / 99 / −1) rejected | ✅ Covered | `security/limit-guards.spec.ts` |
+| UC-SEC-41 | Forged CSRF on API key revoke leaves key active | ✅ Covered | `security/limit-guards.spec.ts` |
+| UC-SEC-42 | Empty / whitespace project name rejected | ✅ Covered | `security/limit-guards.spec.ts` |
+| UC-SEC-43 | Garbage project path → branded 404 (not 5xx) | ✅ Covered | `security/limit-guards.spec.ts` |
+| UC-SEC-44 | Theme AJAX rejects invalid theme + forged CSRF | ✅ Covered | `security/limit-guards.spec.ts` |
+| UC-SEC-45 | Wrong privacy anonymize confirmation does not anonymize | ✅ Covered | `security/limit-guards.spec.ts` |
+| UC-SEC-46 | Viewer cannot escalate own role via forged POST | ✅ Covered | `security/limit-guards.spec.ts` |
+| UC-SEC-47 | `file://` notification endpoint rejected | ✅ Covered | `security/limit-guards.spec.ts` |
+| UC-SEC-48 | Clear-history without slide-to-confirm rejected | ✅ Covered | `security/limit-guards.spec.ts` |
+| UC-SEC-49 | Guest POST cannot create share links | ✅ Covered | `security/limit-guards.spec.ts` |
+| UC-SEC-50 | API key revoke under another project UUID → 404 (IDOR) | ✅ Covered | `security/limit-guards.spec.ts` |
+| UC-SEC-51 | Password confirm mismatch does not change password | ✅ Covered | `security/limit-guards.spec.ts` |
+| UC-SEC-52 | Invalid quiet-hours timezone rejected | ✅ Covered | `security/limit-guards.spec.ts` |
+| UC-SEC-53 | Content-width AJAX rejects invalid value + forged CSRF | ✅ Covered | `security/limit-guards.spec.ts` |
+| UC-SEC-54 | Forged CSRF on share-link create rejected | ✅ Covered | `security/limit-guards.spec.ts` |
+| UC-SEC-55 | Email destination with non-email endpoint rejected | ✅ Covered | `security/limit-guards.spec.ts` |
+| UC-SEC-56 | Oversized display name (>120) rejected | ✅ Covered | `security/limit-guards.spec.ts` |
+| UC-SEC-57 | Unknown project UUID (valid format) → branded 404 | ✅ Covered | `security/limit-guards.spec.ts` |
 
 Helpers: `e2e/support/security.ts` (`expectForbidden`, `createEnabledUser`, `addProjectMember`, `loginAsUser`, …).
 

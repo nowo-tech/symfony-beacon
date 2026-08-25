@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import {
   beaconAuthHeader,
   dismissProductTour,
+  gotoStable,
   ingestHttpBase,
   loadDemoIngestCredentials,
   requireSampleOrSkip,
@@ -18,7 +19,7 @@ function requireCreds() {
 }
 
 async function createEphemeralProject(page: import('@playwright/test').Page, name: string): Promise<string> {
-  await page.goto('/dashboard?new=1');
+  await gotoStable(page, '/dashboard?new=1');
   await dismissProductTour(page);
   if (!(await page.locator('input[name="project[name]"]').isVisible().catch(() => false))) {
     await page.locator('[data-tour="new-project"], [data-action="new-project"]').first().click();

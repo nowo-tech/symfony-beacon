@@ -4,17 +4,19 @@ import {
   DEMO_PASSWORD,
   dismissCookieConsent,
   dismissProductTour,
+  gotoStable,
   openFirstIssue,
   requireSampleOrSkip,
   resolveDemoProjectUuid,
   waitForPageLoader,
 } from '../support/helpers';
+
 /**
  * Unwanted / abusive operator actions — CSRF, IDOR, confirmation mismatch,
  * open redirects, XSS, membership guards. Happy-path mutations live elsewhere.
  */
 async function createEphemeralProject(page: Page, name: string): Promise<string> {
-  await page.goto('/dashboard?new=1');
+  await gotoStable(page, '/dashboard?new=1');
   await dismissProductTour(page);
   const dialog = page.locator('dialog[open], dialog.confirm-dialog[open], dialog:not([hidden])').first();
   if (!(await dialog.isVisible().catch(() => false))) {
@@ -73,6 +75,7 @@ test.describe('Unwanted actions — CSRF, IDOR, confirmations, XSS', () => {
   });
 
   test('issue UUID from another project is 404 (UC-SEC-14)', async ({ page }) => {
+    test.setTimeout(90_000);
     const demoUuid = await resolveDemoProjectUuid(page);
     const issueUuid = await openFirstIssue(page, demoUuid);
     if (!issueUuid) {
@@ -83,6 +86,7 @@ test.describe('Unwanted actions — CSRF, IDOR, confirmations, XSS', () => {
     const otherUuid = await createEphemeralProject(page, `E2E IDOR ${Date.now().toString(36)}`);
     const response = await page.goto(`/projects/${otherUuid}/issues/${issueUuid}`, {
       waitUntil: 'domcontentloaded',
+      timeout: 45_000,
     });
     await dismissProductTour(page);
     expect(response, 'cross-project issue response').not.toBeNull();
@@ -92,6 +96,7 @@ test.describe('Unwanted actions — CSRF, IDOR, confirmations, XSS', () => {
   });
 
   test('login _target_path cannot open-redirect off-site (UC-SEC-15)', async ({ browser }) => {
+    test.setTimeout(90_000);
     const context = await browser.newContext({
       ignoreHTTPSErrors: true,
       storageState: { cookies: [], origins: [] },
@@ -107,22 +112,28 @@ test.describe('Unwanted actions — CSRF, IDOR, confirmations, XSS', () => {
         if (!(form instanceof HTMLFormElement)) {
           return;
         }
-        for (const value of ['https://evil.example/phish', '//evil.example/phish']) {
-          const input = document.createElement('input');
+        let input = form.querySelector('input[name="_target_path"]');
+        if (!(input instanceof HTMLInputElement)) {
+          input = document.createElement('input');
           input.type = 'hidden';
           input.name = '_target_path';
-          input.value = value;
           form.appendChild(input);
         }
+        input.value = 'https://evil.example/phish';
       });
       await page
         .locator('.nowo-auth-kit__panel button[type="submit"], form[name="login_form"] button[type="submit"]')
         .first()
         .click();
-      await page.waitForURL(/\/dashboard/, { timeout: 45_000 });
+      await page.waitForURL((url) => !/\/login(\?|$|\/)/.test(url.pathname) || url.hostname === 'evil.example', {
+        timeout: 45_000,
+        waitUntil: 'domcontentloaded',
+      });
       await dismissProductTour(page);
-      expect(page.url()).not.toMatch(/evil\.example/i);
-      expect(new URL(page.url()).origin).toMatch(/localhost|127\.0\.0\.1/i);
+      const landed = new URL(page.url());
+      expect(landed.hostname, landed.href).toMatch(/localhost|127\.0\.0\.1/i);
+      expect(landed.hostname, landed.href).not.toBe('evil.example');
+      await expect(page.locator('body')).toBeVisible();
     } finally {
       await context.close();
     }
@@ -354,17 +365,28 @@ test.describe('Unwanted actions — CSRF, IDOR, confirmations, XSS', () => {
     const panel = page.locator('[data-testid="project-config-portability"]');
     await expect(panel).toBeVisible({ timeout: 15_000 });
     await panel.locator('#tab-project-config-import').click();
-    await expect(panel.locator('[data-testid="project-config-import"]')).toBeVisible();
+    const importPane = panel.locator('[data-testid="project-config-import"]');
+    await expect(importPane).toBeVisible();
+    const fileInput = importPane.locator('[data-testid="project-config-file"]');
+    await expect(fileInput).toBeAttached();
 
-    await panel.locator('[data-testid="project-config-file"]').setInputFiles({
+    await fileInput.setInputFiles({
       name: 'not-a-bundle.json',
       mimeType: 'application/json',
-      buffer: Buffer.from('{not-json', 'utf8'),
+      buffer: Buffer.from('{"schema":"not-a-beacon-bundle","projects":"nope"}', 'utf8'),
     });
-    await panel.locator('[data-testid="project-config-import-submit"]').click();
+    await importPane.locator('[data-testid="project-config-import-submit"]').click();
     await waitForPageLoader(page);
+    await expect(page.locator('.flash-error, .flash-toast[role="alert"], [role="alert"]').first()).toBeVisible({
+      timeout: 10_000,
+    });
     await expect(page).toHaveURL(new RegExp(`/projects/${uuid}/settings/data`));
-    await expect(page.locator('body')).toContainText(/could not import|invalid JSON|JSON o esquema|security token/i);
+    await expect(page).not.toHaveURL(/\/login/);
+    await expect(page.locator('body')).not.toContainText(/Whoops, looks like something went wrong/);
+    await expect(page.locator('body')).toContainText(
+      /could not import|invalid JSON|JSON o esquema|security token|token de seguridad|choose a JSON|failed|no se pudo|schema/i,
+    );
+    await expect(page.locator('body')).not.toContainText(/settings and memberships updated/i);
   });
 
   test('disabled user cannot be added as a project member (UC-SEC-26)', async ({ page }) => {

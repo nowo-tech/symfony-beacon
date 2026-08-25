@@ -436,6 +436,7 @@ test-unit-js-coverage: ensure-up
 # CI sets PLAYWRIGHT_REQUIRE_SAMPLE=1 so issue-dependent tests fail instead of skip.
 PLAYWRIGHT_IMAGE ?= mcr.microsoft.com/playwright:v1.62.1-jammy
 PLAYWRIGHT_BASE_URL ?= https://localhost:9447
+PLAYWRIGHT_INGEST_BASE_URL ?= http://localhost:9084
 # Mailpit UI (make mailpit) — used by UC-AUTH-18/20; skip when unreachable unless REQUIRE_MAILPIT=1
 PLAYWRIGHT_MAILPIT_URL ?= http://127.0.0.1:18026
 PLAYWRIGHT_REQUIRE_MAILPIT ?=
@@ -444,12 +445,14 @@ test-e2e: ensure-up
 	@# UC-NOTIF-17: console/cron flush — capture for Playwright assertion (no browser surface)
 	@$(DC) exec -T php sh -c 'mkdir -p var/e2e && bin/console app:notifications:flush-digests --force > var/e2e/flush-digests.last 2>&1'
 ifeq ($(PLAYWRIGHT_ON_HOST),1)
+	PLAYWRIGHT_INGEST_BASE_URL="$(PLAYWRIGHT_INGEST_BASE_URL)" \
 	PLAYWRIGHT_MAILPIT_URL="$(PLAYWRIGHT_MAILPIT_URL)" PLAYWRIGHT_REQUIRE_MAILPIT="$(PLAYWRIGHT_REQUIRE_MAILPIT)" pnpm exec playwright test $(ARGS)
 else
 	docker run --rm --network=host \
 		--user "$(shell id -u):$(shell id -g)" \
 		-v "$(CURDIR):/work" -w /work \
 		-e PLAYWRIGHT_BASE_URL="$(PLAYWRIGHT_BASE_URL)" \
+		-e PLAYWRIGHT_INGEST_BASE_URL="$(PLAYWRIGHT_INGEST_BASE_URL)" \
 		-e PLAYWRIGHT_MAILPIT_URL="$(PLAYWRIGHT_MAILPIT_URL)" \
 		-e PLAYWRIGHT_REQUIRE_SAMPLE="$(PLAYWRIGHT_REQUIRE_SAMPLE)" \
 		-e PLAYWRIGHT_REQUIRE_MAILPIT="$(PLAYWRIGHT_REQUIRE_MAILPIT)" \
@@ -527,6 +530,7 @@ test-e2e-isolated: ensure-e2e-up
 ifeq ($(PLAYWRIGHT_ON_HOST),1)
 	PLAYWRIGHT_ISOLATED=1 \
 	PLAYWRIGHT_BASE_URL="$(PLAYWRIGHT_E2E_BASE_URL)" \
+	PLAYWRIGHT_INGEST_BASE_URL="http://localhost:$(E2E_HTTP_PORT)" \
 	PLAYWRIGHT_MAILPIT_URL="$(PLAYWRIGHT_MAILPIT_URL)" \
 	PLAYWRIGHT_REQUIRE_MAILPIT="$(PLAYWRIGHT_REQUIRE_MAILPIT)" \
 	PLAYWRIGHT_REQUIRE_SAMPLE="$(PLAYWRIGHT_REQUIRE_SAMPLE)" \
@@ -537,6 +541,7 @@ else
 		-v "$(CURDIR):/work" -w /work \
 		-e PLAYWRIGHT_ISOLATED=1 \
 		-e PLAYWRIGHT_BASE_URL="$(PLAYWRIGHT_E2E_BASE_URL)" \
+		-e PLAYWRIGHT_INGEST_BASE_URL="http://localhost:$(E2E_HTTP_PORT)" \
 		-e PLAYWRIGHT_MAILPIT_URL="$(PLAYWRIGHT_MAILPIT_URL)" \
 		-e PLAYWRIGHT_REQUIRE_SAMPLE="$(PLAYWRIGHT_REQUIRE_SAMPLE)" \
 		-e PLAYWRIGHT_REQUIRE_MAILPIT="$(PLAYWRIGHT_REQUIRE_MAILPIT)" \

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { dismissCookieConsent, expectGuestPage } from '../support/helpers';
+import { dismissCookieConsent, dismissProductTour, expectGuestPage, waitForPageLoader } from '../support/helpers';
 
 /**
  * Auth security gates — login failure, disabled accounts, and public auth surfaces.
@@ -36,6 +36,8 @@ test.describe('Security — auth gates', () => {
     const password = `E2eSecDis1!${suffix}`;
 
     await page.goto('/admin/users?new=1');
+    await dismissProductTour(page);
+    await waitForPageLoader(page);
     const form = page.locator('form').filter({ has: page.locator('input[name="admin_user[email]"]') });
     await expect(form).toBeVisible({ timeout: 15_000 });
     await form.locator('input[name="admin_user[email]"]').fill(email);
@@ -46,7 +48,16 @@ test.describe('Security — auth gates', () => {
     if (await enabled.isChecked().catch(() => false)) {
       await enabled.uncheck();
     }
-    await form.locator('button[type="submit"]').click();
+    const submit = form.locator('button.btn-primary[type="submit"], button[type="submit"]').first();
+    await Promise.all([
+      page.waitForURL((url) => url.pathname.replace(/\/$/, '') === '/admin/users' && !url.searchParams.has('new'), {
+        timeout: 20_000,
+      }).catch(() => undefined),
+      submit.click(),
+    ]);
+    await waitForPageLoader(page);
+    await page.goto(`/admin/users?q=${encodeURIComponent(email)}`);
+    await waitForPageLoader(page);
     await expect(page.getByRole('main')).toContainText(email, { timeout: 20_000 });
 
     const context = await browser.newContext({
