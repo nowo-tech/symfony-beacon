@@ -104,7 +104,7 @@ help:
 	@echo "  make kit-smoke       AuthKit smoke (login, magic login, password reset, throttle)"
 	@echo "  make secrets-scan    Gitleaks secret scan (same gate as CI)"
 	@echo "  make qa              cs + twig-cs + phpstan + rector + check-module-boundaries + test"
-	@echo "  make qa-fix          cs-fix + twig-cs-fix + phpstan + rector-fix + test"
+	@echo "  make qa-fix          rector-fix (Rector→CS) + twig-cs-fix + phpstan + test"
 	@echo "  make update-deps     bump pinned Composer deps (helper --run) + composer update + pnpm update"
 	@echo "  make composer-outdated  Suggest composer require pins (nowo-tech/composer-update-helper)"
 	@echo ""
@@ -412,8 +412,8 @@ phpstan: ensure-up
 rector: ensure-up
 	$(DC) exec -T php vendor/bin/rector process --dry-run
 
-# Always re-run CS Fixer after Rector: rules like blank_line_before_statement leave diffs
-# that fail `php-cs-fixer check` in CI (qa-fix previously ran CS before Rector only).
+# Always re-run CS Fixer after Rector: Rector is semantic (types/dead code/PHP 8.5);
+# CS-Fixer owns PER-CS / Symfony formatting (blank_line_before_statement, imports, `\fn()`).
 rector-fix: ensure-up
 	$(DC) exec -T php vendor/bin/rector process
 	@$(MAKE) cs-fix
@@ -572,8 +572,8 @@ secrets-scan:
 
 qa: cs twig-cs phpstan rector check-module-boundaries test
 
-# rector-fix re-applies CS Fixer so the tree matches CI `php-cs-fixer check`.
-qa-fix: cs-fix twig-cs-fix phpstan rector-fix test
+# Apply order: Rector first, then CS Fixer once (via rector-fix), then the rest.
+qa-fix: rector-fix twig-cs-fix phpstan test
 
 # Bump exact pins via composer-update-helper, then refresh lockfiles (Composer + pnpm).
 update-deps: ensure-up

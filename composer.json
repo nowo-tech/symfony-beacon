@@ -139,13 +139,12 @@
         "twig-cs-fix": "twig-cs-fixer fix --config=.twig-cs-fixer.dist.php",
         "phpstan": "phpstan analyse --memory-limit=512M",
         "rector": "rector process --dry-run",
-        "rector-fix": "rector process",
+        "rector-fix": "rector process && php-cs-fixer fix",
         "test": "phpunit",
         "qa": [
-            "@cs-fix",
+            "@rector-fix",
             "@twig-cs-fix",
             "@phpstan",
-            "@rector-fix",
             "@test"
         ]
     },

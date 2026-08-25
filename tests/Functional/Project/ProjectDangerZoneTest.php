@@ -16,6 +16,7 @@ use App\Project\Enum\ProjectRole;
 use App\Tests\Support\DatabaseWebTestCase;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -34,7 +35,9 @@ final class ProjectDangerZoneTest extends DatabaseWebTestCase
         self::assertSelectorExists('form[action$="/delete"]');
 
         $form = $crawler->filter('form[action$="/clear-history"]')->form();
-        $form['project_clear_history[confirm]']->tick();
+        $confirm = $form['project_clear_history[confirm]'];
+        self::assertInstanceOf(ChoiceFormField::class, $confirm);
+        $confirm->tick();
         $client->submit($form);
         self::assertResponseRedirects('/projects/'.$project->getUuid().'/settings/danger');
         $client->followRedirect();
