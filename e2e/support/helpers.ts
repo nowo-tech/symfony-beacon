@@ -359,11 +359,19 @@ export async function openFirstIssue(page: Page, projectUuid: string): Promise<s
 export async function completeSlideToConfirm(form: import('@playwright/test').Locator): Promise<void> {
   const slider = form.locator('nowo-slide-to-confirm, .nowo-slide-to-confirm').first();
   await expect(slider).toBeVisible({ timeout: 10_000 });
+  const thumb = slider.locator('[data-slide-to-confirm-target="thumb"], button.nowo-slide-to-confirm__thumb').first();
+  await expect(thumb).toBeVisible({ timeout: 10_000 });
+  // Hidden checkbox ignores forced clicks — confirm via the kit keyboard path (End).
+  await thumb.focus();
+  await thumb.press('End');
   const checkbox = form.locator('input.nowo-slide-to-confirm__input[type="checkbox"]');
-  await checkbox.check({ force: true });
-  await form.evaluate((el) => {
-    if (el instanceof HTMLFormElement) {
-      el.requestSubmit();
-    }
-  });
+  await expect(checkbox).toBeChecked({ timeout: 5_000 });
+  const autoSubmit = await slider.getAttribute('data-slide-to-confirm-submit-on-confirm-value');
+  if (autoSubmit !== '1' && autoSubmit !== 'true') {
+    await form.evaluate((el) => {
+      if (el instanceof HTMLFormElement) {
+        el.requestSubmit();
+      }
+    });
+  }
 }

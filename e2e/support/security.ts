@@ -127,7 +127,28 @@ export async function loginAsUser(
  * Use for authenticated users who lack ROLE_ADMIN or project.* grants.
  */
 export async function expectForbidden(page: Page, path: string): Promise<void> {
-  const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
+  let response: Awaited<ReturnType<Page['goto']>> = null;
+  let lastError: unknown;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      response = await page.goto(path, { waitUntil: 'domcontentloaded' });
+      if (page.url().startsWith('chrome-error://') || page.url().startsWith('chrome-error:')) {
+        throw new Error(`Navigation landed on chrome-error for ${path}`);
+      }
+      break;
+    } catch (err) {
+      lastError = err;
+      const msg = String(err);
+      const retryable = /ERR_NETWORK_CHANGED|net::ERR_|chrome-error|Timeout/i.test(msg);
+      if (attempt === 4 || !retryable) {
+        throw err;
+      }
+      await page.waitForTimeout(400 * (attempt + 1));
+    }
+  }
+  if (!response) {
+    throw lastError ?? new Error(`No response for ${path}`);
+  }
   await dismissProductTour(page);
   expect(response, `No response for ${path}`).not.toBeNull();
   expect(response!.status(), `${path} should be 403`).toBe(403);
