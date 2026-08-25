@@ -65,12 +65,19 @@ final class RetentionPurgeCommandTest extends TestCase
      */
     private function purger(object $ops, array $projects, int $deleteEvents = 0): RetentionPurger
     {
+        $selectCalls = 0;
         $connection = $this->createStub(Connection::class);
         $connection->method('executeStatement')->willReturnCallback(
             static fn (string $sql): int => str_contains($sql, 'DELETE FROM event') ? $deleteEvents : 1,
         );
         $connection->method('fetchOne')->willReturn(0);
-        $connection->method('fetchFirstColumn')->willReturn([]);
+        $connection->method('fetchFirstColumn')->willReturnCallback(function () use (&$selectCalls, $deleteEvents): array {
+            if ($deleteEvents < 1 || $selectCalls++ > 0) {
+                return [];
+            }
+
+            return range(1, $deleteEvents);
+        });
 
         $em = $this->createStub(EntityManagerInterface::class);
         $em->method('getConnection')->willReturn($connection);

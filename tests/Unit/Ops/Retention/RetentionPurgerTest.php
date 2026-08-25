@@ -34,6 +34,7 @@ final class RetentionPurgerTest extends TestCase
     protected function setUp(): void
     {
         $this->sql = [];
+        $ageSelectCalls = 0;
         $this->connection = $this->createStub(Connection::class);
         $this->connection->method('executeStatement')->willReturnCallback(function (string $sql, array $params = []): int {
             $this->sql[] = $sql;
@@ -41,7 +42,13 @@ final class RetentionPurgerTest extends TestCase
             return str_contains($sql, 'DELETE FROM event') ? 3 : 1;
         });
         $this->connection->method('fetchOne')->willReturn(0);
-        $this->connection->method('fetchFirstColumn')->willReturn([]);
+        $this->connection->method('fetchFirstColumn')->willReturnCallback(function (string $sql) use (&$ageSelectCalls): array {
+            if (str_contains($sql, 'received_at <')) {
+                return 0 === $ageSelectCalls++ ? [1, 2, 3] : [];
+            }
+
+            return [];
+        });
 
         $this->entityManager = $this->createStub(EntityManagerInterface::class);
         $this->entityManager->method('getConnection')->willReturn($this->connection);

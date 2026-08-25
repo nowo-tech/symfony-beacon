@@ -9,6 +9,7 @@ use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\ProjectGovernanceResolver;
 use DateTimeImmutable;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
@@ -17,15 +18,22 @@ use Doctrine\ORM\EntityManagerInterface;
  * Prefers per-project overrides, then instance operational defaults.
  * Uses portable SQL (MySQL + SQLite tests). Does not remove projects, keys, or memberships.
  * After deleting events, recomputes issue denormalized aggregates so counters stay truthful.
+ *
+ * Event deletes run in batches ({@see self::DEFAULT_DELETE_BATCH_SIZE}) to avoid long locks
+ * and huge ID lists when a project holds millions of rows.
  */
 final readonly class RetentionPurger
 {
+    public const int DEFAULT_DELETE_BATCH_SIZE = 1000;
+
     public function __construct(
         private EntityManagerInterface $entityManager,
         private ProjectRepository $projectRepository,
         private IssueMergeService $issueMergeService,
         private ProjectGovernanceResolver $governanceResolver,
+        private int $deleteBatchSize = self::DEFAULT_DELETE_BATCH_SIZE,
     ) {
+        // Readonly promoted properties cannot be reassigned; clamp via max() at use sites.
     }
 
     /**
@@ -97,6 +105,7 @@ final readonly class RetentionPurger
         $maxEvents = $this->governanceResolver->effectiveRetentionMaxEvents($project);
 
         $connection = $this->entityManager->getConnection();
+        $batchSize = max(1, $this->deleteBatchSize);
         $events = 0;
         $issues = 0;
         $transactions = 0;
@@ -106,9 +115,11 @@ final readonly class RetentionPurger
         if ($retentionDays >= 1) {
             $cutoff = $now->modify(\sprintf('-%d days', $retentionDays))->format('Y-m-d H:i:s');
 
-            $deleted = (int) $connection->executeStatement(
-                'DELETE FROM event WHERE issue_id IN (SELECT id FROM issue WHERE project_id = ?) AND received_at < ?',
+            $deleted = $this->deleteEventsInBatches(
+                $connection,
+                'SELECT e.id FROM event e WHERE e.project_id = ? AND e.received_at < ? ORDER BY e.received_at ASC, e.id ASC',
                 [$projectId, $cutoff],
+                $batchSize,
             );
             $events += $deleted;
             $deletedEvents = $deleted > 0;
@@ -133,17 +144,20 @@ final readonly class RetentionPurger
 
         if ($maxEvents >= 1) {
             $count = (int) $connection->fetchOne(
-                'SELECT COUNT(e.id) FROM event e INNER JOIN issue i ON i.id = e.issue_id WHERE i.project_id = ?',
+                'SELECT COUNT(e.id) FROM event e WHERE e.project_id = ?',
                 [$projectId],
             );
             if ($count > $maxEvents) {
-                $excess = $count - $maxEvents;
-                // Delete oldest events first (portable: subquery by received_at)
-                $ids = $connection->fetchFirstColumn(
-                    'SELECT e.id FROM event e INNER JOIN issue i ON i.id = e.issue_id WHERE i.project_id = ? ORDER BY e.received_at ASC, e.id ASC LIMIT '.$excess,
-                    [$projectId],
-                );
-                if ([] !== $ids) {
+                $remaining = $count - $maxEvents;
+                while ($remaining > 0) {
+                    $limit = min($batchSize, $remaining);
+                    $ids = $connection->fetchFirstColumn(
+                        'SELECT e.id FROM event e WHERE e.project_id = ? ORDER BY e.received_at ASC, e.id ASC LIMIT '.$limit,
+                        [$projectId],
+                    );
+                    if ([] === $ids) {
+                        break;
+                    }
                     $placeholders = implode(',', array_fill(0, \count($ids), '?'));
                     $deleted = (int) $connection->executeStatement(
                         'DELETE FROM event WHERE id IN ('.$placeholders.')',
@@ -151,11 +165,12 @@ final readonly class RetentionPurger
                     );
                     $events += $deleted;
                     $deletedEvents = $deletedEvents || $deleted > 0;
-                    $issues += (int) $connection->executeStatement(
-                        'DELETE FROM issue WHERE project_id = ? AND id NOT IN (SELECT DISTINCT issue_id FROM event)',
-                        [$projectId],
-                    );
+                    $remaining -= \count($ids);
                 }
+                $issues += (int) $connection->executeStatement(
+                    'DELETE FROM issue WHERE project_id = ? AND id NOT IN (SELECT DISTINCT issue_id FROM event)',
+                    [$projectId],
+                );
             }
         }
 
@@ -169,5 +184,27 @@ final readonly class RetentionPurger
         }
 
         return ['events' => $events, 'issues' => $issues, 'transactions' => $transactions, 'stats' => $stats];
+    }
+
+    /**
+     * @param list<mixed> $params
+     */
+    private function deleteEventsInBatches(Connection $connection, string $selectSql, array $params, int $batchSize): int
+    {
+        $total = 0;
+        do {
+            $ids = $connection->fetchFirstColumn($selectSql.' LIMIT '.$batchSize, $params);
+            if ([] === $ids) {
+                break;
+            }
+            $placeholders = implode(',', array_fill(0, \count($ids), '?'));
+            $deleted = (int) $connection->executeStatement(
+                'DELETE FROM event WHERE id IN ('.$placeholders.')',
+                $ids,
+            );
+            $total += $deleted;
+        } while (\count($ids) >= $batchSize);
+
+        return $total;
     }
 }
