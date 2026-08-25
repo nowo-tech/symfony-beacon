@@ -51,7 +51,7 @@ final class ProjectHealthUiTest extends DatabaseWebTestCase
         $destination->recordDeliveryFailure('boom');
         self::assertFalse($destination->isLastDeliverySuccess());
         self::assertSame('boom', $destination->getLastDeliveryError());
-        self::assertInstanceOf(DateTimeImmutable::class, $destination->getLastDeliveryAt());
+        self::assertGreaterThan(0, $destination->getLastDeliveryAt()->getTimestamp());
 
         $destination->recordDeliverySuccess();
         self::assertTrue($destination->isLastDeliverySuccess());

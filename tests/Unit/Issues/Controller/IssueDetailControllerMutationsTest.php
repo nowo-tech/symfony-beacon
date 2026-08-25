@@ -30,7 +30,6 @@ use ReflectionProperty;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -49,8 +48,8 @@ final class IssueDetailControllerMutationsTest extends TestCase
         );
 
         $response = $controller->status(Request::create('/x', Request::METHOD_POST), $project, $issue);
-        self::assertInstanceOf(RedirectResponse::class, $response);
-        self::assertSame('/issue', $response->getTargetUrl());
+        self::assertTrue($response->isRedirection());
+        self::assertSame('/issue', $response->headers->get('Location'));
         self::assertSame(['issues.status_invalid'], $session->getFlashBag()->peek('error'));
     }
 
@@ -65,7 +64,7 @@ final class IssueDetailControllerMutationsTest extends TestCase
         [$controller, $session, $project, $issue] = $this->triageController($form);
 
         $response = $controller->status(Request::create('/x', Request::METHOD_POST), $project, $issue);
-        self::assertSame('/issue', $response->getTargetUrl());
+        self::assertSame('/issue', $response->headers->get('Location'));
         self::assertSame(['issues.status_invalid'], $session->getFlashBag()->peek('error'));
     }
 
@@ -76,7 +75,7 @@ final class IssueDetailControllerMutationsTest extends TestCase
         );
 
         $response = $controller->priority(Request::create('/x', Request::METHOD_POST), $project, $issue);
-        self::assertSame('/issue', $response->getTargetUrl());
+        self::assertSame('/issue', $response->headers->get('Location'));
         self::assertSame(['issues.priority_invalid'], $session->getFlashBag()->peek('error'));
     }
 
@@ -96,7 +95,7 @@ final class IssueDetailControllerMutationsTest extends TestCase
         self::assertSame(IssuePriority::Medium, $issue->getPriority());
 
         $response = $controller->priority(Request::create('/x', Request::METHOD_POST), $project, $issue);
-        self::assertSame('/issue', $response->getTargetUrl());
+        self::assertSame('/issue', $response->headers->get('Location'));
         self::assertSame(IssuePriority::High, $issue->getPriority());
         self::assertSame(['issues.priority_saved'], $session->getFlashBag()->peek('success'));
     }
@@ -108,7 +107,7 @@ final class IssueDetailControllerMutationsTest extends TestCase
         );
 
         $response = $controller->assign(Request::create('/x', Request::METHOD_POST), $project, $issue);
-        self::assertSame('/issue', $response->getTargetUrl());
+        self::assertSame('/issue', $response->headers->get('Location'));
         self::assertSame(['issues.assignee_invalid'], $session->getFlashBag()->peek('error'));
     }
 
@@ -119,7 +118,7 @@ final class IssueDetailControllerMutationsTest extends TestCase
         );
 
         $response = $controller->addComment(Request::create('/x', Request::METHOD_POST), $project, $issue);
-        self::assertSame('/issue', $response->getTargetUrl());
+        self::assertSame('/issue', $response->headers->get('Location'));
         self::assertSame(['issues.comment_invalid'], $session->getFlashBag()->peek('error'));
     }
 
@@ -138,7 +137,7 @@ final class IssueDetailControllerMutationsTest extends TestCase
         );
 
         $response = $controller->addComment(Request::create('/x', Request::METHOD_POST), $project, $issue);
-        self::assertSame('/issue', $response->getTargetUrl());
+        self::assertSame('/issue', $response->headers->get('Location'));
         self::assertSame(['issues.comment_empty'], $session->getFlashBag()->peek('error'));
     }
 
@@ -149,7 +148,7 @@ final class IssueDetailControllerMutationsTest extends TestCase
         );
 
         $response = $controller->markDuplicate(Request::create('/x', Request::METHOD_POST), $project, $issue);
-        self::assertSame('/issue', $response->getTargetUrl());
+        self::assertSame('/issue', $response->headers->get('Location'));
         self::assertSame(['issues.duplicate_invalid'], $session->getFlashBag()->peek('error'));
     }
 

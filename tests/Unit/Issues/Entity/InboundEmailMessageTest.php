@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Issues\Entity;
 
 use App\Issues\Entity\InboundEmailMessage;
-use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 final class InboundEmailMessageTest extends TestCase
@@ -14,7 +13,7 @@ final class InboundEmailMessageTest extends TestCase
     {
         $message = new InboundEmailMessage();
         self::assertNull($message->getId());
-        self::assertInstanceOf(DateTimeImmutable::class, $message->getCreatedAt());
+        self::assertGreaterThan(0, $message->getCreatedAt()->getTimestamp());
 
         $message
             ->setMessageId('<msg@example.test>')

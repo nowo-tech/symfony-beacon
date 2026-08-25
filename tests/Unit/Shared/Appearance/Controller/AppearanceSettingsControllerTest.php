@@ -16,7 +16,6 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -33,8 +32,8 @@ final class AppearanceSettingsControllerTest extends TestCase
         $this->boot($controller, form: $this->form());
 
         $response = $controller->index();
-        self::assertInstanceOf(RedirectResponse::class, $response);
-        self::assertSame('/admin/appearance/themes', $response->getTargetUrl());
+        self::assertTrue($response->isRedirection());
+        self::assertSame('/admin/appearance/themes', $response->headers->get('Location'));
     }
 
     public function testEditRejectsUnknownSection(): void
@@ -51,8 +50,8 @@ final class AppearanceSettingsControllerTest extends TestCase
         $this->boot($controller, form: $this->form());
 
         $response = $controller->edit(Request::create('/admin/appearance/colors'), 'colors');
-        self::assertInstanceOf(RedirectResponse::class, $response);
-        self::assertSame('/admin/appearance/colors/accents', $response->getTargetUrl());
+        self::assertTrue($response->isRedirection());
+        self::assertSame('/admin/appearance/colors/accents', $response->headers->get('Location'));
     }
 
     public function testEditThemesGetRendersPicker(): void
@@ -82,7 +81,7 @@ final class AppearanceSettingsControllerTest extends TestCase
         $session = $this->boot($controller, form: $themeForm, flash: true);
 
         $response = $controller->edit(Request::create('/admin/appearance/themes', Request::METHOD_POST), 'themes');
-        self::assertInstanceOf(RedirectResponse::class, $response);
+        self::assertTrue($response->isRedirection());
         self::assertSame(['flash.appearance.theme_unknown'], $session->getFlashBag()->peek('error'));
     }
 

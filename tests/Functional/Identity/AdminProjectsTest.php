@@ -211,7 +211,7 @@ final class AdminProjectsTest extends DatabaseWebTestCase
         self::assertSelectorTextNotContains('body', 'Other Project');
 
         $entries = $crawler->filter('#project-audit-timeline [data-testid="project-audit-entry"]');
-        self::assertSame(3, $entries->count());
+        self::assertCount(3, $entries);
         self::assertSame('Project ingest resumed', trim($entries->eq(0)->filter('span.font-medium')->text()));
         self::assertSame('Project member added', trim($entries->eq(1)->filter('span.font-medium')->text()));
         self::assertSame('Project ingest suspended', trim($entries->eq(2)->filter('span.font-medium')->text()));
@@ -219,13 +219,13 @@ final class AdminProjectsTest extends DatabaseWebTestCase
         $crawler = $client->request(Request::METHOD_GET, '/admin/projects/'.$project->getUuid().'?action=project.suspended');
         self::assertResponseIsSuccessful();
         $entries = $crawler->filter('#project-audit-timeline [data-testid="project-audit-entry"]');
-        self::assertSame(1, $entries->count());
+        self::assertCount(1, $entries);
         self::assertSame('Project ingest suspended', trim($entries->eq(0)->filter('span.font-medium')->text()));
 
         $crawler = $client->request(Request::METHOD_GET, '/admin/projects/'.$project->getUuid().'?from=2026-07-21&to=2026-07-21');
         self::assertResponseIsSuccessful();
         $entries = $crawler->filter('#project-audit-timeline [data-testid="project-audit-entry"]');
-        self::assertSame(2, $entries->count());
+        self::assertCount(2, $entries);
         self::assertSame('Project ingest resumed', trim($entries->eq(0)->filter('span.font-medium')->text()));
         self::assertSame('Project member added', trim($entries->eq(1)->filter('span.font-medium')->text()));
     }

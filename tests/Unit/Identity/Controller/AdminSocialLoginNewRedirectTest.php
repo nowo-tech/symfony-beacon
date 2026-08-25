@@ -19,7 +19,6 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
@@ -49,8 +48,8 @@ final class AdminSocialLoginNewRedirectTest extends TestCase
         $controller->setContainer($container);
 
         $response = $controller->new(Request::create('/admin/social-login/new?provider=google'));
-        self::assertInstanceOf(RedirectResponse::class, $response);
-        self::assertSame('/admin_social_login_edit/google', $response->getTargetUrl());
+        self::assertTrue($response->isRedirection());
+        self::assertSame('/admin_social_login_edit/google', $response->headers->get('Location'));
     }
 
     public function testNewIgnoresUnknownPresetProvider(): void

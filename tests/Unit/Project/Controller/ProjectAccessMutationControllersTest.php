@@ -37,7 +37,6 @@ use ReflectionProperty;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -72,8 +71,8 @@ final class ProjectAccessMutationControllersTest extends TestCase
         $session = $this->boot($controller, $user, $invalid, flash: true);
 
         $response = $controller->revoke(Request::create('/x', Request::METHOD_POST), $project, '22222222-2222-7222-8222-222222222222');
-        self::assertInstanceOf(RedirectResponse::class, $response);
-        self::assertSame('/settings/access', $response->getTargetUrl());
+        self::assertTrue($response->isRedirection());
+        self::assertSame('/settings/access', $response->headers->get('Location'));
         self::assertSame(['projects.share.invalid_csrf'], $session->getFlashBag()->peek('error'));
 
         $valid = $this->createStub(FormInterface::class);
@@ -134,7 +133,7 @@ final class ProjectAccessMutationControllersTest extends TestCase
         $session = $this->boot($controller, $actor, $form, flash: true);
 
         $response = $controller->revoke(Request::create('/x', Request::METHOD_POST), $project, $link->getUuid());
-        self::assertSame('/settings/access', $response->getTargetUrl());
+        self::assertSame('/settings/access', $response->headers->get('Location'));
         self::assertSame(['projects.share.revoked'], $session->getFlashBag()->peek('success'));
         self::assertTrue($link->isRevoked());
     }
@@ -204,7 +203,7 @@ final class ProjectAccessMutationControllersTest extends TestCase
         $session = $this->boot($controller, $actor, $form, flash: true, settingsPath: '/settings/access');
 
         $response = $controller->setActive($project, $member, Request::create('/x', Request::METHOD_POST));
-        self::assertSame('/settings/access', $response->getTargetUrl());
+        self::assertSame('/settings/access', $response->headers->get('Location'));
         self::assertFalse($membership->isActive());
         self::assertSame(['flash.project.member_deactivated'], $session->getFlashBag()->peek('success'));
     }
@@ -269,7 +268,7 @@ final class ProjectAccessMutationControllersTest extends TestCase
         $session = $this->boot($controller, $actor, $form, flash: true);
 
         $response = $controller->changeRole($project, $member, Request::create('/x', Request::METHOD_POST));
-        self::assertSame('/settings/access', $response->getTargetUrl());
+        self::assertSame('/settings/access', $response->headers->get('Location'));
         self::assertSame(['flash.project.member_invalid_role'], $session->getFlashBag()->peek('error'));
     }
 
@@ -432,7 +431,7 @@ final class ProjectAccessMutationControllersTest extends TestCase
         $session = $this->boot($controller, $actor, $form, flash: true, settingsPath: '/admin/projects/show');
 
         $response = $controller->addGroup($project, Request::create('/x', Request::METHOD_POST));
-        self::assertSame('/admin/projects/show', $response->getTargetUrl());
+        self::assertSame('/admin/projects/show', $response->headers->get('Location'));
         self::assertSame(['flash.project.group_not_found'], $session->getFlashBag()->peek('error'));
     }
 

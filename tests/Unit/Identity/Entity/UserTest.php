@@ -37,7 +37,7 @@ final class UserTest extends TestCase
         self::assertSame('person@example.com', $user->getUserIdentifier());
         self::assertSame('hash', $user->getPassword());
         self::assertSame('reset', $user->getPasswordResetToken());
-        self::assertInstanceOf(DateTimeImmutable::class, $user->getPasswordResetExpiresAt());
+        self::assertGreaterThan(0, $user->getPasswordResetExpiresAt()->getTimestamp());
         self::assertInstanceOf(DateTime::class, $user->getPasswordChangedAt());
 
         $user->setDisplayName('Q');

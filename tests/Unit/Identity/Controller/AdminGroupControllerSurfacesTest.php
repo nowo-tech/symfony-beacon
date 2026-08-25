@@ -22,7 +22,6 @@ use ReflectionProperty;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -64,8 +63,8 @@ final class AdminGroupControllerSurfacesTest extends TestCase
         $session = $this->boot($controller, new User()->setEmail('admin@example.com')->setRoles(['ROLE_ADMIN']), $form, flash: true);
 
         $response = $controller->addMember($group, Request::create('/x', Request::METHOD_POST));
-        self::assertInstanceOf(RedirectResponse::class, $response);
-        self::assertSame('/admin/groups/show', $response->getTargetUrl());
+        self::assertTrue($response->isRedirection());
+        self::assertSame('/admin/groups/show', $response->headers->get('Location'));
         self::assertSame(['flash.groups.user_not_found'], $session->getFlashBag()->peek('error'));
     }
 
@@ -110,7 +109,7 @@ final class AdminGroupControllerSurfacesTest extends TestCase
         $session = $this->boot($controller, new User()->setEmail('admin@example.com')->setRoles(['ROLE_ADMIN']), $form, flash: true);
 
         $response = $controller->addMember($group, Request::create('/x', Request::METHOD_POST));
-        self::assertSame('/admin/groups/show', $response->getTargetUrl());
+        self::assertSame('/admin/groups/show', $response->headers->get('Location'));
         self::assertSame(['flash.groups.already_member'], $session->getFlashBag()->peek('error'));
     }
 

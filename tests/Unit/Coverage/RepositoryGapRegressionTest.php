@@ -47,7 +47,7 @@ final class RepositoryGapRegressionTest extends TestCase
             ->setConstructorArgs([$this->createStub(ManagerRegistry::class)])
             ->onlyMethods(['createQueryBuilder'])
             ->getMock();
-        $repo->method('createQueryBuilder')->with('m')->willReturn($qb);
+        $repo->expects(self::any())->method('createQueryBuilder')->with('m')->willReturn($qb);
 
         self::assertSame([5 => 2, 7 => 0], $repo->countByGroupIds([5, 7]));
     }
@@ -72,7 +72,7 @@ final class RepositoryGapRegressionTest extends TestCase
             ->setConstructorArgs([$this->createStub(ManagerRegistry::class)])
             ->onlyMethods(['createQueryBuilder'])
             ->getMock();
-        $repo->method('createQueryBuilder')->with('m')->willReturn($qb);
+        $repo->expects(self::any())->method('createQueryBuilder')->with('m')->willReturn($qb);
 
         self::assertSame([], $repo->findInboxForUser(new User(), [new Project()], false, 50, 10));
     }
@@ -108,7 +108,7 @@ final class RepositoryGapRegressionTest extends TestCase
             ->setConstructorArgs([$this->createStub(ManagerRegistry::class)])
             ->onlyMethods(['createQueryBuilder'])
             ->getMock();
-        $repo->method('createQueryBuilder')->with('e')->willReturn($qb);
+        $repo->expects(self::any())->method('createQueryBuilder')->with('e')->willReturn($qb);
 
         self::assertSame([], $repo->findIndexedByUserIds([1]));
     }
@@ -147,7 +147,7 @@ final class RepositoryGapRegressionTest extends TestCase
             ->setConstructorArgs([$this->createStub(ManagerRegistry::class)])
             ->onlyMethods(['createQueryBuilder'])
             ->getMock();
-        $repo->method('createQueryBuilder')->with('e')->willReturnOnConsecutiveCalls($qbByProject, $qbByUser);
+        $repo->expects(self::any())->method('createQueryBuilder')->with('e')->willReturnOnConsecutiveCalls($qbByProject, $qbByUser);
 
         self::assertSame([], $repo->findIndexedByProjectIdForUser($user, [$project]));
         self::assertSame([], $repo->findIndexedByUserIdsForProject($project, [1]));
@@ -187,7 +187,7 @@ final class RepositoryGapRegressionTest extends TestCase
             ->onlyMethods(['createQueryBuilder', 'getEntityManager'])
             ->getMock();
         $repo->method('getEntityManager')->willReturn($em);
-        $repo->method('createQueryBuilder')->with('a')->willReturnOnConsecutiveCalls($recentQb, $keepIdsQb);
+        $repo->expects(self::any())->method('createQueryBuilder')->with('a')->willReturnOnConsecutiveCalls($recentQb, $keepIdsQb);
 
         self::assertSame([1 => []], $repo->findRecentByDestinations([$inputDestination]));
         self::assertSame(0, $repo->trimOlderThanKeep($inputDestination, 5));

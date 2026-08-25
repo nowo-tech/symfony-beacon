@@ -118,7 +118,7 @@ final class ProjectAccessServiceAdminShareTest extends TestCase
             $service->requireTriage($project, $user);
             self::fail('expected');
         } catch (AccessDeniedHttpException $exception) {
-            self::assertInstanceOf(AccessDeniedHttpException::class, $exception);
+            self::assertNotSame('', $exception->getMessage());
         }
 
         $this->expectException(AccessDeniedHttpException::class);

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Shared;
 
-use App\Shared\Settings\Service\InstanceOpsDefaults;
 use App\Tests\Support\InstanceOpsDefaultsTestTrait;
 use PHPUnit\Framework\TestCase;
 
@@ -33,7 +32,6 @@ final class InstanceOpsDefaultsTest extends TestCase
             $settings->setAllowAnonymousResolve(true);
         });
 
-        self::assertInstanceOf(InstanceOpsDefaults::class, $ops);
         self::assertSame(0, $ops->retentionDays());
         self::assertSame(0, $ops->retentionMaxEvents());
         self::assertSame(0, $ops->ingestRateLimit());

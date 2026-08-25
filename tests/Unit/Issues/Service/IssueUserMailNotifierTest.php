@@ -63,7 +63,7 @@ final class IssueUserMailNotifierTest extends TestCase
         $notifier->notifyAssigneeChanged($project, $issue, null, null, $actor);
         $notifier->notifyAssigneeChanged($project, $issue, $assignee, $assignee, $actor);
         $notifier->notifyAssigneeChanged($project, $issue, null, $assignee, $assignee);
-        self::assertSame(0, \count($sent));
+        self::assertCount(0, $sent);
 
         $notifier->notifyAssigneeChanged($project, $issue, null, $assignee, $actor);
         self::assertCount(1, $sent);

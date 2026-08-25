@@ -27,7 +27,7 @@ final class CoverageRegressionTest extends TestCase
         self::assertNull($mention->getMentionedUser());
         self::assertNull($mention->getReadAt());
         self::assertTrue($mention->isUnread());
-        self::assertInstanceOf(DateTimeImmutable::class, $history->getCreatedAt());
+        self::assertGreaterThan(0, $history->getCreatedAt()->getTimestamp());
 
         $user = new User()->setEmail('mention@example.com');
         $readAt = new DateTimeImmutable('2026-08-16T11:00:00+00:00');

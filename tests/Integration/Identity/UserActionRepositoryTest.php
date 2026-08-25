@@ -113,6 +113,9 @@ final class UserActionRepositoryTest extends DatabaseWebTestCase
         self::assertSame([], $repository->findForProject($project, []));
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     private function action(UserActionType $type, ?User $actor, ?User $subject, array $context, DateTimeImmutable $createdAt): UserAction
     {
         $action = new UserAction()

@@ -21,6 +21,7 @@ final class TinyRemainingCoverageTest extends TestCase
 
     public function testPerfSpanRepositoryCanBeConstructed(): void
     {
-        self::assertInstanceOf(PerfSpanRepository::class, new PerfSpanRepository($this->createStub(ManagerRegistry::class)));
+        new PerfSpanRepository($this->createStub(ManagerRegistry::class));
+        $this->addToAssertionCount(1);
     }
 }

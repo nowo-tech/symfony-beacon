@@ -20,7 +20,6 @@ use ReflectionProperty;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -99,8 +98,8 @@ final class AdminProjectConfigControllerOpsTest extends TestCase
         $session = $this->boot($controller, $user, $form, flash: true);
 
         $response = $controller->import(Request::create('/import', Request::METHOD_POST));
-        self::assertInstanceOf(RedirectResponse::class, $response);
-        self::assertSame('/admin/projects', $response->getTargetUrl());
+        self::assertTrue($response->isRedirection());
+        self::assertSame('/admin/projects', $response->headers->get('Location'));
         self::assertSame(['flash.project.config_invalid_csrf'], $session->getFlashBag()->peek('error'));
     }
 

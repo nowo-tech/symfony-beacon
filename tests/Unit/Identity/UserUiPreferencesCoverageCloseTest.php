@@ -6,7 +6,6 @@ namespace App\Tests\Unit\Identity;
 
 use App\Identity\Entity\Embeddable\UserUiPreferences;
 use App\Identity\Tour\ProductTourPage;
-use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 final class UserUiPreferencesCoverageCloseTest extends TestCase
@@ -20,6 +19,6 @@ final class UserUiPreferencesCoverageCloseTest extends TestCase
             $prefs->markTourPageSeen($page->value);
         }
 
-        self::assertInstanceOf(DateTimeImmutable::class, $prefs->getProductTourSeenAt());
+        self::assertTrue($prefs->isProductTourSeen());
     }
 }

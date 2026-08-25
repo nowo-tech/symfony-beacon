@@ -34,7 +34,7 @@ final class ProjectRepositoryTest extends TestCase
         $repo->expects(self::never())->method('createQueryBuilder');
 
         $repo->hydrateMembershipsForProjects([new Project()]);
-        self::assertTrue(true);
+        $this->addToAssertionCount(1);
     }
 
     public function testCountAccessByProjectIdsMapsGroupRowsAndBlankIngestPathReturnsNull(): void
@@ -67,6 +67,9 @@ final class ProjectRepositoryTest extends TestCase
         self::assertNull($repo->findOneByIngestPath('   '));
     }
 
+    /**
+     * @param Query<mixed, mixed> $query
+     */
     private function queryBuilderReturning(Query $query): QueryBuilder
     {
         $qb = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();

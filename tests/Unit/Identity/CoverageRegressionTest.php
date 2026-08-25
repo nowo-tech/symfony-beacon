@@ -29,7 +29,7 @@ final class CoverageRegressionTest extends TestCase
         }
 
         self::assertTrue($preferences->isProductTourSeen());
-        self::assertInstanceOf(DateTimeImmutable::class, $preferences->getProductTourSeenAt());
+        self::assertGreaterThan(0, $preferences->getProductTourSeenAt()->getTimestamp());
     }
 
     public function testInstancePermissionTranslationTrimsValuesAndStartsWithoutId(): void

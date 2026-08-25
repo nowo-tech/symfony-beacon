@@ -40,13 +40,7 @@ final class EventTimestampParserTest extends TestCase
     public function testFallsBackToIntegerUnixTimeWhenFractionalParserCannotBuildDate(): void
     {
         $parser = new EventTimestampParser();
-
-        set_error_handler(static fn (): bool => true);
-        try {
-            $parsed = $parser->parse('1e309');
-        } finally {
-            restore_error_handler();
-        }
+        $parsed = @$parser->parse('1e309');
 
         self::assertNotNull($parsed);
         self::assertSame('1970-01-01 00:00:00', $parsed->format('Y-m-d H:i:s'));

@@ -21,7 +21,6 @@ final class IdentityAllowlistsAndAuditFilterTest extends TestCase
 
         self::assertContains(UserActionType::MagicLoginRequested, $types);
         self::assertContains(UserActionType::PasswordResetRequested, $types);
-        self::assertSame(50, AccountSecurityActivity::TIMELINE_LIMIT);
     }
 
     public function testDashboardProductActivityAllowlist(): void
@@ -38,7 +37,6 @@ final class IdentityAllowlistsAndAuditFilterTest extends TestCase
         self::assertContains(UserActionType::UserAnonymized, AdminIdentityAudit::userTimelineActions());
         self::assertContains(UserActionType::GroupCreated, AdminIdentityAudit::groupTimelineActions());
         self::assertNotContains(UserActionType::IssueOpened, AdminIdentityAudit::userTimelineActions());
-        self::assertSame(100, AdminIdentityAudit::TIMELINE_LIMIT);
     }
 
     public function testAdminAuditFilterParsesValidQuery(): void

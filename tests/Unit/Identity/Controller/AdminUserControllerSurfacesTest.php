@@ -27,7 +27,6 @@ use ReflectionProperty;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -72,8 +71,8 @@ final class AdminUserControllerSurfacesTest extends TestCase
         $session = $this->boot($controller, $admin, flash: true);
 
         $response = $controller->toggleEnabled(Request::create('/toggle', Request::METHOD_POST), $admin);
-        self::assertInstanceOf(RedirectResponse::class, $response);
-        self::assertSame('/admin/users', $response->getTargetUrl());
+        self::assertTrue($response->isRedirection());
+        self::assertSame('/admin/users', $response->headers->get('Location'));
         self::assertSame(['flash.users.cannot_disable_self'], $session->getFlashBag()->peek('error'));
     }
 

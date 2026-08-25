@@ -8,7 +8,6 @@ use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Entity\NotificationDigestBuffer;
 use App\Notifications\Enum\NotificationDestinationType;
 use App\Project\Entity\Project;
-use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 final class NotificationDigestBufferTest extends TestCase
@@ -31,6 +30,6 @@ final class NotificationDigestBufferTest extends TestCase
         self::assertNull($buffer->getId());
         self::assertSame($destination, $buffer->getDestination());
         self::assertSame(['event' => 'issue.new', 'count' => 2], $buffer->getPayload());
-        self::assertInstanceOf(DateTimeImmutable::class, $buffer->getCreatedAt());
+        self::assertGreaterThan(0, $buffer->getCreatedAt()->getTimestamp());
     }
 }

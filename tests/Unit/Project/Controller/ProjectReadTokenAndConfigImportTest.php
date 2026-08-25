@@ -19,7 +19,6 @@ use ReflectionProperty;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -75,8 +74,8 @@ final class ProjectReadTokenAndConfigImportTest extends TestCase
         $this->bootController($controller, $user, $form, flash: true);
 
         $response = $controller->revoke(Request::create('/x', Request::METHOD_POST), $project, '22222222-2222-7222-8222-222222222222');
-        self::assertInstanceOf(RedirectResponse::class, $response);
-        self::assertSame('/settings/access', $response->getTargetUrl());
+        self::assertTrue($response->isRedirection());
+        self::assertSame('/settings/access', $response->headers->get('Location'));
     }
 
     public function testReadTokenCreateInvalidCsrfRedirects(): void
@@ -98,7 +97,7 @@ final class ProjectReadTokenAndConfigImportTest extends TestCase
         $this->bootController($controller, $user, $form, flash: true);
 
         $response = $controller->create(Request::create('/x', Request::METHOD_POST), $project);
-        self::assertSame('/settings/access', $response->getTargetUrl());
+        self::assertSame('/settings/access', $response->headers->get('Location'));
     }
 
     public function testConfigImportInvalidCsrfRedirects(): void
@@ -121,7 +120,7 @@ final class ProjectReadTokenAndConfigImportTest extends TestCase
         $this->bootController($controller, $user, $form, flash: true, settingsPath: '/settings/data');
 
         $response = $controller->import($project, Request::create('/x', Request::METHOD_POST));
-        self::assertSame('/settings/data', $response->getTargetUrl());
+        self::assertSame('/settings/data', $response->headers->get('Location'));
     }
 
     public function testConfigImportMissingFileMapsFlash(): void
@@ -149,7 +148,7 @@ final class ProjectReadTokenAndConfigImportTest extends TestCase
         $this->bootController($controller, $user, $form, flash: true, settingsPath: '/settings/data', session: $session);
 
         $response = $controller->import($project, Request::create('/x', Request::METHOD_POST));
-        self::assertSame('/settings/data', $response->getTargetUrl());
+        self::assertSame('/settings/data', $response->headers->get('Location'));
         self::assertSame(['flash.project.config_missing_file'], $session->getFlashBag()->peek('error'));
     }
 

@@ -172,12 +172,12 @@ final class ProductTourStepsBuilderTest extends TestCase
         $project = new Project();
         $user = new User();
         $membershipRepo = $this->createStub(ProjectMembershipRepository::class);
+        $membershipLookupCalls = (object) ['n' => 0];
         $membershipRepo->method('findOneByProjectAndUser')->willReturnCallback(
-            static function () use ($project, $user): ?ProjectMembership {
-                static $calls = 0;
-                ++$calls;
+            static function () use ($project, $user, $membershipLookupCalls): ?ProjectMembership {
+                ++$membershipLookupCalls->n;
 
-                if (1 === $calls) {
+                if (1 === $membershipLookupCalls->n) {
                     return null;
                 }
 

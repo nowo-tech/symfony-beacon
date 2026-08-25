@@ -17,7 +17,6 @@ use ReflectionProperty;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -82,8 +81,8 @@ final class ProjectDangerZoneControllerTest extends TestCase
         $controller->setContainer($container);
 
         $response = $controller->clearHistory($project, $request);
-        self::assertInstanceOf(RedirectResponse::class, $response);
-        self::assertSame('/settings/danger', $response->getTargetUrl());
+        self::assertTrue($response->isRedirection());
+        self::assertSame('/settings/danger', $response->headers->get('Location'));
         self::assertSame(['flash.project.history_cleared'], $session->getFlashBag()->peek('success'));
     }
 }

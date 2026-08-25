@@ -21,7 +21,6 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionProperty;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -47,8 +46,8 @@ final class ProjectControllerRedirectsTest extends TestCase
         $controller->setContainer($container);
 
         $response = $controller->show($project);
-        self::assertInstanceOf(RedirectResponse::class, $response);
-        self::assertSame('/issue_index/aaaaaaaa-aaaa-7aaa-8aaa-aaaaaaaaaaaa', $response->getTargetUrl());
+        self::assertTrue($response->isRedirection());
+        self::assertSame('/issue_index/aaaaaaaa-aaaa-7aaa-8aaa-aaaaaaaaaaaa', $response->headers->get('Location'));
     }
 
     public function testSettingsIndexRedirectsToDefaultSection(): void
@@ -91,7 +90,7 @@ final class ProjectControllerRedirectsTest extends TestCase
         $response = $controller->settingsIndex($project);
         self::assertSame('/settings/'.ProjectSettingsSection::defaultFor(
             new ProjectAccess(ProjectRole::Owner, viaGroup: false),
-        )->value, $response->getTargetUrl());
+        )->value, $response->headers->get('Location'));
     }
 
     public function testSettingsRejectsUnknownSection(): void

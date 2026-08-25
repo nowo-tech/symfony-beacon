@@ -9,7 +9,6 @@ use App\Project\Entity\ProjectGroupAccess;
 use App\Project\Entity\ProjectMembership;
 use App\Project\Enum\ProjectRole;
 use App\Project\Security\ProjectPermission;
-use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 final class CoverageRegressionTest extends TestCase
@@ -21,8 +20,8 @@ final class CoverageRegressionTest extends TestCase
 
     public function testProjectMembershipAndGroupAccessExposeCreationTimestamps(): void
     {
-        self::assertInstanceOf(DateTimeImmutable::class, new ProjectMembership()->getCreatedAt());
-        self::assertInstanceOf(DateTimeImmutable::class, new ProjectGroupAccess()->getCreatedAt());
+        self::assertGreaterThan(0, new ProjectMembership()->getCreatedAt()->getTimestamp());
+        self::assertGreaterThan(0, new ProjectGroupAccess()->getCreatedAt()->getTimestamp());
     }
 
     public function testProjectRolePermissionsMirrorRoleMatrix(): void

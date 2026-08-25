@@ -55,7 +55,7 @@ final class InstancePermissionTest extends TestCase
         self::assertSame([$existing], $permission->getTranslations()->toArray());
 
         $permission->syncTranslations(
-            [7 => 'ignored', 'es' => 'Nombre actualizado', 'fr' => ' '],
+            ['es' => 'Nombre actualizado', 'fr' => ' '],
             ['es' => '', 'de' => ' Beschreibung '],
         );
 

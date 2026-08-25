@@ -21,7 +21,6 @@ use ReflectionProperty;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -77,8 +76,8 @@ final class IssueControllerSavedViewsTest extends TestCase
 
         $controller = $this->controller($user, $membership, $views);
         $response = $controller->applyView($project, '11111111-1111-7111-8111-111111111111');
-        self::assertInstanceOf(RedirectResponse::class, $response);
-        self::assertSame('/issues?q=boom&level=error&per_page=50', $response->getTargetUrl());
+        self::assertTrue($response->isRedirection());
+        self::assertSame('/issues?q=boom&level=error&per_page=50', $response->headers->get('Location'));
     }
 
     public function testDeleteViewInvalidCsrfFlashesError(): void
@@ -103,8 +102,8 @@ final class IssueControllerSavedViewsTest extends TestCase
             $project,
             '11111111-1111-7111-8111-111111111111',
         );
-        self::assertInstanceOf(RedirectResponse::class, $response);
-        self::assertSame('/issues', $response->getTargetUrl());
+        self::assertTrue($response->isRedirection());
+        self::assertSame('/issues', $response->headers->get('Location'));
         self::assertSame(['issues.view_invalid'], $session->getFlashBag()->peek('error'));
     }
 

@@ -20,7 +20,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -38,8 +37,8 @@ final class AdminInstancePermissionSurfacesTest extends TestCase
         $this->boot($controller);
 
         $response = $controller->new(Request::create('/admin/permissions/new'));
-        self::assertInstanceOf(RedirectResponse::class, $response);
-        self::assertSame('/admin/permissions?new=1', $response->getTargetUrl());
+        self::assertTrue($response->isRedirection());
+        self::assertSame('/admin/permissions?new=1', $response->headers->get('Location'));
     }
 
     public function testEditGetRedirectsWithEditFlag(): void
@@ -54,10 +53,10 @@ final class AdminInstancePermissionSurfacesTest extends TestCase
         $this->boot($controller);
 
         $response = $controller->edit(Request::create('/admin/permissions/x/edit'), $permission);
-        self::assertInstanceOf(RedirectResponse::class, $response);
+        self::assertTrue($response->isRedirection());
         self::assertSame(
             '/admin/permissions?edit=11111111-1111-7111-8111-111111111111',
-            $response->getTargetUrl(),
+            $response->headers->get('Location'),
         );
     }
 
@@ -80,8 +79,8 @@ final class AdminInstancePermissionSurfacesTest extends TestCase
         $session = $this->boot($controller, flash: true);
 
         $response = $controller->new(Request::create('/admin/permissions/new', Request::METHOD_POST));
-        self::assertInstanceOf(RedirectResponse::class, $response);
-        self::assertSame('/admin/permissions?new=1', $response->getTargetUrl());
+        self::assertTrue($response->isRedirection());
+        self::assertSame('/admin/permissions?new=1', $response->headers->get('Location'));
         self::assertSame(['flash.permissions.key_taken'], $session->getFlashBag()->peek('error'));
     }
 

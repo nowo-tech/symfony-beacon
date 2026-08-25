@@ -6,9 +6,7 @@ namespace App\Tests\Unit\Notifications;
 
 use App\Notifications\Service\WebPushClientFactory;
 use Http\Discovery\Exception\ClassInstantiationFailedException;
-use Minishlink\WebPush\Subscription;
 use Minishlink\WebPush\VAPID;
-use Minishlink\WebPush\WebPush;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -39,11 +37,16 @@ final class WebPushClientFactoryTest extends TestCase
         $factory = new WebPushClientFactory($keys['publicKey'], $keys['privateKey'], '');
 
         try {
-            self::assertInstanceOf(WebPush::class, $factory->create());
+            $client = $factory->create();
+            self::assertSame($keys['publicKey'], $factory->getPublicKey());
+            unset($client);
         } catch (ClassInstantiationFailedException $e) {
             self::assertStringContainsString('Unexpected exception', $e->getMessage());
-            self::assertNotNull($e->getPrevious());
-            self::assertStringContainsString('PSR-17 response factory', $e->getPrevious()?->getMessage() ?? '');
+            $previous = $e->getPrevious();
+            if (null === $previous) {
+                self::fail('Expected a previous PSR-17 factory exception');
+            }
+            self::assertStringContainsString('PSR-17 response factory', $previous->getMessage());
         }
     }
 
@@ -77,7 +80,6 @@ final class WebPushClientFactoryTest extends TestCase
             'aesgcm',
         );
 
-        self::assertInstanceOf(Subscription::class, $subscription);
         self::assertSame('https://push.example/endpoint', $subscription->getEndpoint());
     }
 }

@@ -10,7 +10,6 @@ use Nowo\CookieConsentBundle\Repository\CookieConsentConfigRepository;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -35,8 +34,8 @@ final class CookieConsentAdminEntryControllerTest extends TestCase
         });
 
         $response = $controller();
-        self::assertInstanceOf(RedirectResponse::class, $response);
-        self::assertSame('/admin/cookie-consent/7/edit', $response->getTargetUrl());
+        self::assertTrue($response->isRedirection());
+        self::assertSame('/admin/cookie-consent/7/edit', $response->headers->get('Location'));
     }
 
     public function testRedirectsToHubWhenMissing(): void
@@ -51,7 +50,7 @@ final class CookieConsentAdminEntryControllerTest extends TestCase
         });
 
         $response = $controller();
-        self::assertSame('/admin', $response->getTargetUrl());
+        self::assertSame('/admin', $response->headers->get('Location'));
     }
 
     /**

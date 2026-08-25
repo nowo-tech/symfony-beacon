@@ -29,6 +29,9 @@ final class PrivateConstructorCoverageTest extends TestCase
         self::assertInstanceOf($class, $instance);
     }
 
+    /**
+     * @return list<array{0: class-string}>
+     */
     public static function privateConstructorClasses(): array
     {
         return [

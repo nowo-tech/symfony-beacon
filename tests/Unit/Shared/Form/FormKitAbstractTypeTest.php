@@ -25,6 +25,9 @@ final class FormKitAbstractTypeTest extends TestCase
 
 final class FormKitAbstractTypeHarness extends FormKitAbstractType
 {
+    /**
+     * @return array<string, mixed>
+     */
     public function exposeTwigOwnedChromeOptions(): array
     {
         return $this->twigOwnedChromeOptions();

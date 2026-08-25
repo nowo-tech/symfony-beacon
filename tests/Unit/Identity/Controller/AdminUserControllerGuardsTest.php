@@ -20,7 +20,6 @@ use ReflectionProperty;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -44,8 +43,8 @@ final class AdminUserControllerGuardsTest extends TestCase
         $session = $this->boot($controller, $admin, $form, flash: true);
 
         $response = $controller->anonymize(Request::create('/x', Request::METHOD_POST), $admin);
-        self::assertInstanceOf(RedirectResponse::class, $response);
-        self::assertSame('/admin/users', $response->getTargetUrl());
+        self::assertTrue($response->isRedirection());
+        self::assertSame('/admin/users', $response->headers->get('Location'));
         self::assertSame(['flash.users.cannot_anonymize_self'], $session->getFlashBag()->peek('error'));
     }
 
@@ -66,7 +65,7 @@ final class AdminUserControllerGuardsTest extends TestCase
         $session = $this->boot($controller, $admin, $form, flash: true);
 
         $response = $controller->anonymize(Request::create('/x', Request::METHOD_POST), $target);
-        self::assertSame('/admin/users', $response->getTargetUrl());
+        self::assertSame('/admin/users', $response->headers->get('Location'));
         self::assertSame(['flash.privacy.already_anonymized'], $session->getFlashBag()->peek('error'));
     }
 
@@ -82,7 +81,7 @@ final class AdminUserControllerGuardsTest extends TestCase
         $session = $this->boot($controller, $admin, $form, flash: true);
 
         $response = $controller->changeRole(Request::create('/x', Request::METHOD_POST), $admin);
-        self::assertSame('/admin/users', $response->getTargetUrl());
+        self::assertSame('/admin/users', $response->headers->get('Location'));
         self::assertSame(['flash.users.cannot_change_own_role'], $session->getFlashBag()->peek('error'));
     }
 
@@ -100,7 +99,7 @@ final class AdminUserControllerGuardsTest extends TestCase
         $session = $this->boot($controller, $admin, $form, flash: true);
 
         $response = $controller->changeRole(Request::create('/x', Request::METHOD_POST), $target);
-        self::assertSame('/admin/users', $response->getTargetUrl());
+        self::assertSame('/admin/users', $response->headers->get('Location'));
         self::assertSame(['flash.users.invalid_role'], $session->getFlashBag()->peek('error'));
     }
 

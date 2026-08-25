@@ -14,7 +14,6 @@ use ReflectionProperty;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -45,8 +44,8 @@ final class AdminInstanceRoleUsersTest extends TestCase
         $session = $this->boot($controller, $form);
 
         $response = $controller->addUser(Request::create('/add', Request::METHOD_POST), $role);
-        self::assertInstanceOf(RedirectResponse::class, $response);
-        self::assertSame('/admin/roles/users', $response->getTargetUrl());
+        self::assertTrue($response->isRedirection());
+        self::assertSame('/admin/roles/users', $response->headers->get('Location'));
         self::assertSame(['flash.roles.user_not_found'], $session->getFlashBag()->peek('error'));
     }
 
@@ -74,7 +73,7 @@ final class AdminInstanceRoleUsersTest extends TestCase
 
         $response = $controller->addUser(Request::create('/add', Request::METHOD_POST), $role);
         self::assertSame(['flash.roles.user_already'], $session->getFlashBag()->peek('error'));
-        self::assertSame('/admin/roles/users', $response->getTargetUrl());
+        self::assertSame('/admin/roles/users', $response->headers->get('Location'));
     }
 
     /** @param FormInterface<mixed> $form */

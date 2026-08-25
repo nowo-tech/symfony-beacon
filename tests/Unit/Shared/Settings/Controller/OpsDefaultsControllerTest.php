@@ -13,7 +13,6 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -36,8 +35,8 @@ final class OpsDefaultsControllerTest extends TestCase
         $controller->setContainer($container);
 
         $response = $controller->index();
-        self::assertInstanceOf(RedirectResponse::class, $response);
-        self::assertSame('/admin/ops-defaults/governance', $response->getTargetUrl());
+        self::assertTrue($response->isRedirection());
+        self::assertSame('/admin/ops-defaults/governance', $response->headers->get('Location'));
     }
 
     public function testEditRejectsUnknownSection(): void

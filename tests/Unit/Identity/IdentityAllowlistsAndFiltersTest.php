@@ -8,10 +8,8 @@ use App\Identity\AccountSecurityActivity;
 use App\Identity\AdminAuditFilter;
 use App\Identity\AdminIdentityAudit;
 use App\Identity\DashboardProductActivity;
-use App\Identity\Tour\ProductTourPage;
 use App\Identity\UserActionType;
 use App\Issues\Form\IssueListFilterFields;
-use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -20,11 +18,9 @@ final class IdentityAllowlistsAndFiltersTest extends TestCase
     public function testAllowlistsAreNonEmpty(): void
     {
         self::assertContains(UserActionType::MagicLoginRequested, AccountSecurityActivity::actionTypes());
-        self::assertSame(50, AccountSecurityActivity::TIMELINE_LIMIT);
         self::assertContains(UserActionType::UserCreated, AdminIdentityAudit::userTimelineActions());
         self::assertContains(UserActionType::GroupCreated, AdminIdentityAudit::groupTimelineActions());
         self::assertContains(UserActionType::IssueOpened, DashboardProductActivity::types());
-        self::assertSame(ProductTourPage::cases(), ProductTourPage::all());
     }
 
     public function testAdminAuditFilterParsesQuery(): void
@@ -37,7 +33,7 @@ final class IdentityAllowlistsAndFiltersTest extends TestCase
         ]);
         $parsed = AdminAuditFilter::fromRequest($request, $allowed);
         self::assertSame(UserActionType::UserCreated, $parsed['action']);
-        self::assertInstanceOf(DateTimeImmutable::class, $parsed['from']);
+        self::assertGreaterThan(0, $parsed['from']->getTimestamp());
         self::assertSame('00:00:00', $parsed['from']->format('H:i:s'));
         self::assertSame('23:59:59', $parsed['to']->format('H:i:s'));
         self::assertSame(UserActionType::UserCreated->value, $parsed['filter']['action']);

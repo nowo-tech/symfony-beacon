@@ -13,7 +13,6 @@ use ReflectionMethod;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -55,11 +54,11 @@ final class AccountLocaleControllerTest extends TestCase
         $request->setSession($session);
 
         $response = $controller->switch('es', $request);
-        self::assertInstanceOf(RedirectResponse::class, $response);
+        self::assertTrue($response->isRedirection());
         self::assertSame('es', $user->getPreferredLocale());
         self::assertSame('es', $session->get('_locale'));
         self::assertSame(['flash.preferences.locale_saved'], $session->getFlashBag()->peek('success'));
-        self::assertSame('/projects/1?keep=1', $response->getTargetUrl());
+        self::assertSame('/projects/1?keep=1', $response->headers->get('Location'));
     }
 
     public function testStripLocaleQueryRemovesQueryParam(): void

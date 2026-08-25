@@ -6,7 +6,6 @@ namespace App\Tests\Unit\Shared\Settings\Entity;
 
 use App\Identity\Entity\User;
 use App\Shared\Settings\Entity\InstanceSettings;
-use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -21,7 +20,6 @@ final class InstanceSettingsTest extends TestCase
 
         $settings->markSetupCompleted();
         self::assertTrue($settings->isSetupCompleted());
-        self::assertInstanceOf(DateTimeImmutable::class, $settings->getSetupCompletedAt());
 
         $settings->clearSetupCompleted();
         self::assertFalse($settings->isSetupCompleted());

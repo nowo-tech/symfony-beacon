@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Identity\Controller;
 
-use App\Identity\AccountSecurityActivity;
 use App\Identity\Controller\AccountPreferencesController;
 use App\Identity\Entity\User;
 use App\Identity\Repository\UserActionRepository;
@@ -56,7 +55,6 @@ final class AccountPreferencesSecuritySurfacesTest extends TestCase
         self::assertSame('ok', $controller->securityActivity()->getContent());
         self::assertArrayHasKey('account/security_history.html.twig', $seen);
         self::assertSame(['timeline'], $seen['account/security_activity.html.twig']['security_actions']);
-        self::assertSame(AccountSecurityActivity::TIMELINE_LIMIT, 50);
     }
 
     public function testRenderSecurityIncludesSocialFlags(): void

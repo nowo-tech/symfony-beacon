@@ -146,8 +146,8 @@ final class EnvelopeIngestFunctionalTest extends DatabaseWebTestCase
         $issues = $em->getRepository(Issue::class)->findBy(['project' => $project]);
         self::assertCount(1, $issues);
         self::assertSame(2, $issues[0]->getEventCount());
-        self::assertNotNull($issues[0]->getFirstSeen());
-        self::assertNotNull($issues[0]->getLastSeen());
+        self::assertGreaterThan(0, $issues[0]->getFirstSeen()->getTimestamp());
+        self::assertGreaterThan(0, $issues[0]->getLastSeen()->getTimestamp());
 
         $stats = self::getContainer()->get(EventRepository::class)
             ->occurrenceStatsForIssue($issues[0]);

@@ -19,7 +19,6 @@ use ReflectionProperty;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -96,8 +95,8 @@ final class ProjectApiKeyControllerTest extends TestCase
         $request->setSession($session);
 
         $response = $controller->createKey($project, $request);
-        self::assertInstanceOf(RedirectResponse::class, $response);
-        self::assertSame('/settings/access', $response->getTargetUrl());
+        self::assertTrue($response->isRedirection());
+        self::assertSame('/settings/access', $response->headers->get('Location'));
         self::assertSame(['flash.project.api_key_created'], $session->getFlashBag()->peek('success'));
         self::assertNotEmpty($session->get('_beacon_last_api_key_dsn'));
         self::assertCount(1, $project->getApiKeys());
@@ -133,7 +132,7 @@ final class ProjectApiKeyControllerTest extends TestCase
         $session = $this->boot($controller, $user, $form, flash: true);
 
         $response = $controller->revokeKey($project, $key, Request::create('/revoke', Request::METHOD_POST));
-        self::assertSame('/settings/access', $response->getTargetUrl());
+        self::assertSame('/settings/access', $response->headers->get('Location'));
         self::assertFalse($key->isActive());
         self::assertSame(['flash.project.api_key_revoked'], $session->getFlashBag()->peek('success'));
     }

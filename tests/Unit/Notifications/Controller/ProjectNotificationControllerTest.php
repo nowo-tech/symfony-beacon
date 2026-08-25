@@ -158,7 +158,7 @@ final class ProjectNotificationControllerTest extends TestCase
         $response = $controller->toggle($project, $destination, Request::create('/toggle', Request::METHOD_POST));
         self::assertFalse($destination->isEnabled());
         self::assertSame(['notifications.flash.disabled'], $session->getFlashBag()->peek('success'));
-        self::assertSame('/settings/alerts', $response->getTargetUrl());
+        self::assertSame('/settings/alerts', $response->headers->get('Location'));
 
         $invalid = $this->createStub(FormInterface::class);
         $invalid->method('submit');
@@ -215,7 +215,7 @@ final class ProjectNotificationControllerTest extends TestCase
         $controller->setContainer($container);
 
         $response = $controller->resume($project, $destination, Request::create('/resume', Request::METHOD_POST));
-        self::assertSame('/settings/alerts', $response->getTargetUrl());
+        self::assertSame('/settings/alerts', $response->headers->get('Location'));
         self::assertSame(['notifications.flash.circuit_resumed'], $session->getFlashBag()->peek('success'));
         self::assertNull($destination->getCircuitOpenedAt());
 

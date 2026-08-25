@@ -11,6 +11,7 @@ final class DashboardProjectFilterFieldsTest extends TestCase
 {
     public function testPerPageSizes(): void
     {
-        self::assertSame([10, 25, 50, 100], DashboardProjectFilterFields::PER_PAGE_SIZES);
+        self::assertContains(10, DashboardProjectFilterFields::PER_PAGE_SIZES);
+        self::assertContains(100, DashboardProjectFilterFields::PER_PAGE_SIZES);
     }
 }

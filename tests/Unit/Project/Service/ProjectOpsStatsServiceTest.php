@@ -66,7 +66,7 @@ final class ProjectOpsStatsServiceTest extends TestCase
         self::assertNull($map[1]['last_ingest_at']);
         self::assertSame(0, $map[2]['open_issues']);
         self::assertSame(1, $map[2]['events_last_7d']);
-        self::assertInstanceOf(DateTimeImmutable::class, $map[2]['last_ingest_at']);
+        self::assertGreaterThan(0, $map[2]['last_ingest_at']->getTimestamp());
     }
 
     private function project(int $id): Project

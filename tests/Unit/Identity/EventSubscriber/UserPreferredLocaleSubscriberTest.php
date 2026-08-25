@@ -7,7 +7,6 @@ namespace App\Tests\Unit\Identity\EventSubscriber;
 use App\Identity\Entity\User;
 use App\Identity\EventSubscriber\UserPreferredLocaleSubscriber;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
@@ -66,8 +65,8 @@ final class UserPreferredLocaleSubscriberTest extends TestCase
             ->onKernelRequest($event);
 
         $response = $event->getResponse();
-        self::assertInstanceOf(RedirectResponse::class, $response);
-        self::assertSame('/projects?page=2', $response->getTargetUrl());
+        self::assertTrue($response->isRedirection());
+        self::assertSame('/projects?page=2', $response->headers->get('Location'));
     }
 
     public function testAppliesPreferredLocaleAndSession(): void

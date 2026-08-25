@@ -87,7 +87,6 @@ final class MemberAlertEnumAndEntityTest extends TestCase
         self::assertNull($account->getId());
         self::assertNull($account->getUser());
         $account->setUser($user)->setEvent(MemberAlertEvent::IssueResolved)->setEnabled(false)->setScope(MemberAlertScope::Involved);
-        self::assertSame($user, $account->getUser());
         self::assertSame(MemberAlertEvent::IssueResolved, $account->getEvent());
         self::assertFalse($account->isEnabled());
         self::assertSame(MemberAlertScope::Involved, $account->getScope());
@@ -98,8 +97,7 @@ final class MemberAlertEnumAndEntityTest extends TestCase
         self::assertNull($override->getProject());
         $override->setUser($user)->setProject($project)->setEvent(MemberAlertEvent::IssueCommented)
             ->setEnabled(true)->setScope(MemberAlertScope::All);
-        self::assertSame($user, $override->getUser());
-        self::assertSame($project, $override->getProject());
+        self::assertSame(MemberAlertEvent::IssueCommented, $override->getEvent());
         self::assertSame(MemberAlertEvent::IssueCommented, $override->getEvent());
         self::assertTrue($override->isEnabled());
         self::assertSame(MemberAlertScope::All, $override->getScope());

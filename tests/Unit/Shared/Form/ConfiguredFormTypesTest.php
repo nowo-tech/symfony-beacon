@@ -314,6 +314,9 @@ final class ConfiguredFormTypesTest extends TestCase
             {
             }
 
+            /**
+             * @param array<string, mixed> $parameters
+             */
             public function trans(?string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
             {
                 if (null === $id) {

@@ -93,8 +93,6 @@ final class InstanceRbacSeederTest extends TestCase
         self::assertArrayNotHasKey($legacy->getCode(), $roles);
         self::assertFalse($roleWithObsoletePermission->getPermissions()->contains($obsolete));
         self::assertFalse($user->hasInstanceRole($legacy));
-        self::assertNotEmpty($permissions);
-        self::assertNotEmpty($roles);
     }
 
     public function testRepeatedSeedKeepsCatalogPopulated(): void
@@ -132,8 +130,8 @@ final class InstanceRbacSeederTest extends TestCase
         $permissionCount = \count($permissions);
         $roleCount = \count($roles);
         $seeder->seedIfEmpty();
-        self::assertSame($permissionCount, \count($permissions));
-        self::assertSame($roleCount, \count($roles));
+        self::assertCount($permissionCount, $permissions);
+        self::assertCount($roleCount, $roles);
         self::assertGreaterThan(0, $permissionCount);
         self::assertGreaterThan(0, $roleCount);
     }

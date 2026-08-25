@@ -91,7 +91,7 @@ final class EventRepositoryUnitTest extends TestCase
             ->onlyMethods(['createQueryBuilder', 'getEntityManager'])
             ->getMock();
         if ($qb instanceof QueryBuilder) {
-            $repo->method('createQueryBuilder')->with('e')->willReturn($qb);
+            $repo->expects(self::any())->method('createQueryBuilder')->with('e')->willReturn($qb);
         }
         if ($em instanceof EntityManagerInterface) {
             $repo->method('getEntityManager')->willReturn($em);
@@ -100,6 +100,9 @@ final class EventRepositoryUnitTest extends TestCase
         return $repo;
     }
 
+    /**
+     * @param Query<mixed, mixed> $query
+     */
     private function queryBuilderReturning(Query $query): QueryBuilder
     {
         $qb = $this->createMock(QueryBuilder::class);

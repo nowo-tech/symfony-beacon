@@ -78,10 +78,10 @@ final class ProjectShareGrantStoreTest extends TestCase
         self::assertNull($store->getActiveShareEntry($project));
 
         $session->set(ProjectShareGrantStore::SHARE_ACCESS_SESSION_KEY, [$project->getUuid() => ['expires' => time() + 120, 'share' => $validShareUuid, 'issue' => 123]]);
-        self::assertNull($store->getActiveShareEntry($project)['issue']);
+        self::assertNull($store->getActiveShareEntry($project));
 
         $session->set(ProjectShareGrantStore::SHARE_ACCESS_SESSION_KEY, [$project->getUuid() => ['expires' => time() + 120, 'share' => $validShareUuid, 'issue' => '']]);
-        self::assertNull($store->getActiveShareEntry($project)['issue']);
+        self::assertNull($store->getActiveShareEntry($project));
 
         $session->remove(ProjectShareGrantStore::SHARE_ACCESS_SESSION_KEY);
         self::assertFalse($store->hasShareGrantForIssue($project, 'issue-3'));

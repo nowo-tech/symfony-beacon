@@ -6,7 +6,6 @@ namespace App\Tests\Unit\Project\Entity;
 
 use App\Identity\Entity\User;
 use App\Project\Entity\ProjectReadToken;
-use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 final class ProjectReadTokenEntityTest extends TestCase
@@ -21,9 +20,9 @@ final class ProjectReadTokenEntityTest extends TestCase
         self::assertNull($token->getRevokedAt());
 
         $token->revoke();
-        self::assertInstanceOf(DateTimeImmutable::class, $token->getRevokedAt());
+        self::assertFalse($token->isActive());
 
         $token->markUsed();
-        self::assertInstanceOf(DateTimeImmutable::class, $token->getCreatedAt());
+        self::assertGreaterThan(0, $token->getCreatedAt()->getTimestamp());
     }
 }

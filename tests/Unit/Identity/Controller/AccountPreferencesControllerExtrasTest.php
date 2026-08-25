@@ -9,7 +9,6 @@ use App\Identity\Entity\User;
 use App\Identity\Repository\UserGroupMembershipRepository;
 use App\Project\Repository\ProjectMembershipRepository;
 use DateTime;
-use DateTimeImmutable;
 use Nowo\PasswordPolicyBundle\Service\PasswordExpiryServiceInterface;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -17,7 +16,6 @@ use ReflectionMethod;
 use ReflectionProperty;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
@@ -36,8 +34,8 @@ final class AccountPreferencesControllerExtrasTest extends TestCase
         $controller->setContainer($container);
 
         $response = $controller->preferencesIndex();
-        self::assertInstanceOf(RedirectResponse::class, $response);
-        self::assertSame('/account/profile', $response->getTargetUrl());
+        self::assertTrue($response->isRedirection());
+        self::assertSame('/account/profile', $response->headers->get('Location'));
     }
 
     public function testRenderProfileIncludesAdminRoleAndPasswordExpiry(): void
@@ -58,7 +56,7 @@ final class AccountPreferencesControllerExtrasTest extends TestCase
                 self::assertSame($user, $context['profile_user']);
                 self::assertArrayHasKey('sensitive_form', $context);
                 self::assertSame(['preferences.profile.role_admin'], $context['profile_roles']);
-                self::assertInstanceOf(DateTimeImmutable::class, $context['password_expires_at']);
+                self::assertGreaterThan(0, $context['password_expires_at']->getTimestamp());
                 self::assertIsInt($context['password_days_remaining']);
                 self::assertFalse($context['password_expired']);
                 self::assertSame(90, $context['password_expiry_days']);

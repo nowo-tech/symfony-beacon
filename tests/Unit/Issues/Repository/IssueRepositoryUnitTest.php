@@ -73,11 +73,14 @@ final class IssueRepositoryUnitTest extends TestCase
             ->disableOriginalConstructor()
             ->onlyMethods(['createQueryBuilder'])
             ->getMock();
-        $repo->method('createQueryBuilder')->with('i')->willReturn($qb);
+        $repo->expects(self::any())->method('createQueryBuilder')->with('i')->willReturn($qb);
 
         return $repo;
     }
 
+    /**
+     * @param list<Issue> $result
+     */
     private function queryBuilderReturning(array $result): QueryBuilder
     {
         $query = $this->createMock(Query::class);

@@ -10,7 +10,6 @@ use App\Shared\Mailer\MailerDsnValidator;
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -81,8 +80,8 @@ final class MailerGatedAuthKitRouteSubscriberTest extends TestCase
         $this->subscriber(mailerAvailable: false, urls: $urls)->onKernelRequest($event);
 
         $response = $event->getResponse();
-        self::assertInstanceOf(RedirectResponse::class, $response);
-        self::assertSame('/es/login', $response->getTargetUrl());
+        self::assertTrue($response->isRedirection());
+        self::assertSame('/es/login', $response->headers->get('Location'));
     }
 
     public function testUsesDefaultLocaleWhenPathLocaleMissing(): void
@@ -99,7 +98,7 @@ final class MailerGatedAuthKitRouteSubscriberTest extends TestCase
         $event = $this->event('nowo_auth_kit_reset_password');
         $this->subscriber(mailerAvailable: false, urls: $urls, defaultLocale: 'en')->onKernelRequest($event);
 
-        self::assertInstanceOf(RedirectResponse::class, $event->getResponse());
+        self::assertTrue($event->getResponse()->isRedirection());
     }
 
     private function subscriber(

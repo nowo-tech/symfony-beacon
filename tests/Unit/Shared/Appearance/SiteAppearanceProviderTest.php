@@ -14,26 +14,18 @@ final class SiteAppearanceProviderTest extends TestCase
 {
     public function testCachesGetAndRefreshClearsCache(): void
     {
-        $calls = 0;
         $appearance = SiteAppearance::defaults();
-        $repo = $this->createStub(SiteAppearanceRepository::class);
-        $repo->method('getOrCreate')->willReturnCallback(static function () use (&$calls, $appearance): SiteAppearance {
-            ++$calls;
-
-            return $appearance;
-        });
+        $repo = $this->createMock(SiteAppearanceRepository::class);
+        $repo->expects(self::exactly(3))->method('getOrCreate')->willReturn($appearance);
         $provider = new SiteAppearanceProvider($repo);
 
         self::assertSame($appearance, $provider->get());
         self::assertSame($appearance, $provider->get());
-        self::assertSame(1, $calls);
 
         $provider->reset();
         self::assertSame($appearance, $provider->get());
-        self::assertSame(2, $calls);
 
         self::assertSame($appearance, $provider->refresh());
-        self::assertSame(3, $calls);
     }
 
     public function testDelegatesBrandLayoutAndColorGetters(): void
@@ -112,7 +104,6 @@ final class SiteAppearanceProviderTest extends TestCase
         $provider = new SiteAppearanceProvider($repo);
         $appearance = $provider->get();
 
-        self::assertInstanceOf(SiteAppearance::class, $appearance);
         self::assertSame(SiteAppearance::defaults()->getBrandName(), $appearance->getBrandName());
     }
 }

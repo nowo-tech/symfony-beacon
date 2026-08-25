@@ -13,7 +13,6 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionProperty;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -31,8 +30,8 @@ final class AdminRbacDeleteGuardsTest extends TestCase
         $session = $this->boot($controller, ['admin_roles_show' => '/admin/roles/show']);
 
         $response = $controller->delete(Request::create('/x', Request::METHOD_POST), $role);
-        self::assertInstanceOf(RedirectResponse::class, $response);
-        self::assertSame('/admin/roles/show', $response->getTargetUrl());
+        self::assertTrue($response->isRedirection());
+        self::assertSame('/admin/roles/show', $response->headers->get('Location'));
         self::assertSame(['flash.roles.system_locked'], $session->getFlashBag()->peek('error'));
     }
 
@@ -51,7 +50,7 @@ final class AdminRbacDeleteGuardsTest extends TestCase
         $session = $this->boot($controller, ['admin_roles_show' => '/admin/roles/show']);
 
         $response = $controller->delete(Request::create('/x', Request::METHOD_POST), $role);
-        self::assertSame('/admin/roles/show', $response->getTargetUrl());
+        self::assertSame('/admin/roles/show', $response->headers->get('Location'));
         self::assertSame(['flash.roles.in_use'], $session->getFlashBag()->peek('error'));
     }
 
@@ -67,7 +66,7 @@ final class AdminRbacDeleteGuardsTest extends TestCase
         $session = $this->boot($controller, ['admin_permissions' => '/admin/permissions']);
 
         $response = $controller->delete(Request::create('/x', Request::METHOD_POST), $permission);
-        self::assertSame('/admin/permissions', $response->getTargetUrl());
+        self::assertSame('/admin/permissions', $response->headers->get('Location'));
         self::assertSame(['flash.permissions.system_locked'], $session->getFlashBag()->peek('error'));
     }
 
@@ -86,9 +85,9 @@ final class AdminRbacDeleteGuardsTest extends TestCase
         $controller->setContainer($container);
 
         $response = $controller->edit(Request::create('/admin/roles/x/edit'), $role);
-        self::assertInstanceOf(RedirectResponse::class, $response);
-        self::assertStringContainsString('admin_roles_show', $response->getTargetUrl());
-        self::assertStringContainsString('edit=1', $response->getTargetUrl());
+        self::assertTrue($response->isRedirection());
+        self::assertStringContainsString('admin_roles_show', $response->headers->get('Location'));
+        self::assertStringContainsString('edit=1', $response->headers->get('Location'));
     }
 
     /**

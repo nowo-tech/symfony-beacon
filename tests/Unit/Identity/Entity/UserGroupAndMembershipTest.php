@@ -7,7 +7,6 @@ namespace App\Tests\Unit\Identity\Entity;
 use App\Identity\Entity\User;
 use App\Identity\Entity\UserGroup;
 use App\Identity\Entity\UserGroupMembership;
-use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 use stdClass;
@@ -44,6 +43,6 @@ final class UserGroupAndMembershipTest extends TestCase
 
         $group->removeMembership($membership);
         self::assertFalse($group->getMemberships()->contains($membership));
-        self::assertInstanceOf(DateTimeImmutable::class, $membership->getCreatedAt());
+        self::assertGreaterThan(0, $membership->getCreatedAt()->getTimestamp());
     }
 }

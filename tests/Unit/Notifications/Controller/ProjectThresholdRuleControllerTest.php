@@ -16,7 +16,6 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -87,7 +86,7 @@ final class ProjectThresholdRuleControllerTest extends TestCase
         $session = $this->boot($controller, $form, $seen, flash: true);
 
         $response = $controller->toggle($project, $rule, Request::create('/toggle', Request::METHOD_POST));
-        self::assertInstanceOf(RedirectResponse::class, $response);
+        self::assertTrue($response->isRedirection());
         self::assertFalse($rule->isEnabled());
         self::assertSame(['thresholds.flash.disabled'], $session->getFlashBag()->peek('success'));
     }

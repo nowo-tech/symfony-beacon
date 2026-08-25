@@ -71,13 +71,11 @@ final class JsonUploadReaderTest extends TestCase
             $directory->method('getSize')->willReturn(10);
             $directory->method('getPathname')->willReturn($directoryPath);
 
-            set_error_handler(static fn (): bool => true);
-            JsonUploadReader::decodeObject($directory, 1024);
+            @JsonUploadReader::decodeObject($directory, 1024);
             self::fail('Expected missing_file for non-readable contents');
         } catch (InvalidArgumentException $e) {
             self::assertSame('invalid_json', $e->getMessage());
         } finally {
-            restore_error_handler();
             rmdir($directoryPath);
         }
     }

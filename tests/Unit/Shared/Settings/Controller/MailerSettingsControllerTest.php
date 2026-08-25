@@ -63,7 +63,7 @@ final class MailerSettingsControllerTest extends TestCase
 
         $method = new ReflectionMethod(MailerSettingsController::class, 'recordMailerAudit');
         $method->invoke($controller, 'smtp://a@example:25', 'from@example.com', 'smtp://a@example:25', 'from@example.com');
-        self::assertSame(0, \count($persisted));
+        self::assertCount(0, $persisted);
 
         $method->invoke($controller, 'smtp://a@example:25', 'from@example.com', 'smtp://b@example:25', 'from@example.com');
         self::assertCount(1, $persisted);

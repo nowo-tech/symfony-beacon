@@ -6,7 +6,6 @@ namespace App\Tests\Unit\Shared\Doctrine;
 
 use App\Shared\Doctrine\CreatedAtImmutableTrait;
 use App\Shared\Doctrine\PublicUuidTrait;
-use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 final class DoctrineTraitsTest extends TestCase
@@ -44,6 +43,6 @@ final class DoctrineTraitsTest extends TestCase
             }
         };
 
-        self::assertInstanceOf(DateTimeImmutable::class, $entity->getCreatedAt());
+        self::assertGreaterThan(0, $entity->getCreatedAt()->getTimestamp());
     }
 }

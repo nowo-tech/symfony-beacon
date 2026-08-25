@@ -24,7 +24,6 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -54,7 +53,7 @@ final class AdminProjectControllerOpsTest extends TestCase
         $session = $this->boot($controller, $actor, showUrl: '/admin/projects/11111111-1111-7111-8111-111111111111');
 
         $response = $controller->toggleIngest($project, Request::create('/x', Request::METHOD_POST));
-        self::assertInstanceOf(RedirectResponse::class, $response);
+        self::assertTrue($response->isRedirection());
         self::assertFalse($project->isIngestEnabled());
         self::assertSame(['flash.admin_projects.ingest_suspended'], $session->getFlashBag()->peek('success'));
     }
@@ -85,13 +84,13 @@ final class AdminProjectControllerOpsTest extends TestCase
         $request->setSession($session);
         $enable = $controller->enableViewAsMember($request);
         self::assertTrue($session->get(ProjectAccessService::VIEW_AS_MEMBER_SESSION_KEY));
-        self::assertSame('/dashboard', $enable->getTargetUrl());
+        self::assertSame('/dashboard', $enable->headers->get('Location'));
 
         $disableRequest = Request::create('/admin/view-as-member/disable', Request::METHOD_POST);
         $disableRequest->setSession($session);
         $disable = $controller->disableViewAsMember($disableRequest);
         self::assertFalse($session->has(ProjectAccessService::VIEW_AS_MEMBER_SESSION_KEY));
-        self::assertSame('/admin/projects', $disable->getTargetUrl());
+        self::assertSame('/admin/projects', $disable->headers->get('Location'));
     }
 
     /** @param FormInterface<mixed> $form */

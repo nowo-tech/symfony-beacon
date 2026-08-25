@@ -48,6 +48,6 @@ final class ProjectShareLinkEntityTest extends TestCase
         self::assertTrue($link->isRevoked());
         self::assertEquals($now->modify('+2 hours'), $link->getRevokedAt());
         self::assertFalse($link->isUsable($now));
-        self::assertInstanceOf(DateTimeImmutable::class, $link->getCreatedAt());
+        self::assertGreaterThan(0, $link->getCreatedAt()->getTimestamp());
     }
 }

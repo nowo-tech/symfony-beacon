@@ -26,7 +26,6 @@ use ReflectionMethod;
 use ReflectionProperty;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -117,13 +116,13 @@ final class ProjectControllerHelpersTest extends TestCase
         $method = new ReflectionMethod(ProjectController::class, 'redirectAfterMemberAlertsSave');
 
         $toAccount = $method->invoke($controller, $project, Request::create('/x', Request::METHOD_GET, ['return' => 'account']));
-        self::assertInstanceOf(RedirectResponse::class, $toAccount);
-        self::assertSame('/account/notifications', $toAccount->getTargetUrl());
+        self::assertTrue($toAccount->isRedirection());
+        self::assertSame('/account/notifications', $toAccount->headers->get('Location'));
 
         $toSettings = $method->invoke($controller, $project, Request::create('/x'));
         self::assertSame(
             '/projects/11111111-1111-7111-8111-111111111111/settings/alerts#member-alerts',
-            $toSettings->getTargetUrl(),
+            $toSettings->headers->get('Location'),
         );
     }
 
