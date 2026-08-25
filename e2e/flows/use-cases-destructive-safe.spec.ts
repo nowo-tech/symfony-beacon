@@ -25,7 +25,7 @@ async function createEphemeralProject(
   await page.locator('input[name="project[name]"]').fill(name);
   await page.locator('textarea[name="project[description]"]').fill('Ephemeral Playwright project');
   await page.locator('dialog form button[type="submit"], form[action*="/projects/new"] button[type="submit"]').first().click();
-  await page.waitForURL(/\/projects\/([0-9a-f-]{36})/i, { timeout: 30_000 });
+  await page.waitForURL(/\/projects\/([0-9a-f-]{36})/i, { timeout: 30_000, waitUntil: 'domcontentloaded' });
   await dismissProductTour(page);
   const match = page.url().match(/\/projects\/([0-9a-f-]{36})/i);
   if (!match?.[1]) {
@@ -126,12 +126,12 @@ test.describe('Out-of-scope closing — ephemeral / deep flows', () => {
 
     await page.goto(`/projects/${uuid}/settings/danger`);
     await dismissProductTour(page);
-    await expect(page.locator('form[action*="clear-history"] nowo-slide-to-confirm, form[action*="clear-history"] .nowo-slide-to-confirm').first()).toBeVisible();
-
     const clearOpen = page
       .locator('button[data-action="confirm-dialog#open"]')
       .filter({ hasText: /clear history|vaciar historial/i })
       .first();
+    await expect(clearOpen).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator('form[action*="clear-history"] nowo-slide-to-confirm, form[action*="clear-history"] .nowo-slide-to-confirm').first()).toBeAttached();
     await clearOpen.click();
     const clearForm = page.locator('dialog[open] form[action*="clear-history"], .confirm-dialog form[action*="clear-history"]').last();
     await expect(clearForm).toBeVisible({ timeout: 10_000 });
@@ -155,7 +155,7 @@ test.describe('Out-of-scope closing — ephemeral / deep flows', () => {
       .last();
     await expect(deleteSubmit).toBeEnabled({ timeout: 5_000 });
     await deleteSubmit.click();
-    await page.waitForURL(/\/dashboard/, { timeout: 30_000 });
+    await page.waitForURL(/\/dashboard/, { timeout: 30_000, waitUntil: 'domcontentloaded' });
     await expect(page.locator('body')).toContainText(/deleted|eliminado/i);
   });
 

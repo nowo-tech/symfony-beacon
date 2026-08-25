@@ -81,17 +81,9 @@ final readonly class DemoIdentitySeeder
                 $userCreated = true;
             } elseif ('admin@symfony-beacon.local' === $email) {
                 // Re-seed keeps demo QR approver usable after profile clears verification.
-                $dirty = false;
-                if (null === $user->getPhone() || null === $user->getPhoneVerifiedAt()) {
-                    $user->setPhone($user->getPhone() ?? '+34600000000');
-                    $user->setPhoneVerifiedAt(new DateTimeImmutable());
-                    $dirty = true;
-                }
+                $this->ensureDemoAdminQrApprover($user);
                 if (!$user->isPushNotificationsEnabled()) {
                     $user->setPushNotificationsEnabled(true);
-                    $dirty = true;
-                }
-                if ($dirty) {
                     $this->userRepository->save($user);
                 }
             }
@@ -142,6 +134,27 @@ final readonly class DemoIdentitySeeder
             'api_key' => $apiKey,
             'user' => $user,
         ];
+    }
+
+    /**
+     * Restore the local demo admin phone + verification used by UC-AUTH-22.
+     *
+     * Profile saves clear {@see User::phoneVerifiedAt} when the number changes.
+     * E2E calls this via {@see \App\Identity\Controller\DemoQrApproverRepairController}.
+     */
+    public function ensureDemoAdminQrApprover(?User $user = null): void
+    {
+        $user ??= $this->userRepository->findOneByEmail('admin@symfony-beacon.local');
+        if (!$user instanceof User) {
+            return;
+        }
+        if (null !== $user->getPhone() && null !== $user->getPhoneVerifiedAt()) {
+            return;
+        }
+
+        $user->setPhone($user->getPhone() ?? '+34600000000');
+        $user->setPhoneVerifiedAt(new DateTimeImmutable());
+        $this->userRepository->save($user);
     }
 
     /**

@@ -5,6 +5,9 @@ import { fileURLToPath } from 'node:url';
 
 export const DEMO_EMAIL = process.env.PLAYWRIGHT_DEMO_EMAIL ?? 'admin@symfony-beacon.local';
 export const DEMO_PASSWORD = process.env.PLAYWRIGHT_DEMO_PASSWORD ?? 'admin123';
+/** Seeded demo admin phone (E.164) — AuthKit QR approve requires a verified number. */
+export const DEMO_PHONE_COUNTRY = 'ES';
+export const DEMO_PHONE_NATIONAL = '600000000';
 
 const helpersDir = path.dirname(fileURLToPath(import.meta.url));
 
@@ -208,6 +211,15 @@ export async function dismissProductTour(page: Page): Promise<void> {
     await page.keyboard.press('Escape').catch(() => undefined);
     await popover.first().waitFor({ state: 'hidden', timeout: 500 }).catch(() => undefined);
   }
+}
+
+/**
+ * Restore demo admin phone + phoneVerifiedAt after profile E2E clears verification.
+ * Non-prod GET; 204 when the admin session can repair the QR approver.
+ */
+export async function ensureDemoQrApprover(page: Page): Promise<void> {
+  const response = await page.request.get('/_internal/demo/ensure-qr-approver', { failOnStatusCode: false });
+  expect(response.status(), await response.text()).toBe(204);
 }
 
 export async function loginAsDemo(page: Page, email = DEMO_EMAIL, password = DEMO_PASSWORD): Promise<void> {

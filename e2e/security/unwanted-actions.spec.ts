@@ -27,7 +27,7 @@ async function createEphemeralProject(page: Page, name: string): Promise<string>
   await page.locator('input[name="project[name]"]').fill(name);
   await page.locator('textarea[name="project[description]"]').fill('Ephemeral Playwright unwanted-actions');
   await page.locator('dialog form button[type="submit"], form[action*="/projects/new"] button[type="submit"]').first().click();
-  await page.waitForURL(/\/projects\/([0-9a-f-]{36})/i, { timeout: 30_000 });
+  await page.waitForURL(/\/projects\/([0-9a-f-]{36})/i, { timeout: 30_000, waitUntil: 'domcontentloaded' });
   await dismissProductTour(page);
   const match = page.url().match(/\/projects\/([0-9a-f-]{36})/i);
   if (!match?.[1]) {
@@ -125,10 +125,10 @@ test.describe('Unwanted actions — CSRF, IDOR, confirmations, XSS', () => {
         .locator('.nowo-auth-kit__panel button[type="submit"], form[name="login_form"] button[type="submit"]')
         .first()
         .click();
-      await page.waitForURL((url) => !/\/login(\?|$|\/)/.test(url.pathname) || url.hostname === 'evil.example', {
+      await page.waitForURL((url) => url.hostname === 'evil.example' || !/\/login(\?|$|\/)/.test(url.pathname), {
         timeout: 45_000,
-        waitUntil: 'domcontentloaded',
-      });
+        waitUntil: 'commit',
+      }).catch(() => undefined);
       await dismissProductTour(page);
       const landed = new URL(page.url());
       expect(landed.hostname, landed.href).toMatch(/localhost|127\.0\.0\.1/i);

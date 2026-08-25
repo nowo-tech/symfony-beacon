@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import {
   dismissCookieConsent,
   dismissProductTour,
+  ensureDemoQrApprover,
   waitForPageLoader,
 } from '../support/helpers';
 
@@ -37,6 +38,7 @@ async function startQrChallenge(desk: import('@playwright/test').Page): Promise<
 }
 
 async function openApproveOnPhone(mob: import('@playwright/test').Page, approveHref: string): Promise<void> {
+  await ensureDemoQrApprover(mob);
   await mob.goto(approveHref);
   await dismissCookieConsent(mob);
   await dismissProductTour(mob);

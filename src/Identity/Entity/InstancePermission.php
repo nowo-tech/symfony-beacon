@@ -212,8 +212,8 @@ class InstancePermission implements AuditableInterface
      * Replace Translatable rows from locale → name/description maps.
      * Locales with empty name and description are omitted (row removed).
      *
-     * @param array<string, string> $names
-     * @param array<string, string> $descriptions
+     * @param array<int|string, string> $names
+     * @param array<int|string, string> $descriptions
      */
     public function syncTranslations(array $names, array $descriptions): self
     {

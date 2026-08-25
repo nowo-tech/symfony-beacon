@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
 import {
   DEMO_PASSWORD,
+  DEMO_PHONE_COUNTRY,
+  DEMO_PHONE_NATIONAL,
   dismissProductTour,
   waitForPageLoader,
 } from '../support/helpers';
@@ -51,9 +53,10 @@ test.describe('Account mutations — profile & password', () => {
     );
     await expect(page.locator('[data-testid="phone-verification-status"]')).toBeVisible();
 
-    // Clear phone so the seeded admin profile stays clean for later suites.
-    await country.selectOption(previousCountry || 'ES');
-    await national.fill(previousNational || '');
+    // Restore the seeded demo number (not empty). Saving a different E.164 clears
+    // phoneVerifiedAt — UC-AUTH-22 re-applies verification via ensureDemoQrApprover.
+    await country.selectOption(previousCountry || DEMO_PHONE_COUNTRY);
+    await national.fill(previousNational || DEMO_PHONE_NATIONAL);
     await form.locator('button[type="submit"]').click();
     await waitForPageLoader(page);
   });

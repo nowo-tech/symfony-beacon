@@ -72,4 +72,17 @@ final class InstancePermissionTest extends TestCase
         $permission->syncTranslations(['de' => 'Deutsch'], []);
         self::assertNull($permission->findTranslation('es'));
     }
+
+    public function testSyncTranslationsSkipsNonStringLocaleKeys(): void
+    {
+        $permission = new InstancePermission();
+        $permission->syncTranslations(
+            [0 => 'Numeric name', 'es' => 'Nombre'],
+            [1 => 'Numeric description'],
+        );
+
+        self::assertSame('Nombre', $permission->getNameForLocale('es'));
+        self::assertNull($permission->findTranslation('0'));
+        self::assertCount(1, $permission->getTranslations());
+    }
 }
