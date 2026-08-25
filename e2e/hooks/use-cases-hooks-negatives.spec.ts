@@ -407,4 +407,75 @@ test.describe('Hooks — negative paths', () => {
       }
     }
   });
+
+  test('Slack stale timestamp is rejected (UC-HOOK-13)', async ({ page, request }) => {
+    test.setTimeout(90_000);
+    const uuid = await resolveDemoProjectUuid(page);
+    const issueUuid = await openFirstIssue(page, uuid);
+    if (!issueUuid) {
+      requireSampleOrSkip(false, 'No issues — run make seed-sample');
+      return;
+    }
+
+    const label = `e2e-hook13-${Date.now().toString(36)}`;
+    try {
+      const destUuid = await createDestination(page, uuid, {
+        label,
+        type: 'slack',
+        endpointUrl: 'https://hooks.slack.com/services/T/B/e2e-hook13',
+        signingSecret: SLACK_SECRET,
+      });
+      const body = slackResolveBody(destUuid, uuid, issueUuid, 'U_STALE_E2E');
+      const ts = String(Math.floor(Date.now() / 1000) - 400);
+      const res = await request.post('/hooks/slack/interactions', {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-Slack-Request-Timestamp': ts,
+          'X-Slack-Signature': slackSignature(body, SLACK_SECRET, ts),
+        },
+        data: body,
+        failOnStatusCode: false,
+      });
+      expect(res.status(), await res.text()).toBe(401);
+      await expect(await res.text()).toMatch(/invalid signature/i);
+    } finally {
+      await deleteDestinationByLabel(page, uuid, label).catch(() => undefined);
+    }
+  });
+
+  test('Slack action for a different project is forbidden (UC-HOOK-14)', async ({ page, request }) => {
+    test.setTimeout(90_000);
+    const uuid = await resolveDemoProjectUuid(page);
+    const issueUuid = await openFirstIssue(page, uuid);
+    if (!issueUuid) {
+      requireSampleOrSkip(false, 'No issues — run make seed-sample');
+      return;
+    }
+
+    const label = `e2e-hook14-${Date.now().toString(36)}`;
+    try {
+      const destUuid = await createDestination(page, uuid, {
+        label,
+        type: 'slack',
+        endpointUrl: 'https://hooks.slack.com/services/T/B/e2e-hook14',
+        signingSecret: SLACK_SECRET,
+      });
+      const otherProject = '00000000-0000-4000-8000-000000000099';
+      const body = slackResolveBody(destUuid, otherProject, issueUuid, 'U_MISMATCH_E2E');
+      const ts = String(Math.floor(Date.now() / 1000));
+      const res = await request.post('/hooks/slack/interactions', {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-Slack-Request-Timestamp': ts,
+          'X-Slack-Signature': slackSignature(body, SLACK_SECRET, ts),
+        },
+        data: body,
+        failOnStatusCode: false,
+      });
+      expect(res.status(), await res.text()).toBe(403);
+      await expect(await res.text()).toMatch(/project mismatch/i);
+    } finally {
+      await deleteDestinationByLabel(page, uuid, label).catch(() => undefined);
+    }
+  });
 });
