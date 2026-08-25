@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8d803f17a2ea173208c330210dbfd65a",
+    "content-hash": "6c231ffa1e830b11ff3cd1ca466760cc",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -2717,16 +2717,16 @@
         },
         {
             "name": "nowo-tech/form-kit-bundle",
-            "version": "v2.5.1",
+            "version": "v2.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/FormKitBundle.git",
-                "reference": "5e99909f55e72e78c9338c1578706dff44132dbf"
+                "reference": "74347a3711ee510019b6fcc0651a5ff2b3101ee5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/FormKitBundle/zipball/5e99909f55e72e78c9338c1578706dff44132dbf",
-                "reference": "5e99909f55e72e78c9338c1578706dff44132dbf",
+                "url": "https://api.github.com/repos/nowo-tech/FormKitBundle/zipball/74347a3711ee510019b6fcc0651a5ff2b3101ee5",
+                "reference": "74347a3711ee510019b6fcc0651a5ff2b3101ee5",
                 "shasum": ""
             },
             "require": {
@@ -2819,7 +2819,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-08-24T16:56:33+00:00"
+            "time": "2026-08-25T08:02:55+00:00"
         },
         {
             "name": "nowo-tech/http-log-bundle",

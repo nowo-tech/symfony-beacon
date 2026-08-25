@@ -46,8 +46,8 @@ importers:
         specifier: 3.2.2
         version: 3.2.2
       '@openai/codex-security':
-        specifier: ^0.1.19
-        version: 0.1.19(@types/node@26.3.0)(graphql@17.0.2)
+        specifier: ^0.1.20
+        version: 0.1.20(@types/node@26.3.0)(graphql@17.0.2)
       '@playwright/test':
         specifier: ^1.62.1
         version: 1.62.1
@@ -654,8 +654,8 @@ packages:
     resolution: {integrity: sha512-3t54+WC9E/YANQIf2LomahmLXYe8pOuCe5//wZi4tE7o2sjJPCBA01g3ySlMUjXdQrVZC7J+KzOekTBGabwLnA==}
     engines: {node: '>=18'}
 
-  '@openai/codex-security@0.1.19':
-    resolution: {integrity: sha512-agrgjCQxm/gPCFucg6EZR5VPy1SJzgAgzvq+7n6nz4fzSc2gzO3NHiqTNa+bMzm0CKlT8R3LGXMv8Z39Ighwtg==}
+  '@openai/codex-security@0.1.20':
+    resolution: {integrity: sha512-cLDpc9lG2A/v57OqEUUKOEL2RtYx5xQ8QwH1kIhmYfLe7UTnnkP5hZwYu6tzvLlsWbgZsBcVHNENr1jYxdyiTg==}
     engines: {node: ^22.13.0 || ^24.0.0 || ^26.0.0}
     hasBin: true
 
@@ -2726,7 +2726,7 @@ snapshots:
     dependencies:
       '@openai/codex': 0.148.0-alpha.8
 
-  '@openai/codex-security@0.1.19(@types/node@26.3.0)(graphql@17.0.2)':
+  '@openai/codex-security@0.1.20(@types/node@26.3.0)(graphql@17.0.2)':
     dependencies:
       '@inquirer/prompts': 8.3.0(@types/node@26.3.0)
       '@linear/sdk': 89.0.0(graphql@17.0.2)

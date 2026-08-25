@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "@hotwired/stimulus": "3.2.2",
-    "@openai/codex-security": "^0.1.19",
+    "@openai/codex-security": "^0.1.20",
     "@playwright/test": "^1.62.1",
     "@symfony/ux-autocomplete": "file:vendor/symfony/ux-autocomplete/assets",
     "@symfony/ux-live-component": "file:vendor/symfony/ux-live-component/assets",
