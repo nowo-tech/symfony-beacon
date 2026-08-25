@@ -23,7 +23,7 @@
 
 As a project owner or admin, I can empty telemetry history so the project stays but past issues/perf/analytics are gone.
 
-**Independent Test**: Seed issues/events for a project; open Settings danger zone; confirm clear in modal; assert telemetry is gone and project/keys remain.
+**Independent Test**: Seed issues/events for a project; open Settings danger zone; complete the danger slider; assert telemetry is gone and project/keys remain.
 
 **Acceptance Scenarios**:
 
