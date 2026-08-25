@@ -28,7 +28,60 @@ final class ProjectShareGrantStoreTest extends TestCase
         self::assertNull($store->getActiveShareEntry($project));
     }
 
-    public function testGrantsProjectWideAndIssueScopedAccessAndClearsInvalidEntries(): void
+    public function testGrantsProjectWideAndIssueScopedAccess(): void
+    {
+        [$store, $project, $validShareUuid] = $this->storeWithValidLink();
+
+        $store->grantShareAccess($project, null, time() + 120, $validShareUuid);
+        self::assertTrue($store->hasActiveShareGrant($project));
+        self::assertTrue($store->hasProjectWideShareGrant($project));
+        self::assertTrue($store->hasShareGrantForIssue($project, 'issue-1'));
+        $entry = $store->getActiveShareEntry($project);
+        self::assertNotNull($entry);
+        self::assertNull($entry['issue']);
+
+        $store->grantShareAccess($project, 'issue-1', time() + 120, $validShareUuid);
+        self::assertFalse($store->hasProjectWideShareGrant($project));
+        self::assertTrue($store->hasShareGrantForIssue($project, 'issue-1'));
+        self::assertFalse($store->hasShareGrantForIssue($project, 'issue-2'));
+    }
+
+    public function testClearsExpiredMissingShareAndRevokedEntries(): void
+    {
+        [$store, $project, $validShareUuid, $session] = $this->storeWithValidLink();
+
+        $session->set(ProjectShareGrantStore::SHARE_ACCESS_SESSION_KEY, [$project->getUuid() => ['expires' => time() - 1, 'share' => $validShareUuid]]);
+        self::assertNull($store->getActiveShareEntry($project));
+
+        $session->set(ProjectShareGrantStore::SHARE_ACCESS_SESSION_KEY, [$project->getUuid() => ['expires' => time() + 120]]);
+        self::assertNull($store->getActiveShareEntry($project));
+
+        $session->set(ProjectShareGrantStore::SHARE_ACCESS_SESSION_KEY, [$project->getUuid() => ['expires' => time() + 120, 'share' => 'revoked-share']]);
+        self::assertNull($store->getActiveShareEntry($project));
+
+        $session->remove(ProjectShareGrantStore::SHARE_ACCESS_SESSION_KEY);
+        self::assertFalse($store->hasShareGrantForIssue($project, 'issue-3'));
+    }
+
+    public function testNormalizesNonStringAndBlankIssueToNull(): void
+    {
+        [$store, $project, $validShareUuid, $session] = $this->storeWithValidLink();
+
+        $session->set(ProjectShareGrantStore::SHARE_ACCESS_SESSION_KEY, [$project->getUuid() => ['expires' => time() + 120, 'share' => $validShareUuid, 'issue' => 123]]);
+        $withNonStringIssue = $store->getActiveShareEntry($project);
+        self::assertNotNull($withNonStringIssue);
+        self::assertNull($withNonStringIssue['issue']);
+
+        $session->set(ProjectShareGrantStore::SHARE_ACCESS_SESSION_KEY, [$project->getUuid() => ['expires' => time() + 120, 'share' => $validShareUuid, 'issue' => '']]);
+        $withBlankIssue = $store->getActiveShareEntry($project);
+        self::assertNotNull($withBlankIssue);
+        self::assertNull($withBlankIssue['issue']);
+    }
+
+    /**
+     * @return array{0: ProjectShareGrantStore, 1: Project, 2: string, 3: Session}
+     */
+    private function storeWithValidLink(): array
     {
         $request = Request::create('/');
         $session = new Session(new MockArraySessionStorage());
@@ -56,34 +109,6 @@ final class ProjectShareGrantStoreTest extends TestCase
             default => null,
         });
 
-        $store = new ProjectShareGrantStore($stack, $repo);
-        $store->grantShareAccess($project, null, time() + 120, $validShareUuid);
-        self::assertTrue($store->hasActiveShareGrant($project));
-        self::assertTrue($store->hasProjectWideShareGrant($project));
-        self::assertTrue($store->hasShareGrantForIssue($project, 'issue-1'));
-        self::assertNull($store->getActiveShareEntry($project)['issue']);
-
-        $store->grantShareAccess($project, 'issue-1', time() + 120, $validShareUuid);
-        self::assertFalse($store->hasProjectWideShareGrant($project));
-        self::assertTrue($store->hasShareGrantForIssue($project, 'issue-1'));
-        self::assertFalse($store->hasShareGrantForIssue($project, 'issue-2'));
-
-        $session->set(ProjectShareGrantStore::SHARE_ACCESS_SESSION_KEY, [$project->getUuid() => ['expires' => time() - 1, 'share' => $validShareUuid]]);
-        self::assertNull($store->getActiveShareEntry($project));
-
-        $session->set(ProjectShareGrantStore::SHARE_ACCESS_SESSION_KEY, [$project->getUuid() => ['expires' => time() + 120]]);
-        self::assertNull($store->getActiveShareEntry($project));
-
-        $session->set(ProjectShareGrantStore::SHARE_ACCESS_SESSION_KEY, [$project->getUuid() => ['expires' => time() + 120, 'share' => 'revoked-share']]);
-        self::assertNull($store->getActiveShareEntry($project));
-
-        $session->set(ProjectShareGrantStore::SHARE_ACCESS_SESSION_KEY, [$project->getUuid() => ['expires' => time() + 120, 'share' => $validShareUuid, 'issue' => 123]]);
-        self::assertNull($store->getActiveShareEntry($project));
-
-        $session->set(ProjectShareGrantStore::SHARE_ACCESS_SESSION_KEY, [$project->getUuid() => ['expires' => time() + 120, 'share' => $validShareUuid, 'issue' => '']]);
-        self::assertNull($store->getActiveShareEntry($project));
-
-        $session->remove(ProjectShareGrantStore::SHARE_ACCESS_SESSION_KEY);
-        self::assertFalse($store->hasShareGrantForIssue($project, 'issue-3'));
+        return [new ProjectShareGrantStore($stack, $repo), $project, $validShareUuid, $session];
     }
 }

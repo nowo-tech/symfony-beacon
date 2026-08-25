@@ -86,6 +86,8 @@ final class IssueListQueryBuilderTraitSortHarness
 
     public function createQueryBuilder(string $alias, ?string $indexBy = null): QueryBuilder
     {
+        unset($alias, $indexBy);
+
         throw new LogicException('createQueryBuilder is not used by applySqlSort tests');
     }
 

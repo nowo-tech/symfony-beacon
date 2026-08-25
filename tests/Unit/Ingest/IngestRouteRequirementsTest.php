@@ -13,6 +13,11 @@ final class IngestRouteRequirementsTest extends TestCase
     public function testProjectRefAcceptsPositiveIntOrUuidPattern(): void
     {
         self::assertTrue(new ReflectionClass(IngestRouteRequirements::class)->isFinal());
-        self::assertMatchesRegularExpression('#^[0-9a-zA-Z_|\\[\\]\\-\\+\\*]+$#', IngestRouteRequirements::PROJECT_REF);
+
+        $pattern = '#^(?:'.IngestRouteRequirements::PROJECT_REF.')$#';
+        self::assertMatchesRegularExpression($pattern, '42');
+        self::assertMatchesRegularExpression($pattern, '019fea2d-507b-7890-8b33-ca488db6f696');
+        self::assertDoesNotMatchRegularExpression($pattern, '0');
+        self::assertDoesNotMatchRegularExpression($pattern, 'not-a-project-ref');
     }
 }
