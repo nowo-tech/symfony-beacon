@@ -60,3 +60,7 @@ Operators get safer defaults (no unverified phone QR, tighter maintenance exclus
 - No Doctrine migrations in this release.
 - Host Maintenance Twig override uses kit FormViews + `_fields`.
 - Dashboard embeds `ProjectController::newFormFragment` so Identity does not own `ProjectCreationFormFactory`.
+
+## Amendment (shared private-network SSRF, 2026-08-25 / `106`)
+
+R3 Mercure hub guard and webhook `OutboundUrlGuard` MUST use `App\Shared\Http\PrivateNetworkTarget` (private IP literals, localhost-style hosts, reserved ranges). Mercure MUST NOT DNS-resolve hostnames so Compose service `mercure` stays valid. Cloud metadata MUST stay blocked even when Ops `allowPrivateUrls` is on (`084`). See `specs/106-ops-ingest-hardening/` US5.

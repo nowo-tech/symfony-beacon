@@ -145,3 +145,8 @@ Extends FR-007:
 - Predecessors: `018-project-governance`, `038-prometheus-metrics`, `044-instance-config-export`, `052-api-public-key-hardening`, `055-install-seed-layers`, `058-self-beacon-client`, `062-sitebackup-nondev-guard`, `068-slack-interactive-actions`
 - Audit canvas: `security-architecture-audit-2026-08-10`
 - Architecture lineage: `083` / `085` / `086` (boundaries unchanged by this pass)
+- Follow-up: `096` hash-at-rest; `106` `app:project:api-key-legacy-secrets` clears redundant Halite ciphertext only
+
+## Amendment (legacy API-key ciphertext command, 2026-08-25 / `106`)
+
+After `096` SHA-256 `secret_hash`, leftover Halite `secret_key` is recoverable secret material. Operators MAY run `app:project:api-key-legacy-secrets` (dry-run) and `--apply` to clear ciphertext **only** when `secret_hash` is already present. Legacy-only keys (no hash) MUST be reported, not cleared — rotate in Settings or wait for ingest dual-read upgrade. Show-once DSN rules (FR-001 / `102`) unchanged.

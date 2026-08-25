@@ -189,3 +189,11 @@ Account / project member-alert LiveComponent Twigs intentionally use `form_widge
 ## Amendment (Browser push preference default on, 2026-08-16)
 
 `UserUiPreferences.pushNotificationsEnabled` defaults to **true** for new users (Doctrine column default `1` on table `` `user` ``; migration `Version20260816120000` changes default only — no mass update of existing rows). Product copy: preference on by default; browser still prompts for Notification permission; `issue-realtime` registers `push_subscription` when the member visits a page that mounts the controller with VAPID configured. Dogfood `make beacon-test` counts `push_subscription` rows (not the preference flag) when warning about missing Web Push.
+
+## Amendment (AuditKit timestamps, 2026-08-25 / `106`)
+
+`MemberProjectAlertPreference`, `MemberAccountAlertEvent`, and `PushSubscription` MUST use [`nowo-tech/audit-kit-bundle`](https://packagist.org/packages/nowo-tech/audit-kit-bundle) `TimestampableTrait` for `createdAt`/`updatedAt` — do not copy host trait logic. Preference evaluation and channel behaviour unchanged. See `specs/106-ops-ingest-hardening/` H8.
+
+## Amendment (Rector vs CS-Fixer ownership, 2026-08-25 / `106`)
+
+Extends the v1.23.2 Rector note: Rector MUST NOT enable coding-style / `withImportNames()` / CS-Fixer `@PHP*Migration` sets. Formatting, import order, native `\fn()`, and union style stay with PHP-CS-Fixer. `make qa-fix` / `rector-fix` MUST apply CS-Fixer **after** Rector.

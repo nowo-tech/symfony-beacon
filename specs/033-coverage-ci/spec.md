@@ -43,3 +43,7 @@ As a maintainer, after the includable `src/` tree reaches 100% statement coverag
 
 - Mutation testing.
 - Requiring 100% on HTTP controllers, canvas/WebGL engines, or demo/install seed commands (excluded by design).
+
+## Amendment (Unreleased / `106`, 2026-08-25)
+
+Includable PHP Clover **100%** restored after Ops/ingest/security additions (`MessengerQueueHealth`, `EventQuotaUsageStore`, `RetentionPurger` batches, `PrivateNetworkTarget`, legacy API-key command). PHPUnit `tests/` MUST stay PHPStan-clean at level 6 without `ignoreErrors` / baseline rows (`094` / `106` H10). Vitest whitelist 100% unchanged.

@@ -76,3 +76,7 @@ As a maintainer, the Symfony Flex debug `umask(0000)` in PHPUnit bootstrap remai
 - Beacon already ran classic + worker + hardening under 1.0.x; 1.1.0 adds identifiers inside those rulesets.
 - Worker-strict remains opt-in.
 - `doctrine.associationType` entity ignore is orthogonal and retained.
+
+## Amendment (empty baseline + injectable seams, 2026-08-25 / `106`)
+
+`phpstan-baseline.neon` is empty (`parameters: {}`). `phpstan.neon.dist` MUST NOT list `ignoreErrors`: association nullability uses `doctrine.allowNullablePropertyForRequiredField`; FrankenPHP worker/hardening stays green via injectable Clock, `HostnameDnsLookup`, and `HaliteSecretsFilesystem` (no process-wide umask in PHPUnit bootstrap, no path-scoped `frankenphp.worker.*` ignores on `src/`). Issue query traits MUST NOT use `phpstan-require-extends` (unit harnesses compose them without pretending to be `ServiceEntityRepository`). `tests/` MUST analyse clean at level 6 without ignores. Rector owns semantic upgrades only; CS-Fixer owns PER-CS / imports / native `\fn()`; `make qa-fix` runs Rector then CS-Fixer. Production gate remains `rules.neon` (`094` P2). See `specs/106-ops-ingest-hardening/` H10.

@@ -117,3 +117,7 @@ As a project admin, I see warnings when usage approaches rate or quota limits so
 ## Amendment (FormKit `beacon` governance form, 2026-08-13)
 
 `ProjectGovernanceType` extends `FormKitAbstractType` (profile `beacon`, block prefix `project_governance`). Labels / placeholders / help live under `project_governance.*` in `translations/form.*.yaml` (auto); numeric placeholders may be literal defaults; help may use `help_translation_parameters` (`%default%`). Twig: `form_row` + `_fields` (`077`). Canonical: `081` FR-003c. Automated tests / E2E MUST use prefixed ids such as `#project_governance_retention_days` (not `#retention_days`).
+
+## Amendment (batched retention + quota cache, 2026-08-25 / `106`)
+
+`app:retention:purge` deletes events in batches of **1000** per project (`RetentionPurger`) so age/max-event caps do not hold long locks. Daily/monthly quota checks use cached usage (`032` / `EventQuotaUsageStore`); do not COUNT(*) on every ACK. Growth beyond retention is operator later — [docs/ops/EVENT-STORAGE.md](../../docs/ops/EVENT-STORAGE.md). Unique-constraint races on Envelope flush retry **once** (`ProcessEnvelopeHandler`). See `specs/106-ops-ingest-hardening/`.

@@ -102,3 +102,8 @@ As an operator installing from `.env.dist`, I no longer see (or need) the migrat
 - `077-form-type-field-loop` — Form Type field loop.
 - `078-form-save-restore-actions` — Save + Restore chrome.
 - `081-formkit-uikit-kit-sync` — UiKit tabs/pagination + FormKit pins.
+- `106-ops-ingest-hardening` — batched retention, quota cache, shared `PrivateNetworkTarget` (Mercure + webhooks). `allowPrivateUrls` still MUST NOT open cloud metadata.
+
+## Amendment (EVENT-STORAGE + SSRF helper, 2026-08-25 / `106`)
+
+Retention schedule in PRODUCTION.md links [docs/ops/EVENT-STORAGE.md](../../docs/ops/EVENT-STORAGE.md) (retention-first; no default partitioning). Outbound private-URL policy and Mercure hub validation share `PrivateNetworkTarget`; metadata stays blocked when private URLs are allowed.

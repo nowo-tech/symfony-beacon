@@ -19,7 +19,7 @@ Prefer official Nowo.tech kits — do not hand-roll sliders, device fingerprints
 | K4 | Trust | Account → Security → **Trusted browsers** (`/account/security/devices`) — explicit trust/revoke; login never auto-trusts |
 | K5 | Mail | `AuthKitNewDeviceLoginMailNotifier` implements AuthKit `NewDeviceLoginNotifierInterface` via encrypted instance Mailer |
 | K6 | OTP UX | [`nowo-tech/otp-input-bundle`](https://packagist.org/packages/nowo-tech/otp-input-bundle) on `/reset-password/complete` (`otp_input.enabled` + `OtpType`); server OTP checks unchanged |
-| K7 | FormKit | [`nowo-tech/form-kit-bundle`](https://packagist.org/packages/nowo-tech/form-kit-bundle) **2.5.1** — `addSlideToConfirmField()`; drop host `nowo_form_kit.type_map.search` (built-in since 2.4.0) |
+| K7 | FormKit | [`nowo-tech/form-kit-bundle`](https://packagist.org/packages/nowo-tech/form-kit-bundle) **2.5.2** — `addSlideToConfirmField()`; drop host `nowo_form_kit.type_map.search` (built-in since 2.4.0). Dashboard Menu `SearchQueryType` host tag is `106`, not this feature |
 | K8 | Ops | MaintenanceMode excludes `/_device`; PWA `deny_cache_patterns` includes `/_device`; SW `cache_version` **v6**; SiteBackup `short_circuit_when_done: true` |
 
 ## Non-goals
@@ -114,7 +114,7 @@ As a project admin clearing telemetry history, Settings danger zone requires sli
 
 ## Functional Requirements
 
-- **FR-001**: Composer MUST pin AuthKit **1.20.0**, Device Intelligence **1.1.0**, OTP Input (current patch), Slide-to-confirm **1.1.0**, FormKit **≥ 2.5.1**.
+- **FR-001**: Composer MUST pin AuthKit **1.20.0**, Device Intelligence **1.1.0**, OTP Input (current patch), Slide-to-confirm **1.1.0**, FormKit **≥ 2.5.2**.
 - **FR-002**: AuthKit profile MUST enable `slide_to_confirm` (registration `gate`; QR approve **false**), `device_intelligence` (collect on auth pages, new-device notify, extra device-keyed rate limit on register/reset/magic), and `otp_input` (password-reset code page).
 - **FR-003**: Device ID MUST NOT be a credential. AuthKit MUST NOT auto-trust a device after login.
 - **FR-004**: `di_obs` MUST be HttpOnly, first-party, category **required**, documented in cookie inventory + `/legal/cookies` + seed fixture `cookie_consent.default.json`.
@@ -152,5 +152,6 @@ As a project admin clearing telemetry history, Settings danger zone requires sli
 ## Cross-links
 
 - Prior: `011`, `034`, `037`, `056`, `072`, `075`, `081`, `090`, `096`, `097`, `100`, `101`, `103`
+- Follow-up: `106-ops-ingest-hardening` (FormKit **2.5.2**, Dashboard Menu `SearchQueryType` tag, Ops/ingest/QA — not AuthKit kits)
 - Docs: [`docs/product/LEGAL-AND-COOKIES.md`](../../docs/product/LEGAL-AND-COOKIES.md), [`docs/product/E2E-USE-CASES.md`](../../docs/product/E2E-USE-CASES.md) (UC-AUTH-22/26, UC-PROJ-17)
 - Kits: AuthKit, Device Intelligence, OTP Input, Slide-to-confirm, FormKit, Cookie Consent, Maintenance Mode, PWA, SiteBackup

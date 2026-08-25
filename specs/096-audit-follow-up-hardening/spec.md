@@ -37,7 +37,8 @@ Default `qr_login.mode: disabled` (this feature) stayed correct for prod. Host n
 - Shipping SMS OTP / re-enabling QR login
 - Token-scoped Read API limiter (IP only in this cut; token key optional on limiter API for later)
 - Api Platform / Serializer `#[Groups]` on Read API
-- Full Identity admin controller rewrite / RetentionPurger streaming (deferred)
+- Full Identity admin controller rewrite
+- MySQL RANGE partitioning / `event_cold` in default migrations (operator later; `106` ships batched `RetentionPurger` + EVENT-STORAGE docs instead of streaming)
 
 ## User Scenarios & Testing
 
@@ -66,3 +67,7 @@ Default `qr_login.mode: disabled` (this feature) stayed correct for prod. Host n
 - Migrations: `Version20260813180000` (indexes), `Version20260813190000` (`secret_hash`).
 - Add `BEACON_READ_API_RATE_LIMIT=120` to operator `.env` from `.env.dist`.
 - Docs: SECURITY / PRODUCTION / DSN / API / ROLES / UPGRADING.
+
+## Amendment (redundant Halite ciphertext, 2026-08-25 / `106`)
+
+F2 dual-read stays: legacy encrypted `secret_key` still authenticates and upgrades to `secret_hash` on successful ingest. Operators can inventory and `--apply` drop **redundant** ciphertext via `app:project:api-key-legacy-secrets` without revoking legacy-only keys. See `specs/106-ops-ingest-hardening/` US6.

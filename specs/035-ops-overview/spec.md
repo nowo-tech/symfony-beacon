@@ -80,3 +80,7 @@ As an instance admin, I jump from a failed-delivery or spike row to the projectâ
 - Real-time websocket push of overview widgets (Mercure optional later).
 - Replacing Admin â†’ Projects list.
 - Member-scoped failed-delivery inbox (not admin Ops): **`080-dashboard-aside-panels`** Alerts panel.
+
+## Amendment (Redis transport depths + failed, 2026-08-25 / `106`)
+
+`MessengerQueueHealth` lives under `App\Ops\Messenger` (completes the `085` Ops move). Pending depth MUST prefer Redis transport `MessageCountAware` counts for `async_ingest` + `async`; **failed** transport depth is shown on Ops overview and exported as `beacon_messenger_failed_pending` (`038`). Doctrine `messenger_messages` remains fallback when transports cannot count. Prod Compose Redis DSNs MUST NOT use path `/messages` (`099` / `106`). Copy MAY point operators to `messenger:failed` CLI. See `specs/106-ops-ingest-hardening/`.

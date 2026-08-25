@@ -225,6 +225,7 @@ Host Twig catch-up after Types already on `beacon` / `filter`:
 - `090-csrf-symfony-forms` — host CSRF via Symfony Forms / kit `CsrfOnlyType` (FormKit ≥ 2.4 / `101`); GET filters on host `AbstractGetFilterType` → kit base.
 - `101-kit-csp-shared-helpers` — PhoneInput 1.3 / CookieConsent 1.9 / FormKit 2.4 / UiKit 1.8 CSP + shared helpers upstream.
 - `105-authkit-security-kits` — FormKit **2.5.1** `addSlideToConfirmField`; drop host `type_map.search`.
+- `106-ops-ingest-hardening` — FormKit **2.5.2**; host tag Dashboard Menu `SearchQueryType`.
 - `nowo-tech/pwa-bundle` — Preferences install links = vendor + `_components.scss` BEM (no `install_links.html.twig` host fork as of 2026-08-17).
 - `084-ops-env-to-db` — Ops defaults UI (section tabs + FormKit Types).
 - `080-dashboard-aside-panels` / `079-dashboard-assignments` — list pagination convention.
@@ -247,3 +248,7 @@ Host Twig catch-up after Types already on `beacon` / `filter`:
 ## Amendment (FormKit 2.5.1 slide helper, 2026-08-25 / `105`)
 
 FormKit **2.5.1** ships `addSlideToConfirmField()`. Host product Types MUST use that helper (Clear history `danger` profile) instead of raw `$builder->add()` for sliders. Snake-case `search` → `SearchType` is built-in since **2.4.0** — do not keep `nowo_form_kit.type_map.search`. Cursor rule `.cursor/rules/formkit-profiles.mdc` mentions the helper. See `specs/105-authkit-security-kits/`.
+
+## Amendment (FormKit 2.5.2 + Dashboard Menu SearchQueryType, 2026-08-25 / `106`)
+
+Host pin is FormKit **2.5.2** (slide helper unchanged). Dashboard Menu **2.1.9** tags other FormKit types as `form.type` but omits kit `SearchQueryType`. Until the kit tags it, host `config/services/dashboard_menu.yaml` MUST register `Nowo\DashboardMenuBundle\Form\SearchQueryType` so FormFactory applies `FormOptionsMerger` (otherwise `/admin/menus/` HTTP 500). Prefer dropping the host tag when an upstream kit release autoconfigures the type. See `specs/106-ops-ingest-hardening/` H9.

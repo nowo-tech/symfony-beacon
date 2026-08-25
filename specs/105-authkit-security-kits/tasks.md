@@ -5,7 +5,7 @@
 
 ## Phase 1: Kit pins and AuthKit profile
 
-- [x] T001 Pin AuthKit **1.20.0** + Device Intelligence **1.1.0** + OTP Input + Slide-to-confirm **1.1.0** + FormKit **2.5.1**
+- [x] T001 Pin AuthKit **1.20.0** + Device Intelligence **1.1.0** + OTP Input + Slide-to-confirm **1.1.0** + FormKit **2.5.1** (later **2.5.2** in `106`)
 - [x] T002 Enable `slide_to_confirm` / `device_intelligence` / `otp_input` on `nowo_auth_kit.profiles.default`; keep QR Approve as a button
 - [x] T003 Add host YAML for `nowo_device_intelligence`, `nowo_otp_input`, `nowo_slide_to_confirm`; drop host `type_map.search`
 

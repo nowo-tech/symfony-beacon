@@ -39,3 +39,7 @@ As an operator, I scrape Prometheus metrics from a documented path.
 
 - Full APM / distributed tracing.
 - Ops overview UI (`035`) — may share underlying counters.
+
+## Amendment (failed transport gauge, 2026-08-25 / `106`)
+
+FR-003 extends to a separate failed-transport gauge: `beacon_messenger_failed_pending` from `App\Ops\Messenger\MessengerQueueHealth` (Redis `failed` stream when `MessageCountAware`; not Doctrine table when Redis transports count). Ops overview surfaces the same number (`035`). See `specs/106-ops-ingest-hardening/`.

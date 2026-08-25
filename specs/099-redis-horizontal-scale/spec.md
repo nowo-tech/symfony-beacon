@@ -101,3 +101,7 @@
 - `developer.local.server/server` Redis (`redis-8.10.0`) for shared mode
 - PHP extension `redis`; Composer `symfony/redis-messenger`
 - Prior shared MySQL dual-mode (`098`)
+
+## Amendment (Messenger Redis DSN path, 2026-08-25 / `106`)
+
+Symfony Redis transport treats the DSN **path** as the **stream name**. Prod Compose MUST NOT append `/messages` on `MESSENGER_*` Redis URLs — that would override `async_ingest` / `async` / `failed` from `messenger.yaml`. Use `?dbindex=N` when selecting a Redis logical DB (E2E `104` / v1.23.3). Queue depth on Ops/`/metrics` reads those named streams (`035` / `106`).

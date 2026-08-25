@@ -36,3 +36,7 @@ As a project admin, I see a warning near 80% of the monthly quota (same spirit a
 ## Out of scope
 
 - Billing integrations / Stripe metering.
+
+## Amendment (quota usage cache, 2026-08-25 / `106`)
+
+Daily and monthly enforcement MUST use `EventQuotaUsageStore` (`cache.app`): seed from `EventRepository` on miss, increment on accepted Envelope writes. UTC day/month boundaries unchanged (FR-004). After retention deletes, cache MAY stay slightly high until TTL (fail-closed for quotas). Do not reintroduce per-ACK `COUNT(*)` on the hot path. See `specs/106-ops-ingest-hardening/` and [docs/ops/EVENT-STORAGE.md](../../docs/ops/EVENT-STORAGE.md).
