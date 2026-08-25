@@ -69,8 +69,8 @@ Same for `choice_translation_domain`: omit when choice labels should use the fie
 ## Conventions
 
 - Catalogue: `translations/form.*.yaml`
-- Prefer FormKit helpers (`withBuilder`, `addTextField`, …) over raw `$builder->add()`
-- Snake-case `search` → Symfony `SearchType` via host `nowo_form_kit.type_map` (not built into FormKit)
+- Prefer FormKit helpers (`withBuilder`, `addTextField`, `addSlideToConfirmField`, …) over raw `$builder->add()`
+- Snake-case `search` → Symfony `SearchType` (built into FormKit ≥ 2.4.0; do not re-add host `type_map.search`)
 - Twig that sets `placeholder: 'key'|trans` (messages) MUST pair with `twigOwnedChromeOptions()` / `translation_domain: false` — Symfony re-translates `attr.placeholder` in the field domain
 - Empty `getBlockPrefix()` + auto_placeholder → keys like `.bundle.placeholder`; disable with `placeholder: false` (or use `twigOwnedChromeOptions()`)
 - Choice empty options with `form` keys: `addChoiceWithFormPlaceholder()` (not raw `placeholder` on `addChoiceField`); filters: `addFilterSelect()`

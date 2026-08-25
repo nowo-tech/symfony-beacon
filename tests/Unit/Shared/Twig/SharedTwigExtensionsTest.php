@@ -11,6 +11,7 @@ use App\Shared\Twig\CsrfActionTwigExtension;
 use App\Shared\Twig\RbacPermissionTwigExtension;
 use App\Shared\Twig\RbacRoleTwigExtension;
 use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
+use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -41,17 +42,22 @@ final class SharedTwigExtensionsTest extends TestCase
         $form->method('createView')->willReturn($view);
 
         $formFactory = $this->createMock(FormFactoryInterface::class);
-        $formFactory->expects(self::once())
+        $formFactory->expects(self::exactly(2))
             ->method('createNamed')
             ->willReturn($form);
         $formFactory->expects(self::exactly(3))
             ->method('create')
             ->willReturn($form);
 
-        $ext = new CsrfActionTwigExtension(new CsrfOnlyFormFactory($formFactory), $formFactory);
-        self::assertCount(3, $ext->getFunctions());
+        $ext = new CsrfActionTwigExtension(
+            new CsrfOnlyFormFactory($formFactory),
+            $formFactory,
+            new GetFilterFormFactory($formFactory),
+        );
+        self::assertCount(4, $ext->getFunctions());
         self::assertSame($view, $ext->csrfActionForm('/action', 'token-id'));
         self::assertSame($view, $ext->csrfActionForm('/action', 'token-id', fields: ['enabled' => '1']));
+        self::assertSame($view, $ext->getFilterForm(\App\Setup\Form\SetupTokenGateType::class, ['token' => '']));
         self::assertSame($view, $ext->searchQueryForm('/search', 'q', ['placeholder' => 'Search']));
         self::assertSame($view, $ext->flatHiddenFields(['_section' => 'config']));
     }

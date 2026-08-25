@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Shared\Twig;
 
 use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
+use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use Nowo\FormKitBundle\Form\Type\HiddenFieldsCsrfType;
 use Nowo\FormKitBundle\Form\Type\SearchQueryType;
 use Override;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\FormView;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -21,6 +23,7 @@ final class CsrfActionTwigExtension extends AbstractExtension
     public function __construct(
         private readonly CsrfOnlyFormFactory $csrfOnlyFormFactory,
         private readonly FormFactoryInterface $formFactory,
+        private readonly GetFilterFormFactory $getFilterFormFactory,
     ) {
     }
 
@@ -29,6 +32,7 @@ final class CsrfActionTwigExtension extends AbstractExtension
     {
         return [
             new TwigFunction('csrf_action_form', $this->csrfActionForm(...)),
+            new TwigFunction('get_filter_form', $this->getFilterForm(...)),
             new TwigFunction('search_query_form', $this->searchQueryForm(...)),
             new TwigFunction('flat_hidden_fields', $this->flatHiddenFields(...)),
         ];
@@ -86,6 +90,18 @@ final class CsrfActionTwigExtension extends AbstractExtension
             'csrf_protection' => false,
             'fields' => array_keys($data),
         ])->createView();
+    }
+
+    /**
+     * Rootless GET filter form (no CSRF) for list search UIs and the setup token gate.
+     *
+     * @param class-string<FormTypeInterface<mixed>> $type
+     * @param array<string, mixed>                   $data
+     * @param array<string, mixed>                   $options
+     */
+    public function getFilterForm(string $type, array $data = [], array $options = []): FormView
+    {
+        return $this->getFilterFormFactory->create($type, $data, $options)->createView();
     }
 
     /**

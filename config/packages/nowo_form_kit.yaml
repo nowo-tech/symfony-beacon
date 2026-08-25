@@ -12,9 +12,7 @@
 nowo_form_kit:
     default_profile: beacon
     css_framework: tailwind
-    # SearchType is not in FormKit's built-in map (text/email/… only).
-    type_map:
-        search: Symfony\Component\Form\Extension\Core\Type\SearchType
+    # FormKit ≥ 2.4.0 already maps snake-case `search` → Symfony SearchType.
     profiles:
         beacon: &beacon_profile
             alias: beacon

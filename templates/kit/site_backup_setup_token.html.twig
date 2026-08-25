@@ -1,4 +1,5 @@
-{# Friendly SiteBackup token gate — extends host setup layout (REQ-UI-001). #}
+{# Friendly SiteBackup token gate — host chrome (REQ-SETUP-009).
+   Primary action: paste token. How-to steps stay behind a disclosure. #}
 {% extends nowo_site_backup_setup_layout_template %}
 
 {% set token_example = pathPrefix ~ '?token=…' %}
@@ -21,14 +22,37 @@
     <h1 class="setup-token-gate__title">{{ 'setup.token.title'|trans }}</h1>
     <p class="setup-token-gate__lead">{{ 'setup.token.lead'|trans }}</p>
 
-    <ol class="setup-token-gate__steps">
-        <li>{{ 'setup.token.step_env'|trans }}</li>
-        <li>{{ 'setup.token.step_url'|trans({'%path%': token_example}) }}</li>
-        <li>{{ 'setup.token.step_header'|trans }}</li>
-    </ol>
+    <div class="setup-token-gate__panel">
+        {% set token_form = get_filter_form(
+            'App\\Setup\\Form\\SetupTokenGateType',
+            {token: app.request.query.get('token', '')},
+            {
+                action: pathPrefix,
+                method: 'GET',
+            }
+        ) %}
+        {% form_theme token_form with ['form/beacon_theme.html.twig'] %}
+        {{ form_start(token_form, {attr: {class: 'setup-token-gate__form'}}) }}
+            <label for="setup-token">{{ 'setup.token.field_label'|trans }}</label>
+            <div class="setup-token-gate__row">
+                {{ form_row(token_form.token, {
+                    attr: {
+                        placeholder: 'setup.token.field_placeholder'|trans,
+                    },
+                }) }}
+                <button type="submit">{{ 'setup.token.submit'|trans }}</button>
+            </div>
+            {% include 'form/_fields.html.twig' with {form: token_form} only %}
+        {{ form_end(token_form, {render_rest: false}) }}
 
-    <p class="setup-token-gate__tip">
-        <code class="setup-token-gate__code">{{ token_example }}</code>
-    </p>
+        <details class="setup-token-gate__howto">
+            <summary>{{ 'setup.token.howto'|trans }}</summary>
+            <ol class="setup-token-gate__steps">
+                <li>{{ 'setup.token.step_env'|trans }}</li>
+                <li>{{ 'setup.token.step_url'|trans({'%path%': token_example}) }}</li>
+                <li>{{ 'setup.token.step_header'|trans }}</li>
+            </ol>
+        </details>
+    </div>
 </div>
 {% endblock %}

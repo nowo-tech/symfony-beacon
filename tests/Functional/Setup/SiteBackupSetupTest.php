@@ -70,6 +70,9 @@ final class SiteBackupSetupTest extends DatabaseWebTestCase
         self::assertResponseStatusCodeSame(403);
         self::assertSelectorExists('[data-testid="setup-token-gate"]');
         self::assertSelectorExists('img.setup-token-gate__img[src*="error-403"]');
+        self::assertSelectorExists('form.setup-token-gate__form');
+        self::assertSelectorExists('input[name="token"]');
+        self::assertSelectorExists('details.setup-token-gate__howto');
     }
 
     public function testLocalizedSetupRouteRespondsSuccessfullyWithToken(): void
