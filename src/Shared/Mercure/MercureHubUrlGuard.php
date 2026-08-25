@@ -4,11 +4,29 @@ declare(strict_types=1);
 
 namespace App\Shared\Mercure;
 
+use App\Shared\Http\PrivateNetworkTarget;
+use App\Shared\Settings\Service\InstanceOpsDefaults;
+
+/**
+ * Validates Mercure hub / public HTTP URLs stored in Administration or env.
+ *
+ * Policy matches {@see \App\Notifications\Service\OutboundUrlGuard} for IP literals and
+ * blocked hostnames. Unlike webhooks, hostnames are **not** DNS-resolved here so Docker
+ * Compose service names ({@code mercure}, {@code php}) remain valid without requiring
+ * {@see InstanceOpsDefaults::allowPrivateUrls()}.
+ *
+ * Cloud metadata hosts/IPs are always rejected, even when private URLs are opted in.
+ */
 final class MercureHubUrlGuard
 {
     public const string RESULT_VALID = 'valid';
     public const string RESULT_INVALID = 'invalid';
     public const string RESULT_UNSAFE = 'unsafe';
+
+    public function __construct(
+        private readonly ?InstanceOpsDefaults $opsDefaults = null,
+    ) {
+    }
 
     public function classifyHttpUrl(?string $value): string
     {
@@ -28,7 +46,17 @@ final class MercureHubUrlGuard
         }
 
         $host = strtolower(rtrim($parts['host'], '.'));
-        if ('' === $host || $this->isBlockedHost($host)) {
+        if ('' === $host) {
+            return self::RESULT_UNSAFE;
+        }
+
+        $allowPrivate = null !== $this->opsDefaults && $this->opsDefaults->allowPrivateUrls();
+
+        if (PrivateNetworkTarget::isCloudMetadataHost($host)) {
+            return self::RESULT_UNSAFE;
+        }
+
+        if (!$allowPrivate && PrivateNetworkTarget::isBlockedHostName($host)) {
             return self::RESULT_UNSAFE;
         }
 
@@ -38,45 +66,23 @@ final class MercureHubUrlGuard
         }
 
         if (false !== filter_var($ipLiteral, \FILTER_VALIDATE_IP)) {
-            return $this->isBlockedIp($ipLiteral)
-                ? self::RESULT_UNSAFE
-                : self::RESULT_VALID;
+            if (PrivateNetworkTarget::isCloudMetadataIp($ipLiteral)) {
+                return self::RESULT_UNSAFE;
+            }
+
+            if (!$allowPrivate && PrivateNetworkTarget::isBlockedIp($ipLiteral)) {
+                return self::RESULT_UNSAFE;
+            }
+
+            return self::RESULT_VALID;
         }
 
+        // Hostname (e.g. Docker service): no DNS resolve — private A/AAAA would break Compose hubs.
         return self::RESULT_VALID;
     }
 
     public function isSafeHttpUrl(?string $value): bool
     {
         return self::RESULT_VALID === $this->classifyHttpUrl($value);
-    }
-
-    private function isBlockedHost(string $host): bool
-    {
-        return \in_array($host, [
-            'metadata',
-            'metadata.google.internal',
-        ], true);
-    }
-
-    private function isBlockedIp(string $ip): bool
-    {
-        if (false !== filter_var($ip, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV4)) {
-            $packed = @inet_pton($ip);
-
-            return false !== $packed && str_starts_with($packed, "\xA9\xFE");
-        }
-
-        if (false !== filter_var($ip, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV6)) {
-            $packed = @inet_pton($ip);
-            if (false === $packed) {
-                return true; // @codeCoverageIgnore
-            }
-
-            // fe80::/10 link-local (including metadata-accessible variants).
-            return 0xFE === \ord($packed[0]) && 0x80 === (\ord($packed[1]) & 0xC0);
-        }
-
-        return true;
     }
 }

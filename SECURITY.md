@@ -61,7 +61,7 @@ Outside local `dev`/`test`, `SiteBackupSecurityDefaultsGuard` also rejects the d
 | Setup token | Prefer header `X-Setup-Token`. Query `?token=` remains for the SiteBackup wizard; rotate `SITE_SETUP_TOKEN` after first setup. |
 | Ops posture | Administration → Ops overview warns when private webhook URLs, anonymous Resolve, or optional metrics scrape are enabled. |
 | Maintenance exclusions (`095`) | Only Envelope + OTLP ingest paths skip the public 503. Read API `/api/projects/…` stays under maintenance. |
-| Mercure hub URL (`095`) | Administration → Mercure rejects private/metadata hub URLs (`MercureHubUrlGuard`). |
+| Mercure hub URL (`095`) | Administration → Mercure rejects private IP literals, `localhost` / `.local` / `.internal`, and cloud metadata (`MercureHubUrlGuard`, same IP policy as `OutboundUrlGuard`). Docker Compose **service hostnames** (`mercure`, `php`) stay allowed without DNS resolve. Opt-in Ops `allowPrivateUrls` permits LAN literals; metadata stays blocked. |
 | AuthKit QR phone | **Disabled** until a real phone OTP sets `User.phoneVerifiedAt` (profile save only clears/restores verification). |
 | Slack user ID | Set under Account → Profile; changing it requires the current password and must be unique (anti-hijack until Slack OAuth linking ships). |
 | Instance `ROLE_PROJECT_*` | Catalog / Admin UI only. Product `#[IsGranted(ProjectPermission::…, 'project')]` requires membership (`InstancePermissionVoter` abstains when the subject is a `Project`). |

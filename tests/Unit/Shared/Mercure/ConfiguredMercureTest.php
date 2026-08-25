@@ -29,7 +29,7 @@ final class ConfiguredMercureTest extends TestCase
         $mercure = new ConfiguredMercure(
             $repo,
             'http://mercure/.well-known/mercure',
-            'https://localhost/.well-known/mercure',
+            'https://beacon.example/.well-known/mercure',
             '!ChangeThisMercureHubJWTSecretKey!',
             new MercureHubUrlGuard(),
         );
@@ -50,13 +50,13 @@ final class ConfiguredMercureTest extends TestCase
         $mercure = new ConfiguredMercure(
             $repo,
             'http://mercure/.well-known/mercure',
-            'https://localhost/.well-known/mercure',
+            'https://beacon.example/.well-known/mercure',
             '!ChangeThisMercureHubJWTSecretKey!',
             new MercureHubUrlGuard(),
         );
 
         self::assertTrue($mercure->isEnabled());
-        self::assertSame('https://localhost/.well-known/mercure', $mercure->getPublicUrl());
+        self::assertSame('https://beacon.example/.well-known/mercure', $mercure->getPublicUrl());
         self::assertNotNull($mercure->createSubscriberToken(['/projects/x/issues']));
     }
 
@@ -75,7 +75,7 @@ final class ConfiguredMercureTest extends TestCase
         $mercure = new ConfiguredMercure(
             $repo,
             'http://mercure/.well-known/mercure',
-            'https://localhost/.well-known/mercure',
+            'https://beacon.example/.well-known/mercure',
             '!ChangeThisMercureHubJWTSecretKey!',
             new MercureHubUrlGuard(),
         );
@@ -83,7 +83,7 @@ final class ConfiguredMercureTest extends TestCase
         self::assertTrue($mercure->isEnabled());
         self::assertFalse($mercure->isUsingDatabaseUrl());
         self::assertFalse($mercure->isUsingDatabaseSecret());
-        self::assertSame('https://localhost/.well-known/mercure', $mercure->getPublicUrl());
+        self::assertSame('https://beacon.example/.well-known/mercure', $mercure->getPublicUrl());
     }
 
     public function testCreateSubscriberTokenReturnsNullWhenSecretBecomesUnavailableAfterEnableCheck(): void
@@ -132,7 +132,7 @@ final class ConfiguredMercureTest extends TestCase
         $mercure = new ConfiguredMercure(
             $repo,
             'http://mercure/.well-known/mercure',
-            'https://localhost/.well-known/mercure',
+            'https://beacon.example/.well-known/mercure',
             '!ChangeThisMercureHubJWTSecretKey!',
             new MercureHubUrlGuard(),
         );

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Notifications\Service;
 
+use App\Shared\Http\PrivateNetworkTarget;
 use App\Shared\Settings\Service\InstanceOpsDefaults;
 use InvalidArgumentException;
 
@@ -69,7 +70,7 @@ final readonly class OutboundUrlGuard
         }
 
         $host = strtolower($parts['host']);
-        if ($this->isBlockedHostName($host)) {
+        if (PrivateNetworkTarget::isBlockedHostName($host)) {
             throw new InvalidArgumentException('Notification URL host is not allowed.');
         }
 
@@ -79,7 +80,7 @@ final readonly class OutboundUrlGuard
         }
 
         if (false !== filter_var($ipLiteral, \FILTER_VALIDATE_IP)) {
-            if ($this->isBlockedIp($ipLiteral)) {
+            if (PrivateNetworkTarget::isBlockedIp($ipLiteral)) {
                 throw new InvalidArgumentException('Notification URL must not target a private address.');
             }
 
@@ -142,35 +143,12 @@ final readonly class OutboundUrlGuard
 
         $publicIps = [];
         foreach (array_values(array_unique($candidates)) as $ip) {
-            if ($this->isBlockedIp($ip)) {
+            if (PrivateNetworkTarget::isBlockedIp($ip)) {
                 throw new InvalidArgumentException('Notification URL resolves to a private address.');
             }
             $publicIps[] = $ip;
         }
 
         return $publicIps;
-    }
-
-    private function isBlockedHostName(string $host): bool
-    {
-        return 'localhost' === $host
-            || str_ends_with($host, '.localhost')
-            || str_ends_with($host, '.local')
-            || str_ends_with($host, '.internal')
-            || 'metadata.google.internal' === $host;
-    }
-
-    private function isBlockedIp(string $ip): bool
-    {
-        if (false === filter_var($ip, \FILTER_VALIDATE_IP)) {
-            return true;
-        }
-
-        // Block loopback, RFC1918, link-local, unique-local, multicast, unspecified.
-        return false === filter_var(
-            $ip,
-            \FILTER_VALIDATE_IP,
-            \FILTER_FLAG_NO_PRIV_RANGE | \FILTER_FLAG_NO_RES_RANGE,
-        );
     }
 }

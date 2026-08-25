@@ -154,7 +154,7 @@ final class MemberIssueRealtimeNotifierTest extends TestCase
         return new ConfiguredMercure(
             $repo,
             'http://mercure.test/.well-known/mercure',
-            'https://localhost/.well-known/mercure',
+            'https://beacon.example/.well-known/mercure',
             '!ChangeThisMercureHubJWTSecretKey!',
             new MercureHubUrlGuard(),
             $http,
