@@ -187,6 +187,8 @@ php bin/console nowo:http-log:purge
 make console ARGS='nowo:http-log:purge'
 ```
 
+For multi‑million-row `event` tables, see [EVENT-STORAGE.md](ops/EVENT-STORAGE.md) (batched purge today; cold table / partitioning later).
+
 ## Ingest rate limit
 
 Set the maximum Envelope POSTs per project per minute under **Administration → Ops defaults** (`0` = unlimited). Projects may override it. Exceeded requests get HTTP `429` with `Retry-After: 60`.

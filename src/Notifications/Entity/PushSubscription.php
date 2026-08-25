@@ -8,6 +8,7 @@ use App\Identity\Entity\User;
 use App\Notifications\Repository\PushSubscriptionRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Nowo\AuditKitBundle\Model\TimestampableTrait;
 use Nowo\DoctrineEncryptBundle\Configuration\Encrypted;
 
 /**
@@ -19,6 +20,8 @@ use Nowo\DoctrineEncryptBundle\Configuration\Encrypted;
 #[ORM\Index(name: 'idx_push_subscription_user', columns: ['user_id'])]
 class PushSubscription
 {
+    use TimestampableTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -46,19 +49,13 @@ class PushSubscription
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $userAgent = null;
 
-    #[ORM\Column]
-    private DateTimeImmutable $createdAt;
-
-    #[ORM\Column]
-    private DateTimeImmutable $updatedAt;
-
     public function __construct(#[ORM\ManyToOne(targetEntity: User::class)]
         #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
         private User $user)
     {
         $now = new DateTimeImmutable();
-        $this->createdAt = $now;
-        $this->updatedAt = $now;
+        $this->setCreatedAt($now);
+        $this->setUpdatedAt($now);
     }
 
     public function getId(): ?int
@@ -125,16 +122,6 @@ class PushSubscription
         return $this->userAgent;
     }
 
-    public function getCreatedAt(): DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function getUpdatedAt(): DateTimeImmutable
-    {
-        return $this->updatedAt;
-    }
-
     public function setSubscription(
         string $endpoint,
         string $p256dh,
@@ -148,13 +135,13 @@ class PushSubscription
         $this->authToken = $authToken;
         $this->contentEncoding = '' !== $contentEncoding ? $contentEncoding : 'aes128gcm';
         $this->userAgent = $userAgent;
-        $this->updatedAt = new DateTimeImmutable();
+        $this->setUpdatedAt(new DateTimeImmutable());
 
         return $this;
     }
 
     public function touch(): void
     {
-        $this->updatedAt = new DateTimeImmutable();
+        $this->setUpdatedAt(new DateTimeImmutable());
     }
 }

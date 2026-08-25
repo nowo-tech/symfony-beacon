@@ -9,6 +9,7 @@ use App\Notifications\Repository\MemberProjectAlertPreferenceRepository;
 use App\Project\Entity\Project;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Nowo\AuditKitBundle\Model\TimestampableTrait;
 
 /**
  * Per-user per-project member alert master switch (opt-out).
@@ -20,6 +21,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(name: 'idx_member_project_alert_user', columns: ['user_id'])]
 class MemberProjectAlertPreference
 {
+    use TimestampableTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -36,17 +39,11 @@ class MemberProjectAlertPreference
     #[ORM\Column(options: ['default' => true])]
     private bool $enabled = true;
 
-    #[ORM\Column]
-    private DateTimeImmutable $createdAt;
-
-    #[ORM\Column]
-    private DateTimeImmutable $updatedAt;
-
     public function __construct()
     {
         $now = new DateTimeImmutable();
-        $this->createdAt = $now;
-        $this->updatedAt = $now;
+        $this->setCreatedAt($now);
+        $this->setUpdatedAt($now);
     }
 
     public function getId(): ?int
@@ -86,18 +83,8 @@ class MemberProjectAlertPreference
     public function setEnabled(bool $enabled): self
     {
         $this->enabled = $enabled;
-        $this->updatedAt = new DateTimeImmutable();
+        $this->setUpdatedAt(new DateTimeImmutable());
 
         return $this;
-    }
-
-    public function getCreatedAt(): DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function getUpdatedAt(): DateTimeImmutable
-    {
-        return $this->updatedAt;
     }
 }

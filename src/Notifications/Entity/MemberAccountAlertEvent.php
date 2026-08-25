@@ -10,6 +10,7 @@ use App\Notifications\Enum\MemberAlertScope;
 use App\Notifications\Repository\MemberAccountAlertEventRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Nowo\AuditKitBundle\Model\TimestampableTrait;
 
 /**
  * Account-level deviation from default member alert settings (opt-out).
@@ -21,6 +22,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(name: 'idx_member_account_alert_user', columns: ['user_id'])]
 class MemberAccountAlertEvent
 {
+    use TimestampableTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -39,17 +42,11 @@ class MemberAccountAlertEvent
     #[ORM\Column(length: 16, enumType: MemberAlertScope::class, options: ['default' => 'all'])]
     private MemberAlertScope $scope = MemberAlertScope::All;
 
-    #[ORM\Column]
-    private DateTimeImmutable $createdAt;
-
-    #[ORM\Column]
-    private DateTimeImmutable $updatedAt;
-
     public function __construct()
     {
         $now = new DateTimeImmutable();
-        $this->createdAt = $now;
-        $this->updatedAt = $now;
+        $this->setCreatedAt($now);
+        $this->setUpdatedAt($now);
     }
 
     public function getId(): ?int
@@ -77,7 +74,7 @@ class MemberAccountAlertEvent
     public function setEvent(MemberAlertEvent $event): self
     {
         $this->event = $event;
-        $this->updatedAt = new DateTimeImmutable();
+        $this->setUpdatedAt(new DateTimeImmutable());
 
         return $this;
     }
@@ -90,7 +87,7 @@ class MemberAccountAlertEvent
     public function setEnabled(bool $enabled): self
     {
         $this->enabled = $enabled;
-        $this->updatedAt = new DateTimeImmutable();
+        $this->setUpdatedAt(new DateTimeImmutable());
 
         return $this;
     }
@@ -103,7 +100,7 @@ class MemberAccountAlertEvent
     public function setScope(MemberAlertScope $scope): self
     {
         $this->scope = $scope;
-        $this->updatedAt = new DateTimeImmutable();
+        $this->setUpdatedAt(new DateTimeImmutable());
 
         return $this;
     }
