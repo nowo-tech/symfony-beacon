@@ -6,7 +6,7 @@ namespace App\Tests\Unit\Ops;
 
 use App\Notifications\Repository\NotificationDestinationRepository;
 use App\Ops\Metrics\MetricsCollector;
-use App\Shared\Health\MessengerQueueHealth;
+use App\Ops\Messenger\MessengerQueueHealth;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -38,6 +38,7 @@ final class MetricsCollectorTest extends TestCase
         }
 
         self::assertSame(0.0, $byName['beacon_messenger_async_pending']['samples'][0]['value']);
+        self::assertSame(0.0, $byName['beacon_messenger_failed_pending']['samples'][0]['value']);
         self::assertSame(2.0, $byName['beacon_notification_destinations_failed']['samples'][0]['value']);
         self::assertSame(2.0, $byName['beacon_ingest_ack_total']['samples'][0]['value']);
 

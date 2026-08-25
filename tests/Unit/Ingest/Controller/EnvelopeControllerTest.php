@@ -15,7 +15,7 @@ use App\Ops\Metrics\MetricsCollector;
 use App\Project\Repository\ProjectApiKeyRepository;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\ProjectGovernanceResolver;
-use App\Shared\Health\MessengerQueueHealth;
+use App\Ops\Messenger\MessengerQueueHealth;
 use App\Shared\Settings\Service\InstanceOpsDefaults;
 use App\Tests\Support\InstanceOpsDefaultsTestTrait;
 use Doctrine\ORM\EntityManagerInterface;

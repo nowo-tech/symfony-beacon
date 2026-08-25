@@ -41,7 +41,7 @@ use App\Project\Service\ProjectMembershipFormSupport;
 use App\Project\Service\ProjectMembershipManager;
 use App\Project\Service\ProjectMembershipPolicy;
 use App\Project\Service\ProjectSettingsPageBuilder;
-use App\Shared\Health\MessengerQueueHealth;
+use App\Ops\Messenger\MessengerQueueHealth;
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use App\Shared\Settings\Service\InstanceOpsDefaults;

@@ -32,7 +32,7 @@ use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectReadTokenRepository;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Repository\ProjectShareLinkRepository;
-use App\Shared\Health\MessengerQueueHealth;
+use App\Ops\Messenger\MessengerQueueHealth;
 use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
 use Nowo\FormKitBundle\Form\Type\HiddenFieldsCsrfType;
 use Symfony\Component\Form\FormFactoryInterface;

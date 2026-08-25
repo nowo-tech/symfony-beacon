@@ -15,7 +15,7 @@ use App\Ops\Service\OpsOverviewService;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\ProjectOpsStatsService;
-use App\Shared\Health\MessengerQueueHealth;
+use App\Ops\Messenger\MessengerQueueHealth;
 use DateTimeImmutable;
 use DateTimeZone;
 use Doctrine\ORM\EntityManagerInterface;
@@ -78,7 +78,13 @@ final class OpsOverviewServiceTest extends TestCase
             $destinations,
         )->build();
 
-        self::assertSame(['pending' => null, 'available' => false], $overview['messenger']);
+        self::assertSame([
+            'pending' => null,
+            'available' => false,
+            'failed' => null,
+            'async_ingest' => null,
+            'async' => null,
+        ], $overview['messenger']);
         self::assertSame(5, $overview['open_issues_total']);
         self::assertCount(1, $overview['open_issues_by_project']);
         self::assertSame($active, $overview['open_issues_by_project'][0]['project']);

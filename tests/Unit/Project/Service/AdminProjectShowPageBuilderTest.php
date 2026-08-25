@@ -27,7 +27,7 @@ use App\Project\Service\ProjectMembershipFormSupport;
 use App\Project\Service\ProjectMembershipManager;
 use App\Project\Service\ProjectMembershipPolicy;
 use App\Project\Service\ProjectOpsStatsService;
-use App\Shared\Health\MessengerQueueHealth;
+use App\Ops\Messenger\MessengerQueueHealth;
 use App\Tests\Support\ProjectAccessServiceFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;

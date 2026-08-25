@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Ops\Metrics;
 
 use App\Notifications\Repository\NotificationDestinationRepository;
-use App\Shared\Health\MessengerQueueHealth;
+use App\Ops\Messenger\MessengerQueueHealth;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -54,6 +54,7 @@ final readonly class MetricsCollector
     {
         $queue = $this->messengerQueueHealth->asyncPending();
         $pending = $queue['pending'] ?? 0;
+        $failedQueue = $queue['failed'] ?? 0;
 
         $failed = $this->destinationRepository->countWithFailedLastDelivery();
 
@@ -69,8 +70,14 @@ final readonly class MetricsCollector
             [
                 'name' => 'beacon_messenger_async_pending',
                 'type' => 'gauge',
-                'help' => 'Pending messages on the async Messenger transport',
+                'help' => 'Pending messages on async_ingest + async Messenger transports',
                 'samples' => [['labels' => [], 'value' => (float) $pending]],
+            ],
+            [
+                'name' => 'beacon_messenger_failed_pending',
+                'type' => 'gauge',
+                'help' => 'Pending messages on the Messenger failure transport',
+                'samples' => [['labels' => [], 'value' => (float) $failedQueue]],
             ],
             [
                 'name' => 'beacon_notification_destinations_failed',

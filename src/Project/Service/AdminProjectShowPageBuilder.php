@@ -21,7 +21,7 @@ use App\Project\Form\ProjectMemberAddType;
 use App\Project\Form\ProjectMemberRoleType;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Project\Repository\ProjectRepository;
-use App\Shared\Health\MessengerQueueHealth;
+use App\Ops\Messenger\MessengerQueueHealth;
 use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
 use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use Symfony\Component\Form\FormFactoryInterface;

@@ -118,7 +118,7 @@ docker compose up -d --scale messenger=2
 docker compose up -d --scale messenger-notify=2
 ```
 
-Monitor queue depth via authenticated `GET /metrics` → `beacon_messenger_async_pending` (Doctrine transport). Do not rely on the public readiness probe for backlog; `/health/ready` checks the database only.
+Monitor queue depth via authenticated `GET /metrics` → `beacon_messenger_async_pending` and `beacon_messenger_failed_pending` (Redis stream counts when `MESSENGER_TRANSPORT_DSN` is Redis; Doctrine `messenger_messages` fallback otherwise). Do not rely on the public readiness probe for backlog; `/health/ready` checks the database only.
 
 **Failed transport:** messages that exhaust retries land in the Doctrine `failed` queue (`queue_name=failed`). Envelope payloads may contain application PII even after DSN scrubbing — treat the failed table as sensitive, restrict DB access, and purge periodically:
 

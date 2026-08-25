@@ -14,7 +14,7 @@ use App\Ops\Service\SecurityPosture;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\ProjectOpsStatsService;
-use App\Shared\Health\MessengerQueueHealth;
+use App\Ops\Messenger\MessengerQueueHealth;
 use App\Tests\Support\InstanceOpsDefaultsTestTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Nowo\FormKitBundle\Form\GetFilterFormFactory;
