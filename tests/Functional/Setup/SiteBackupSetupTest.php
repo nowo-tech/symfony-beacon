@@ -164,7 +164,7 @@ final class SiteBackupSetupTest extends DatabaseWebTestCase
         self::assertTrue($markers->isDone());
     }
 
-    public function testSetupStaysOpenForCatalogRepairEvenWhenDbSaysDone(): void
+    public function testSetupRedirectsHomeWhenDbSaysDoneEvenWhenCatalogsEmpty(): void
     {
         $client = self::createClient();
         self::assertTrue(self::getContainer()->get(PlatformBootstrapState::class)->needsPlatformSeed());
@@ -173,15 +173,11 @@ final class SiteBackupSetupTest extends DatabaseWebTestCase
         $settings->markSetupCompleted();
         self::getContainer()->get(InstanceSettingsRepository::class)->save($settings);
 
+        // SiteBackup 1.13.7+ short_circuit_when_done: durable done skips detectors (including
+        // PlatformCatalogsSetupNeedDetector), so empty catalogs must not keep /setup open.
         $client->request(Request::METHOD_GET, '/setup?token='.self::SETUP_TOKEN);
-        if ($client->getResponse()->isRedirection()) {
-            $location = (string) $client->getResponse()->headers->get('Location');
-            self::assertStringContainsString('/setup', $location);
-            $client->followRedirect();
-        }
-
-        self::assertResponseIsSuccessful();
-        self::assertSelectorExists('body');
+        self::assertTrue($client->getResponse()->isRedirection());
+        self::assertSame('/', $client->getResponse()->headers->get('Location'));
     }
 
     public function testNonAdminDoesNotGetCatalogRedirectToSetup(): void

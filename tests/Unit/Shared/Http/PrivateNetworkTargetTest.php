@@ -37,6 +37,8 @@ final class PrivateNetworkTargetTest extends TestCase
         self::assertTrue(PrivateNetworkTarget::isCloudMetadataIp('169.254.169.254'));
         self::assertTrue(PrivateNetworkTarget::isCloudMetadataIp('fe80::1'));
         self::assertFalse(PrivateNetworkTarget::isCloudMetadataIp('8.8.8.8'));
+        self::assertFalse(PrivateNetworkTarget::isCloudMetadataIp('not-an-ip'));
+        self::assertFalse(PrivateNetworkTarget::isCloudMetadataIp('2001:db8::1'));
         self::assertTrue(PrivateNetworkTarget::isCloudMetadataHost('metadata'));
         self::assertTrue(PrivateNetworkTarget::isCloudMetadataHost('metadata.google.internal'));
         self::assertFalse(PrivateNetworkTarget::isCloudMetadataHost('mercure'));

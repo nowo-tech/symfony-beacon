@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Project;
 
+use App\Ingest\Service\EventQuotaUsageStore;
 use App\Issues\Repository\EventRepository;
 use App\Project\Entity\Project;
 use App\Project\Service\ProjectGovernanceResolver;
@@ -11,7 +12,6 @@ use App\Tests\Support\InstanceOpsDefaultsTestTrait;
 use DateTimeImmutable;
 use DateTimeZone;
 use PHPUnit\Framework\TestCase;
-use App\Ingest\Service\EventQuotaUsageStore;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 final class ProjectGovernanceResolverTest extends TestCase

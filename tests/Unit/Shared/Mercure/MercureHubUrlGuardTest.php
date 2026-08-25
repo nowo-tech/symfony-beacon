@@ -53,6 +53,7 @@ final class MercureHubUrlGuardTest extends TestCase
         self::assertSame(MercureHubUrlGuard::RESULT_INVALID, $guard->classifyHttpUrl(''));
         self::assertSame(MercureHubUrlGuard::RESULT_INVALID, $guard->classifyHttpUrl('mercure'));
         self::assertSame(MercureHubUrlGuard::RESULT_INVALID, $guard->classifyHttpUrl('ftp://mercure/.well-known/mercure'));
+        self::assertSame(MercureHubUrlGuard::RESULT_UNSAFE, $guard->classifyHttpUrl('http://./.well-known/mercure'));
     }
 
     public function testRejectsMetadataAndLinkLocalTargets(): void

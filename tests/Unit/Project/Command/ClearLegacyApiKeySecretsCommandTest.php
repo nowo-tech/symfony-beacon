@@ -25,8 +25,10 @@ final class ClearLegacyApiKeySecretsCommandTest extends TestCase
         new ReflectionProperty(ProjectApiKey::class, 'secretKey')->setValue($legacyOnly, 'legacy-plain');
         new ReflectionProperty(ProjectApiKey::class, 'secretHash')->setValue($legacyOnly, null);
 
+        $hashOnly = ProjectApiKey::generate(new Project()->setName('H')->setSlug('h'), 'Hashed', 'pub-h', 'plain-secret-h');
+
         $repo = $this->createStub(ProjectApiKeyRepository::class);
-        $repo->method('findAll')->willReturn([$redundant, $legacyOnly]);
+        $repo->method('findAll')->willReturn([$redundant, $legacyOnly, $hashOnly]);
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::never())->method('flush');
 

@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Ops\Metrics;
 
 use App\Notifications\Repository\NotificationDestinationRepository;
+use App\Ops\Messenger\MessengerQueueHealth;
 use App\Ops\Metrics\MetricsCollector;
 use App\Ops\Metrics\MetricsController;
 use App\Ops\Metrics\PrometheusTextFormatter;
-use App\Ops\Messenger\MessengerQueueHealth;
 use App\Tests\Support\InstanceOpsDefaultsTestTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;

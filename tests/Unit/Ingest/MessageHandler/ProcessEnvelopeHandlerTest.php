@@ -8,6 +8,7 @@ use App\Analytics\Repository\DailyProjectStatRepository;
 use App\Ingest\Message\ProcessEnvelopeMessage;
 use App\Ingest\MessageHandler\ProcessEnvelopeHandler;
 use App\Ingest\Service\EnvelopeParser;
+use App\Ingest\Service\EventQuotaUsageStore;
 use App\Issues\Entity\Event;
 use App\Issues\Repository\EventRepository;
 use App\Issues\Repository\IssueRepository;
@@ -30,9 +31,8 @@ use Doctrine\ORM\UnitOfWork;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use ReflectionProperty;
-use Symfony\Component\Messenger\MessageBusInterface;
-use App\Ingest\Service\EventQuotaUsageStore;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 final class ProcessEnvelopeHandlerTest extends TestCase
 {
@@ -136,10 +136,7 @@ final class ProcessEnvelopeHandlerTest extends TestCase
         $em->method('flush')->willReturnCallback(function () use (&$flush): void {
             ++$flush;
             if (1 === $flush) {
-                throw new UniqueConstraintViolationException(
-                    $this->createStub(\Doctrine\DBAL\Driver\Exception::class),
-                    null,
-                );
+                throw new UniqueConstraintViolationException($this->createStub(\Doctrine\DBAL\Driver\Exception::class), null);
             }
         });
 

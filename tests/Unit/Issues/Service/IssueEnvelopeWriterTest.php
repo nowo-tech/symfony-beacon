@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Issues\Service;
 
 use App\Analytics\Entity\DailyProjectStat;
 use App\Analytics\Repository\DailyProjectStatRepository;
+use App\Ingest\Service\EventQuotaUsageStore;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
 use App\Issues\Enum\IssueStatus;
@@ -23,7 +24,6 @@ use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use ReflectionProperty;
-use App\Ingest\Service\EventQuotaUsageStore;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 final class IssueEnvelopeWriterTest extends TestCase

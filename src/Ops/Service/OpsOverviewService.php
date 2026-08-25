@@ -8,10 +8,10 @@ use App\Analytics\Entity\DailyProjectStat;
 use App\Analytics\Repository\DailyProjectStatRepository;
 use App\Notifications\Entity\NotificationDestination;
 use App\Notifications\Repository\NotificationDestinationRepository;
+use App\Ops\Messenger\MessengerQueueHealth;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\ProjectOpsStatsService;
-use App\Ops\Messenger\MessengerQueueHealth;
 use DateTimeImmutable;
 use DateTimeZone;
 

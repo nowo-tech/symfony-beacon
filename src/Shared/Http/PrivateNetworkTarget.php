@@ -58,12 +58,9 @@ final class PrivateNetworkTarget
         }
 
         $packed = @inet_pton($ip);
-        if (false === $packed) {
-            return true;
-        }
 
-        // fe80::/10 link-local.
-        return 0xFE === \ord($packed[0]) && 0x80 === (\ord($packed[1]) & 0xC0);
+        // fe80::/10 link-local (fail closed matches the IPv4 packed-bytes check).
+        return false !== $packed && 0xFE === \ord($packed[0]) && 0x80 === (\ord($packed[1]) & 0xC0);
     }
 
     public static function isCloudMetadataHost(string $host): bool

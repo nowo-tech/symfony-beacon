@@ -17,14 +17,14 @@ use App\Shared\Settings\Service\InstanceOpsDefaults;
  *
  * Cloud metadata hosts/IPs are always rejected, even when private URLs are opted in.
  */
-final class MercureHubUrlGuard
+final readonly class MercureHubUrlGuard
 {
     public const string RESULT_VALID = 'valid';
     public const string RESULT_INVALID = 'invalid';
     public const string RESULT_UNSAFE = 'unsafe';
 
     public function __construct(
-        private readonly ?InstanceOpsDefaults $opsDefaults = null,
+        private ?InstanceOpsDefaults $opsDefaults = null,
     ) {
     }
 

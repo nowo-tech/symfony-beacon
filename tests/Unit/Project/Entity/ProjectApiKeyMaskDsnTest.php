@@ -90,4 +90,18 @@ final class ProjectApiKeyMaskDsnTest extends TestCase
         self::assertSame('not-a-dsn', ProjectApiKey::maskDsn('not-a-dsn'));
         self::assertFalse($key->upgradeLegacySecretToHash('missing'));
     }
+
+    public function testClearRedundantLegacySecretRequiresHashAndCiphertext(): void
+    {
+        $legacyOnly = new ProjectApiKey();
+        $legacyOnly->setSecretKey('legacy-cipher');
+        self::assertFalse($legacyOnly->clearRedundantLegacySecret());
+
+        $hashed = ProjectApiKey::generate(new Project()->setName('P')->setSlug('p'), 'Primary', 'pk_hash', 'sk_hash');
+        self::assertFalse($hashed->clearRedundantLegacySecret());
+
+        new ReflectionProperty(ProjectApiKey::class, 'secretKey')->setValue($hashed, 'leftover-cipher');
+        self::assertTrue($hashed->clearRedundantLegacySecret());
+        self::assertFalse($hashed->hasLegacyEncryptedSecret());
+    }
 }

@@ -229,12 +229,6 @@ parameters:
 			path: tests/Unit/Notifications/Entity/NotificationDigestBufferTest.php
 
 		-
-			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''DateTimeImmutable'' and DateTimeImmutable will always evaluate to true\.$#'
-			identifier: staticMethod.alreadyNarrowedType
-			count: 4
-			path: tests/Unit/Notifications/MemberAlertEnumAndEntityTest.php
-
-		-
 			message: '#^Parameter \#1 \$expected of static method PHPUnit\\Framework\\Assert\:\:assertSame\(\) contains unresolvable type\.$#'
 			identifier: argument.unresolvableType
 			count: 3

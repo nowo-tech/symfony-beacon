@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Ops\Retention;
 
+use App\Ingest\Service\EventQuotaUsageStore;
 use App\Issues\Repository\EventRepository;
 use App\Issues\Repository\IssueRepository;
 use App\Issues\Service\IssueHistoryRecorder;
@@ -18,9 +19,8 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
-use Symfony\Component\Console\Tester\CommandTester;
-use App\Ingest\Service\EventQuotaUsageStore;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Console\Tester\CommandTester;
 
 final class RetentionPurgeCommandTest extends TestCase
 {
@@ -73,7 +73,7 @@ final class RetentionPurgeCommandTest extends TestCase
             static fn (string $sql): int => str_contains($sql, 'DELETE FROM event') ? $deleteEvents : 1,
         );
         $connection->method('fetchOne')->willReturn(0);
-        $connection->method('fetchFirstColumn')->willReturnCallback(function () use (&$selectCalls, $deleteEvents): array {
+        $connection->method('fetchFirstColumn')->willReturnCallback(static function () use (&$selectCalls, $deleteEvents): array {
             if ($deleteEvents < 1 || $selectCalls++ > 0) {
                 return [];
             }

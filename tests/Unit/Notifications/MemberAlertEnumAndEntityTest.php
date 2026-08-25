@@ -80,8 +80,8 @@ final class MemberAlertEnumAndEntityTest extends TestCase
         self::assertSame($user, $pref->getUser());
         self::assertSame($project, $pref->getProject());
         self::assertFalse($pref->isEnabled());
-        self::assertInstanceOf(DateTimeImmutable::class, $pref->getCreatedAt());
-        self::assertInstanceOf(DateTimeImmutable::class, $pref->getUpdatedAt());
+        self::assertLessThanOrEqual(new DateTimeImmutable(), $pref->getCreatedAt());
+        self::assertLessThanOrEqual(new DateTimeImmutable(), $pref->getUpdatedAt());
 
         $account = new MemberAccountAlertEvent();
         self::assertNull($account->getId());
@@ -136,8 +136,8 @@ final class MemberAlertEnumAndEntityTest extends TestCase
         self::assertSame('a', $sub->getAuthToken());
         self::assertSame('aesgcm', $sub->getContentEncoding());
         self::assertSame('UA', $sub->getUserAgent());
-        self::assertInstanceOf(DateTimeImmutable::class, $sub->getCreatedAt());
-        self::assertInstanceOf(DateTimeImmutable::class, $sub->getUpdatedAt());
+        self::assertLessThanOrEqual(new DateTimeImmutable(), $sub->getCreatedAt());
+        self::assertLessThanOrEqual(new DateTimeImmutable(), $sub->getUpdatedAt());
         $sub->setEndpoint('cipher')->setP256dh('c1')->setAuthToken('c2');
         self::assertSame('cipher', $sub->getEndpoint());
         self::assertSame('c1', $sub->getP256dh());

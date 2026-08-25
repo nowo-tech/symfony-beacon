@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Project\Controller;
 
 use App\Identity\Entity\User;
+use App\Ingest\Service\EventQuotaUsageStore;
 use App\Issues\Repository\EventRepository;
 use App\Project\Access\ProjectAccess;
 use App\Project\Controller\AdminProjectAccessController;
@@ -23,6 +24,7 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,8 +34,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use App\Ingest\Service\EventQuotaUsageStore;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 final class ProjectControllerHelpersTest extends TestCase
 {
@@ -140,7 +140,7 @@ final class ProjectControllerHelpersTest extends TestCase
         new ReflectionProperty(ProjectController::class, 'governanceResolver')->setValue(
             $controller,
             new ProjectGovernanceResolver($this->opsDefaultsWith(static function ($settings): void {
-                }), new EventQuotaUsageStore($events, new ArrayAdapter())),
+            }), new EventQuotaUsageStore($events, new ArrayAdapter())),
         );
 
         $session = new Session(new MockArraySessionStorage());
@@ -174,7 +174,7 @@ final class ProjectControllerHelpersTest extends TestCase
         new ReflectionProperty(ProjectController::class, 'governanceResolver')->setValue(
             $controller,
             new ProjectGovernanceResolver($this->opsDefaultsWith(static function ($settings): void {
-                }), new EventQuotaUsageStore($events, new ArrayAdapter())),
+            }), new EventQuotaUsageStore($events, new ArrayAdapter())),
         );
 
         $session = new Session(new MockArraySessionStorage());

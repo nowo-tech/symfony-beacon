@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Ops;
 
 use App\Notifications\Repository\NotificationDestinationRepository;
-use App\Ops\Metrics\MetricsCollector;
 use App\Ops\Messenger\MessengerQueueHealth;
+use App\Ops\Metrics\MetricsCollector;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;

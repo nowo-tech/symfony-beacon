@@ -94,6 +94,35 @@ final class MessengerQueueHealthTest extends TestCase
         );
     }
 
+    public function testMessageCountAwareTransportExceptionsAreIgnored(): void
+    {
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('getConnection')->willThrowException(new RuntimeException('should not use doctrine'));
+
+        $throwing = new readonly class implements MessageCountAwareInterface {
+            public function getMessageCount(): int
+            {
+                throw new RuntimeException('redis down');
+            }
+        };
+
+        self::assertSame(
+            [
+                'pending' => 4,
+                'available' => true,
+                'failed' => null,
+                'async_ingest' => null,
+                'async' => 4,
+            ],
+            new MessengerQueueHealth(
+                $em,
+                $throwing,
+                $this->countingTransport(4),
+                $throwing,
+            )->asyncPending(),
+        );
+    }
+
     public function testAsyncPendingHandlesSchemaInspectionFailures(): void
     {
         $schema = $this->createMock(AbstractSchemaManager::class);
@@ -121,7 +150,7 @@ final class MessengerQueueHealthTest extends TestCase
 
     private function countingTransport(int $count): object
     {
-        return new class($count) implements MessageCountAwareInterface {
+        return new readonly class($count) implements MessageCountAwareInterface {
             public function __construct(private int $count)
             {
             }

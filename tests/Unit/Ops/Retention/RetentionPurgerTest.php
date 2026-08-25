@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Ops\Retention;
 
+use App\Ingest\Service\EventQuotaUsageStore;
 use App\Issues\Repository\EventRepository;
 use App\Issues\Repository\IssueRepository;
 use App\Issues\Service\IssueHistoryRecorder;
@@ -19,7 +20,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
-use App\Ingest\Service\EventQuotaUsageStore;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 final class RetentionPurgerTest extends TestCase
@@ -44,7 +44,7 @@ final class RetentionPurgerTest extends TestCase
             return str_contains($sql, 'DELETE FROM event') ? 3 : 1;
         });
         $this->connection->method('fetchOne')->willReturn(0);
-        $this->connection->method('fetchFirstColumn')->willReturnCallback(function (string $sql) use (&$ageSelectCalls): array {
+        $this->connection->method('fetchFirstColumn')->willReturnCallback(static function (string $sql) use (&$ageSelectCalls): array {
             if (str_contains($sql, 'received_at <')) {
                 return 0 === $ageSelectCalls++ ? [1, 2, 3] : [];
             }
@@ -262,6 +262,44 @@ final class RetentionPurgerTest extends TestCase
         );
 
         self::assertSame(0, $this->purger->purge(new DateTimeImmutable('2026-08-13T00:00:00+00:00'))['projects']);
+    }
+
+    public function testAgePurgeStopsWhenSelectReturnsNoIds(): void
+    {
+        $project = $this->project(8);
+        $this->connection = $this->createStub(Connection::class);
+        $this->connection->method('fetchFirstColumn')->willReturn([]);
+        $this->connection->method('executeStatement')->willReturnCallback(function (string $sql): int {
+            $this->sql[] = $sql;
+
+            return 0;
+        });
+        $this->entityManager = $this->createStub(EntityManagerInterface::class);
+        $this->entityManager->method('getConnection')->willReturn($this->connection);
+        $this->entityManager->method('clear');
+        $this->projectRepository->method('find')->willReturn($project);
+
+        $events = $this->createStub(EventRepository::class);
+        $this->purger = new RetentionPurger(
+            $this->entityManager,
+            $this->projectRepository,
+            new IssueMergeService(
+                $events,
+                $this->createStub(IssueRepository::class),
+                new IssueHistoryRecorder($this->entityManager),
+                $this->entityManager,
+            ),
+            new ProjectGovernanceResolver($this->opsDefaultsWith(static function ($settings): void {
+                $settings->setRetentionDays(30);
+                $settings->setRetentionMaxEvents(0);
+            }), new EventQuotaUsageStore($events, new ArrayAdapter())),
+        );
+
+        self::assertSame(
+            ['events' => 0, 'issues' => 0, 'transactions' => 0, 'stats' => 0],
+            $this->purger->purgeProject($project, new DateTimeImmutable('2026-08-13T12:00:00+00:00')),
+        );
+        self::assertFalse(array_any($this->sql, static fn (string $sql): bool => str_contains($sql, 'DELETE FROM event WHERE id IN')));
     }
 
     public function testMaxEventsCapSkipsDeleteWhenNoIdsNeedRemoval(): void

@@ -7,15 +7,16 @@ namespace App\Tests\Unit\Ingest\Controller;
 use App\Ingest\Controller\EnvelopeController;
 use App\Ingest\Service\EnvelopeAuthParser;
 use App\Ingest\Service\EnvelopeParser;
+use App\Ingest\Service\EventQuotaUsageStore;
 use App\Ingest\Service\IngestProjectAccessGate;
 use App\Ingest\Service\IngestRateLimiter;
 use App\Issues\Repository\EventRepository;
 use App\Notifications\Repository\NotificationDestinationRepository;
+use App\Ops\Messenger\MessengerQueueHealth;
 use App\Ops\Metrics\MetricsCollector;
 use App\Project\Repository\ProjectApiKeyRepository;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\ProjectGovernanceResolver;
-use App\Ops\Messenger\MessengerQueueHealth;
 use App\Shared\Settings\Service\InstanceOpsDefaults;
 use App\Tests\Support\InstanceOpsDefaultsTestTrait;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,7 +27,6 @@ use RuntimeException;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
-use App\Ingest\Service\EventQuotaUsageStore;
 
 final class EnvelopeControllerTest extends TestCase
 {

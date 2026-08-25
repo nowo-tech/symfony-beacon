@@ -33,4 +33,18 @@ final class EventQuotaUsageStoreTest extends TestCase
         self::assertSame(11, $store->eventsReceivedToday($project));
         self::assertSame(41, $store->eventsReceivedThisMonth($project));
     }
+
+    public function testUnpersistedProjectBypassesCacheAndRecord(): void
+    {
+        $project = new Project()->setName('Q')->setSlug('q');
+        $events = $this->createMock(EventRepository::class);
+        $events->expects(self::exactly(2))->method('countReceivedTodayForProject')->willReturn(3);
+        $events->expects(self::once())->method('countReceivedSinceForProject')->willReturn(9);
+
+        $store = new EventQuotaUsageStore($events, new ArrayAdapter());
+        self::assertSame(3, $store->eventsReceivedToday($project));
+        self::assertSame(9, $store->eventsReceivedThisMonth($project));
+        $store->recordAcceptedEvent($project, new DateTimeImmutable('now', new DateTimeZone('UTC')));
+        self::assertSame(3, $store->eventsReceivedToday($project));
+    }
 }

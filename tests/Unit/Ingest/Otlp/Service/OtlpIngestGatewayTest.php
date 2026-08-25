@@ -6,17 +6,18 @@ namespace App\Tests\Unit\Ingest\Otlp\Service;
 
 use App\Ingest\Otlp\Service\OtlpIngestGateway;
 use App\Ingest\Service\EnvelopeAuthParser;
+use App\Ingest\Service\EventQuotaUsageStore;
 use App\Ingest\Service\IngestProjectAccessGate;
 use App\Ingest\Service\IngestRateLimiter;
 use App\Issues\Repository\EventRepository;
 use App\Notifications\Repository\NotificationDestinationRepository;
+use App\Ops\Messenger\MessengerQueueHealth;
 use App\Ops\Metrics\MetricsCollector;
 use App\Project\Entity\Project;
 use App\Project\Entity\ProjectApiKey;
 use App\Project\Repository\ProjectApiKeyRepository;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\ProjectGovernanceResolver;
-use App\Ops\Messenger\MessengerQueueHealth;
 use App\Tests\Support\InstanceOpsDefaultsTestTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -25,7 +26,6 @@ use RuntimeException;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\Ingest\Service\EventQuotaUsageStore;
 
 final class OtlpIngestGatewayTest extends TestCase
 {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Ingest\Service;
 
+use App\Ingest\Service\EventQuotaUsageStore;
 use App\Ingest\Service\IngestProjectAccessGate;
 use App\Ingest\Service\IngestRateLimiter;
 use App\Issues\Repository\EventRepository;
@@ -18,7 +19,6 @@ use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
-use App\Ingest\Service\EventQuotaUsageStore;
 
 final class IngestProjectAccessGateTest extends TestCase
 {

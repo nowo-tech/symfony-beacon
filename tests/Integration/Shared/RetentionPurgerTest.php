@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Shared;
 
+use App\Ingest\Service\EventQuotaUsageStore;
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
 use App\Issues\Enum\IssueStatus;
@@ -18,8 +19,6 @@ use App\Shared\Settings\Service\InstanceOpsDefaults;
 use App\Tests\Support\DatabaseWebTestCase;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Ingest\Service\EventQuotaUsageStore;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 final class RetentionPurgerTest extends DatabaseWebTestCase
 {
