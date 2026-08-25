@@ -78,6 +78,9 @@
     "nowo-tech/dashboard-menu-bundle": {
         "version": "v0.3.45"
     },
+    "nowo-tech/device-intelligence-bundle": {
+        "version": "v1.1.0"
+    },
     "nowo-tech/doctrine-encrypt-bundle": {
         "version": "v2.3.1"
     },
@@ -95,6 +98,9 @@
     },
     "nowo-tech/migrations-kit-bundle": {
         "version": "v2.0.17"
+    },
+    "nowo-tech/otp-input-bundle": {
+        "version": "v1.4.4"
     },
     "nowo-tech/password-policy-bundle": {
         "version": "v1.2.3"
@@ -118,6 +124,9 @@
         "version": "v1.4.11"
     },
     "nowo-tech/site-backup-bundle": {
+        "version": "v1.1.0"
+    },
+    "nowo-tech/slide-to-confirm-bundle": {
         "version": "v1.1.0"
     },
     "nowo-tech/tag-input-bundle": {
