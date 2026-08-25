@@ -5,31 +5,12 @@ parameters:
         - tests
     tmpDir: var/phpstan
     treatPhpDocTypesAsCertain: false
+    doctrine:
+        # Doctrine non-nullable associations are often uninitialized (`?Entity = null`) until persist/hydrate.
+        allowNullablePropertyForRequiredField: true
     symfony:
         containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
         consoleApplicationLoader: tests/phpstan/console-application.php
-    ignoreErrors:
-        -
-            identifier: doctrine.associationType
-            path: src/*/Entity/*
-        # PHPUnit CLI bootstrap (Symfony Flex debug umask); not a FrankenPHP worker request path
-        -
-            identifier: frankenphp.worker.noUmask
-            path: tests/bootstrap.php
-        # Test doubles / namespaced function hooks are process-local PHPUnit fixtures, not worker code
-        -
-            identifier: frankenphp.worker.noMutableStaticProperty
-            path: tests/*
-        -
-            identifier: frankenphp.worker.noSetErrorExceptionHandler
-            path: tests/*
-        -
-            identifier: frankenphp.worker.noStaticLocalVariable
-            path: tests/*
-        # CLI-only Messenger poll after Envelope ACK (`app:beacon:test`); never on HTTP worker path
-        -
-            identifier: frankenphp.hardening.noBlockingSleep
-            path: src/Ops/Service/BeaconDogfoodDiagnostics.php
 
 includes:
     - phpstan-baseline.neon
