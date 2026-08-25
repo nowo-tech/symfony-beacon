@@ -1496,6 +1496,8 @@ admin:
     filter_all: Todos os projetos
     queue_title: Fila Messenger
     queue_instance_wide: Pendentes async da instância (não por projeto)
+    queue_failed_label: Failed transport
+    queue_failed_help: 'Drain with: php bin/console messenger:failed:show — then messenger:failed:retry or messenger:failed:remove'
     open_issues_title: Issues abertas
     suspended_title: Ingest suspenso
     suspended_list_title: Projetos suspensos

@@ -1501,6 +1501,8 @@ admin:
     filter_all: Alle projecten
     queue_title: Messenger-wachtrij
     queue_instance_wide: Instance-brede async pending (niet projectgebonden)
+    queue_failed_label: Failed transport
+    queue_failed_help: 'Drain with: php bin/console messenger:failed:show — then messenger:failed:retry or messenger:failed:remove'
     open_issues_title: Open issues
     suspended_title: Ingest gepauzeerd
     suspended_list_title: Gepauzeerde projecten

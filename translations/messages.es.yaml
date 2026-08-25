@@ -1719,6 +1719,8 @@ admin:
     filter_all: Todos los proyectos
     queue_title: Cola Messenger
     queue_instance_wide: Pendientes async a nivel de instancia (no por proyecto)
+    queue_failed_label: Failed transport
+    queue_failed_help: 'Drain with: php bin/console messenger:failed:show — then messenger:failed:retry or messenger:failed:remove'
     open_issues_title: Incidencias abiertas
     suspended_title: Ingest suspendido
     suspended_list_title: Proyectos suspendidos

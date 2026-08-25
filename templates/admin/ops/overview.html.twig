@@ -43,6 +43,15 @@
             {% endif %}
         </p>
         <p class="mt-1 text-xs text-[var(--color-ink)]/55">{{ 'admin.ops.queue_instance_wide'|trans }}</p>
+        <p class="mt-3 text-sm text-[var(--color-ink)]/70" data-testid="ops-messenger-failed">
+            {{ 'admin.ops.queue_failed_label'|trans }}:
+            {% if overview.messenger.available and overview.messenger.failed is not null %}
+                <span class="font-semibold">{{ overview.messenger.failed }}</span>
+            {% else %}
+                {{ 'common.na'|trans }}
+            {% endif %}
+        </p>
+        <p class="mt-1 text-xs text-[var(--color-ink)]/55">{{ 'admin.ops.queue_failed_help'|trans }}</p>
     </div>
     <div class="panel">
         <h2 class="text-sm font-semibold text-[var(--color-ink)]/70">{{ 'admin.ops.open_issues_title'|trans }}</h2>

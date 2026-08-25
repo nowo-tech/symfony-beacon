@@ -1508,6 +1508,8 @@ admin:
     filter_all: Tutti i progetti
     queue_title: Coda Messenger
     queue_instance_wide: Messaggi async in sospeso a livello di istanza (non per progetto)
+    queue_failed_label: Failed transport
+    queue_failed_help: 'Drain with: php bin/console messenger:failed:show — then messenger:failed:retry or messenger:failed:remove'
     open_issues_title: Issue aperte
     suspended_title: Ingest sospeso
     suspended_list_title: Progetti sospesi
