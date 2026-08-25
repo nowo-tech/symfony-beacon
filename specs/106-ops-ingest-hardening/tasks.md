@@ -20,7 +20,7 @@
 - [x] T007 `PrivateNetworkTarget` shared by Mercure hub + outbound webhook guards
 - [x] T008 `app:project:api-key-legacy-secrets` dry-run / `--apply` redundant `secret_key` only
 - [x] T009 AuditKit `TimestampableTrait` on member-alert/push entities
-- [x] T010 FormKit **2.5.2**; host tag Dashboard Menu `SearchQueryType`
+- [x] T010 FormKit **2.5.2**; Dashboard Menu **2.1.10** (kit tags `SearchQueryType`; drop host override)
 
 ## Phase 4: QA + specs
 

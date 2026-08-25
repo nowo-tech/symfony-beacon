@@ -328,7 +328,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
 | 6.57 | Finish AuthKit security kits cut (migrate, E2E Trusted browsers optional UC, release notes) | Beacon | `105-authkit-security-kits` | **In progress** |
-| 6.58 | Finish ops ingest hardening cut (release notes; drop Dashboard Menu `SearchQueryType` host tag when kit tags it) | Beacon | `106-ops-ingest-hardening` | **In progress** |
+| 6.58 | Finish ops ingest hardening cut (release notes; Dashboard Menu **2.1.10** tags `SearchQueryType` — host override removed) | Beacon | `106-ops-ingest-hardening` | **In progress** |
 | — | Pull from Later (SSO / QR SMS OTP / WebAuthn / Hotwire Native) when prioritized | Beacon | — | **Next** |
 
 ### Done (AuthKit 1.12 foundation)

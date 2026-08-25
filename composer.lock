@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6c231ffa1e830b11ff3cd1ca466760cc",
+    "content-hash": "5ee6991ebbb4d94a063f87bdaa78e7d7",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -2408,16 +2408,16 @@
         },
         {
             "name": "nowo-tech/dashboard-menu-bundle",
-            "version": "v2.1.9",
+            "version": "v2.1.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/DashboardMenuBundle.git",
-                "reference": "5638c50c56e244dd904b34317959c7bb7eab40e2"
+                "reference": "2a1e51701146e6712bbd32d589a154d08ed89067"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/DashboardMenuBundle/zipball/5638c50c56e244dd904b34317959c7bb7eab40e2",
-                "reference": "5638c50c56e244dd904b34317959c7bb7eab40e2",
+                "url": "https://api.github.com/repos/nowo-tech/DashboardMenuBundle/zipball/2a1e51701146e6712bbd32d589a154d08ed89067",
+                "reference": "2a1e51701146e6712bbd32d589a154d08ed89067",
                 "shasum": ""
             },
             "require": {
@@ -2514,7 +2514,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-08-24T16:03:01+00:00"
+            "time": "2026-08-25T17:00:53+00:00"
         },
         {
             "name": "nowo-tech/device-intelligence-bundle",

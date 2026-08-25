@@ -19,7 +19,7 @@ Prefer official Nowo.tech kits — do not hand-roll sliders, device fingerprints
 | K4 | Trust | Account → Security → **Trusted browsers** (`/account/security/devices`) — explicit trust/revoke; login never auto-trusts |
 | K5 | Mail | `AuthKitNewDeviceLoginMailNotifier` implements AuthKit `NewDeviceLoginNotifierInterface` via encrypted instance Mailer |
 | K6 | OTP UX | [`nowo-tech/otp-input-bundle`](https://packagist.org/packages/nowo-tech/otp-input-bundle) on `/reset-password/complete` (`otp_input.enabled` + `OtpType`); server OTP checks unchanged |
-| K7 | FormKit | [`nowo-tech/form-kit-bundle`](https://packagist.org/packages/nowo-tech/form-kit-bundle) **2.5.2** — `addSlideToConfirmField()`; drop host `nowo_form_kit.type_map.search` (built-in since 2.4.0). Dashboard Menu `SearchQueryType` host tag is `106`, not this feature |
+| K7 | FormKit | [`nowo-tech/form-kit-bundle`](https://packagist.org/packages/nowo-tech/form-kit-bundle) **2.5.2** — `addSlideToConfirmField()`; drop host `nowo_form_kit.type_map.search` (built-in since 2.4.0). Dashboard Menu `SearchQueryType` kit tag is `106` (**≥2.1.10**, no host override) |
 | K8 | Ops | MaintenanceMode excludes `/_device`; PWA `deny_cache_patterns` includes `/_device`; SW `cache_version` **v6**; SiteBackup `short_circuit_when_done: true` |
 
 ## Non-goals
@@ -152,6 +152,6 @@ As a project admin clearing telemetry history, Settings danger zone requires sli
 ## Cross-links
 
 - Prior: `011`, `034`, `037`, `056`, `072`, `075`, `081`, `090`, `096`, `097`, `100`, `101`, `103`
-- Follow-up: `106-ops-ingest-hardening` (FormKit **2.5.2**, Dashboard Menu `SearchQueryType` tag, Ops/ingest/QA — not AuthKit kits)
+- Follow-up: `106-ops-ingest-hardening` (FormKit **2.5.2**, Dashboard Menu **≥2.1.10** `SearchQueryType` kit tag, Ops/ingest/QA — not AuthKit kits)
 - Docs: [`docs/product/LEGAL-AND-COOKIES.md`](../../docs/product/LEGAL-AND-COOKIES.md), [`docs/product/E2E-USE-CASES.md`](../../docs/product/E2E-USE-CASES.md) (UC-AUTH-22/26, UC-PROJ-17)
 - Kits: AuthKit, Device Intelligence, OTP Input, Slide-to-confirm, FormKit, Cookie Consent, Maintenance Mode, PWA, SiteBackup

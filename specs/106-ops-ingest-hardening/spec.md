@@ -11,7 +11,7 @@
 
 Operators see truthful queue and failed-transport counts; ingest stays fast under burst without `COUNT(*)` on every ACK; retention does not lock huge `event` tables; outbound URL policy is one shared helper; leftover encrypted ingest secrets can be inventoried without revoking working keys. Maintainers keep PHPStan level 6 + FrankenPHP rules green without path-scoped ignores, and `COVERAGE_MIN=100` on includable `src/`.
 
-Prefer official Nowo.tech kits — timestamps use [`nowo-tech/audit-kit-bundle`](https://packagist.org/packages/nowo-tech/audit-kit-bundle) `TimestampableTrait` (do not hand-roll `createdAt`/`updatedAt`). FormKit pin is **2.5.2**. Dashboard Menu admin search needs a host `form.type` tag for kit `SearchQueryType` until the kit tags it.
+Prefer official Nowo.tech kits — timestamps use [`nowo-tech/audit-kit-bundle`](https://packagist.org/packages/nowo-tech/audit-kit-bundle) `TimestampableTrait` (do not hand-roll `createdAt`/`updatedAt`). FormKit pin is **2.5.2**. Dashboard Menu **≥2.1.10** tags kit `SearchQueryType` as `form.type` (no host override).
 
 | ID | Area | Deliverable |
 |----|------|-------------|
@@ -23,7 +23,7 @@ Prefer official Nowo.tech kits — timestamps use [`nowo-tech/audit-kit-bundle`]
 | H6 | SSRF | `PrivateNetworkTarget` shared by `OutboundUrlGuard` and `MercureHubUrlGuard`; private IP literals + localhost-style hosts blocked by default; Mercure does **not** DNS-resolve (Docker `mercure` stays usable); cloud metadata always rejected even when `allowPrivateUrls` is on |
 | H7 | API keys | `app:project:api-key-legacy-secrets` inventories Halite `secret_key`; `--apply` clears ciphertext only when `secret_hash` already exists; legacy-only keys are reported, not cleared (`096` F2) |
 | H8 | Notifications | Member alert preference / event + `PushSubscription` use AuditKit `TimestampableTrait` |
-| H9 | FormKit / Menu | FormKit **2.5.2**; host tags `Nowo\DashboardMenuBundle\Form\SearchQueryType` so `/admin/menus/` does not 500 (kit 2.1.9 omits the tag) |
+| H9 | FormKit / Menu | FormKit **2.5.2**; Dashboard Menu **≥2.1.10** tags kit `SearchQueryType` as `form.type` (drop host `config/services/dashboard_menu.yaml` — was required on **2.1.9**) |
 | H10 | QA | PHPStan baseline empty; no `ignoreErrors` in `phpstan.neon.dist` (Doctrine association nullability via `allowNullablePropertyForRequiredField`); injectable Clock / `HostnameDnsLookup` / `HaliteSecretsFilesystem`; drop `phpstan-require-extends` on issue query traits; Rector semantic-only, CS-Fixer owns formatting; PHPUnit suite PHPStan-clean; includable coverage **100%** |
 
 ## Non-goals
@@ -127,7 +127,7 @@ As an operator after `096` hash-at-rest, I can inventory `secret_key` rows and, 
 - Quota cache after retention delete: counter may stay high until TTL (fail-closed; may 429 until expiry).
 - Unique retry after `clear()`: identity maps must be reloaded; do not flush a mixed old/new graph.
 - Mercure `allowPrivateUrls` must never open link-local metadata (`169.254.169.254`, `metadata.google.internal`).
-- Dashboard Menu without the host `SearchQueryType` tag: FormFactory skips `FormOptionsMerger` → HTTP 500 on `/admin/menus/`.
+- On Dashboard Menu **&lt;2.1.10** without a host `SearchQueryType` tag: FormFactory skips `FormOptionsMerger` → HTTP 500 on `/admin/menus/` (fixed upstream in **2.1.10**).
 
 ## Functional Requirements
 
@@ -140,10 +140,10 @@ As an operator after `096` hash-at-rest, I can inventory `secret_key` rows and, 
 - **FR-007**: Mercure hub and outbound webhook guards MUST share `PrivateNetworkTarget`. Mercure MUST NOT DNS-resolve hostnames. Metadata targets MUST always be blocked.
 - **FR-008**: `app:project:api-key-legacy-secrets` MUST be dry-run by default; `--apply` MUST clear `secret_key` only when `secret_hash` is present.
 - **FR-009**: Member alert preference/event and push subscription timestamps MUST use AuditKit `TimestampableTrait` (not host-copied trait logic).
-- **FR-010**: Host MUST tag Dashboard Menu `SearchQueryType` as `form.type` until the kit does. FormKit pin MUST be **≥ 2.5.2**.
+- **FR-010**: Dashboard Menu pin MUST be **≥2.1.10** so kit `SearchQueryType` is tagged `form.type` (no host `config/services/dashboard_menu.yaml`). FormKit pin MUST be **≥2.5.2**.
 - **FR-011**: `phpstan.neon.dist` MUST NOT rely on `ignoreErrors` or a populated baseline; `src/` and `tests/` MUST pass level 6 + FrankenPHP `rules.neon`. Process-wide sleep/DNS/umask/FS in request or test paths MUST go through injectable seams (Clock, `HostnameDnsLookup`, `HaliteSecretsFilesystem`).
 - **FR-012**: Rector MUST NOT own PER-CS / import / native-function formatting (PHP-CS-Fixer does). `make qa-fix` MUST run Rector before CS-Fixer.
-- **FR-013**: Includable PHPUnit statement coverage MUST remain **100%** (`033` / REQ-QA-002). PHPUnit MUST cover queue health, quota store, unique retry, batched purge, SSRF helper, legacy-secret command, and Dashboard Menu type tag behaviour.
+- **FR-013**: Includable PHPUnit statement coverage MUST remain **100%** (`033` / REQ-QA-002). PHPUnit MUST cover queue health, quota store, unique retry, batched purge, SSRF helper, and legacy-secret command.
 
 ## Key Entities
 
