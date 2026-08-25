@@ -12,7 +12,7 @@
 
 - AuthKit login / register / logout / remember-me / dual public locales (pin **≥ 1.15** with FormKit **≥ 2.2** host profile `auth_kit`: `auto_help` / `auto_placeholder: false` — see `081-formkit-uikit-kit-sync`).
 - Magic login + social OAuth (`026`, `060`) with mailer gating where required (`034`).
-- Account tabs: Profile | Projects | Groups; Security | History; Display | Panels | Tours | Notifications.
+- Account tabs: Profile | Projects | Groups; Security | History | Activity | **Trusted browsers** (`105`); Display | Panels | Tours | Notifications.
 - Password change + password history; content-width preference; profile overview (roles, UUID, memberships).
 - Password reset OTP path (`delivery: both`) shipped with AuthKit polish.
 
@@ -88,6 +88,11 @@ As a guest completing password reset (link or OTP), pages use Beacon guest shell
 
 - Greenfield AuthKit rewrite or removing AuthKit.
 - Enterprise SSO/SAML/OIDC.
-- WebAuthn / passkeys / MFA (unless already provided by AuthKit and trivially wired).
+- WebAuthn / passkeys / MFA (unless already provided by AuthKit and trivially wired). Phone SMS OTP stays Later (`072` / `100`); reset-code OTP **UX** is `105`.
 - GDPR account export / anonymize (`043`).
 - Admin identity audit timelines (`036` — admin-only).
+- Treating Device ID as a login factor (`105` — explicit Trusted browsers only).
+
+## Amendment (Trusted browsers tab, 2026-08-25 / `105`)
+
+Account → Security adds a **Trusted browsers** sub-tab (`account_security_devices`) for explicit Device Intelligence trust/revoke. Login never auto-trusts. See `specs/105-authkit-security-kits/`.

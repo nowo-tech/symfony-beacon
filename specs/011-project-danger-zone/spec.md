@@ -4,7 +4,7 @@
 
 **Created**: 2026-07-20
 
-**Status**: Completed (shipped in v0.4.0; confirm-dialog UX hardened later; **transfer ownership** in v0.9.2; Symfony Forms **090** / empty block-prefix test fix **v1.8.2**)
+**Status**: Completed (shipped in v0.4.0; confirm-dialog UX hardened later; **transfer ownership** in v0.9.2; Symfony Forms **090** / empty block-prefix test fix **v1.8.2**; Clear history slide-to-confirm **105**)
 
 **Input**: User description: "Do I have options to delete a project and to empty its history? Both should open a warning modal; delete should require typing a confirmation text."
 
@@ -14,7 +14,7 @@
 
 - **Q1 (clear history scope)**: Removes issues + events, performance transactions/spans, and daily analytics stats. Keeps the project, memberships, and API keys.
 - **Q2 (permissions)**: Clear history — `project.settings.manage` (admin/owner/full matrix). Delete project — `project.delete` (owner and **full**). Transfer ownership — primary project owner (`requirePrimaryOwner()`). See `002` FR-013 / `docs/product/ROLES.md`. Owner membership rows have no edit/remove UI; transfer is the only ownership hand-off.
-- **Q3 (typed confirm)**: Delete requires typing the project **name** exactly (case-sensitive). Clear history uses a warning modal with an explicit confirm button (no typed phrase).
+- **Q3 (typed confirm)**: Delete requires typing the project **name** exactly (case-sensitive). Clear history uses slide-to-confirm (`105` / FormKit `addSlideToConfirmField` profile `danger`) — no typed phrase. Delete / transfer keep typed-name modals.
 - **Q4 (UI placement)**: Danger zone section on the **project Settings** page (`/projects/{id}/settings`). (Project show redirects to Issues; management actions live in Settings.)
 
 ## User Scenarios & Testing *(mandatory)*
@@ -27,9 +27,9 @@ As a project owner or admin, I can empty telemetry history so the project stays 
 
 **Acceptance Scenarios**:
 
-1. **Given** I have `project.settings.manage` on a project with history, **When** I open Clear history on Settings and confirm in the modal, **Then** issues/events/perf/stats for that project are removed and I stay on Settings with a success flash.
+1. **Given** I have `project.settings.manage` on a project with history, **When** I open Clear history on Settings and complete the danger slider, **Then** issues/events/perf/stats for that project are removed and I stay on Settings with a success flash.
 2. **Given** I am a viewer/member without Settings-surface grants, **When** I request Settings, **Then** I receive **403** and do not see Clear history; POST clear without the grant is denied.
-3. **Given** the clear modal is open, **When** I cancel, **Then** no data is deleted.
+3. **Given** the clear slider is not confirmed, **When** I cancel or POST without a confirmed slide, **Then** no data is deleted.
 
 ### User Story 2 - Delete project with typed confirmation (Priority: P1)
 
@@ -63,7 +63,7 @@ As a project owner, I can hand ownership to another direct member and become a *
 - **FR-001**: Danger zone on **project Settings** with Clear history, Transfer ownership, and Delete project (`project_clear_history`, `project_transfer_ownership`, `project_delete`).
 - **FR-002**: Destructive / ownership actions open warning modals (native `<dialog>` via Stimulus `confirm-dialog`). Typed-confirm dialogs that collect fields (delete / transfer) SHOULD use structured chrome (`header_wrapper` + `content_wrapper`) per `086` FR-003b; body-only confirms may stay flat.
 - **FR-003**: Delete and transfer require CSRF + exact project name confirmation server-side. Delete POST MUST use `ProjectDeleteType` (Symfony Form / FormKit) per `090`.
-- **FR-004**: Clear requires CSRF + explicit confirm + `project.settings.manage`; removes history only (`ProjectHistoryClearer`). Clear POST MUST use `ProjectClearHistoryType` per `090`.
+- **FR-004**: Clear requires CSRF + explicit confirm + `project.settings.manage`; removes history only (`ProjectHistoryClearer`). Clear POST MUST use `ProjectClearHistoryType` per `090`. As of `105`, confirm is kit slide-to-confirm (UX friction, not authorization).
 - **FR-005**: Delete uses DB cascades / entity remove so keys, memberships, and telemetry are gone with the project; MUST require `project.delete`.
 - **FR-006**: Transfer promotes the selected direct member to owner and demotes the acting owner to **full** (`ProjectMembershipManager::transferOwnership`); MUST require primary project owner (`ProjectAccessService::requirePrimaryOwner()` — exact `Owner`, not rank).
 - **FR-007**: Settings (and Admin → Projects) MUST NOT show edit-role or remove controls on membership rows whose role is `owner`. Changing primary ownership MUST go through Transfer ownership (FR-006), not member role CRUD. Deactivating membership (`089`) MUST NOT deactivate the last **active** owner (same last-owner guard family as remove/demote).
@@ -82,3 +82,7 @@ Clear history and delete project POSTs use `ProjectClearHistoryType` / `ProjectD
 ## Amendment (empty form prefix, 2026-08-12 / v1.8.2)
 
 `ProjectDeleteType` (and related danger-zone Types) use FormKit with **`getBlockPrefix(): ''`**, so DomCrawler / PHPUnit must set **`confirmation`** (and `_token`), not a nested `project_delete[confirmation]` bag. Functional coverage: `tests/Functional/Project/ProjectDangerZoneTest.php`.
+
+## Amendment (Clear history slide-to-confirm, 2026-08-25 / `105`)
+
+`ProjectClearHistoryType` uses FormKit `addSlideToConfirmField('confirm', profile: danger)` from [`nowo-tech/slide-to-confirm-bundle`](https://packagist.org/packages/nowo-tech/slide-to-confirm-bundle) **1.1.0** (AuthKit registration uses the same kit with `gate`). Block prefix is **`project_clear_history`**. Delete and transfer keep typed-name confirmation. E2E: UC-PROJ-17. See `specs/105-authkit-security-kits/`.

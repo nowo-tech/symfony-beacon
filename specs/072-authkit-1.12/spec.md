@@ -31,10 +31,11 @@ As an admin, I can mark a social credential as **Enterprise SSO** so it appears 
 
 ## Out of Scope
 
-- SMS OTP phone verification (ROADMAP **Later**; extends `072` / `075`)
+- SMS OTP phone verification (ROADMAP **Later**; extends `072` / `075` / `100`). AuthKit **1.20** / `105` adds **OTP input UX** on `/reset-password/complete` only — not phone SMS.
 - WebAuthn runtime (ROADMAP **Later**)
 - SAML (ROADMAP **Later**; OIDC enterprise flag shipped here)
 - QR PNG/SVG image generation (shipped in `075-qr-png`)
+- QR Approve as slide-to-confirm (`105` keeps a button for UC-AUTH-22)
 
 ## Amendments
 
@@ -42,3 +43,10 @@ As an admin, I can mark a social credential as **Enterprise SSO** so it appears 
 
 - Account → Profile phone field uses `nowo-tech/phone-input-bundle` (`PhoneType`, E.164) instead of free text — see `specs/100-phone-input-profile/`.
 - Production/default `qr_login.mode` remains **disabled** per `096`; local/E2E re-enable via `when@dev` / `when@test` (not a global `enabled` default).
+
+### 2026-08-25 — AuthKit 1.20 optional kits (`105`)
+
+- Password-reset **code** page uses `nowo-tech/otp-input-bundle` (multi-box UX; server OTP unchanged).
+- Device Intelligence collect + Trusted browsers + new-device mail; Device ID is not a credential and is not auto-trusted after login.
+- Slide-to-confirm on registration terms; QR Approve stays a button.
+- See `specs/105-authkit-security-kits/`.
