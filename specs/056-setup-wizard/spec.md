@@ -86,7 +86,7 @@ Beacon global seal = `instance_settings.setup_completed_at` (FR-001 / FR-011); f
 - Empty schema after `database_create` keeps `/setup` rendering (200) without CookieConsent / Twig Doctrine 500s (US1 / US9).
 - Optional `database_url` Skip works with missing schema (FR-012).
 - Catalog/schema repair still opens the wizard even if `setup_completed_at` is set (US7).
-- Pins: SiteBackup **1.13.0**, CookieConsent **≥ 1.8.0** (current **1.9.0**), `progress_storage: cache_doctrine` in `nowo_site_backup.yaml`.
+- Pins: SiteBackup **1.13.0** (current **1.13.8**), CookieConsent **≥ 1.8.0** (current **1.9.6**), `progress_storage: cache_doctrine` in `nowo_site_backup.yaml`, `short_circuit_when_done: true` (1.13.7+).
 - Hitting `/login` or `/register` (bare or localized) while catalogs/setup are incomplete redirects to `/setup` (FR-014).
 
 ## Out of Scope
@@ -104,3 +104,7 @@ Beacon global seal = `instance_settings.setup_completed_at` (FR-001 / FR-011); f
 ### 2026-08-17 — AuthKit gated until setup completes (FR-014)
 
 Cold-start previously excluded AuthKit paths so `/login` and `/register` could run beside an incomplete catalog. That raced the wizard `admin_user` step (two first-admin paths). Host YAML `nowo_site_backup.exclusions` no longer lists `/login` `/register` `/logout` `/reset-password`; the localized exclusion regex is `(legal|setup)` only. `PlatformCatalogsSetupRedirectSubscriber` dropped those path prefixes and the `nowo_auth_kit_*` route allow-list. First admin = wizard / CLI only until `setup_completed_at` (and catalogs) are done.
+
+### 2026-08-25 — Durable-done short-circuit + device collect (`105`)
+
+SiteBackup **1.13.7+** `setup.short_circuit_when_done: true` (default in kit; Beacon documents it explicitly) so `PlatformCatalogsSetupNeedDetector` MUST NOT reopen `/setup` after durable done. `/_device` is excluded from the setup gate so Device Intelligence collect can run while AuthKit HTML stays gated (FR-014). Pins: SiteBackup **1.13.8**. See `specs/105-authkit-security-kits/`.

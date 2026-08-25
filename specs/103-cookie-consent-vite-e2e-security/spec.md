@@ -86,3 +86,7 @@ As a maintainer, CI proves guest redirects, role denials, membership demotion/de
 
 - Docs: [`docs/product/LEGAL-AND-COOKIES.md`](../../docs/product/LEGAL-AND-COOKIES.md), [`docs/product/E2E-USE-CASES.md`](../../docs/product/E2E-USE-CASES.md) §16, [`docs/INSTALL.md`](../../docs/INSTALL.md), [`docs/product/ROLES.md`](../../docs/product/ROLES.md)
 - Prior: `002`, `055`, `058`, `081`, `097`, `101`
+
+## Amendment (Required `di_obs` cookie, 2026-08-25 / `105`)
+
+Device Intelligence cookie `di_obs` is inventoried as **required** account-security (HttpOnly observation pointer; not a credential; not analytics). Seed: `src/Setup/Demo/fixtures/cookie_consent.default.json`. Docs: `docs/product/LEGAL-AND-COOKIES.md`. PWA `cache_version` **v6** (deny `/_device`). See `specs/105-authkit-security-kits/`.

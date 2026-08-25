@@ -24,7 +24,7 @@ Controllers validate mutable posts with `$form->isSubmitted() && $form->isValid(
 | F1 | Shared CSRF-only | **As of `101` / FormKit ≥ 2.4**: `Nowo\FormKitBundle\Form\Type\CsrfOnlyType`, `HiddenFieldsCsrfType`, `CsrfOnlyFormFactory`, Twig `csrf_action_form`, partial `templates/form/_csrf_action.html.twig`. (Originally shipped under `App\Shared\Form\*` in v1.7.0.) |
 | F2 | Issues triage | `IssueStatusType`, `IssuePriorityType`, `IssueDuplicateType`, `IssueSavedViewType`, `IssueCommentType`; delete saved-view via `CsrfOnlyType` |
 | F3 | Mentions | `MentionsMarkReadType`, `MentionsMarkAllReadType` on dashboard Mentions |
-| F4 | Danger zone | `ProjectClearHistoryType`, `ProjectDeleteType` (typed name on delete; **empty** `getBlockPrefix()` → top-level `confirmation` / `_token`, not `project_delete[...]`) |
+| F4 | Danger zone | `ProjectClearHistoryType` (block prefix `project_clear_history`; slide-to-confirm `105`), `ProjectDeleteType` (typed name; **empty** `getBlockPrefix()` → top-level `confirmation` / `_token`, not `project_delete[...]`) |
 | F5 | Account tours | `AccountProductTourReplayType` on Display → Tours |
 | F6 | Single-action POSTs | Locale switch, view-as disable, API key revoke/rotate, member activate/deactivate/remove, share and read-token revoke, notification and threshold toggles/deletes/tests, admin permission delete, admin project ingest/access toggles — via `CsrfOnlyType` / factory / `HiddenFieldsCsrfType` |
 | F7 | Settings / admin fielded POSTs | Governance, API key / read-token / share / group / member add+role, config import (project + admin + instance), appearance theme picker, mailer test, group-member add, role permissions / role-user add, user role confirm, privacy anonymize (`TypeToConfirmType`), … |
@@ -61,7 +61,7 @@ As a project member or admin, status / priority / duplicate / saved-view / clear
 **Acceptance Scenarios**:
 
 1. **Given** issue show/index, **When** I change status or priority or mark duplicate or save/delete a view, **Then** the controller handles a Symfony Form Type and persists only when valid.
-2. **Given** Settings danger zone, **When** I clear history or delete with typed name, **Then** `ProjectClearHistoryType` / `ProjectDeleteType` validate CSRF (+ name match for delete).
+2. **Given** Settings danger zone, **When** I clear history or delete with typed name, **Then** `ProjectClearHistoryType` / `ProjectDeleteType` validate CSRF (+ confirmed slide for clear / name match for delete).
 3. **Given** Settings create/import panels (API key, share, governance, config import, …), **When** I submit, **Then** a named Form Type backs the POST (no hand-rolled `_token` + raw bags).
 
 ### User Story 3 - Mentions + tour replay (Priority: P2)
@@ -114,6 +114,8 @@ As a member, list filters submit via GET Form Types sharing `AbstractGetFilterTy
 
 Aligns with `081` FR-003a: `AbstractGetFilterType::mergeFieldOptions()` defaults every filter field to `required: false`; **`per_page`** MUST pass `required: true` (`addDashboardPerPage` / Issues index). Host registers `nowo_form_kit.type_map.search` → `SearchType` for snake-case `addNamedField(..., 'search', …)`.
 
+**As of FormKit ≥ 2.4 / `105`**: that `type_map.search` entry is **built-in**; host MUST NOT re-register it.
+
 **Security posture (non-regression)**:
 
 - GET filters KEEP `csrf_protection: false` + `method: GET` — intentional for idempotent list UIs (`F8` / US4). Mutable host POSTs remain on Symfony Form CSRF (`FR-001`…`FR-006`).
@@ -135,6 +137,12 @@ FormKit **≥ 2.4** (`101`): move `CsrfOnlyType`, `HiddenFieldsCsrfType`, `Searc
 | Twig | `csrf_action_form(..., named: bool)` still supported; maps to `createNamed` / `create` |
 | Dashboard filters | Host `App\Shared\Form\AbstractGetFilterType` extends kit base; keeps `addDashboardPageAndProject` / `addDashboardPerPage` |
 
+## Amendment (FormKit 2.5.1 + slide-to-confirm, 2026-08-25 / `105`)
+
+- Drop host `nowo_form_kit.type_map.search` — snake-case `search` → `SearchType` is built-in since FormKit **2.4.0**.
+- `ProjectClearHistoryType` uses `addSlideToConfirmField()` (`mapped: false` is the type default). Trusted browsers trust/revoke stay CSRF-only (`CsrfOnlyFormFactory`).
+- Pin FormKit **2.5.1**. See `specs/105-authkit-security-kits/` and `011`.
+
 ## Related
 
 - `077-form-type-field-loop` — field loop; deferred hand-rolled migration → this spec
@@ -144,6 +152,7 @@ FormKit **≥ 2.4** (`101`): move `CsrfOnlyType`, `HiddenFieldsCsrfType`, `Searc
 - `080-dashboard-aside-panels` — Mentions mark-read Types + title weight polish
 - `081-formkit-uikit-kit-sync` — FormKit pins / kit forks / kit filter chrome
 - `101-kit-csp-shared-helpers` — FormKit ≥ 2.4 owns CSRF / GET factories; UiKit peers
+- `105-authkit-security-kits` — FormKit 2.5.1 `addSlideToConfirmField`; drop host `type_map.search`
 - `087-security-audit-hardening` — CSRF as standing security control
 - `089-project-config-export` — project/admin import Types
 

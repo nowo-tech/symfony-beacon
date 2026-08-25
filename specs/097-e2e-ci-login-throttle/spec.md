@@ -114,3 +114,7 @@ Local dogfood hygiene (`104` / Phase 6.55): parallel Compose project `symfony-be
 - CI continues to use `make test-e2e` against the ephemeral CI DB
 
 Cross-ref: `specs/104-isolated-e2e-stack/`, `e2e/README.md`.
+
+## Amendment (Device-keyed extra limits, 2026-08-25 / `105`)
+
+AuthKit `device_intelligence.device_rate_limit: true` adds a **device-keyed** limit on register / reset / magic. It does **not** replace `AuthKitAwareLoginRateLimiter` (`097` C1). Login brute-force isolation by username remains required. See `specs/105-authkit-security-kits/`.
