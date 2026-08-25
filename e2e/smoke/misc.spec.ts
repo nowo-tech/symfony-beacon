@@ -19,6 +19,20 @@ test.describe('Appearance & PWA smoke', () => {
       expect(res.status(), path).toBeLessThan(500);
     }
   });
+
+  test('PWA manifest does not set session cookies (UC-ACC-16)', async ({ request }) => {
+    const res = await request.get('/manifest.webmanifest');
+    // Tolerate builds without a manifest; when present, stay cookie-free (PwaStatelessCookieSubscriber).
+    if (res.status() >= 400) {
+      test.skip(true, 'manifest not exposed in this build');
+      return;
+    }
+    const setCookie = res.headers()['set-cookie'] ?? res.headersArray()
+      .filter((h) => h.name.toLowerCase() === 'set-cookie')
+      .map((h) => h.value)
+      .join('\n');
+    expect(setCookie, 'manifest must not Set-Cookie').toBe('');
+  });
 });
 
 test.describe('Project settings deep checks', () => {

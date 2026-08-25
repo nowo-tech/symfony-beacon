@@ -1,12 +1,12 @@
 # Coverage (REQ-QA-002)
 
-Measured **2026-08-16** against includable `src/` (PHPUnit Clover statements) and Vitest V8 (TypeScript includable set).
+Measured **2026-08-20** against includable `src/` (PHPUnit Clover statements) and Vitest V8 (TypeScript includable set).
 
 ## Current measured floors
 
 | Surface | Metric | Measured | CI / local gate |
 |---------|--------|----------|-----------------|
-| PHP (`src/`, Controllers + install tooling excluded) | Statements (Clover) | **100.00% (13953/13953)** | `COVERAGE_MIN=100` |
+| PHP (`src/`, Controllers + install tooling excluded) | Statements (Clover) | **100.00% (14284/14284)** | `COVERAGE_MIN=100` |
 | TypeScript (includable `assets/` whitelist) | Lines / statements (V8) | **100% / 100%** | Vitest `coverage.thresholds` lines/statements **100** (hard fail) |
 
 Regenerate PHP:
@@ -42,17 +42,22 @@ Justified exclusions under `<source><exclude>` (not counted toward 100%):
 
 ## TypeScript includable set (`vitest.config.ts` → `coverage.include`)
 
-Hard-gated at 100% under jsdom: `theme-boot`, shell Stimulus controllers (clipboard/collapse/combobox/confirm-dialog/csrf/human-key/issue-panels-reset/menu-nested/navigate-select/password-*/tabs/toast), thinking-orbs `presets` / `theme` / `engine/profiles`.
+Hard-gated at 100% under jsdom:
+
+- `theme-boot`
+- Shell Stimulus: `collapse_panel`, `combobox`, `csrf_protection`, `human_key_label`, `issue_panels_reset`, `menu_nested_collapse`, `navigate_select`, `password_confirm_mirror`, `password_toggle`, `temporary_reveal`
+- `assets/lib/morphicons/index.ts` (theme / content-width / sidebar / password morph helpers)
+- thinking-orbs `presets` / `theme` / `engine/profiles`
 
 ## TypeScript exclusions (not in includable set)
 
 | Path | Justification |
 |------|----------------|
-| Vendor Stimulus re-exports (`page_loader`, `confirm_submit`) | Peer controllers from UiKit; no host runtime to unit-test. |
-| `analytics_chart`, `issue_realtime`, `product_tour`, `qr_login`, `thinking_orb`, `datatable`, `temporary_reveal` | Browser / Chart / Mercure / tour / canvas — Playwright e2e. |
-| Controllers with empty V8 instrumentation (`clipboard_copy`, `confirm_dialog`, `tabs`, `toast_stack` twins when 0/0) | Kept out of the gate when V8 reports 0 statements; behavior covered by colocated unit tests + e2e. |
-| `assets/lib/thinking-orbs/engine/{core,lattice,…}` | Canvas/WebGL draw loop. |
+| Vendor Stimulus re-exports (`page_loader`, `confirm_submit`, `clipboard_copy`, `confirm_dialog`, `tabs`, `toast_stack`) | Peer controllers from UiKit; V8 often reports 0/0 statements. Colocated unit tests + Playwright cover behavior. |
+| `analytics_chart`, `issue_realtime`, `product_tour`, `qr_login`, `thinking_orb`, `datatable` | Browser / Chart / Mercure / tour / canvas — Playwright e2e. |
+| `assets/lib/thinking-orbs/engine/{core,lattice,…}`, `assets/lib/thinking-orbs/index.ts` | Canvas/WebGL draw loop / barrel. |
+| `assets/app.ts` | Browser bootstrap (morphicon wiring + Turbo); product chrome covered by UC-ACC-26 E2E + morphicons unit gate. |
 
 ## Status note
 
-Beacon historically shipped soft `COVERAGE_MIN=35`. REQ-QA-002 is now closed with hard **100%** on includable PHP `src/` and hard **100%** on the TypeScript includable set. Controllers remain e2e-owned via the documented PHPUnit source exclusions.
+Beacon historically shipped soft `COVERAGE_MIN=35`. REQ-QA-002 is now closed with hard **100%** on includable PHP `src/` and hard **100%** on the TypeScript includable set (including morphicons + temporary-reveal). Controllers remain e2e-owned via the documented PHPUnit source exclusions. Product surface tracking: [`docs/product/E2E-USE-CASES.md`](product/E2E-USE-CASES.md).

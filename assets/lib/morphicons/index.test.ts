@@ -47,6 +47,8 @@ describe('morphicons helpers', () => {
 
     syncContentWidthMorphIcon(widthBtn, 'content', false);
     expect(widthBtn.classList.contains('is-morph-ready')).toBe(true);
+    syncContentWidthMorphIcon(widthBtn, 'full', true);
+    expect(widthBtn.classList.contains('is-morph-ready')).toBe(true);
 
     syncPasswordMorphIcon(pwdBtn, false, false);
     expect(pwdBtn.classList.contains('is-morph-ready')).toBe(true);

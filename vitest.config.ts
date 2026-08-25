@@ -24,6 +24,8 @@ export default defineConfig({
         'assets/controllers/navigate_select_controller.ts',
         'assets/controllers/password_confirm_mirror_controller.ts',
         'assets/controllers/password_toggle_controller.ts',
+        'assets/controllers/temporary_reveal_controller.ts',
+        'assets/lib/morphicons/index.ts',
         'assets/lib/thinking-orbs/presets.ts',
         'assets/lib/thinking-orbs/theme.ts',
         'assets/lib/thinking-orbs/engine/profiles.ts',

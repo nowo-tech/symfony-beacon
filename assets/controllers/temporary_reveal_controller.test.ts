@@ -76,6 +76,86 @@ describe('temporary-reveal controller', () => {
     expect(display.dataset.revealed).toBeUndefined();
   });
 
+  it('no-ops reveal when secret is empty and when already cleared', async () => {
+    document.body.innerHTML = `
+      <div
+        data-controller="temporary-reveal"
+        data-temporary-reveal-secret-value="   "
+        data-temporary-reveal-duration-value="0"
+      >
+        <code data-temporary-reveal-target="display"></code>
+      </div>
+    `;
+    application.stop();
+    application = Application.start();
+    application.register('temporary-reveal', TemporaryRevealController);
+    const controller = await getController();
+    const display = document.querySelector('code') as HTMLElement;
+    expect(display.textContent).toBe('');
+    controller.reveal();
+    expect(display.dataset.revealed).toBeUndefined();
+    controller.toggle();
+    expect(display.dataset.revealed).toBeUndefined();
+    controller.disconnect();
+  });
+
+  it('ignores toggle after clearOnHide purge', async () => {
+    vi.useFakeTimers();
+    document.body.innerHTML = `
+      <div
+        data-controller="temporary-reveal"
+        data-temporary-reveal-secret-value="https://pk:supersecret@localhost/uuid"
+        data-temporary-reveal-duration-value="1000"
+        data-temporary-reveal-start-revealed-value="true"
+        data-temporary-reveal-clear-on-hide-value="true"
+        data-temporary-reveal-cleared-label-value="Hidden — rotate"
+      >
+        <code data-temporary-reveal-target="display"></code>
+        <button type="button" data-temporary-reveal-target="toggle">Hide DSN</button>
+      </div>
+    `;
+    application.stop();
+    application = Application.start();
+    application.register('temporary-reveal', TemporaryRevealController);
+    await Promise.resolve();
+
+    const controller = await getController();
+    const display = document.querySelector('code') as HTMLElement;
+    expect(display.textContent).toBe('https://pk:supersecret@localhost/uuid');
+
+    vi.advanceTimersByTime(1000);
+    expect(display.dataset.cleared).toBe('true');
+    controller.toggle();
+    controller.reveal();
+    expect(display.textContent).toBe('Hidden — rotate');
+    controller.disconnect();
+  });
+
+  it('reveals and hides without a toggle target', async () => {
+    document.body.innerHTML = `
+      <div
+        data-controller="temporary-reveal"
+        data-temporary-reveal-secret-value="https://pk:supersecret@localhost/uuid"
+        data-temporary-reveal-duration-value="0"
+      >
+        <code data-temporary-reveal-target="display"></code>
+      </div>
+    `;
+    application.stop();
+    application = Application.start();
+    application.register('temporary-reveal', TemporaryRevealController);
+    const controller = await getController();
+    const display = document.querySelector('code') as HTMLElement;
+
+    controller.reveal();
+    expect(display.dataset.revealed).toBe('true');
+    expect(display.textContent).toBe('https://pk:supersecret@localhost/uuid');
+
+    controller.hide();
+    expect(display.dataset.revealed).toBeUndefined();
+    expect(display.textContent).toBe('https://pk:••••••••@localhost/uuid');
+  });
+
   it('starts revealed and purges secret when clearOnHide is set', async () => {
     vi.useFakeTimers();
     document.body.innerHTML = `

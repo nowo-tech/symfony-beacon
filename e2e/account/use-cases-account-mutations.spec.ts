@@ -26,6 +26,38 @@ test.describe('Account mutations — profile & password', () => {
     await waitForPageLoader(page);
   });
 
+  test('saves PhoneInput country + national number as E.164 (UC-ACC-27)', async ({ page }) => {
+    await page.goto('/account/profile');
+    await dismissProductTour(page);
+    const form = page.locator('[data-testid="profile-basic-form"]');
+    await expect(form).toBeVisible({ timeout: 15_000 });
+
+    const country = form.locator('select[name="user_profile[phone][country_iso]"]');
+    const national = form.locator('input[name="user_profile[phone][national_number]"]');
+    await expect(country).toBeVisible({ timeout: 15_000 });
+    await expect(national).toBeVisible();
+
+    const previousCountry = await country.inputValue();
+    const previousNational = await national.inputValue();
+
+    await country.selectOption('ES');
+    await national.fill('600111222');
+    await form.locator('button[type="submit"]').click();
+    await waitForPageLoader(page);
+    await expect(page).toHaveURL(/\/account\/profile/);
+    await expect(form.locator('select[name="user_profile[phone][country_iso]"]')).toHaveValue('ES');
+    await expect(form.locator('input[name="user_profile[phone][national_number]"]')).toHaveValue(
+      /600\s?111\s?222|600111222/,
+    );
+    await expect(page.locator('[data-testid="phone-verification-status"]')).toBeVisible();
+
+    // Clear phone so the seeded admin profile stays clean for later suites.
+    await country.selectOption(previousCountry || 'ES');
+    await national.fill(previousNational || '');
+    await form.locator('button[type="submit"]').click();
+    await waitForPageLoader(page);
+  });
+
   test('rejects email change without current password (UC-ACC-18)', async ({ page }) => {
     await page.goto('/account/profile');
     await dismissProductTour(page);
