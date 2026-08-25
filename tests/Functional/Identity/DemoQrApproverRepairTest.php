@@ -36,7 +36,7 @@ final class DemoQrApproverRepairTest extends DatabaseWebTestCase
 
     public function testAnonymousRequestIsNotPublic(): void
     {
-        $client = static::createClient();
+        $client = self::createClient();
         $this->seedPlatformCatalogs();
         $client->request(Request::METHOD_GET, '/_internal/demo/ensure-qr-approver');
         $status = $client->getResponse()->getStatusCode();
