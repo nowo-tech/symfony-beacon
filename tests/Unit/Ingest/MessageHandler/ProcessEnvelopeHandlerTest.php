@@ -24,6 +24,7 @@ use App\Project\Service\ProjectGovernanceResolver;
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use App\Shared\Settings\Service\InstanceOpsDefaults;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\UnitOfWork;
 use PHPUnit\Framework\TestCase;
@@ -115,6 +116,60 @@ final class ProcessEnvelopeHandlerTest extends TestCase
             new ProcessEnvelopeMessage(10, $raw, '2026-08-01T00:00:00+00:00'),
         );
         self::assertSame(1, $flush);
+    }
+
+    public function testRetriesOnceAfterUniqueConstraintRaceThenSucceeds(): void
+    {
+        $project = new Project()->setName('Race')->setSlug('race');
+        new ReflectionProperty(Project::class, 'id')->setValue($project, 11);
+        $projects = $this->createStub(ProjectRepository::class);
+        $projects->method('find')->willReturn($project);
+
+        $flush = 0;
+        $uow = $this->createStub(UnitOfWork::class);
+        $uow->method('getIdentityMap')->willReturn([]);
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->method('getUnitOfWork')->willReturn($uow);
+        $em->expects(self::atLeastOnce())->method('clear');
+        $em->method('flush')->willReturnCallback(function () use (&$flush): void {
+            ++$flush;
+            if (1 === $flush) {
+                throw new UniqueConstraintViolationException(
+                    $this->createStub(\Doctrine\DBAL\Driver\Exception::class),
+                    null,
+                );
+            }
+        });
+
+        $raw = "{\"sdk\":{}}\n".
+            "{\"type\":\"session\"}\n".
+            "{}\n";
+
+        $this->handler($projects, em: $em)(
+            new ProcessEnvelopeMessage(11, $raw, '2026-08-01T00:00:00+00:00'),
+        );
+        self::assertSame(2, $flush);
+    }
+
+    public function testRethrowsUniqueConstraintOnSecondFailure(): void
+    {
+        $project = new Project()->setName('Race2')->setSlug('race2');
+        new ReflectionProperty(Project::class, 'id')->setValue($project, 12);
+        $projects = $this->createStub(ProjectRepository::class);
+        $projects->method('find')->willReturn($project);
+
+        $driverEx = $this->createStub(\Doctrine\DBAL\Driver\Exception::class);
+        $uow = $this->createStub(UnitOfWork::class);
+        $uow->method('getIdentityMap')->willReturn([]);
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('getUnitOfWork')->willReturn($uow);
+        $em->method('clear');
+        $em->method('flush')->willThrowException(new UniqueConstraintViolationException($driverEx, null));
+
+        $this->expectException(UniqueConstraintViolationException::class);
+        $this->handler($projects, em: $em)(
+            new ProcessEnvelopeMessage(12, "{\"sdk\":{}}\n", '2026-08-01T00:00:00+00:00'),
+        );
     }
 
     private function handler(

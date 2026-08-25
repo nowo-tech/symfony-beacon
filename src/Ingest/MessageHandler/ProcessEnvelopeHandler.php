@@ -15,6 +15,7 @@ use App\Project\Entity\ProjectApiKey;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\ProjectGovernanceResolver;
 use DateTimeImmutable;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -26,6 +27,9 @@ use Symfony\Component\Messenger\MessageBusInterface;
  * Keep this handler thin: fingerprinting/grouping lives in {@see IssueEnvelopeWriter},
  * N+1 / spans in {@see PerformanceEnvelopeWriter}, outbound alerts in Notifications.
  * OTLP adapters map into {@see ProcessEnvelopeMessage} under `App\Ingest\Otlp`.
+ *
+ * Concurrent workers may race on {@code uniq_project_fingerprint} or daily stats; a single
+ * clear + retry absorbs that race so Messenger does not poison the message.
  */
 #[AsMessageHandler(sign: true)]
 final readonly class ProcessEnvelopeHandler
@@ -43,6 +47,11 @@ final readonly class ProcessEnvelopeHandler
     }
 
     public function __invoke(ProcessEnvelopeMessage $message): void
+    {
+        $this->process($message, isRetry: false);
+    }
+
+    private function process(ProcessEnvelopeMessage $message, bool $isRetry): void
     {
         // Sync Messenger shares the HTTP EntityManager. If Envelope auth left a
         // ProjectApiKey managed, clear so notification flushes cannot double-encrypt
@@ -123,7 +132,22 @@ final readonly class ProcessEnvelopeHandler
             // Other item types are accepted at the HTTP layer and ignored here.
         }
 
-        $this->entityManager->flush();
+        try {
+            $this->entityManager->flush();
+        } catch (UniqueConstraintViolationException $exception) {
+            if ($isRetry) {
+                throw $exception;
+            }
+
+            $this->logger->info('Retrying Envelope after unique constraint race.', [
+                'project_id' => $message->projectId,
+                'error' => $exception->getMessage(),
+            ]);
+            $this->entityManager->clear();
+            $this->process($message, isRetry: true);
+
+            return;
+        }
 
         /** @var list<array{kind: 'new'|'regression'|'nplus1', issue_id?: int, transaction_id?: int}> $alerts */
         $alerts = [];
