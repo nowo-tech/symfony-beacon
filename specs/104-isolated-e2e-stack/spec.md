@@ -75,3 +75,17 @@ As an operator, isolated seed must not rewrite `.env.local` `BEACON_DSN` or recr
 - Dogfood and E2E HTTPS health checks both return 200 while coexisting.
 - Smoke Playwright suite passes under `make test-e2e-isolated`.
 - `nowo:beacon:test --check-only` succeeds in the E2E `php` service when target is `self`.
+
+## Amendments
+
+### 2026-08-17 — Morphicons chrome (v1.21.0)
+
+Lucide-driven spring morphs for theme toggle, burger/sidebar, content-width, and password reveal (Vitest `assets/lib/morphicons/`; E2E UC-ACC-26). Does not change Compose isolation.
+
+### 2026-08-20 — Messenger Redis DB index (v1.23.3 / REQ-MESSENGER-001)
+
+`MESSENGER_TRANSPORT_DSN` MUST use Redis `?dbindex=N` (the URL path is the **stream name**, not the DB index). `compose.e2e.yaml` MUST use `env_file: !override` and MUST NOT re-interpolate `DATABASE_URL` / `REDIS_URL` / `MESSENGER_TRANSPORT_DSN` / `BEACON_DSN` from a polluted process environment. Make `DC_E2E` forces Redis DSNs on the process env so isolated workers do not share dogfood streams.
+
+### 2026-08-25 — Device collect on E2E/SUT (`105`)
+
+Isolated stack inherits `/_device` PUBLIC_ACCESS + PWA deny-cache. No extra Compose service. See `specs/105-authkit-security-kits/`.

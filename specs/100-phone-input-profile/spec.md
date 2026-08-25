@@ -129,3 +129,7 @@ PhoneInput **1.3.0** owns the CSP-safe prefix picker and progressive-enhancement
 ### 2026-08-17 — Host theme bridge (`_phone_input.scss`)
 
 Kit `phone_input.css` still paints the prefix toggle / portaled dropdown with Bootstrap tokens (`--bs-body-bg` → white fallback). Beacon is Tailwind + `--color-*` / `data-theme`, so without a host bridge the country picker stays white in dark mode and misaligns with `.input`. Host `assets/styles/_phone_input.scss` (loaded from `app.scss`) remaps theme + metrics only — **not** a Twig/JS fork. Same pattern as the thin `_cookie_consent.scss` bridge (`103`). See `101` amendment.
+
+### 2026-08-25 — OTP input is not phone SMS (`105`)
+
+AuthKit **1.20** `/reset-password/complete` uses `nowo-tech/otp-input-bundle` (email/code UX). Profile phone **SMS OTP** verification remains ROADMAP Later. See `specs/105-authkit-security-kits/` and `072`.
