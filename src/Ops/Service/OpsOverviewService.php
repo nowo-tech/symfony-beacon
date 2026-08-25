@@ -11,7 +11,7 @@ use App\Notifications\Repository\NotificationDestinationRepository;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
 use App\Project\Service\ProjectOpsStatsService;
-use App\Shared\Health\MessengerQueueHealth;
+use App\Ops\Messenger\MessengerQueueHealth;
 use DateTimeImmutable;
 use DateTimeZone;
 
