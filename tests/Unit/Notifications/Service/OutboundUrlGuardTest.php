@@ -21,8 +21,8 @@ final class OutboundUrlGuardTest extends TestCase
             try {
                 $guard->assertSafeHttpUrl($url);
                 self::fail('Expected InvalidArgumentException for '.$url);
-            } catch (InvalidArgumentException) {
-                self::assertTrue(true);
+            } catch (InvalidArgumentException $e) {
+                self::assertNotSame('', $e->getMessage());
             }
         }
     }

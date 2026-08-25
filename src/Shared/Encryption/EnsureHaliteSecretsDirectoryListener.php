@@ -26,6 +26,7 @@ final readonly class EnsureHaliteSecretsDirectoryListener
     public function __construct(
         #[Autowire('%kernel.project_dir%')]
         private string $projectDir,
+        private HaliteSecretsFilesystem $filesystem = new HaliteSecretsFilesystem(),
     ) {
     }
 
@@ -48,10 +49,8 @@ final readonly class EnsureHaliteSecretsDirectoryListener
     private function ensure(): void
     {
         $dir = $this->projectDir.'/var/secrets';
-        if (!is_dir($dir)) {
-            if (!mkdir($dir, self::DIR_MODE, true) && !is_dir($dir)) {
-                throw new RuntimeException(\sprintf('Unable to create Halite secrets directory: %s', $dir));
-            }
+        if (!$this->filesystem->isDirectory($dir) && !$this->filesystem->makeDirectory($dir, self::DIR_MODE)) {
+            throw new RuntimeException(\sprintf('Unable to create Halite secrets directory: %s', $dir));
         }
 
         $this->hardenKeyFiles($dir);
@@ -60,12 +59,12 @@ final readonly class EnsureHaliteSecretsDirectoryListener
     private function hardenKeyFiles(string $dir): void
     {
         $pattern = $dir.'/.Halite*.key';
-        foreach (glob($pattern) ?: [] as $keyFile) {
-            if (!is_file($keyFile)) {
+        foreach ($this->filesystem->glob($pattern) ?: [] as $keyFile) {
+            if (!$this->filesystem->isFile($keyFile)) {
                 continue;
             }
 
-            $perms = fileperms($keyFile);
+            $perms = $this->filesystem->filePerms($keyFile);
             if (false === $perms) {
                 continue;
             }
@@ -75,7 +74,7 @@ final readonly class EnsureHaliteSecretsDirectoryListener
                 continue;
             }
 
-            if (!@chmod($keyFile, self::KEY_MODE)) {
+            if (!$this->filesystem->chmod($keyFile, self::KEY_MODE)) {
                 // Best-effort: directory may be read-only in some CI images.
                 continue;
             }

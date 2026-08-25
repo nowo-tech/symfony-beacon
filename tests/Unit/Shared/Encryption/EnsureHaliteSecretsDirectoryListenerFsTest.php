@@ -2,98 +2,51 @@
 
 declare(strict_types=1);
 
-namespace App\Shared\Encryption {
-    final class EnsureHaliteFsHooks
-    {
-        public static $isDir;
-        public static $mkdir;
-        public static $glob;
-        public static $isFile;
-        public static $filePerms;
-        public static $chmod;
+namespace App\Tests\Unit\Shared\Encryption;
 
-        public static function reset(): void
-        {
-            self::$isDir = null;
-            self::$mkdir = null;
-            self::$glob = null;
-            self::$isFile = null;
-            self::$filePerms = null;
-            self::$chmod = null;
-        }
+use App\Shared\Encryption\EnsureHaliteSecretsDirectoryListener;
+use App\Shared\Encryption\HaliteSecretsFilesystem;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use RuntimeException;
+
+final class EnsureHaliteSecretsDirectoryListenerFsTest extends TestCase
+{
+    public function testConsoleCommandThrowsWhenDirectoryCannotBeCreated(): void
+    {
+        /** @var HaliteSecretsFilesystem&MockObject $filesystem */
+        $filesystem = $this->createMock(HaliteSecretsFilesystem::class);
+        $filesystem->method('isDirectory')->willReturn(false);
+        $filesystem->method('makeDirectory')->willReturn(false);
+
+        $listener = new EnsureHaliteSecretsDirectoryListener('/virtual/project', $filesystem);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unable to create Halite secrets directory');
+        $listener->onConsoleCommand();
     }
 
-    function is_dir(string $path): bool
+    public function testEnsureSkipsNonFilesUnknownPermsAndFailedChmod(): void
     {
-        return \is_callable(EnsureHaliteFsHooks::$isDir) ? (EnsureHaliteFsHooks::$isDir)($path) : \is_dir($path);
-    }
-
-    function mkdir(string $directory, int $permissions = 0777, bool $recursive = false): bool
-    {
-        return \is_callable(EnsureHaliteFsHooks::$mkdir) ? (EnsureHaliteFsHooks::$mkdir)($directory, $permissions, $recursive) : \mkdir($directory, $permissions, $recursive);
-    }
-
-    function glob(string $pattern, int $flags = 0): array|false
-    {
-        return \is_callable(EnsureHaliteFsHooks::$glob) ? (EnsureHaliteFsHooks::$glob)($pattern, $flags) : \glob($pattern, $flags);
-    }
-
-    function is_file(string $filename): bool
-    {
-        return \is_callable(EnsureHaliteFsHooks::$isFile) ? (EnsureHaliteFsHooks::$isFile)($filename) : \is_file($filename);
-    }
-
-    function fileperms(string $filename): int|false
-    {
-        return \is_callable(EnsureHaliteFsHooks::$filePerms) ? (EnsureHaliteFsHooks::$filePerms)($filename) : \fileperms($filename);
-    }
-
-    function chmod(string $filename, int $permissions): bool
-    {
-        return \is_callable(EnsureHaliteFsHooks::$chmod) ? (EnsureHaliteFsHooks::$chmod)($filename, $permissions) : \chmod($filename, $permissions);
-    }
-}
-
-namespace App\Tests\Unit\Shared\Encryption {
-    use App\Shared\Encryption\EnsureHaliteFsHooks;
-    use App\Shared\Encryption\EnsureHaliteSecretsDirectoryListener;
-    use PHPUnit\Framework\TestCase;
-
-    final class EnsureHaliteSecretsDirectoryListenerFsTest extends TestCase
-    {
-        protected function tearDown(): void
-        {
-            EnsureHaliteFsHooks::reset();
-        }
-
-        public function testConsoleCommandThrowsWhenDirectoryCannotBeCreated(): void
-        {
-            EnsureHaliteFsHooks::$isDir = static fn (string $path): bool => false;
-            EnsureHaliteFsHooks::$mkdir = static fn (string $directory, int $permissions, bool $recursive): bool => false;
-
-            $listener = new EnsureHaliteSecretsDirectoryListener('/virtual/project');
-
-            $this->expectException(\RuntimeException::class);
-            $this->expectExceptionMessage('Unable to create Halite secrets directory');
-            $listener->onConsoleCommand();
-        }
-
-        public function testEnsureSkipsNonFilesUnknownPermsAndFailedChmod(): void
-        {
-            EnsureHaliteFsHooks::$isDir = static fn (string $path): bool => true;
-            EnsureHaliteFsHooks::$glob = static fn (string $pattern): array => ['skip.key', 'perms.key', 'chmod.key'];
-            EnsureHaliteFsHooks::$isFile = static fn (string $file): bool => 'skip.key' !== $file;
-            EnsureHaliteFsHooks::$filePerms = (static fn (string $file): int|false => match ($file) {
+        /** @var HaliteSecretsFilesystem&MockObject $filesystem */
+        $filesystem = $this->createMock(HaliteSecretsFilesystem::class);
+        $filesystem->method('isDirectory')->willReturn(true);
+        $filesystem->method('glob')->willReturn(['skip.key', 'perms.key', 'chmod.key']);
+        $filesystem->method('isFile')->willReturnCallback(
+            static fn (string $file): bool => 'skip.key' !== $file,
+        );
+        $filesystem->method('filePerms')->willReturnCallback(
+            static fn (string $file): int|false => match ($file) {
                 'perms.key' => false,
                 'chmod.key' => 0644,
                 default => 0600,
-            });
-            EnsureHaliteFsHooks::$chmod = static fn (string $file, int $permissions): bool => false;
+            },
+        );
+        $filesystem->method('chmod')->willReturn(false);
 
-            $listener = new EnsureHaliteSecretsDirectoryListener('/virtual/project');
-            $listener->onConsoleCommand();
+        $listener = new EnsureHaliteSecretsDirectoryListener('/virtual/project', $filesystem);
+        $listener->onConsoleCommand();
 
-            self::assertTrue(true);
-        }
+        $this->addToAssertionCount(1);
     }
 }

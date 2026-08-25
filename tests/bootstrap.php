@@ -11,10 +11,6 @@ new Dotenv()->bootEnv(dirname(__DIR__).'/.env');
 // Per-process SQLite isolation is handled by PidSqliteUrlEnvVarProcessor (FrankenPHP-safe:
 // no putenv / $_ENV mutation). See doctrine.yaml when@test.
 
-if (!empty($_SERVER['APP_DEBUG'])) {
-    umask(0000);
-}
-
 // Persist Halite key across KernelBrowser reboots. Without a file key the encrypt
 // bundle keeps material in memory only; reboot generates a new key and API-secret
 // decrypt fails on the next request (Envelope ingest 403, mailer settings, etc.).

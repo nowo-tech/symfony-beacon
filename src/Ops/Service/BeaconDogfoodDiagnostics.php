@@ -12,6 +12,8 @@ use App\Notifications\Service\WebPushClientFactory;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Clock\Clock;
+use Symfony\Component\Clock\ClockInterface;
 
 /**
  * Explains why a successful ingest ACK may still produce no dashboard / Web Push alert.
@@ -31,6 +33,7 @@ final readonly class BeaconDogfoodDiagnostics
         private PushSubscriptionRepository $pushSubscriptionRepository,
         private WebPushClientFactory $webPushClientFactory,
         private EntityManagerInterface $entityManager,
+        private ClockInterface $clock = new Clock(),
     ) {
     }
 
@@ -187,8 +190,7 @@ final readonly class BeaconDogfoodDiagnostics
             if ($event instanceof Event) {
                 return $event;
             }
-            // CLI diagnostics only (`app:beacon:test`); ignored by PHPStan FrankenPHP hardening.
-            usleep(200_000);
+            $this->clock->sleep(0.2);
         } while (microtime(true) < $deadline);
 
         return null;

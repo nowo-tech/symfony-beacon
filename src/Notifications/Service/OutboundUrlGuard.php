@@ -19,6 +19,7 @@ final readonly class OutboundUrlGuard
 {
     public function __construct(
         private InstanceOpsDefaults $opsDefaults,
+        private HostnameDnsLookup $dnsLookup = new HostnameDnsLookup(),
     ) {
     }
 
@@ -115,7 +116,7 @@ final readonly class OutboundUrlGuard
     {
         $candidates = [];
 
-        $aRecords = @dns_get_record($host, \DNS_A);
+        $aRecords = $this->dnsLookup->dnsGetRecord($host, \DNS_A);
         if (\is_array($aRecords)) {
             foreach ($aRecords as $row) {
                 if (isset($row['ip']) && \is_string($row['ip']) && '' !== $row['ip']) {
@@ -124,7 +125,7 @@ final readonly class OutboundUrlGuard
             }
         }
 
-        $aaaaRecords = @dns_get_record($host, \DNS_AAAA);
+        $aaaaRecords = $this->dnsLookup->dnsGetRecord($host, \DNS_AAAA);
         if (\is_array($aaaaRecords)) {
             foreach ($aaaaRecords as $row) {
                 if (isset($row['ipv6']) && \is_string($row['ipv6']) && '' !== $row['ipv6']) {
@@ -135,7 +136,7 @@ final readonly class OutboundUrlGuard
 
         // Fallback when dns_get_record is unavailable / empty (common in some containers).
         if ([] === $candidates) {
-            $fallback = @gethostbynamel($host);
+            $fallback = $this->dnsLookup->hostByNameL($host);
             if (\is_array($fallback)) {
                 $candidates = $fallback;
             }
