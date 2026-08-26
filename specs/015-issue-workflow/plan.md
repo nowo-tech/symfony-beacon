@@ -32,6 +32,7 @@ Add issue triage workflow: priority (`low`|`medium`|`high`|`critical`, default `
 
 - English documentation / PHPDoc / Twig copy
 - Prefer existing Issues patterns (`IssueController`, history recorder, UserAction) over new kits
+- Issue status graph stays in `004` application code (`IssueStatusTransition`); do not add `symfony/workflow` or WorkflowBundle (see `004` spec amendment 2026-08-26)
 - No Cursor commit attribution
 
 ## Project Structure

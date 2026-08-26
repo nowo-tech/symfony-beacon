@@ -70,3 +70,7 @@ As ingest, I store full `payload` and promote common columns (see `010-rich-even
 
 - Envelope HTTP auth + governance/rate checks share `App\Ingest\Service\IngestProjectAccessGate` with OTLP (`authorizeCredentials` + `assertIngestAllowed`). Controllers keep body-size limits, auth parsing, and response shaping.
 - Cross-links: `067-otlp-ingest`, `086-dry-refactor`.
+
+## Amendment (Issue reopen is not Symfony Workflow, 2026-08-26)
+
+FR-003 reopen is a **direct** status write on the matching issue (`resolved` / `ignored` → `unresolved`) plus a system `issue_history` row. It MUST NOT go through `symfony/workflow` or `nowo-tech/workflow-bundle`. The closed three-status contract and rationale live in `004-issues` (amendment 2026-08-26). Ingest remains a privileged bypass of the UI status POST path so Envelope processing does not depend on a human transition.

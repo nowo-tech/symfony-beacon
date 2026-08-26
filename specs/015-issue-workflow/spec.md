@@ -120,6 +120,7 @@ As a project member, I queue two issues for a future merge without merging event
 - Saved views are per-user within a project (not shared team-wide in v1).
 - Full issue merge (fingerprints/events) is out of scope; only "merge later" intent.
 - Builds on `004-issues` status/assignee/history behaviour.
+- This spec’s “workflow” means triage (comments, priority, duplicates, saved views). Issue **status** (`unresolved` / `resolved` / `ignored`) stays a closed graph in `004-issues` — not `symfony/workflow` and not `nowo-tech/workflow-bundle` (see `004` amendment 2026-08-26).
 
 ## Amendment (Symfony Forms, 2026-08-11)
 
@@ -132,3 +133,7 @@ Issue show duplicate dialog keeps Stimulus combobox markup around `IssueDuplicat
 ## Amendment (Issue detail tabs, 2026-08-16)
 
 Issue show is split into path-based tabs `main` | `similar` | `history` (`102-issue-detail-tabs-api-reveal`). Comments, priority, assignee, and duplicate dialog remain on **Main**; similar suggestions on **Similar** (`041`); assignment/status timeline on **History**. Deep links and E2E MUST use `…/issues/{id}/{tab}` (default `main`). Workflow Form Types / CSRF rules in this spec are unchanged.
+
+## Amendment (Status graph ownership, 2026-08-26)
+
+Do not introduce `symfony/workflow` or `nowo-tech/workflow-bundle` to implement this spec or issue status. Duplicate/merge MAY set `ignored` as a domain action; the allowed status graph and the “why not Symfony Workflow” rationale live in `004-issues` (amendment 2026-08-26).

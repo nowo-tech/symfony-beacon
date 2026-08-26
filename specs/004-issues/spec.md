@@ -17,7 +17,7 @@ Cross-links: [`docs/product/EVENT-CONTEXT.md`](../../docs/product/EVENT-CONTEXT.
 - **Grouping**: Client `fingerprint` array wins when present; otherwise exception type + normalized message + file/function (no line numbers). Volatile tokens (UUIDs, hex, digits) are normalized.
 - **Regression**: Matching events reopen both **`resolved` and `ignored`** issues to **`unresolved`** (aligned with `009-project-notifications`). Each reopen is recorded on `issue_history` with no human actor (ingest / system).
 - **Assignee**: Optional project member; filter `assignee=<userId>` or `assignee=unassigned`. Assign/unassign is recorded on `issue_history`.
-- **Status UI**: Actors with `project.issues.triage` can mark an issue **resolved**, **unresolved** (reopen), or **ignored** from the issue sidebar (`POST …/status`). Changes are recorded on `issue_history`. Viewers see read-only UI (`project_grants`); POST without triage returns 403 (`requireTriage`).
+- **Status UI**: Actors with `project.issues.triage` can mark an issue **resolved**, **unresolved** (reopen), or **ignored** from the issue sidebar (`POST …/status`). Changes are recorded on `issue_history`. Viewers see read-only UI (`project_grants`); POST without triage returns 403 (`requireTriage`). The three statuses are a **closed product contract** (not an operator-editable state machine). See Amendment (Issue status graph, 2026-08-26).
 - **History**: Table `issue_history` stores assignee changes (`assignee_changed`) and status changes (`status_changed`) with optional actor, previous/next values, and timestamp.
 - **Occurrence windows**: Total event count plus last **24h / 7d / 30d** (computed for list + detail).
 
@@ -101,7 +101,7 @@ As ingest, similar events merge into one issue; resolved and ignored issues reop
 - **FR-006**: Issue detail MUST present structured panels including stack source context and Copy path.
 - **FR-007**: Panels MUST be collapsible with `localStorage` + optional account defaults (`IssuePanelIds`).
 - **FR-008**: Assignee MUST be an optional project member with list filter support.
-- **FR-009**: Status workflow MUST support unresolved / resolved / ignored via UI (`issue_status`) and ingest reopen of resolved **and** ignored → unresolved. Status POST MUST use `IssueStatusType` (Symfony Form) per `090`.
+- **FR-009**: Status workflow MUST support unresolved / resolved / ignored via UI (`issue_status`) and ingest reopen of resolved **and** ignored → unresolved. Status POST MUST use `IssueStatusType` (Symfony Form) per `090`. The allowed graph MUST stay a closed product contract in application code (see Amendment 2026-08-26) — not `symfony/workflow` and not `nowo-tech/workflow-bundle`.
 - **FR-010**: The system MUST persist an `issue_history` timeline for assignee changes and status changes (including ingest reopen), showing actor (or system), previous/next values, and timestamp on the issue detail sidebar.
 
 ### Non-Functional
@@ -123,3 +123,21 @@ Status POST uses `IssueStatusType`. Related triage Types live under `015` / `090
 ## Amendment (Issues index FormKit filter, 2026-08-13)
 
 Issues list filters use `IssueIndexFilterType` → `AbstractGetFilterType` (FormKit profile `filter`). Placeholders/help under `issue_index_filter.*` in `translations/form.*.yaml`. Fields optional except **`per_page`** (`required: true`). CSRF disabled on GET (intentional). Chrome: `form_row` + `_fields` / loop (no FormKit labels; theme omits label). Canonical contract: `081` FR-003a; Twig loop: `077`; CSRF boundary: `090` FR-007.
+
+## Amendment (Issue status graph is not Symfony Workflow, 2026-08-26)
+
+**Decision**: Keep `unresolved` / `resolved` / `ignored` as a closed product contract implemented in Issues application code. Do **not** introduce `symfony/workflow` or `nowo-tech/workflow-bundle` for this graph.
+
+**Why this is not a Workflow component problem**:
+
+- The graph is three fully connected places (any status may move to the other two). That is smaller than the ceremony of places, named transitions, a marking store, and event subscribers.
+- Ingest regression (`003-ingest`, User Story 2) MUST reopen `resolved` and `ignored` to `unresolved` on a matching event **without** a human transition. A Workflow `apply()` on the UI graph would still need this bypass (or a privileged `reopen` that ingest calls anyway).
+- Duplicate and merge (`015-issue-workflow`) force `ignored` as a domain action, not as an operator-picked Workflow transition.
+- History, audit, and notifications (`009-project-notifications`) are domain side effects. Symfony Workflow would not replace `IssueStatusChanger` / ingest writers; it would sit in front of the same services.
+- List filters, saved views, webhooks, and analytics assume the three statuses. An operator-editable DB definition (WorkflowBundle CRUD at `/workflow`) could change places at runtime and break that contract.
+
+**Out of scope here**: `015-issue-workflow` is triage (comments, priority, duplicates, saved views), not a state-machine engine. Do not conflate that spec name with `symfony/workflow`.
+
+**When to revisit** (requires a new spec, not a silent refactor): extra product states (for example muted / archived), named transitions with guards (for example resolve requires assignee), or per-project custom graphs. Then prefer versioned `symfony/workflow` YAML (`state_machine` type) in this repository — still **not** `nowo-tech/workflow-bundle` unless operators must edit the graph in the UI.
+
+As-built: `IssueStatus` enum + `IssueStatusTransition` (explicitly “lightweight workflow without symfony/workflow”) + `IssueStatusChanger` (UI) + direct status write on ingest reopen. See `plan.md`.
