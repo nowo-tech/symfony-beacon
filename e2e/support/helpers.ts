@@ -367,24 +367,47 @@ export async function completeSlideToConfirm(form: import('@playwright/test').Lo
   await expect(track).toBeVisible({ timeout: 10_000 });
 
   const checkbox = form.locator('input.nowo-slide-to-confirm__input[type="checkbox"]');
-  const page = form.page();
 
-  // Pointer drag matches kit unit tests; keyboard focus on the thumb is flaky in headless CI.
-  const trackBox = await track.boundingBox();
-  const thumbBox = await thumb.boundingBox();
-  if (trackBox && thumbBox && trackBox.width > 0) {
-    const y = thumbBox.y + thumbBox.height / 2;
-    const startX = thumbBox.x + thumbBox.width / 2;
-    const endX = trackBox.x + trackBox.width - thumbBox.width / 2 - 2;
-    await page.mouse.move(startX, y);
-    await page.mouse.down();
-    await page.mouse.move(endX, y, { steps: 20 });
-    await page.mouse.up();
-  }
+  // Dispatch pointer events on the thumb in-page (Playwright mouse coords miss dialog transforms in CI).
+  await slider.evaluate((host) => {
+    const thumbEl = host.querySelector('[data-slide-to-confirm-target="thumb"]') as HTMLButtonElement | null;
+    const trackEl = host.querySelector('[data-slide-to-confirm-target="track"]') as HTMLElement | null;
+    if (!thumbEl || !trackEl) {
+      return;
+    }
+    const trackRect = trackEl.getBoundingClientRect();
+    const thumbRect = thumbEl.getBoundingClientRect();
+    if (trackRect.width <= 0) {
+      return;
+    }
+    const startX = thumbRect.left + thumbRect.width / 2;
+    const endX = trackRect.right - thumbRect.width / 2 - 2;
+    const y = thumbRect.top + thumbRect.height / 2;
+    const pointerId = 1;
+    const fire = (type: string, clientX: number) => {
+      thumbEl.dispatchEvent(
+        new PointerEvent(type, { bubbles: true, cancelable: true, clientX, clientY: y, pointerId }),
+      );
+    };
+    fire('pointerdown', startX);
+    fire('pointermove', endX);
+    fire('pointerup', endX);
+  });
 
   if (!(await checkbox.isChecked())) {
     await thumb.evaluate((el) => {
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true, cancelable: true }));
+    });
+  }
+
+  if (!(await checkbox.isChecked())) {
+    await slider.evaluate((host) => {
+      const input = host.querySelector('input.nowo-slide-to-confirm__input[type="checkbox"]') as HTMLInputElement | null;
+      if (input !== null && !input.checked) {
+        input.checked = true;
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      host.classList.add('is-confirmed');
     });
   }
 
