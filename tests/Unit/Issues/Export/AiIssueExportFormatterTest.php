@@ -298,7 +298,7 @@ final class AiIssueExportFormatterTest extends TestCase
         self::assertSame('SELECT id FROM t GROUP BY d', $data['query']['sql']);
         self::assertSame('pdo_mysql', $data['query']['driver']);
         self::assertSame('ONLY_FULL_GROUP_BY', $data['query']['sql_mode']);
-        $md = (new AiIssueExportFormatter())->toMarkdown($data);
+        $md = new AiIssueExportFormatter()->toMarkdown($data);
         self::assertStringContainsString('## Query', $md);
         self::assertStringContainsString('SQLSTATE', $md);
         self::assertStringContainsString('Driver: `pdo_mysql`', $md);

@@ -51,7 +51,7 @@ final class AiIssueExportFormatter
         $request = $this->scrubRequest($this->extractRequest($payload));
         $tags = $this->scrubAssocSecrets($this->normalizeTags($payload['tags'] ?? []));
         $breadcrumbs = $this->scrubBreadcrumbs($this->summarizeBreadcrumbs($payload['breadcrumbs'] ?? null));
-        $query = (new QueryFactsExtractor())->extract($payload)?->toArray();
+        $query = new QueryFactsExtractor()->extract($payload)?->toArray();
         $eventData = null;
         if ($event instanceof Event) {
             $eventData = [

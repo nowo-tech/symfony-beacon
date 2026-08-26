@@ -152,7 +152,7 @@ final class QueryFactsExtractor
         }
         $message = $payload['message'] ?? null;
         if (\is_string($message) && '' !== $message) {
-            $merged = $this->merge($merged, $this->parseMessage($message));
+            return $this->merge($merged, $this->parseMessage($message));
         }
 
         return $merged;
@@ -326,7 +326,7 @@ final class QueryFactsExtractor
         if (!\is_array($values) || [] === $values) {
             return null;
         }
-        $last = $values[array_key_last($values)];
+        $last = array_last($values);
         if (\is_array($last) && isset($last['value']) && \is_string($last['value'])) {
             return $last['value'];
         }

@@ -32,7 +32,7 @@ final class QueryFactsExtractorTest extends TestCase
         self::assertSame($sql, $facts->sql);
         self::assertSame(QueryFacts::SOURCE_EXCEPTION, $facts->source);
         self::assertNotNull($facts->summary);
-        self::assertStringNotContainsString('(SQL:', (string) $facts->summary);
+        self::assertStringNotContainsString('(SQL:', $facts->summary);
     }
 
     public function testStructuredContextsDbWinsOverMessage(): void
