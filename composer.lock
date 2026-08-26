@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5ee6991ebbb4d94a063f87bdaa78e7d7",
+    "content-hash": "99cf7c58447f4ab9fade48abd18c7e5d",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -599,16 +599,16 @@
         },
         {
             "name": "doctrine/doctrine-migrations-bundle",
-            "version": "4.0.0",
+            "version": "4.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/DoctrineMigrationsBundle.git",
-                "reference": "20505da78735744fb4a42a3bb9a416b345ad6f7c"
+                "reference": "43e9212c7441178e3748580e53f88c08f4e70e5f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/DoctrineMigrationsBundle/zipball/20505da78735744fb4a42a3bb9a416b345ad6f7c",
-                "reference": "20505da78735744fb4a42a3bb9a416b345ad6f7c",
+                "url": "https://api.github.com/repos/doctrine/DoctrineMigrationsBundle/zipball/43e9212c7441178e3748580e53f88c08f4e70e5f",
+                "reference": "43e9212c7441178e3748580e53f88c08f4e70e5f",
                 "shasum": ""
             },
             "require": {
@@ -671,7 +671,7 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/DoctrineMigrationsBundle/issues",
-                "source": "https://github.com/doctrine/DoctrineMigrationsBundle/tree/4.0.0"
+                "source": "https://github.com/doctrine/DoctrineMigrationsBundle/tree/4.0.1"
             },
             "funding": [
                 {
@@ -687,7 +687,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-12-05T08:14:38+00:00"
+            "time": "2026-08-26T05:54:54+00:00"
         },
         {
             "name": "doctrine/event-manager",
@@ -2130,16 +2130,16 @@
         },
         {
             "name": "nowo-tech/beacon-bundle",
-            "version": "v1.7.8",
+            "version": "v1.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/BeaconBundle.git",
-                "reference": "b81a795ef9a2398f3383aa73fb5073dbac172070"
+                "reference": "86440045b512d92b7c68cf3b2de8dd5f1387f33e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/BeaconBundle/zipball/b81a795ef9a2398f3383aa73fb5073dbac172070",
-                "reference": "b81a795ef9a2398f3383aa73fb5073dbac172070",
+                "url": "https://api.github.com/repos/nowo-tech/BeaconBundle/zipball/86440045b512d92b7c68cf3b2de8dd5f1387f33e",
+                "reference": "86440045b512d92b7c68cf3b2de8dd5f1387f33e",
                 "shasum": ""
             },
             "require": {
@@ -2182,7 +2182,7 @@
             "type": "symfony-bundle",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "1.7.x-dev"
+                    "dev-main": "1.8.x-dev"
                 }
             },
             "autoload": {
@@ -2223,7 +2223,7 @@
                 "issues": "https://github.com/nowo-tech/BeaconBundle/issues",
                 "source": "https://github.com/nowo-tech/BeaconBundle"
             },
-            "time": "2026-08-24T16:02:56+00:00"
+            "time": "2026-08-26T06:46:39+00:00"
         },
         {
             "name": "nowo-tech/breadcrumb-kit-bundle",
@@ -2518,16 +2518,16 @@
         },
         {
             "name": "nowo-tech/device-intelligence-bundle",
-            "version": "v1.1.0",
+            "version": "v1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/DeviceIntelligenceBundle.git",
-                "reference": "ec1eaabd61836fefa73370f084cd94dae1e0b67a"
+                "reference": "6975457425f0bd0d69ec0adfcdf336e11357857d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/DeviceIntelligenceBundle/zipball/ec1eaabd61836fefa73370f084cd94dae1e0b67a",
-                "reference": "ec1eaabd61836fefa73370f084cd94dae1e0b67a",
+                "url": "https://api.github.com/repos/nowo-tech/DeviceIntelligenceBundle/zipball/6975457425f0bd0d69ec0adfcdf336e11357857d",
+                "reference": "6975457425f0bd0d69ec0adfcdf336e11357857d",
                 "shasum": ""
             },
             "require": {
@@ -2621,7 +2621,7 @@
                 "issues": "https://github.com/nowo-tech/DeviceIntelligenceBundle/issues",
                 "source": "https://github.com/nowo-tech/DeviceIntelligenceBundle"
             },
-            "time": "2026-08-24T16:03:47+00:00"
+            "time": "2026-08-26T07:09:53+00:00"
         },
         {
             "name": "nowo-tech/doctrine-encrypt-bundle",
@@ -13667,23 +13667,23 @@
         },
         {
             "name": "phpunit/php-file-iterator",
-            "version": "7.0.1",
+            "version": "7.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-file-iterator.git",
-                "reference": "3ccaa29123548190af12fee7af078dcd7f3ddfab"
+                "reference": "9bb4e6c58b62c1e043be995c66abec7c97307aae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-file-iterator/zipball/3ccaa29123548190af12fee7af078dcd7f3ddfab",
-                "reference": "3ccaa29123548190af12fee7af078dcd7f3ddfab",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-file-iterator/zipball/9bb4e6c58b62c1e043be995c66abec7c97307aae",
+                "reference": "9bb4e6c58b62c1e043be995c66abec7c97307aae",
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.4"
             },
             "require-dev": {
-                "phpunit/phpunit": "^13.3.0"
+                "phpunit/phpunit": "^13.3.1"
             },
             "type": "library",
             "extra": {
@@ -13716,7 +13716,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/php-file-iterator/issues",
                 "security": "https://github.com/sebastianbergmann/php-file-iterator/security/policy",
-                "source": "https://github.com/sebastianbergmann/php-file-iterator/tree/7.0.1"
+                "source": "https://github.com/sebastianbergmann/php-file-iterator/tree/7.0.2"
             },
             "funding": [
                 {
@@ -13736,7 +13736,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-08-10T06:43:12+00:00"
+            "time": "2026-08-25T14:47:43+00:00"
         },
         {
             "name": "phpunit/php-invoker",
@@ -14869,24 +14869,24 @@
         },
         {
             "name": "sebastian/diff",
-            "version": "9.0.0",
+            "version": "9.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/diff.git",
-                "reference": "a3fb6a298a265ff487a91bbea46e03cd01dbb226"
+                "reference": "a2df6626c1baf31d5a88674882a3072f151b5a26"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/diff/zipball/a3fb6a298a265ff487a91bbea46e03cd01dbb226",
-                "reference": "a3fb6a298a265ff487a91bbea46e03cd01dbb226",
+                "url": "https://api.github.com/repos/sebastianbergmann/diff/zipball/a2df6626c1baf31d5a88674882a3072f151b5a26",
+                "reference": "a2df6626c1baf31d5a88674882a3072f151b5a26",
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.4"
             },
             "require-dev": {
-                "phpunit/phpunit": "^13.2",
-                "symfony/process": "^7.4.13"
+                "phpunit/phpunit": "^13.3.1",
+                "symfony/process": "^7.4.17"
             },
             "type": "library",
             "extra": {
@@ -14924,7 +14924,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/diff/issues",
                 "security": "https://github.com/sebastianbergmann/diff/security/policy",
-                "source": "https://github.com/sebastianbergmann/diff/tree/9.0.0"
+                "source": "https://github.com/sebastianbergmann/diff/tree/9.0.1"
             },
             "funding": [
                 {
@@ -14944,7 +14944,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-06-05T03:04:51+00:00"
+            "time": "2026-08-25T15:38:55+00:00"
         },
         {
             "name": "sebastian/environment",
