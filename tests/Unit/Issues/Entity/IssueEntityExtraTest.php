@@ -18,4 +18,16 @@ final class IssueEntityExtraTest extends TestCase
         self::assertSame(IssueLevel::Warning, $issue->getLevelEnum());
         self::assertCount(0, $issue->getEvents());
     }
+
+    public function testCulpritKeepsTypicalClassMethod(): void
+    {
+        $issue = new Issue();
+        $long = 'App\\Repositories\\Eloquent\\AttendanceRepository::getAttendanceSummary';
+        $issue->setCulprit($long);
+
+        self::assertSame($long, $issue->getCulprit());
+        self::assertSame(255, Issue::CULPRIT_MAX_LENGTH);
+        $issue->setCulprit(str_repeat('a', 300));
+        self::assertSame(255, mb_strlen($issue->getCulprit()));
+    }
 }

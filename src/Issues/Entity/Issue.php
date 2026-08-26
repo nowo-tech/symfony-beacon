@@ -35,6 +35,8 @@ class Issue
 {
     use PublicUuidTrait;
 
+    public const int CULPRIT_MAX_LENGTH = 255;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -54,7 +56,7 @@ class Issue
     #[ORM\Column(length: 500)]
     private string $title = '';
 
-    #[ORM\Column(length: 40)]
+    #[ORM\Column(length: self::CULPRIT_MAX_LENGTH)]
     private string $culprit = '';
 
     #[ORM\Column(length: 20, enumType: IssueLevel::class)]
@@ -173,7 +175,7 @@ class Issue
 
     public function setCulprit(string $culprit): self
     {
-        $this->culprit = mb_substr($culprit, 0, 40);
+        $this->culprit = mb_substr($culprit, 0, self::CULPRIT_MAX_LENGTH);
 
         return $this;
     }
