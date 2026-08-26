@@ -131,4 +131,59 @@ final class QueryFactsExtractorTest extends TestCase
         self::assertSame('1055', $facts->vendorCode);
         self::assertSame('SELECT * FROM attendances', $facts->sql);
     }
+
+    public function testExtraQueryBindingsSqlstateAndInvalidPayloadShapes(): void
+    {
+        $facts = new QueryFactsExtractor()->extract([
+            'extra' => [
+                'query' => 'SELECT 2',
+                'bindings' => ['a'],
+                'sqlstate' => 'HY000',
+            ],
+        ]);
+
+        self::assertInstanceOf(QueryFacts::class, $facts);
+        self::assertSame('SELECT 2', $facts->sql);
+        self::assertSame(['a'], $facts->bindings);
+        self::assertSame('HY000', $facts->sqlstate);
+
+        self::assertNull(new QueryFactsExtractor()->extract([
+            'breadcrumbs' => ['values' => 'not-a-list'],
+        ]));
+
+        $fromMessage = new QueryFactsExtractor()->extract([
+            'breadcrumbs' => [
+                'values' => [
+                    ['category' => 'query', 'message' => 'SELECT name FROM users'],
+                    ['category' => 'query', 'message' => 'not sql'],
+                ],
+            ],
+        ]);
+        self::assertSame('SELECT name FROM users', $fromMessage->sql);
+
+        $chain = new QueryFactsExtractor()->extract([
+            'exception' => [
+                'values' => ['bad-entry', ['value' => 'SQLSTATE[42000]: Syntax error: 1055']],
+            ],
+            'extra' => ['sql' => 'SELECT 1'],
+        ]);
+        self::assertSame('42000', $chain->sqlstate);
+
+        $longSummary = new QueryFactsExtractor()->extract([
+            'exception' => [
+                'values' => [['value' => str_repeat('E', 500)]],
+            ],
+            'extra' => ['sql' => 'SELECT 1'],
+        ]);
+        self::assertNotNull($longSummary->summary);
+        self::assertSame(401, mb_strlen((string) $longSummary->summary));
+
+        $missingValue = new QueryFactsExtractor()->extract([
+            'exception' => [
+                'values' => [['type' => 'PDOException']],
+            ],
+            'extra' => ['sql' => 'SELECT 1'],
+        ]);
+        self::assertSame('SELECT 1', $missingValue->sql);
+    }
 }

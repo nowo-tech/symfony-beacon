@@ -12,7 +12,7 @@ final class IssueStackPresenter
     /**
      * Payload frames are typically outermost-first; display is innermost-first.
      *
-     * @param list<mixed> $frames
+     * @param mixed $frames Envelope stack frames (list or invalid)
      *
      * @return list<array{frame: array<string, mixed>, open: bool}>
      */

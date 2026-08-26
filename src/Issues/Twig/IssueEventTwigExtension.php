@@ -32,7 +32,7 @@ final class IssueEventTwigExtension extends AbstractExtension
     }
 
     /**
-     * @param array<string, mixed>|null $payload
+     * @param mixed $payload Envelope event payload
      */
     public function queryFacts(mixed $payload): ?QueryFacts
     {

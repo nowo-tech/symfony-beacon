@@ -275,6 +275,15 @@ final class AiIssueExportFormatterTest extends TestCase
         $event->setEnvironment('prod');
         $event->setPlatform('php');
         $event->setPayload([
+            'contexts' => [
+                'db' => [
+                    'sqlstate' => '42000',
+                    'code' => '1055',
+                    'driver' => 'pdo_mysql',
+                    'sql_mode' => 'ONLY_FULL_GROUP_BY',
+                    'sql' => 'SELECT id FROM t GROUP BY d',
+                ],
+            ],
             'exception' => [
                 'values' => [[
                     'type' => 'PDOException',
@@ -287,9 +296,13 @@ final class AiIssueExportFormatterTest extends TestCase
         self::assertIsArray($data['query']);
         self::assertSame('42000', $data['query']['sqlstate']);
         self::assertSame('SELECT id FROM t GROUP BY d', $data['query']['sql']);
+        self::assertSame('pdo_mysql', $data['query']['driver']);
+        self::assertSame('ONLY_FULL_GROUP_BY', $data['query']['sql_mode']);
         $md = (new AiIssueExportFormatter())->toMarkdown($data);
         self::assertStringContainsString('## Query', $md);
         self::assertStringContainsString('SQLSTATE', $md);
+        self::assertStringContainsString('Driver: `pdo_mysql`', $md);
+        self::assertStringContainsString('sql_mode: `ONLY_FULL_GROUP_BY`', $md);
         self::assertStringContainsString('SELECT id FROM t', $md);
     }
 }

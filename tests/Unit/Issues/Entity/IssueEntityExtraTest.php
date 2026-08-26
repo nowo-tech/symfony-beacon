@@ -26,8 +26,7 @@ final class IssueEntityExtraTest extends TestCase
         $issue->setCulprit($long);
 
         self::assertSame($long, $issue->getCulprit());
-        self::assertSame(255, Issue::CULPRIT_MAX_LENGTH);
         $issue->setCulprit(str_repeat('a', 300));
-        self::assertSame(255, mb_strlen($issue->getCulprit()));
+        self::assertSame(Issue::CULPRIT_MAX_LENGTH, mb_strlen($issue->getCulprit()));
     }
 }
