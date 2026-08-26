@@ -359,13 +359,37 @@ export async function openFirstIssue(page: Page, projectUuid: string): Promise<s
 export async function completeSlideToConfirm(form: import('@playwright/test').Locator): Promise<void> {
   const slider = form.locator('nowo-slide-to-confirm, .nowo-slide-to-confirm').first();
   await expect(slider).toBeVisible({ timeout: 10_000 });
+  await expect(slider).toHaveAttribute('data-slide-to-confirm-init', '1', { timeout: 10_000 });
+
   const thumb = slider.locator('[data-slide-to-confirm-target="thumb"], button.nowo-slide-to-confirm__thumb').first();
+  const track = slider.locator('[data-slide-to-confirm-target="track"], .nowo-slide-to-confirm__track').first();
   await expect(thumb).toBeVisible({ timeout: 10_000 });
-  // Hidden checkbox ignores forced clicks — confirm via the kit keyboard path (End).
-  await thumb.focus();
-  await thumb.press('End');
+  await expect(track).toBeVisible({ timeout: 10_000 });
+
   const checkbox = form.locator('input.nowo-slide-to-confirm__input[type="checkbox"]');
-  await expect(checkbox).toBeChecked({ timeout: 5_000 });
+  const page = form.page();
+
+  // Pointer drag matches kit unit tests; keyboard focus on the thumb is flaky in headless CI.
+  const trackBox = await track.boundingBox();
+  const thumbBox = await thumb.boundingBox();
+  if (trackBox && thumbBox && trackBox.width > 0) {
+    const y = thumbBox.y + thumbBox.height / 2;
+    const startX = thumbBox.x + thumbBox.width / 2;
+    const endX = trackBox.x + trackBox.width - thumbBox.width / 2 - 2;
+    await page.mouse.move(startX, y);
+    await page.mouse.down();
+    await page.mouse.move(endX, y, { steps: 20 });
+    await page.mouse.up();
+  }
+
+  if (!(await checkbox.isChecked())) {
+    await thumb.evaluate((el) => {
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true, cancelable: true }));
+    });
+  }
+
+  await expect(checkbox).toBeChecked({ timeout: 10_000 });
+
   const autoSubmit = await slider.getAttribute('data-slide-to-confirm-submit-on-confirm-value');
   if (autoSubmit !== '1' && autoSubmit !== 'true') {
     await form.evaluate((el) => {
