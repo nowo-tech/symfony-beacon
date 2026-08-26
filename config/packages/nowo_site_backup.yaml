@@ -1,5 +1,12 @@
 # nowo-tech/site-backup-bundle — backup panel + cold-start setup wizard
 # Docs: https://github.com/nowo-tech/SiteBackupBundle/blob/main/docs/SETUP-WIZARD.md
+#
+# Empty SITE_SETUP_TOKEN would open /setup (bundle contract). Fall back to the
+# documented local default so /setup without ?token= always returns 403 + gate form.
+# Must match App\Setup\SiteBackupSecurityDefaultsGuard::LOCAL_DEV_SETUP_TOKEN (prod refuses it).
+parameters:
+    beacon.local_setup_token: 'beacon-local-setup'
+
 nowo_site_backup:
     enabled: true
     # Host CSS stack hint (Twig global nowo_site_backup_css_framework) — REQ-UI-001 / v1.6+
@@ -79,9 +86,10 @@ nowo_site_backup:
             unlocalized: serve
         # Host chrome only — wizard/done/token stay in the package (SiteBackup 1.4+).
         layout_template: 'kit/site_backup_setup_layout.html.twig'
-        # Shared secret for /setup (?token= or X-Setup-Token). Empty = open (dev only).
-        # Production MUST set a non-default value (SiteBackupSecurityDefaultsGuard).
-        setup_token: '%env(default::SITE_SETUP_TOKEN)%'
+        # Shared secret for /setup (?token= or X-Setup-Token). Empty env uses
+        # beacon.local_setup_token so the 403 FormKit gate still renders.
+        # Production MUST set a unique value (SiteBackupSecurityDefaultsGuard).
+        setup_token: '%env(default:beacon.local_setup_token:SITE_SETUP_TOKEN)%'
         # Existing installs without setup.done stay usable; empty schema / setup.required still gate.
         # Fresh clones that must block the app until wizard finishes: set true.
         require_done_marker: false

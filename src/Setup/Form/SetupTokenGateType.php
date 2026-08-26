@@ -20,14 +20,18 @@ final class SetupTokenGateType extends AbstractGetFilterType
             $this->addNamedField('token', 'text', [
                 'required' => true,
                 'help' => false,
-                'label' => false,
                 'placeholder' => false,
                 'attr' => [
                     'id' => 'setup-token',
+                    'class' => 'input setup-token-gate__input',
                     'autocomplete' => 'off',
                     'autocapitalize' => 'off',
                     'spellcheck' => 'false',
                     'inputmode' => 'text',
+                    'aria-labelledby' => 'setup-token-heading',
+                ],
+                'row_attr' => [
+                    'class' => 'setup-token-gate__field',
                 ],
             ]);
         });

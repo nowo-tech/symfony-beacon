@@ -1,11 +1,11 @@
 <!--
 Sync Impact Report
-- Version change: 1.4.2 → 1.4.3 (PATCH: Principle II — Hotwire Native deferred to ROADMAP Later; PWA remains current mobile path)
-- Modified principles: II (Canonical stack — Hotwire Native ban clarified as roadmap-deferred)
+- Version change: 1.4.3 → 1.4.4 (PATCH: Principle IX — version `.env.e2e.dist` beside `.env.dist`; never commit `.env.local` / `.env.e2e.local`)
+- Modified principles: IX (Env defaults — isolated E2E template)
 - Added sections: none
 - Removed sections: none
-- Templates: unchanged
-- Follow-up: do not implement `008-ux-native` until prioritized
+- Templates: plan-template Principle IX env list mentions `.env.e2e.dist`
+- Follow-up: none
 -->
 
 # symfony-beacon Constitution
@@ -69,7 +69,8 @@ Every spec that changes behavior MUST ship PHPUnit coverage (unit and/or functio
 
 `config/parameters.yaml` MUST NOT define Symfony env default entries of the form `env(VAR_NAME): '…'`.
 
-- Document and version operator-facing defaults **only** in `.env.dist` (and keep secrets out of git).
+- Document and version operator-facing defaults **only** in `.env.dist` (dogfood / app stack) and `.env.e2e.dist` (isolated Playwright stack). Keep secrets out of git.
+- Working files `.env.local` and `.env.e2e.local` MUST NOT be committed (`cp .env.dist .env.local`, `cp .env.e2e.dist .env.e2e.local`).
 - Typed aliases such as `beacon.foo: '%env(int:FOO)%'` remain allowed when the variable is required or always present via `.env.dist` / runtime env.
 - Environment-specific overrides (e.g. prod fail-closed flags) belong in `config/packages/*.yaml` under `when@…`, not as `env(…):` defaults in `parameters.yaml`.
 - Prefer instance/database settings for tunable ops defaults; migrate operator knobs out of `.env.dist` into Admin UI when they are not boot/infra secrets. Do not paper over missing `.env.dist` keys with `env(NAME):` in parameters.
@@ -94,7 +95,7 @@ Rationale: contribution history and review attribution belong to the people who 
 
 - Entrypoint: `.docker/frankenphp/docker-entrypoint.sh` maps `FRANKENPHP_MODE` → `FRANKENPHP_CONFIG`.
 - Document root: `/app/public`.
-- Secrets: never in git. Version **only** `.env.dist`.
+- Secrets: never in git. Version **only** `.env.dist` and `.env.e2e.dist`.
 - Ingest auth: Envelope-compatible (`X-Beacon-Auth` header and/or envelope `dsn`) mapped to project API keys. Query-string auth (`beacon_key` / `beacon_secret`) is **deprecated** but still accepted with deprecation headers.
 - Primary ingest path: `POST /api/{project_id}/envelope/`.
 - The Symfony client bundle (`nowo-tech/beacon-bundle`) lives in a **separate repository**; this server may install it for **dogfooding** (self-reporting via `BEACON_DSN`). External apps configure their own DSN against this host.
@@ -120,4 +121,4 @@ Per-feature artifacts: `specs/NNN-name/{spec,plan,tasks}.md`.
 - Commits, issues, and PRs/MRs MUST comply with **Principle X** (no Cursor / agent attribution).
 - Amendments: edit this file, bump **Version**, update **Last Amended**.
 
-**Version**: 1.4.3 | **Ratified**: 2026-07-19 | **Last Amended**: 2026-08-13
+**Version**: 1.4.4 | **Ratified**: 2026-07-19 | **Last Amended**: 2026-08-26

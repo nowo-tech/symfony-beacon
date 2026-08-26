@@ -11,7 +11,7 @@
 
 | ID | Area | Deliverable |
 |----|------|-------------|
-| I1 | Compose | `compose.e2e.yaml` + generated `.env.e2e.local`; project `symfony-beacon-e2e` (`-p`); ports `:9085` / `:9460`; Redis DB index `1`; named volumes for `var/cache` / `var/log` |
+| I1 | Compose | `compose.e2e.yaml` + versioned `.env.e2e.dist` → generated `.env.e2e.local` (gitignored); project `symfony-beacon-e2e` (`-p`); ports `:9085` / `:9460`; Redis DB index `1`; named volumes for `var/cache` / `var/log` |
 | I2 | Make | `up-e2e` / `ready-e2e` / `seed-e2e` / `test-e2e-isolated` / `down-e2e`; force process env for ports so a sourced `.env.local` cannot steal bindings |
 | I3 | Seed | `app:seed-demo --server-env-file=.env.e2e.local` writes loopback `BEACON_DSN` only there; `--write-client-env=.demo-client.e2e.env`; never rewrite dogfood `.env.local` |
 | I4 | Playwright | `PLAYWRIGHT_ISOLATED=1` → base URL `:9460`, auth `e2e/.auth/admin.e2e.json`, credentials from `.demo-client.e2e.env` |
@@ -89,3 +89,7 @@ Lucide-driven spring morphs for theme toggle, burger/sidebar, content-width, and
 ### 2026-08-25 — Device collect on E2E/SUT (`105`)
 
 Isolated stack inherits `/_device` PUBLIC_ACCESS + PWA deny-cache. No extra Compose service. See `specs/105-authkit-security-kits/`.
+
+### 2026-08-26 — `.env.e2e.dist` template
+
+Isolated E2E MUST version `.env.e2e.dist` (sibling of `.env.dist`). Working file `.env.e2e.local` MUST stay gitignored. `ensure-e2e-env.sh` copies the dist template, overlays shared infra / secrets from `.env.local` (not isolation keys), then applies Make `E2E_*` overrides. Never commit `.env.local` or `.env.e2e.local`.

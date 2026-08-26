@@ -7,6 +7,7 @@
 # Quiet recursive $(MAKE) noise (Entering/Leaving directory).
 MAKEFLAGS += --no-print-directory
 ENV_FILE := .env.local
+E2E_ENV_DIST := .env.e2e.dist
 E2E_ENV_FILE := .env.e2e.local
 export COMPOSE_ENV_FILES := $(ENV_FILE)
 DC := docker compose --env-file $(ENV_FILE)
@@ -469,7 +470,7 @@ ensure-e2e-env: ensure-env
 	@E2E_HTTP_PORT="$(E2E_HTTP_PORT)" E2E_HTTPS_PORT="$(E2E_HTTPS_PORT)" \
 		E2E_MYSQL_DATABASE="$(E2E_MYSQL_DATABASE)" E2E_REDIS_DB="$(E2E_REDIS_DB)" \
 		E2E_BEACON_TARGET="$(E2E_BEACON_TARGET)" \
-		E2E_ENV_FILE="$(E2E_ENV_FILE)" ./.scripts/ensure-e2e-env.sh
+		E2E_ENV_DIST="$(E2E_ENV_DIST)" E2E_ENV_FILE="$(E2E_ENV_FILE)" ./.scripts/ensure-e2e-env.sh
 
 ensure-e2e-db: up-infra ensure-e2e-env
 	@set -a; . ./$(ENV_FILE); set +a; \

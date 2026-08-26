@@ -1,9 +1,11 @@
 ###> symfony/framework-bundle ###
-# Only `.env.dist` is versioned. Install: `cp .env.dist .env.local` (or `make up`).
-# Never commit secrets. Optional overrides: `.env.local` (gitignored).
+# Only `.env.dist` and `.env.e2e.dist` are versioned.
+# Install: `cp .env.dist .env.local` and `cp .env.e2e.dist .env.e2e.local` (or `make up` / `make up-e2e`).
+# Never commit secrets. Working files: `.env.local` and `.env.e2e.local` (gitignored).
 /.env
 /.env.local
 /.env.local.php
+/.env.e2e.local
 /.env.*.local
 /.env.dev
 /.env.prod
@@ -74,8 +76,9 @@ composer.phar
 
 # Spec Kit: specs and .specify are versioned
 
-# Env template (only versioned env file)
+# Env templates (only versioned env files)
 !.env.dist
+!.env.e2e.dist
 
 # Local package downloads
 *.deb

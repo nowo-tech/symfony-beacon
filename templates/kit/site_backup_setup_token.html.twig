@@ -23,6 +23,7 @@
     <p class="setup-token-gate__lead">{{ 'setup.token.lead'|trans }}</p>
 
     <div class="setup-token-gate__panel">
+        <h2 id="setup-token-heading" class="setup-token-gate__panel-title">{{ 'setup.token.field_label'|trans }}</h2>
         {% set token_form = get_filter_form(
             'App\\Setup\\Form\\SetupTokenGateType',
             {token: app.request.query.get('token', '')},
@@ -33,14 +34,16 @@
         ) %}
         {% form_theme token_form with ['form/beacon_theme.html.twig'] %}
         {{ form_start(token_form, {attr: {class: 'setup-token-gate__form'}}) }}
-            <label for="setup-token">{{ 'setup.token.field_label'|trans }}</label>
             <div class="setup-token-gate__row">
                 {{ form_row(token_form.token, {
+                    label: false,
+                    translation_domain: false,
                     attr: {
+                        'aria-labelledby': 'setup-token-heading',
                         placeholder: 'setup.token.field_placeholder'|trans,
                     },
                 }) }}
-                <button type="submit">{{ 'setup.token.submit'|trans }}</button>
+                <button type="submit" class="setup-token-gate__submit">{{ 'setup.token.submit'|trans }}</button>
             </div>
             {% include 'form/_fields.html.twig' with {form: token_form} only %}
         {{ form_end(token_form, {render_rest: false}) }}

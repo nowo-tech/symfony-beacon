@@ -72,6 +72,9 @@ final class SiteBackupSetupTest extends DatabaseWebTestCase
         self::assertSelectorExists('img.setup-token-gate__img[src*="error-403"]');
         self::assertSelectorExists('form.setup-token-gate__form');
         self::assertSelectorExists('input[name="token"]');
+        self::assertSelectorExists('#setup-token-heading');
+        self::assertSelectorExists('button.setup-token-gate__submit');
+        self::assertSelectorNotExists('.setup-token-gate__form label');
         self::assertSelectorExists('details.setup-token-gate__howto');
     }
 

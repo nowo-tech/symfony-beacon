@@ -107,7 +107,7 @@ make ready
 - MySQL: `mysql-9.7-primary` on the shared network (no host port; `make mysql`)
 - Mailpit (after `make mailpit`): http://localhost:18026 — save `smtp://mailpit:1025` (shared) or `smtp://mailer:1025` (app-local) in Administration → Mailer
 - Demo login (after seed): `admin@symfony-beacon.local` / `admin123`
-- Browser E2E (Playwright): `make test-e2e` (dogfood DB) or `make up-e2e && make ready-e2e && make test-e2e-isolated` (`app_e2e` / `:9460`) — see [`e2e/README.md`](e2e/README.md)
+- Browser E2E (Playwright): `make test-e2e` (dogfood DB) or `make up-e2e && make ready-e2e && make test-e2e-isolated` (`app_e2e` / `:9460`; template `.env.e2e.dist` → gitignored `.env.e2e.local`) — see [`e2e/README.md`](e2e/README.md)
 - After seed, open Performance with N+1 filter: `/projects/{uuid}/performance?nplus1=1` (transaction `demo.nplus1.products`)
 - After seed, open Analytics: `/projects/{uuid}/analytics` (14 days of error / transaction / N+1 counters)
 - First admin on a cold DB: SiteBackup wizard at `/setup` (AuthKit `/register` stays gated until setup completes)

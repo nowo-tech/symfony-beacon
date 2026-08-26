@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
-# Build `.env.e2e.local` from `.env.local` for an isolated Playwright stack.
-# Same MySQL/Redis hosts; separate schema (app_e2e), Redis DB index, Compose project, ports.
+# Build `.env.e2e.local` from `.env.e2e.dist` for an isolated Playwright stack.
+# Overlay shared infra / secrets from `.env.local` (never copy isolation keys from dogfood).
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-if [[ ! -f .env.local ]]; then
-  echo "Missing .env.local — run make ensure-env / cp .env.dist .env.local first." >&2
+DIST="${E2E_ENV_DIST:-.env.e2e.dist}"
+OUT="${E2E_ENV_FILE:-.env.e2e.local}"
+
+if [[ ! -f "$DIST" ]]; then
+  echo "Missing ${DIST} — this repository must version the E2E env template." >&2
   exit 1
 fi
 
@@ -16,16 +19,15 @@ E2E_HTTPS_PORT="${E2E_HTTPS_PORT:-9460}"
 E2E_MYSQL_DATABASE="${E2E_MYSQL_DATABASE:-app_e2e}"
 E2E_REDIS_DB="${E2E_REDIS_DB:-1}"
 E2E_VITE_PORT="${E2E_VITE_PORT:-5178}"
-OUT="${E2E_ENV_FILE:-.env.e2e.local}"
 E2E_BEACON_TARGET="${E2E_BEACON_TARGET:-self}"
 
-# Preserve prior E2E BEACON_DSN across regenerations (before overwriting from .env.local).
+# Preserve prior E2E BEACON_DSN across regenerations (before overwriting from dist).
 PREV_E2E_BEACON_DSN=""
 if [[ -f "$OUT" ]]; then
   PREV_E2E_BEACON_DSN="$(grep -E '^BEACON_DSN=' "$OUT" | head -1 | cut -d= -f2- || true)"
 fi
 
-cp .env.local "$OUT"
+cp "$DIST" "$OUT"
 
 # Upsert KEY=VALUE (value must not contain newlines). Escapes & \ for sed replacement.
 upsert() {
@@ -41,6 +43,31 @@ upsert() {
   fi
 }
 
+# Isolation keys owned by .env.e2e.dist / Make E2E_* — never copy from .env.local.
+is_isolation_key() {
+  case "$1" in
+    COMPOSE_PROJECT_NAME|HTTP_PORT|HTTPS_PORT|HTTP3_PORT|DEFAULT_URI|MYSQL_DATABASE|VITE_PORT|REDIS_URL|MESSENGER_TRANSPORT_DSN|BEACON_DSN|DATABASE_URL|DATABASE_URL_RO)
+      return 0
+      ;;
+  esac
+  return 1
+}
+
+# Overlay operator secrets and shared infra from .env.local (MYSQL_PASSWORD, REDIS_HOST, …).
+if [[ -f .env.local ]]; then
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    [[ "$line" =~ ^[[:space:]]*# ]] && continue
+    [[ "$line" =~ ^[[:space:]]*$ ]] && continue
+    [[ "$line" != *=* ]] && continue
+    key="${line%%=*}"
+    value="${line#*=}"
+    is_isolation_key "$key" && continue
+    upsert "$key" "$value" "$OUT"
+  done < .env.local
+else
+  echo "Note: no .env.local — ${OUT} uses ${DIST} placeholders. Run make ensure-env if shared infra secrets differ." >&2
+fi
+
 upsert COMPOSE_PROJECT_NAME "symfony-beacon-e2e" "$OUT"
 upsert HTTP_PORT "$E2E_HTTP_PORT" "$OUT"
 upsert HTTPS_PORT "$E2E_HTTPS_PORT" "$OUT"
@@ -52,15 +79,21 @@ upsert VITE_PORT "$E2E_VITE_PORT" "$OUT"
 # Isolate sessions / cache / Messenger from the dogfood stack (shared Redis host).
 # REDIS_URL path = Redis DB index. MESSENGER path would be the stream name (overrides
 # messenger.yaml) — use ?dbindex=N instead (REQ-MESSENGER-001).
-# shellcheck disable=SC1091
-set -a
-# shellcheck source=/dev/null
-source .env.local
-set +a
-REDIS_HOST="${REDIS_HOST:-redis-8.10.0}"
-REDIS_PORT="${REDIS_PORT:-6379}"
-upsert REDIS_URL "redis://${REDIS_HOST}:${REDIS_PORT}/${E2E_REDIS_DB}" "$OUT"
-upsert MESSENGER_TRANSPORT_DSN "redis://${REDIS_HOST}:${REDIS_PORT}?dbindex=${E2E_REDIS_DB}" "$OUT"
+# Prefer REDIS_* already written to OUT (.env.e2e.dist + optional .env.local overlay).
+env_file_value() {
+  local key="$1"
+  local file="$2"
+  local line
+  line="$(grep -E "^${key}=" "$file" | head -1 || true)"
+  [[ -z "$line" ]] && return 0
+  printf '%s' "${line#*=}"
+}
+REDIS_HOST_VALUE="$(env_file_value REDIS_HOST "$OUT")"
+REDIS_PORT_VALUE="$(env_file_value REDIS_PORT "$OUT")"
+REDIS_HOST_VALUE="${REDIS_HOST_VALUE:-redis-8.10.0}"
+REDIS_PORT_VALUE="${REDIS_PORT_VALUE:-6379}"
+upsert REDIS_URL "redis://${REDIS_HOST_VALUE}:${REDIS_PORT_VALUE}/${E2E_REDIS_DB}" "$OUT"
+upsert MESSENGER_TRANSPORT_DSN "redis://${REDIS_HOST_VALUE}:${REDIS_PORT_VALUE}?dbindex=${E2E_REDIS_DB}" "$OUT"
 
 # BeaconBundle dogfood for the E2E stack (never touch .env.local).
 # - self (default): loopback DSN of app_e2e's Symfony Beacon project (from .demo-client.e2e.env)
@@ -143,7 +176,7 @@ rewrite_db_url DATABASE_URL_RO "$OUT"
 
 chmod 600 "$OUT" 2>/dev/null || true
 if [[ -n "$BEACON_FOR_E2E" ]]; then
-  echo "Wrote ${OUT} (DB=${E2E_MYSQL_DATABASE}, HTTPS=${E2E_HTTPS_PORT}, Redis DB=${E2E_REDIS_DB}, BEACON_DSN target=${E2E_BEACON_TARGET})"
+  echo "Wrote ${OUT} from ${DIST} (DB=${E2E_MYSQL_DATABASE}, HTTPS=${E2E_HTTPS_PORT}, Redis DB=${E2E_REDIS_DB}, BEACON_DSN target=${E2E_BEACON_TARGET})"
 else
-  echo "Wrote ${OUT} (DB=${E2E_MYSQL_DATABASE}, HTTPS=${E2E_HTTPS_PORT}, Redis DB=${E2E_REDIS_DB}, BEACON_DSN empty — run make ready-e2e)"
+  echo "Wrote ${OUT} from ${DIST} (DB=${E2E_MYSQL_DATABASE}, HTTPS=${E2E_HTTPS_PORT}, Redis DB=${E2E_REDIS_DB}, BEACON_DSN empty — run make ready-e2e)"
 fi

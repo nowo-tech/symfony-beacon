@@ -93,7 +93,13 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Unreleased (main after 1.24.0)
 
-No unreleased operator-facing upgrade steps yet. Track [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
+Setup token default + isolated E2E env template. **No migrations.**
+
+1. `.env.dist` ships `SITE_SETUP_TOKEN=beacon-local-setup`. `/setup` without `?token=` is 403 + paste form (prod still refuses that documented default).
+2. Versioned E2E template is **`.env.e2e.dist`**. Working file remains gitignored `.env.e2e.local` (`cp .env.e2e.dist .env.e2e.local` or `make ensure-e2e-env`).
+3. Do not commit `.env.local` or `.env.e2e.local`. After pull: `make up-e2e` regenerates `.env.e2e.local` from the dist file and overlays shared infra secrets from `.env.local`.
+
+See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
 
 ## Upgrading from 1.23.3 to 1.24.0
 
@@ -2424,6 +2430,6 @@ There is no `composer update nowo-tech/symfony-beacon` path for application code
 
 ### Env file policy
 
-- Only `.env.dist` is versioned.
-- Do not commit `.env`, `.env.dev`, or `.env.local`.
-- After pulling upstream changes, always merge new keys from `.env.dist` into your local `.env`.
+- Versioned templates: `.env.dist` (app / dogfood) and `.env.e2e.dist` (isolated Playwright).
+- Do not commit `.env`, `.env.dev`, `.env.local`, or `.env.e2e.local`.
+- After pulling upstream changes, merge new keys from `.env.dist` into `.env.local`, and from `.env.e2e.dist` into `.env.e2e.local` (or re-run `make ensure-e2e-env`).

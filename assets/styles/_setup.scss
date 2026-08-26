@@ -3,130 +3,155 @@
  */
 
 .setup-token-gate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
 }
 
 .setup-token-gate__art {
   display: flex;
   justify-content: center;
-  margin: 0 0 0.5rem;
+  margin: 0 0 1.15rem;
 }
 
 .setup-token-gate__img {
   display: block;
-  width: min(100%, 14rem);
+  width: min(100%, 18rem);
   height: auto;
-  border-radius: 1rem;
+  border-radius: 1.1rem;
 }
 
 .setup-token-gate__title {
-  margin: 0 0 0.45rem;
-  font-size: 1.35rem;
+  margin: 0 0 0.55rem;
+  max-width: 22rem;
+  font-size: 1.5rem;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
   color: var(--color-ink);
   text-wrap: balance;
 }
 
 .setup-token-gate__lead {
-  margin: 0 auto 1.15rem;
-  max-width: 32rem;
-  font-size: 0.95rem;
+  margin: 0 auto 1.5rem;
+  max-width: 28rem;
+  font-size: 0.975rem;
   line-height: 1.55;
   color: color-mix(in srgb, var(--color-ink) 68%, transparent);
   text-wrap: pretty;
 }
 
 .setup-token-gate__panel {
-  padding: 1.1rem 1.15rem 1.2rem;
+  width: 100%;
+  padding: 1.25rem 1.25rem 1.1rem;
   text-align: left;
   border: 1px solid var(--color-sand);
-  border-radius: 0.9rem;
+  border-radius: 1rem;
   background: var(--color-surface);
   box-shadow: var(--shadow-soft, 0 1px 2px color-mix(in srgb, var(--color-ink) 6%, transparent));
+}
+
+.setup-token-gate__panel-title {
+  margin: 0 0 0.85rem;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  color: var(--color-ink);
 }
 
 .setup-token-gate__form {
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
-  margin: 0 0 1rem;
-}
-
-.setup-token-gate__form label {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--color-ink);
+  gap: 0;
+  margin: 0;
 }
 
 .setup-token-gate__row {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  align-items: stretch;
+  gap: 0.65rem;
+}
+
+.setup-token-gate__field {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
 }
 
 .setup-token-gate__row .form-group,
 .setup-token-gate__row .mb-5 {
   margin: 0;
-  flex: 1 1 auto;
-  min-width: 0;
 }
 
-@media (min-width: 520px) {
-  .setup-token-gate__row {
-    flex-direction: row;
-    align-items: stretch;
-  }
-}
-
+.setup-token-gate__input,
 .setup-token-gate__row input {
   flex: 1 1 auto;
   width: 100%;
   min-width: 0;
-  padding: 0.7rem 0.85rem;
+  min-height: 2.75rem;
+  padding: 0.7rem 0.9rem;
   font: inherit;
   font-size: 0.9375rem;
+  font-family: var(--font-mono, "IBM Plex Mono", ui-monospace, monospace);
+  letter-spacing: 0.01em;
   color: var(--color-ink);
-  background: color-mix(in srgb, var(--color-mist) 35%, var(--color-surface));
+  background: color-mix(in srgb, var(--color-mist) 40%, var(--color-surface));
   border: 1px solid var(--color-sand);
-  border-radius: 0.625rem;
+  border-radius: 0.7rem;
 }
 
+.setup-token-gate__input:focus,
 .setup-token-gate__row input:focus {
   outline: 2px solid color-mix(in srgb, var(--color-moss) 45%, transparent);
   outline-offset: 1px;
   border-color: color-mix(in srgb, var(--color-moss) 40%, var(--color-sand));
 }
 
-.setup-token-gate__row button {
+.setup-token-gate__submit {
   flex: 0 0 auto;
+  width: 100%;
+  min-height: 2.75rem;
   cursor: pointer;
-  padding: 0.7rem 1.1rem;
+  padding: 0.7rem 1.25rem;
   font: inherit;
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 650;
+  line-height: 1.2;
   color: #fff;
   background: var(--color-moss-deep, var(--color-moss, #1f6f54));
   border: 1px solid var(--color-moss-deep, var(--color-moss, #1f6f54));
-  border-radius: 0.625rem;
+  border-radius: 0.7rem;
+  white-space: nowrap;
 }
 
-.setup-token-gate__row button:hover {
-  filter: brightness(0.95);
+.setup-token-gate__submit:hover {
+  filter: brightness(0.96);
 }
 
 .setup-token-gate__howto {
-  margin: 0;
+  margin: 0.95rem 0 0;
   padding-top: 0.85rem;
   border-top: 1px solid var(--color-sand);
 }
 
 .setup-token-gate__howto summary {
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: color-mix(in srgb, var(--color-ink) 62%, transparent);
+  color: color-mix(in srgb, var(--color-ink) 58%, transparent);
   list-style: none;
+}
+
+.setup-token-gate__howto summary:hover {
+  color: var(--color-ink);
 }
 
 .setup-token-gate__howto summary::-webkit-details-marker {
@@ -134,12 +159,19 @@
 }
 
 .setup-token-gate__howto summary::after {
-  content: ' ▾';
-  font-weight: 400;
+  content: '';
+  display: inline-block;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  translate: 0 -0.05rem;
 }
 
 .setup-token-gate__howto[open] summary::after {
-  content: ' ▴';
+  transform: rotate(45deg);
+  translate: 0 -0.15rem;
 }
 
 .setup-token-gate__steps {
@@ -187,6 +219,12 @@
     background: transparent;
     border: 0;
     box-shadow: none;
+  }
+
+  /* Guest-shell setup buttons grow to fill .actions; keep the token submit full-width. */
+  button.setup-token-gate__submit {
+    flex: 0 0 auto;
+    width: 100%;
   }
 
   .brand {

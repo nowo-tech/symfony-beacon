@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-_No unreleased operator-facing changes yet._
+### Changed
+
+- **Setup token gate**: `.env.dist` ships `SITE_SETUP_TOKEN=beacon-local-setup` (same pattern as the FrankenPHP boilerplate). `/setup` without `?token=` returns **403** and the FormKit paste form even when the env var is empty (fallback to that documented local default; prod still refuses it).
+- **Isolated E2E env template**: versioned file is **`.env.e2e.dist`** (sibling of `.env.dist`). Working file `.env.e2e.local` stays gitignored (`cp .env.e2e.dist .env.e2e.local` / `make ensure-e2e-env` overlays shared infra from `.env.local`). Never commit `.env.local` or `.env.e2e.local`. Spec `104`.
 
 ## [1.24.0] - 2026-08-26
 
