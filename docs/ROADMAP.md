@@ -329,6 +329,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 |---|------|------|------|--------|
 | 6.57 | Finish AuthKit security kits cut (migrate, E2E Trusted browsers optional UC, release notes) | Beacon | `105-authkit-security-kits` | **In progress** |
 | 6.58 | Finish ops ingest hardening cut (release notes; Dashboard Menu **2.1.10** tags `SearchQueryType` — host override removed) | Beacon | `106-ops-ingest-hardening` | **In progress** |
+| 6.59 | **SQL / database error context** on issue detail (Query panel, in-app stack, culprit 255) + BeaconBundle `contexts.db` **1.8.0** | Beacon + Bundle | `107-sql-error-context` | **In progress** |
 | — | Pull from Later (SSO / QR SMS OTP / WebAuthn / Hotwire Native) when prioritized | Beacon | — | **Next** |
 
 ### Done (AuthKit 1.12 foundation)

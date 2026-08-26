@@ -50,7 +50,9 @@ final readonly class IssueSampleSeeder
             $issue->setProject($project);
             $issue->setFingerprint($fingerprint);
             $issue->setTitle(\sprintf('Sample error #%d: synthetic exception for QA', $i));
-            $issue->setCulprit(\sprintf('App\\Sample\\Demo%d', $i % 20));
+            $issue->setCulprit(1 === $i
+                ? 'App\\Repositories\\Eloquent\\AttendanceRepository::getAttendanceSummary'
+                : \sprintf('App\\Sample\\Demo%d', $i % 20));
             $issue->setLevel(0 === $i % 7 ? 'fatal' : 'error');
             $issue->setFirstSeen($seen);
             $issue->setLastSeen($seen);
@@ -69,14 +71,7 @@ final readonly class IssueSampleSeeder
                 $event->setPlatform('php');
                 $event->setPhpVersion('8.5.0');
                 $event->setSymfonyVersion('8.1.0');
-                $event->setPayload([
-                    'message' => $issue->getTitle(),
-                    'level' => $issue->getLevel(),
-                    'platform' => 'php',
-                    'environment' => $issue->getLastEnvironment(),
-                    'release' => $issue->getLastRelease(),
-                    'sample' => true,
-                ]);
+                $event->setPayload($this->samplePayload($issue, $i));
                 $eventAt = $seen->modify(\sprintf('-%d minutes', $e * 3));
                 $event->setEventTimestamp($eventAt);
                 $event->setReceivedAt($eventAt);
@@ -95,5 +90,65 @@ final readonly class IssueSampleSeeder
         $this->entityManager->flush();
 
         return ['issues' => $issuesCreated, 'events' => $eventsCreated];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function samplePayload(Issue $issue, int $issueIndex): array
+    {
+        $base = [
+            'message' => $issue->getTitle(),
+            'level' => $issue->getLevel(),
+            'platform' => 'php',
+            'environment' => $issue->getLastEnvironment(),
+            'release' => $issue->getLastRelease(),
+            'sample' => true,
+        ];
+        if (1 !== $issueIndex) {
+            return $base;
+        }
+
+        $sql = 'select `id`, `user_id`, `date`, `status` from `attendances` where `user_id` = ? group by `date` order by `date` desc';
+        $message = 'SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #1 of SELECT list is not in GROUP BY clause and contains nonaggregated column \'db.attendances.id\' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by (Connection: mysql, SQL: '.$sql.')';
+
+        $base['exception'] = [
+            'values' => [[
+                'type' => 'Illuminate\\Database\\QueryException',
+                'value' => $message,
+                'stacktrace' => [
+                    'frames' => [
+                        [
+                            'filename' => 'app/Repositories/Eloquent/AttendanceRepository.php',
+                            'lineno' => 158,
+                            'function' => 'App\\Repositories\\Eloquent\\AttendanceRepository::getAttendanceSummary',
+                            'in_app' => true,
+                            'pre_context' => [
+                                '        return $this->model',
+                                "            ->select('id', 'user_id', 'date', 'status')",
+                            ],
+                            'context_line' => "            ->where('user_id', \$userId)",
+                            'post_context' => [
+                                "            ->groupBy('date')",
+                                "            ->orderBy('date', 'desc')",
+                                '            ->get();',
+                            ],
+                        ],
+                        [
+                            'filename' => 'vendor/laravel/framework/src/Illuminate/Database/Connection.php',
+                            'lineno' => 671,
+                            'function' => 'Illuminate\\Database\\Connection::runQueryCallback',
+                            'in_app' => false,
+                        ],
+                    ],
+                ],
+            ]],
+        ];
+        $base['request'] = [
+            'method' => 'POST',
+            'url' => 'https://example.test/api/v1/attendance/summary',
+        ];
+
+        return $base;
     }
 }

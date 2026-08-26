@@ -1,10 +1,11 @@
 {#
   Issue detail event body. Expects `event`.
-  Order: Highlights → Stack → Breadcrumbs → Request → Console → Messenger → Scheduler → Monolog → Fatal → Tags → Contexts → Extra → Raw
+  Order: Highlights → Query → Stack → Breadcrumbs → Request → Console → Messenger → Scheduler → Monolog → Fatal → Tags → Contexts → Extra → Raw
 #}
 {% set payload = event.payload %}
 {% set exceptionValues = payload.exception.values|default([]) %}
 {% set exception = exceptionValues[0]|default(null) %}
+{% set queryFacts = beacon_query_facts(payload) %}
 {% set frames = exception.stacktrace.frames|default(payload.stacktrace.frames|default([])) %}
 {% set breadcrumbs = payload.breadcrumbs.values|default([]) %}
 {% set user = payload.user|default(null) %}
@@ -64,6 +65,18 @@
                     <tr>
                         <th>{{ 'issues.logger'|trans }}</th>
                         <td class="font-mono">{{ payload.logger }}</td>
+                    </tr>
+                {% endif %}
+                {% if queryFacts and queryFacts.sqlstate %}
+                    <tr>
+                        <th>{{ 'issues.query_sqlstate'|trans }}</th>
+                        <td class="font-mono" data-testid="issue-query-sqlstate">{{ queryFacts.sqlstate }}</td>
+                    </tr>
+                {% endif %}
+                {% if queryFacts and queryFacts.vendorCode %}
+                    <tr>
+                        <th>{{ 'issues.query_code'|trans }}</th>
+                        <td class="font-mono" data-testid="issue-query-code">{{ queryFacts.vendorCode }}</td>
                     </tr>
                 {% endif %}
                 {% if payload.server_name is defined %}
@@ -183,6 +196,69 @@
     {% endblock %}
 {% endembed %}
 
+{% if queryFacts %}
+{% embed 'issue/_collapse_section.html.twig' with {panel_id: 'query', title: 'issues.query'|trans} %}
+    {% block body %}
+        <div class="issue-query" data-testid="issue-query">
+            <table class="issue-kv">
+                <tbody>
+                    {% if queryFacts.sqlstate %}
+                        <tr>
+                            <th>{{ 'issues.query_sqlstate'|trans }}</th>
+                            <td class="font-mono" data-testid="issue-query-panel-sqlstate">{{ queryFacts.sqlstate }}</td>
+                        </tr>
+                    {% endif %}
+                    {% if queryFacts.vendorCode %}
+                        <tr>
+                            <th>{{ 'issues.query_code'|trans }}</th>
+                            <td class="font-mono" data-testid="issue-query-panel-code">{{ queryFacts.vendorCode }}</td>
+                        </tr>
+                    {% endif %}
+                    {% if queryFacts.driver %}
+                        <tr>
+                            <th>{{ 'issues.query_driver'|trans }}</th>
+                            <td class="font-mono">{{ queryFacts.driver }}</td>
+                        </tr>
+                    {% endif %}
+                    {% if queryFacts.sqlMode %}
+                        <tr>
+                            <th>{{ 'issues.query_sql_mode'|trans }}</th>
+                            <td class="font-mono">{{ queryFacts.sqlMode }}</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            {% if queryFacts.sql %}
+                <h3 class="issue-section__subtitle">{{ 'issues.query_sql'|trans }}</h3>
+                <div class="issue-query__sql">
+                    <span
+                        class="issue-stack__copy"
+                        data-controller="clipboard-copy"
+                        data-clipboard-copy-text-value="{{ queryFacts.sql|e('html_attr') }}"
+                        data-clipboard-copy-label-value="{{ 'issues.query_copy_sql'|trans|e('html_attr') }}"
+                        data-clipboard-copy-done-label-value="{{ 'issues.path_copied'|trans|e('html_attr') }}"
+                    >
+                        <button
+                            type="button"
+                            class="issue-stack__copy-btn"
+                            data-action="click->clipboard-copy#copy"
+                        >{{ 'issues.query_copy_sql'|trans }}</button>
+                    </span>
+                    <pre class="code-block" data-testid="issue-query-sql">{{ queryFacts.sql }}</pre>
+                    {% if queryFacts.sqlTruncated %}
+                        <p class="issue-tags__hint">{{ 'issues.query_truncated'|trans }}</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+            {% if queryFacts.bindings is iterable and queryFacts.bindings is not empty %}
+                <h3 class="issue-section__subtitle">{{ 'issues.query_bindings'|trans }}</h3>
+                <pre class="code-block" data-testid="issue-query-bindings">{{ queryFacts.bindings|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+            {% endif %}
+        </div>
+    {% endblock %}
+{% endembed %}
+{% endif %}
+
 {% if frames is not empty or exception %}
 {% embed 'issue/_collapse_section.html.twig' with {panel_id: 'stacktrace', title: 'issues.stacktrace'|trans} %}
     {% block body %}
@@ -193,84 +269,19 @@
                     <p class="issue-exception__value">{{ ex.value }}</p>
                 {% endif %}
             </div>
+            {% set exFrames = beacon_stack_frames(ex.stacktrace.frames|default([])) %}
+            {% if exFrames is not empty %}
+                {% include 'issue/_stack_frames.html.twig' with {display_frames: exFrames} only %}
+            {% endif %}
         {% else %}
             {% if payload.message is defined and payload.message %}
                 <p class="issue-exception__value mb-3">{{ payload.message }}</p>
             {% endif %}
+            {% set rootFrames = beacon_stack_frames(payload.stacktrace.frames|default([])) %}
+            {% if rootFrames is not empty %}
+                {% include 'issue/_stack_frames.html.twig' with {display_frames: rootFrames} only %}
+            {% endif %}
         {% endfor %}
-
-        {% if frames is not empty %}
-            <ol class="issue-stack">
-                {% for frame in frames|reverse %}
-                    {% set inApp = frame.in_app|default(false) %}
-                    {% set hasSource = frame.context_line is defined and frame.context_line is not same as(null) and frame.context_line is not same as('') %}
-                    {% set fileLabel = frame.filename|default(frame.abs_path|default('?')) %}
-                    {% set filePath = frame.abs_path|default(frame.filename|default('')) %}
-                    {% set fileCopy = filePath ~ (frame.lineno is defined and frame.lineno ? ':' ~ frame.lineno : '') %}
-                    <li class="issue-stack__frame{% if inApp %} issue-stack__frame--app{% endif %}">
-                        <details class="issue-stack__details"{% if loop.first %} open{% endif %}>
-                            <summary class="issue-stack__summary">
-                                <span class="issue-stack__chevron" aria-hidden="true"></span>
-                                <span class="issue-stack__summary-body">
-                                    <span class="issue-stack__meta">
-                                        <span class="issue-stack__file font-mono" title="{{ filePath }}">{{ fileLabel }}</span>
-                                        <span class="issue-stack__line font-mono">:{{ frame.lineno|default('?') }}</span>
-                                        {% if filePath %}
-                                            <span
-                                                class="issue-stack__copy"
-                                                data-controller="clipboard-copy"
-                                                data-clipboard-copy-text-value="{{ fileCopy|e('html_attr') }}"
-                                                data-clipboard-copy-label-value="{{ 'issues.copy_path'|trans|e('html_attr') }}"
-                                                data-clipboard-copy-done-label-value="{{ 'issues.path_copied'|trans|e('html_attr') }}"
-                                            >
-                                                <button
-                                                    type="button"
-                                                    class="issue-stack__copy-btn"
-                                                    data-action="click->clipboard-copy#copy"
-                                                    aria-label="{{ 'issues.copy_path'|trans }}"
-                                                    title="{{ 'issues.copy_path'|trans }} — {{ fileCopy }}"
-                                                >{{ 'issues.copy_path'|trans }}</button>
-                                            </span>
-                                        {% endif %}
-                                        {% if inApp %}
-                                            <span class="issue-badge issue-badge--app">{{ 'issues.in_app'|trans }}</span>
-                                        {% endif %}
-                                    </span>
-                                    <span class="issue-stack__fn font-mono">
-                                        {{ frame.function|default('common.unknown'|trans) }}
-                                    </span>
-                                </span>
-                            </summary>
-                            {% if hasSource %}
-                                {% set pre = frame.pre_context|default([]) %}
-                                {% set post = frame.post_context|default([]) %}
-                                {% set startLine = frame.lineno - pre|length %}
-                                <div class="issue-stack__source" aria-label="{{ 'issues.source_context'|trans }}">
-                                    {% for line in pre %}
-                                        <div class="issue-stack__src-line">
-                                            <span class="issue-stack__ln">{{ startLine + loop.index0 }}</span>
-                                            <code>{{ line }}</code>
-                                        </div>
-                                    {% endfor %}
-                                    <div class="issue-stack__src-line issue-stack__src-line--active">
-                                        <span class="issue-stack__ln">{{ frame.lineno }}</span>
-                                        <code>{{ frame.context_line }}</code>
-                                    </div>
-                                    {% for line in post %}
-                                        <div class="issue-stack__src-line">
-                                            <span class="issue-stack__ln">{{ frame.lineno + loop.index }}</span>
-                                            <code>{{ line }}</code>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                <p class="issue-stack__empty">{{ 'issues.no_source_context'|trans }}</p>
-                            {% endif %}
-                        </details>
-                    </li>
-                {% endfor %}
-            </ol>
-        {% endif %}
     {% endblock %}
 {% endembed %}
 {% elseif payload.message is defined and payload.message %}

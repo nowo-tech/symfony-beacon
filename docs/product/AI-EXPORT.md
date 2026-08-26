@@ -31,7 +31,7 @@ release: 1.2.3
 ---
 ```
 
-JSON includes `"format": "beacon-ai-export/v1"` plus `issue`, `event`, `exception`, `stacktrace`, `request`, `tags`, `breadcrumbs`, and `links.issue`.
+JSON includes `"format": "beacon-ai-export/v1"` plus `issue`, `event`, `exception`, `stacktrace`, `query` (when database facts exist), `request`, `tags`, `breadcrumbs`, and `links.issue`.
 
 ## Scrubbing
 

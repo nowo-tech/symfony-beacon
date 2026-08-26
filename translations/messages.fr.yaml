@@ -638,6 +638,15 @@ issues:
   fatal_type: Type
   extra: Données supplémentaires
   stacktrace: Trace de pile
+  query: Requête
+  query_sqlstate: SQLSTATE
+  query_code: Erreur base de données
+  query_driver: Pilote
+  query_sql: SQL
+  query_sql_mode: sql_mode
+  query_bindings: Liaisons
+  query_truncated: SQL tronqué à l’affichage. Le texte complet reste dans la charge brute.
+  query_copy_sql: Copier le SQL
   source_context: Source
   no_source_context: Aucun contexte source pour ce cadre.
   copy_path: Copier le chemin
@@ -1252,6 +1261,7 @@ preferences:
   issue_panels_reset_done: Effacé
   issue_panel:
     highlights: Points forts
+    query: Requête
     stacktrace: Trace de pile
     message: Message
     breadcrumbs: Fil d'Ariane

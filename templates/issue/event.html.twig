@@ -5,8 +5,9 @@
 {% block body %}
 {% set payload = event.payload %}
 {% set exception = payload.exception.values[0]|default(null) %}
+{% set queryFacts = beacon_query_facts(payload) %}
 {% set headline = exception.type|default(payload.message|default(issue.title)) %}
-{% set subtitle = exception.value|default(null) %}
+{% set subtitle = queryFacts and queryFacts.summary ? queryFacts.summary : (exception.value|default(null)) %}
 
 <header class="issue-hero">
     <div class="issue-hero__top">

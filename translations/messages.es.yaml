@@ -634,6 +634,15 @@ issues:
   fatal_type: Type
   extra: Datos adicionales
   stacktrace: Stack Trace
+  query: Consulta
+  query_sqlstate: SQLSTATE
+  query_code: Error de base de datos
+  query_driver: Controlador
+  query_sql: SQL
+  query_sql_mode: sql_mode
+  query_bindings: Bindings
+  query_truncated: SQL truncado en pantalla. El texto completo está en el payload en bruto.
+  query_copy_sql: Copiar SQL
   source_context: Código fuente
   no_source_context: Sin código fuente para este frame.
   copy_path: Copiar ruta
@@ -1525,6 +1534,7 @@ preferences:
   issue_panels_reset_done: Borrado
   issue_panel:
     highlights: Highlights
+    query: Consulta
     stacktrace: Stack Trace
     message: Mensaje
     breadcrumbs: Breadcrumbs

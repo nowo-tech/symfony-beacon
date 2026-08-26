@@ -125,6 +125,7 @@ final class AiIssueExportFormatterTest extends TestCase
         self::assertNull($data['request']);
         self::assertSame([], $data['tags']);
         self::assertSame([], $data['breadcrumbs']);
+        self::assertNull($data['query']);
 
         $md = $formatter->toMarkdown($data);
         self::assertStringContainsString('environment: —', $md);
@@ -134,6 +135,7 @@ final class AiIssueExportFormatterTest extends TestCase
         self::assertStringContainsString('_No tags._', $md);
         self::assertStringContainsString('_No breadcrumbs._', $md);
         self::assertStringContainsString('# Fallback title: Fallback title', $md);
+        self::assertStringNotContainsString('## Query', $md);
     }
 
     public function testBuildCanonicalFallsBackToContextRequestAndTopLevelStacktrace(): void
@@ -254,5 +256,40 @@ final class AiIssueExportFormatterTest extends TestCase
         $relativeData = $formatter->buildCanonical($project, $issue, $relativeUrlEvent, 'https://beacon.test/issues/relative');
         self::assertSame('%2Frelative%2Fpath%3Ftoken=%5Bredacted%5D', $relativeData['request']['url']);
         self::assertSame('&&', $relativeData['request']['query_string']);
+    }
+
+    public function testExportIncludesQueryFacts(): void
+    {
+        $project = new Project()->setName('Beacon')->setSlug('beacon');
+        $issue = new Issue();
+        $issue->setProject($project);
+        $issue->setFingerprint('fp-ai-query');
+        $issue->setTitle('Query failed');
+        $issue->setCulprit('App\\Repo::run');
+        $issue->setLevel(IssueLevel::Error);
+        $issue->setStatus(IssueStatus::Unresolved);
+
+        $event = new Event();
+        $event->setIssue($issue);
+        $event->setEventId('evt-q');
+        $event->setEnvironment('prod');
+        $event->setPlatform('php');
+        $event->setPayload([
+            'exception' => [
+                'values' => [[
+                    'type' => 'PDOException',
+                    'value' => 'SQLSTATE[42000]: Syntax error or access violation: 1055 (SQL: SELECT id FROM t GROUP BY d)',
+                ]],
+            ],
+        ]);
+
+        $data = new AiIssueExportFormatter()->buildCanonical($project, $issue, $event, 'https://beacon.test/i');
+        self::assertIsArray($data['query']);
+        self::assertSame('42000', $data['query']['sqlstate']);
+        self::assertSame('SELECT id FROM t GROUP BY d', $data['query']['sql']);
+        $md = (new AiIssueExportFormatter())->toMarkdown($data);
+        self::assertStringContainsString('## Query', $md);
+        self::assertStringContainsString('SQLSTATE', $md);
+        self::assertStringContainsString('SELECT id FROM t', $md);
     }
 }

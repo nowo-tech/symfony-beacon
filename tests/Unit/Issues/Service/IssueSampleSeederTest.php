@@ -48,4 +48,28 @@ final class IssueSampleSeederTest extends TestCase
         self::assertNotEmpty(array_filter($persisted, static fn (object $e): bool => $e instanceof Issue));
         self::assertNotEmpty(array_filter($persisted, static fn (object $e): bool => $e instanceof Event));
     }
+
+    public function testFirstIssuePayloadIncludesQueryException(): void
+    {
+        $project = new Project()->setName('P')->setSlug('p');
+        new ReflectionProperty(Project::class, 'id')->setValue($project, 7);
+
+        $persisted = [];
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('persist')->willReturnCallback(static function (object $entity) use (&$persisted): void {
+            $persisted[] = $entity;
+        });
+        $em->method('flush');
+
+        $issues = $this->createStub(IssueRepository::class);
+        $issues->method('findOneByProjectAndFingerprint')->willReturn(null);
+
+        new IssueSampleSeeder($em, $issues)->seed($project, 1, 1);
+        $events = array_values(array_filter($persisted, static fn (object $e): bool => $e instanceof Event));
+        self::assertCount(1, $events);
+        $payload = $events[0]->getPayload();
+        self::assertStringContainsString('SQLSTATE[42000]', (string) ($payload['exception']['values'][0]['value'] ?? ''));
+        $issuesCreated = array_values(array_filter($persisted, static fn (object $e): bool => $e instanceof Issue));
+        self::assertStringContainsString('AttendanceRepository', $issuesCreated[0]->getCulprit());
+    }
 }

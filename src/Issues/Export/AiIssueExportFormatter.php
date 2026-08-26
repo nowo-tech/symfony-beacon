@@ -6,6 +6,7 @@ namespace App\Issues\Export;
 
 use App\Issues\Entity\Event;
 use App\Issues\Entity\Issue;
+use App\Issues\Service\QueryFactsExtractor;
 use App\Project\Entity\Project;
 
 /**
@@ -20,6 +21,7 @@ use App\Project\Entity\Project;
  *     request: array<string, mixed>|null,
  *     tags: array<string, mixed>,
  *     breadcrumbs: list<array<string, mixed>>,
+ *     query: array<string, mixed>|null,
  *     links: array{issue: string}
  * }
  */
@@ -49,6 +51,7 @@ final class AiIssueExportFormatter
         $request = $this->scrubRequest($this->extractRequest($payload));
         $tags = $this->scrubAssocSecrets($this->normalizeTags($payload['tags'] ?? []));
         $breadcrumbs = $this->scrubBreadcrumbs($this->summarizeBreadcrumbs($payload['breadcrumbs'] ?? null));
+        $query = (new QueryFactsExtractor())->extract($payload)?->toArray();
         $eventData = null;
         if ($event instanceof Event) {
             $eventData = [
@@ -87,6 +90,7 @@ final class AiIssueExportFormatter
             'request' => $request,
             'tags' => $tags,
             'breadcrumbs' => $breadcrumbs,
+            'query' => $query,
             'links' => [
                 'issue' => $issueAbsoluteUrl,
             ],
@@ -157,6 +161,31 @@ final class AiIssueExportFormatter
             $lines[] = '_No exception payload._';
         }
         $lines[] = '';
+
+        $query = $data['query'] ?? null;
+        if (\is_array($query) && [] !== $query) {
+            $lines[] = '## Query';
+            $lines[] = '';
+            if (isset($query['sqlstate']) && \is_string($query['sqlstate']) && '' !== $query['sqlstate']) {
+                $lines[] = '- SQLSTATE: `'.$query['sqlstate'].'`';
+            }
+            if (isset($query['vendor_code']) && \is_string($query['vendor_code']) && '' !== $query['vendor_code']) {
+                $lines[] = '- Code: `'.$query['vendor_code'].'`';
+            }
+            if (isset($query['driver']) && \is_string($query['driver']) && '' !== $query['driver']) {
+                $lines[] = '- Driver: `'.$query['driver'].'`';
+            }
+            if (isset($query['sql_mode']) && \is_string($query['sql_mode']) && '' !== $query['sql_mode']) {
+                $lines[] = '- sql_mode: `'.$query['sql_mode'].'`';
+            }
+            if (isset($query['sql']) && \is_string($query['sql']) && '' !== $query['sql']) {
+                $lines[] = '';
+                $lines[] = '```sql';
+                $lines[] = $query['sql'];
+                $lines[] = '```';
+            }
+            $lines[] = '';
+        }
 
         $lines[] = '## Stacktrace';
         $lines[] = '';

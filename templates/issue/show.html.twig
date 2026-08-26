@@ -6,8 +6,9 @@
 {% set event = latestEvent %}
 {% set payload = event ? event.payload : {} %}
 {% set exception = payload.exception.values[0]|default(null) %}
+{% set queryFacts = beacon_query_facts(payload) %}
 {% set headline = exception.type|default(issue.title) %}
-{% set subtitle = exception.value|default(payload.message|default(issue.culprit)) %}
+{% set subtitle = queryFacts and queryFacts.summary ? queryFacts.summary : (exception.value|default(payload.message|default(issue.culprit))) %}
 
 <header class="issue-hero">
     <div class="issue-hero__top">

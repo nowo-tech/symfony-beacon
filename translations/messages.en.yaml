@@ -625,6 +625,15 @@ issues:
   fatal_type: Type
   extra: Additional data
   stacktrace: Stack Trace
+  query: Query
+  query_sqlstate: SQLSTATE
+  query_code: Database error
+  query_driver: Driver
+  query_sql: SQL
+  query_sql_mode: sql_mode
+  query_bindings: Bindings
+  query_truncated: SQL truncated for display. Full text remains in the raw payload.
+  query_copy_sql: Copy SQL
   source_context: Source
   no_source_context: No source context for this frame.
   copy_path: Copy path
@@ -1564,6 +1573,7 @@ preferences:
   issue_panels_reset_done: Cleared
   issue_panel:
     highlights: Highlights
+    query: Query
     stacktrace: Stack Trace
     message: Message
     breadcrumbs: Breadcrumbs

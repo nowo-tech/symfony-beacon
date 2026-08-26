@@ -10,6 +10,7 @@ namespace App\Issues;
 final class IssuePanelIds
 {
     public const string HIGHLIGHTS = 'highlights';
+    public const string QUERY = 'query';
     public const string STACKTRACE = 'stacktrace';
     public const string MESSAGE = 'message';
     public const string BREADCRUMBS = 'breadcrumbs';
@@ -31,6 +32,7 @@ final class IssuePanelIds
     {
         return [
             self::HIGHLIGHTS,
+            self::QUERY,
             self::STACKTRACE,
             self::MESSAGE,
             self::BREADCRUMBS,

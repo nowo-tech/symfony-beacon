@@ -629,6 +629,15 @@ issues:
   fatal_type: Type
   extra: Dados adicionais
   stacktrace: Rastreamento de pilha
+  query: Consulta
+  query_sqlstate: SQLSTATE
+  query_code: Erro de base de dados
+  query_driver: Controlador
+  query_sql: SQL
+  query_sql_mode: sql_mode
+  query_bindings: Bindings
+  query_truncated: SQL truncado no ecrã. O texto completo permanece no payload em bruto.
+  query_copy_sql: Copiar SQL
   source_context: Fonte
   no_source_context: Nenhum contexto de origem para este quadro.
   copy_path: Copiar caminho
@@ -1228,6 +1237,7 @@ preferences:
   issue_panels_reset_done: Desmarcado
   issue_panel:
     highlights: Destaques
+    query: Consulta
     stacktrace: Rastreamento de pilha
     message: Mensagem
     breadcrumbs: Pão ralado

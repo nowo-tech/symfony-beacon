@@ -626,6 +626,15 @@ issues:
   fatal_type: Type
   extra: Aanvullende gegevens
   stacktrace: Stapeltrace
+  query: Query
+  query_sqlstate: SQLSTATE
+  query_code: Databasefout
+  query_driver: Driver
+  query_sql: SQL
+  query_sql_mode: sql_mode
+  query_bindings: Bindings
+  query_truncated: SQL ingekort in de weergave. Volledige tekst blijft in de ruwe payload.
+  query_copy_sql: SQL kopiëren
   source_context: Bron
   no_source_context: Geen broncontext voor dit frame.
   copy_path: Kopieer pad
@@ -1232,6 +1241,7 @@ preferences:
   issue_panels_reset_done: Gewist
   issue_panel:
     highlights: Hoogtepunten
+    query: Query
     stacktrace: Stapeltrace
     message: Bericht
     breadcrumbs: Paneermeel

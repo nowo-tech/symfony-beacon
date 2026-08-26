@@ -633,6 +633,15 @@ issues:
   fatal_type: Type
   extra: Dati aggiuntivi
   stacktrace: Traccia dello stack
+  query: Query
+  query_sqlstate: SQLSTATE
+  query_code: Errore database
+  query_driver: Driver
+  query_sql: SQL
+  query_sql_mode: sql_mode
+  query_bindings: Binding
+  query_truncated: SQL troncato in visualizzazione. Il testo completo resta nel payload grezzo.
+  query_copy_sql: Copia SQL
   source_context: Fonte
   no_source_context: Nessun contesto di origine per questo frame.
   copy_path: Copia percorso
@@ -1240,6 +1249,7 @@ preferences:
   issue_panels_reset_done: Cancellato
   issue_panel:
     highlights: Punti salienti
+    query: Query
     stacktrace: Traccia dello stack
     message: Messaggio
     breadcrumbs: Pangrattato

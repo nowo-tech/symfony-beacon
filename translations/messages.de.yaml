@@ -645,6 +645,15 @@ issues:
   fatal_type: Type
   extra: Zusätzliche Daten
   stacktrace: Stack-Trace
+  query: Abfrage
+  query_sqlstate: SQLSTATE
+  query_code: Datenbankfehler
+  query_driver: Treiber
+  query_sql: SQL
+  query_sql_mode: sql_mode
+  query_bindings: Bindings
+  query_truncated: SQL in der Anzeige gekürzt. Der vollständige Text bleibt im Roh-Payload.
+  query_copy_sql: SQL kopieren
   source_context: Quelle
   no_source_context: Kein Quellkontext für diesen Frame.
   copy_path: Pfad kopieren
@@ -1252,6 +1261,7 @@ preferences:
   issue_panels_reset_done: Gelöscht
   issue_panel:
     highlights: Höhepunkte
+    query: Abfrage
     stacktrace: Stack-Trace
     message: Nachricht
     breadcrumbs: Paniermehl

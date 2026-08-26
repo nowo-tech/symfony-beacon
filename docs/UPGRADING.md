@@ -116,6 +116,8 @@ AuthKit **1.20.0** + SlideToConfirm **1.1.0** + Device Intelligence **1.1.0**. *
 
 7. **Kit pin refresh (no extra migrations)** — `composer install` also pins FormKit **2.5.1**, SiteBackup **1.13.8**, Symfony **8.1.5** (components that shipped that patch), and the rest of the `nowo-tech/*` patch bumps in [CHANGELOG.md](CHANGELOG.md) Unreleased. Host YAML: drop `nowo_form_kit.type_map.search`; keep `setup.short_circuit_when_done: true`. PWA operators pick up `cache_version` **v6** after the next asset/SW deploy.
 
+8. **SQL error context (`107`)** — `php bin/console doctrine:migrations:migrate -n` widens `issue.culprit` to VARCHAR(255) on MySQL. Issue/event pages show a Query panel when SQLSTATE/SQL is in the payload. Pin `nowo-tech/beacon-bundle` **1.8.0** so dogfood clients send `contexts.db`.
+
 Device ID is not a login factor. Keep LoginThrottle / CSRF / remember-me.
 
 ## Upgrading from 1.23.2 to 1.23.3

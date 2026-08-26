@@ -43,6 +43,21 @@ Also see [DSN.md](../DSN.md#client-capabilities-beaconbundle) and specs `023-cli
 
 Opt-in `instrumentation.doctrine` / `instrumentation.http_client` attach SQL and HTTP spans to transactions and dual-write breadcrumbs on events. Config keys: [BeaconBundle CONFIGURATION](https://github.com/nowo-tech/BeaconBundle/blob/main/docs/CONFIGURATION.md). Spans render under Performance transaction detail; breadcrumbs under event Breadcrumbs.
 
+## Query / database errors
+
+When the event is a database failure, issue and event detail show a **Query** panel (SQLSTATE, vendor code, SQL, optional bindings) derived at render time from:
+
+1. `contexts.db` (BeaconBundle **1.8.0+**)
+2. `extra.sql` / `extra.query` / `extra.bindings`
+3. Query breadcrumbs (`category` `query` / `db` / `db.query` / `sql.query`)
+4. Exception messages (`SQLSTATE[…]`, Laravel `(SQL: …)`, MySQL `(1040, 'Too many connections')`)
+
+SQL display is truncated at 8 KiB; the raw payload keeps the original string. SQL may contain personal data already stored in the event — scrub on the client (`before_send`, `023`).
+
+The stack UI opens the innermost **in-app** frame by default (same preference as culprit), not the vendor PDO/Connection throw site.
+
+`issue.culprit` is VARCHAR(255) so typical `Class::method` names are not clipped.
+
 ## Stack source context
 
 When the client includes readable frame context (BeaconBundle `v1.3.0+` with `send.stacktrace: true`), each stack frame may contain:
@@ -54,4 +69,4 @@ When the client includes readable frame context (BeaconBundle `v1.3.0+` with `se
 | `context_line` | The line that threw / was current |
 | `post_context` | Lines after the crash line |
 
-The Issues UI renders these under each stack frame (first frame expanded by default).
+The Issues UI renders these under each stack frame (the preferred in-app frame is expanded by default).

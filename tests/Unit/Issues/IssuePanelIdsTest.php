@@ -14,6 +14,7 @@ final class IssuePanelIdsTest extends TestCase
         $all = IssuePanelIds::all();
 
         self::assertContains(IssuePanelIds::STACKTRACE, $all);
+        self::assertContains(IssuePanelIds::QUERY, $all);
         self::assertContains(IssuePanelIds::TRIAGE, $all);
         self::assertSame($all, array_values(array_unique($all)));
     }

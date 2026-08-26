@@ -107,4 +107,126 @@ final class IssueErrorSurfacesFunctionalTest extends DatabaseWebTestCase
         self::assertSelectorTextContains('.issue-tags:not(.issue-tags--custom)', 'console.command');
         self::assertSelectorTextContains('.issue-tags:not(.issue-tags--custom)', 'messenger.handler');
     }
+
+    public function testQueryPanelRendersSqlstateAndSql(): void
+    {
+        [$client, $owner, $project] = $this->bootWithDemoProject('query-panel@example.com');
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+
+        $issue = new Issue();
+        $issue->setProject($project);
+        $issue->setFingerprint(hash('sha256', 'query-panel-ui'));
+        $issue->setTitle('QueryException');
+        $issue->setCulprit('App\\Repositories\\Eloquent\\AttendanceRepository::getAttendanceSummary');
+        $issue->setLevel('error');
+        $issue->setFirstSeen(new DateTimeImmutable());
+        $issue->setLastSeen(new DateTimeImmutable());
+        $issue->incrementEventCount();
+
+        $sql = 'select `id` from `attendances` group by `date`';
+        $event = new Event();
+        $event->setIssue($issue);
+        $event->setEventId(bin2hex(random_bytes(8)));
+        $event->setReceivedAt(new DateTimeImmutable());
+        $event->setEventTimestamp(new DateTimeImmutable());
+        $event->setPayload([
+            'level' => 'error',
+            'exception' => [
+                'values' => [
+                    [
+                        'type' => 'PDOException',
+                        'value' => 'SQLSTATE[42000]: Syntax error or access violation: 1055',
+                        'stacktrace' => [
+                            'frames' => [
+                                ['filename' => 'vendor/pdo.php', 'lineno' => 1, 'function' => 'query', 'in_app' => false],
+                            ],
+                        ],
+                    ],
+                    [
+                        'type' => 'Illuminate\\Database\\QueryException',
+                        'value' => 'SQLSTATE[42000]: Syntax error or access violation: 1055 group by (Connection: mysql, SQL: '.$sql.')',
+                        'stacktrace' => [
+                            'frames' => [
+                                [
+                                    'filename' => 'app/Repositories/Eloquent/AttendanceRepository.php',
+                                    'lineno' => 158,
+                                    'function' => 'App\\Repositories\\Eloquent\\AttendanceRepository::getAttendanceSummary',
+                                    'in_app' => true,
+                                    'context_line' => '->groupBy(\'date\')',
+                                ],
+                                [
+                                    'filename' => 'vendor/laravel/framework/src/Illuminate/Database/Connection.php',
+                                    'lineno' => 671,
+                                    'function' => 'runQueryCallback',
+                                    'in_app' => false,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        $em->persist($issue);
+        $em->persist($event);
+        $em->flush();
+
+        $this->login($client, $owner);
+        $client->request(
+            Request::METHOD_GET,
+            '/projects/'.$project->getUuid().'/issues/'.$issue->getUuid(),
+        );
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('[data-testid="issue-query"]');
+        self::assertSelectorTextContains('[data-testid="issue-query-sqlstate"]', '42000');
+        self::assertSelectorTextContains('[data-testid="issue-query-sql"]', 'attendances');
+        $html = (string) $client->getResponse()->getContent();
+        self::assertStringContainsString('AttendanceRepository.php', $html);
+        self::assertMatchesRegularExpression(
+            '/<details[^>]*open[^>]*>[\s\S]*AttendanceRepository\.php/',
+            $html,
+        );
+    }
+
+    public function testQueryPanelAbsentWithoutDatabaseFacts(): void
+    {
+        [$client, $owner, $project] = $this->bootWithDemoProject('query-absent@example.com');
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+
+        $issue = new Issue();
+        $issue->setProject($project);
+        $issue->setFingerprint(hash('sha256', 'query-absent-ui'));
+        $issue->setTitle('Plain error');
+        $issue->setCulprit('demo');
+        $issue->setLevel('error');
+        $issue->setFirstSeen(new DateTimeImmutable());
+        $issue->setLastSeen(new DateTimeImmutable());
+        $issue->incrementEventCount();
+
+        $event = new Event();
+        $event->setIssue($issue);
+        $event->setEventId(bin2hex(random_bytes(8)));
+        $event->setReceivedAt(new DateTimeImmutable());
+        $event->setEventTimestamp(new DateTimeImmutable());
+        $event->setPayload([
+            'exception' => [
+                'values' => [[
+                    'type' => 'RuntimeException',
+                    'value' => 'not a database problem',
+                ]],
+            ],
+        ]);
+        $em->persist($issue);
+        $em->persist($event);
+        $em->flush();
+
+        $this->login($client, $owner);
+        $client->request(
+            Request::METHOD_GET,
+            '/projects/'.$project->getUuid().'/issues/'.$issue->getUuid(),
+        );
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorNotExists('[data-testid="issue-query"]');
+    }
 }

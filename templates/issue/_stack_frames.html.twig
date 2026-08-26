@@ -1,0 +1,72 @@
+{# Expects display_frames: list of {frame, open} from beacon_stack_frames() #}
+<ol class="issue-stack">
+    {% for item in display_frames %}
+        {% set frame = item.frame %}
+        {% set inApp = frame.in_app|default(false) %}
+        {% set hasSource = frame.context_line is defined and frame.context_line is not same as(null) and frame.context_line is not same as('') %}
+        {% set fileLabel = frame.filename|default(frame.abs_path|default('?')) %}
+        {% set filePath = frame.abs_path|default(frame.filename|default('')) %}
+        {% set fileCopy = filePath ~ (frame.lineno is defined and frame.lineno ? ':' ~ frame.lineno : '') %}
+        <li class="issue-stack__frame{% if inApp %} issue-stack__frame--app{% endif %}">
+            <details class="issue-stack__details"{% if item.open %} open{% endif %}>
+                <summary class="issue-stack__summary">
+                    <span class="issue-stack__chevron" aria-hidden="true"></span>
+                    <span class="issue-stack__summary-body">
+                        <span class="issue-stack__meta">
+                            <span class="issue-stack__file font-mono" title="{{ filePath }}">{{ fileLabel }}</span>
+                            <span class="issue-stack__line font-mono">:{{ frame.lineno|default('?') }}</span>
+                            {% if filePath %}
+                                <span
+                                    class="issue-stack__copy"
+                                    data-controller="clipboard-copy"
+                                    data-clipboard-copy-text-value="{{ fileCopy|e('html_attr') }}"
+                                    data-clipboard-copy-label-value="{{ 'issues.copy_path'|trans|e('html_attr') }}"
+                                    data-clipboard-copy-done-label-value="{{ 'issues.path_copied'|trans|e('html_attr') }}"
+                                >
+                                    <button
+                                        type="button"
+                                        class="issue-stack__copy-btn"
+                                        data-action="click->clipboard-copy#copy"
+                                        aria-label="{{ 'issues.copy_path'|trans }}"
+                                        title="{{ 'issues.copy_path'|trans }} — {{ fileCopy }}"
+                                    >{{ 'issues.copy_path'|trans }}</button>
+                                </span>
+                            {% endif %}
+                            {% if inApp %}
+                                <span class="issue-badge issue-badge--app">{{ 'issues.in_app'|trans }}</span>
+                            {% endif %}
+                        </span>
+                        <span class="issue-stack__fn font-mono">
+                            {{ frame.function|default('common.unknown'|trans) }}
+                        </span>
+                    </span>
+                </summary>
+                {% if hasSource %}
+                    {% set pre = frame.pre_context|default([]) %}
+                    {% set post = frame.post_context|default([]) %}
+                    {% set startLine = frame.lineno - pre|length %}
+                    <div class="issue-stack__source" aria-label="{{ 'issues.source_context'|trans }}">
+                        {% for line in pre %}
+                            <div class="issue-stack__src-line">
+                                <span class="issue-stack__ln">{{ startLine + loop.index0 }}</span>
+                                <code>{{ line }}</code>
+                            </div>
+                        {% endfor %}
+                        <div class="issue-stack__src-line issue-stack__src-line--active">
+                            <span class="issue-stack__ln">{{ frame.lineno }}</span>
+                            <code>{{ frame.context_line }}</code>
+                        </div>
+                        {% for line in post %}
+                            <div class="issue-stack__src-line">
+                                <span class="issue-stack__ln">{{ frame.lineno + loop.index }}</span>
+                                <code>{{ line }}</code>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="issue-stack__empty">{{ 'issues.no_source_context'|trans }}</p>
+                {% endif %}
+            </details>
+        </li>
+    {% endfor %}
+</ol>
