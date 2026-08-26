@@ -2,7 +2,7 @@
 
 **Feature Branch**: `107-sql-error-context`  
 **Created**: 2026-08-26  
-**Status**: Implemented (Unreleased / Phase 6.59)  
+**Status**: Shipped (v1.24.0 / Phase 6.59)  
 **Roadmap**: Phase 6.59 (proposed; after `106`)  
 
 **Input**: Analyze a Sentry incident (Laravel `QueryException` / MySQL `SQLSTATE[42000]` 1055 `ONLY_FULL_GROUP_BY`, failing `SELECT … GROUP BY`, application frame `AttendanceRepository::getAttendanceSummary`) and specify how Beacon should collect and display the same diagnostic surface — especially MySQL/SQL facts, plus the in-app stack location — without forcing operators to open raw JSON.

@@ -320,16 +320,14 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | 6.54 | **Cookie Consent Vite bundle + dogfood admin resolve + E2E security denials**: kit CSS in `app` entry (ad-blocker resilient); earliest `ROLE_ADMIN` dogfood owner; Playwright `UC-SEC-01`…`12` | Beacon | `103-cookie-consent-vite-e2e-security` | **Done** (v1.20.0) |
 | 6.55 | **Isolated Playwright E2E stack**: parallel Compose `symfony-beacon-e2e` / schema `app_e2e` / `:9460`; `make test-e2e-isolated`; optional BeaconBundle dogfood (`E2E_BEACON_TARGET`); Morphicons UI toggles | Beacon | `104-isolated-e2e-stack` | **Done** (v1.21.0) |
 | 6.56 | **Kit polish + first-run gate**: hot-reload-bundle **1.3.2** (pin **1.4.2** in Unreleased); drop PWA `install_links` fork; BP-004 / ENGINEERING-AUDIT close; AuthKit gated until SiteBackup setup; PhoneInput `_phone_input.scss` theme bridge. **v1.23.1**: `make update-deps` runs helper `--run`; FormKit **2.4.1**; password-strength **2.2.0**; password-toggle **2.1.1**; Mercure **0.5.0**; Symfony **8.1.4** | Beacon | `053` / `056` / `058` / `081` / `083` / `100` / `101` | **Done** (v1.23.0; pins/DX v1.23.1) |
-| 6.57 | **AuthKit security kits**: AuthKit **1.20.0** + slide-to-confirm **1.1.0** (register `gate`; Clear history `danger`) + device-intelligence **1.1.0** (collect, `di_obs`, Trusted browsers, new-device mail) + otp-input on `/reset-password/complete`; FormKit **2.5.1** (pin **2.5.2** in `106`); Device ID is not a credential; QR Approve stays a button; SMS OTP still Later | Beacon | `105-authkit-security-kits` | **In progress** (Unreleased) |
-| 6.58 | **Ops ingest hardening**: Redis Messenger depths + failed gauge; quota usage cache; Envelope unique-constraint retry; batched retention + EVENT-STORAGE; shared `PrivateNetworkTarget` SSRF; legacy API-key ciphertext command; AuditKit timestamps; PHPStan empty baseline + FrankenPHP seams; includable coverage 100% | Beacon | `106-ops-ingest-hardening` | **In progress** (Unreleased) |
+| 6.57 | **AuthKit security kits**: AuthKit **1.20.0** + slide-to-confirm **1.1.0** (register `gate`; Clear history `danger`) + device-intelligence **1.1.1** (collect, `di_obs`, Trusted browsers, new-device mail) + otp-input on `/reset-password/complete`; FormKit **2.5.2**; Device ID is not a credential; QR Approve stays a button; SMS OTP still Later | Beacon | `105-authkit-security-kits` | **Done** (v1.24.0) |
+| 6.58 | **Ops ingest hardening**: Redis Messenger depths + failed gauge; quota usage cache; Envelope unique-constraint retry; batched retention + EVENT-STORAGE; shared `PrivateNetworkTarget` SSRF; legacy API-key ciphertext command; AuditKit timestamps; PHPStan empty baseline + FrankenPHP seams; includable coverage 100%; Dashboard Menu **2.1.10** | Beacon | `106-ops-ingest-hardening` | **Done** (v1.24.0) |
+| 6.59 | **SQL / database error context** on issue detail (Query panel, in-app stack, culprit 255) + BeaconBundle `contexts.db` **1.8.0** | Beacon + Bundle | `107-sql-error-context` | **Done** (v1.24.0) |
 
 ### Next (immediate queue)
 
 | # | Item | Repo | Spec | Status |
 |---|------|------|------|--------|
-| 6.57 | Finish AuthKit security kits cut (migrate, E2E Trusted browsers optional UC, release notes) | Beacon | `105-authkit-security-kits` | **In progress** |
-| 6.58 | Finish ops ingest hardening cut (release notes; Dashboard Menu **2.1.10** tags `SearchQueryType` — host override removed) | Beacon | `106-ops-ingest-hardening` | **In progress** |
-| 6.59 | **SQL / database error context** on issue detail (Query panel, in-app stack, culprit 255) + BeaconBundle `contexts.db` **1.8.0** | Beacon + Bundle | `107-sql-error-context` | **In progress** |
 | — | Pull from Later (SSO / QR SMS OTP / WebAuthn / Hotwire Native) when prioritized | Beacon | — | **Next** |
 
 ### Done (AuthKit 1.12 foundation)

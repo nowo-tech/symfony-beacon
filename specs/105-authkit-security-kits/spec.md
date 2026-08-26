@@ -2,7 +2,7 @@
 
 **Feature Branch**: `105-authkit-security-kits`  
 **Created**: 2026-08-25  
-**Status**: Implemented (Unreleased / Phase 6.57)  
+**Status**: Shipped (v1.24.0 / Phase 6.57)  
 **Roadmap**: Phase 6.57  
 
 **Input**: Wire AuthKit **1.20.0** optional kits so registration and danger-zone confirms use slide-to-confirm, guest auth pages collect a non-credential device observation, members can trust/revoke browsers, password-reset complete uses multi-box OTP UX, and new-device sign-in can notify via the encrypted instance Mailer.

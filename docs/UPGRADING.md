@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.23.3)](#unreleased-main-after-1233)
+- [Unreleased (main after 1.24.0)](#unreleased-main-after-1240)
+- [Upgrading from 1.23.3 to 1.24.0](#upgrading-from-1233-to-1240)
 - [Upgrading from 1.23.2 to 1.23.3](#upgrading-from-1232-to-1233)
 - [Upgrading from 1.23.1 to 1.23.2](#upgrading-from-1231-to-1232)
 - [Upgrading from 1.23.0 to 1.23.1](#upgrading-from-1230-to-1231)
@@ -90,21 +91,25 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.23.3)
+## Unreleased (main after 1.24.0)
 
-AuthKit **1.20.0** + SlideToConfirm **1.1.0** + Device Intelligence **1.1.0**. **Has a Doctrine migration.**
+No unreleased operator-facing upgrade steps yet. Track [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
 
-1. Pull `main` / the next tag.
+## Upgrading from 1.23.3 to 1.24.0
 
-2. `composer install` — pins `nowo-tech/auth-kit-bundle` **1.20.0**, `nowo-tech/slide-to-confirm-bundle` **1.1.0**, `nowo-tech/device-intelligence-bundle` **1.1.0**, `nowo-tech/otp-input-bundle` (password-reset code boxes).
+AuthKit **1.20.0** security kits, ops ingest hardening, and SQL error context. **Has Doctrine migrations.**
 
-3. `php bin/console doctrine:migrations:migrate -n` — creates `device_intelligence_*` tables.
+1. Pull / checkout `v1.24.0`.
+
+2. `composer install` — pins include `nowo-tech/auth-kit-bundle` **1.20.0**, `nowo-tech/slide-to-confirm-bundle` **1.1.0**, `nowo-tech/device-intelligence-bundle` **1.1.1**, `nowo-tech/otp-input-bundle`, `nowo-tech/beacon-bundle` **1.8.0**, FormKit **2.5.2**, dashboard-menu **2.1.10**, Symfony **8.1.5** (where that patch exists), and related `nowo-tech/*` bumps (see [CHANGELOG.md](CHANGELOG.md) `[1.24.0]`).
+
+3. `php bin/console doctrine:migrations:migrate -n` — creates `device_intelligence_*` tables (`Version20260824120000`) and widens `issue.culprit` to VARCHAR(255) on MySQL (`Version20260826120000`).
 
 4. `php bin/console assets:install` (or `make ready`) so `/bundles/nowoslidetoconfirm`, `/bundles/nowodeviceintelligence`, and `/bundles/nowootpinput` exist.
 
 5. Re-seed cookie inventory so `di_obs` appears in `/legal/cookies`: `make seed-platform` (or Setup → platform).
 
-6. **Behaviour**
+6. **AuthKit / device intelligence behaviour**
    - AuthKit registration (when it is actually shown) uses a **gate** slide for terms consent. After the first user exists, `/register` still redirects to login.
    - Guest AuthKit pages call `POST /_device/collect` (public; origin CSRF). Privacy mode is **strict** (no canvas/webgl/audio/fonts).
    - After password/magic/social/QR login from a **new** device cluster, AuthKit sets session flag `nowo_auth_kit.new_device` and sends `auth.magic.new_device_email_*` when instance Mailer is configured.
@@ -114,11 +119,23 @@ AuthKit **1.20.0** + SlideToConfirm **1.1.0** + Device Intelligence **1.1.0**. *
    - Password-reset **code** completion (`/reset-password/complete`) uses `OtpType` when `otp_input.enabled` is true. Hidden field value is still a single string; server `hash_equals` / attempt limits are unchanged. Phone SMS OTP stays Later.
    - Device Intelligence collect is excluded from SiteBackup setup redirect, HttpLog, MaintenanceMode 503, PWA runtime cache, and `ROLE_USER` catch-all.
 
-7. **Kit pin refresh (no extra migrations)** — `composer install` also pins FormKit **2.5.1**, SiteBackup **1.13.8**, Symfony **8.1.5** (components that shipped that patch), and the rest of the `nowo-tech/*` patch bumps in [CHANGELOG.md](CHANGELOG.md) Unreleased. Host YAML: drop `nowo_form_kit.type_map.search`; keep `setup.short_circuit_when_done: true`. PWA operators pick up `cache_version` **v6** after the next asset/SW deploy.
+7. **Ops / ingest (`106`)**
+   - Ops overview and `/metrics` report Redis Messenger depths (including failed transport).
+   - Event quota usage is cached (may stay high until TTL after retention purge — fail-closed).
+   - Optional: `php bin/console app:project:api-key-legacy-secrets` inventories redundant Halite API-key ciphertext; `--apply` clears only when `secret_hash` already exists.
+   - Host YAML: drop `nowo_form_kit.type_map.search`; remove `config/services/dashboard_menu.yaml` if you forked it (kit **2.1.10+** tags `SearchQueryType`). Keep `setup.short_circuit_when_done: true`.
+   - Prod Compose: Messenger Redis DSNs must not use path `/messages`.
 
-8. **SQL error context (`107`)** — `php bin/console doctrine:migrations:migrate -n` widens `issue.culprit` to VARCHAR(255) on MySQL. Issue/event pages show a Query panel when SQLSTATE/SQL is in the payload. Pin `nowo-tech/beacon-bundle` **1.8.0** so dogfood clients send `contexts.db`.
+8. **SQL error context (`107`)**
+   - Issue/event detail shows a **Query** panel when SQLSTATE/SQL is in the payload (also in AI export).
+   - Stack UI opens the preferred **in-app** frame by default.
+   - Pin client SDK `nowo-tech/beacon-bundle` **≥ 1.8.0** so ingested events include `contexts.db` on database exceptions.
+
+9. **PWA / assets** — deploy rebuilt assets/SW so `cache_version` **v6** picks up `/_device` deny-cache (`make vite-build` if you override kit templates).
 
 Device ID is not a login factor. Keep LoginThrottle / CSRF / remember-me.
+
+See [CHANGELOG.md](CHANGELOG.md) `[1.24.0]`.
 
 ## Upgrading from 1.23.2 to 1.23.3
 

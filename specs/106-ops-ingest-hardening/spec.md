@@ -2,7 +2,7 @@
 
 **Feature Branch**: `106-ops-ingest-hardening`  
 **Created**: 2026-08-25  
-**Status**: Implemented (Unreleased / Phase 6.58)  
+**Status**: Shipped (v1.24.0 / Phase 6.58)  
 **Roadmap**: Phase 6.58  
 
 **Input**: After AuthKit security kits (`105`), close Unreleased ops/ingest/security/QA gaps: Messenger depths from Redis transports (including failed), cached daily/monthly quota counts, one unique-constraint Envelope retry, batched retention deletes, shared private-network SSRF for Mercure + webhooks, a dry-run command to drop redundant Halite API-key ciphertext, AuditKit timestamps on member-alert/push entities, empty PHPStan baseline with injectable FrankenPHP seams, and restore the includable PHPUnit 100% gate.
