@@ -7,10 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+_No unreleased operator-facing changes yet._
+
+## [1.24.1] - 2026-08-26
+
 ### Changed
 
 - **Setup token gate**: `.env.dist` ships `SITE_SETUP_TOKEN=beacon-local-setup` (same pattern as the FrankenPHP boilerplate). `/setup` without `?token=` returns **403** and the FormKit paste form even when the env var is empty (fallback to that documented local default; prod still refuses it).
 - **Isolated E2E env template**: versioned file is **`.env.e2e.dist`** (sibling of `.env.dist`). Working file `.env.e2e.local` stays gitignored (`cp .env.e2e.dist .env.e2e.local` / `make ensure-e2e-env` overlays shared infra from `.env.local`). Never commit `.env.local` or `.env.e2e.local`. Spec `104`.
+
+### Fixed
+
+- **CI Quality**: restore PHPStan-clean / includable 100% coverage and Rector dry-run for issue 107 (Query panel / AI export branches).
+
+### Notes for integrators
+
+- No Doctrine migrations.
+- After pull: merge `SITE_SETUP_TOKEN` from `.env.dist` into `.env.local` if missing. For isolated E2E, `cp .env.e2e.dist .env.e2e.local` or `make ensure-e2e-env` (do not commit `.env.local` / `.env.e2e.local`).
+- See [UPGRADING.md](UPGRADING.md) **Upgrading from 1.24.0 to 1.24.1**.
 
 ## [1.24.0] - 2026-08-26
 
@@ -1528,7 +1542,9 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.23.3...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.1...HEAD
+[1.24.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.0...v1.24.1
+[1.24.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.23.3...v1.24.0
 [1.23.3]: https://github.com/nowo-tech/symfony-beacon/compare/v1.23.2...v1.23.3
 [1.23.2]: https://github.com/nowo-tech/symfony-beacon/compare/v1.23.1...v1.23.2
 [1.23.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.23.0...v1.23.1

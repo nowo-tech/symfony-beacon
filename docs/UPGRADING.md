@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.24.0)](#unreleased-main-after-1240)
+- [Unreleased (main after 1.24.1)](#unreleased-main-after-1241)
+- [Upgrading from 1.24.0 to 1.24.1](#upgrading-from-1240-to-1241)
 - [Upgrading from 1.23.3 to 1.24.0](#upgrading-from-1233-to-1240)
 - [Upgrading from 1.23.2 to 1.23.3](#upgrading-from-1232-to-1233)
 - [Upgrading from 1.23.1 to 1.23.2](#upgrading-from-1231-to-1232)
@@ -91,15 +92,25 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.24.0)
+## Unreleased (main after 1.24.1)
+
+_No unreleased operator-facing steps yet._
+
+See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
+
+## Upgrading from 1.24.0 to 1.24.1
 
 Setup token default + isolated E2E env template. **No migrations.**
 
-1. `.env.dist` ships `SITE_SETUP_TOKEN=beacon-local-setup`. `/setup` without `?token=` is 403 + paste form (prod still refuses that documented default).
-2. Versioned E2E template is **`.env.e2e.dist`**. Working file remains gitignored `.env.e2e.local` (`cp .env.e2e.dist .env.e2e.local` or `make ensure-e2e-env`).
-3. Do not commit `.env.local` or `.env.e2e.local`. After pull: `make up-e2e` regenerates `.env.e2e.local` from the dist file and overlays shared infra secrets from `.env.local`.
+1. Pull / checkout `v1.24.1`.
 
-See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
+2. `.env.dist` ships `SITE_SETUP_TOKEN=beacon-local-setup`. `/setup` without `?token=` is 403 + paste form (prod still refuses that documented default). Merge the key into `.env.local` if missing.
+
+3. Versioned E2E template is **`.env.e2e.dist`**. Working file remains gitignored `.env.e2e.local` (`cp .env.e2e.dist .env.e2e.local` or `make ensure-e2e-env`).
+
+4. Do not commit `.env.local` or `.env.e2e.local`. After pull: `make up-e2e` regenerates `.env.e2e.local` from the dist file and overlays shared infra secrets from `.env.local`.
+
+See [CHANGELOG.md](CHANGELOG.md) `[1.24.1]`.
 
 ## Upgrading from 1.23.3 to 1.24.0
 
