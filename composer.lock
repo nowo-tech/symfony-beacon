@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "99cf7c58447f4ab9fade48abd18c7e5d",
+    "content-hash": "5a8bb355f29d6f59e7c020651a125e8b",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -12905,16 +12905,16 @@
         },
         {
             "name": "nowo-tech/hot-reload-bundle",
-            "version": "v1.4.2",
+            "version": "v1.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/HotReloadBundle.git",
-                "reference": "2311313bca7d1c5a65f8322b4b95bae30fab9417"
+                "reference": "f91673ded68b4babd98c58faf958a1b6c2538aee"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/HotReloadBundle/zipball/2311313bca7d1c5a65f8322b4b95bae30fab9417",
-                "reference": "2311313bca7d1c5a65f8322b4b95bae30fab9417",
+                "url": "https://api.github.com/repos/nowo-tech/HotReloadBundle/zipball/f91673ded68b4babd98c58faf958a1b6c2538aee",
+                "reference": "f91673ded68b4babd98c58faf958a1b6c2538aee",
                 "shasum": ""
             },
             "require": {
@@ -12944,6 +12944,11 @@
                 "twig/twig": "Required for {{ nowo_hot_reload_assets() }} Twig helper"
             },
             "type": "symfony-bundle",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "1.5.x-dev"
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "Nowo\\HotReloadBundle\\": "src/"
@@ -12986,7 +12991,7 @@
                 "issues": "https://github.com/nowo-tech/HotReloadBundle/issues",
                 "source": "https://github.com/nowo-tech/HotReloadBundle"
             },
-            "time": "2026-08-24T16:03:01+00:00"
+            "time": "2026-08-28T08:20:38+00:00"
         },
         {
             "name": "nowo-tech/phpstan-frankenphp",
