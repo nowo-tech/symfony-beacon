@@ -15,7 +15,7 @@ Operators keep per-account login throttling that matches AuthKit nested `login_f
 
 | ID | Area | Deliverable |
 |----|------|-------------|
-| C1 | Login throttle | **Superseded (pass 40):** LoginThrottle **≥3.2** extracts nested AuthKit `login_form[_username]` in-kit. Former host `AuthKitAwareLoginRateLimiter` removed. |
+| C1 | Login throttle | **Superseded (v1.24.4 / OTHER pass 40):** LoginThrottle **≥3.2** extracts nested AuthKit `login_form[_username]` in-kit. Former host `AuthKitAwareLoginRateLimiter` removed. |
 | C2 | PHPUnit | `LoginThrottleTest` asserts unrelated username is not locked after peer exhausts attempts on same IP |
 | C3 | CI E2E job | `timeout-minutes: 90`; `docker compose --profile mail up -d`; Mailpit readiness wait; `PLAYWRIGHT_MAILPIT_URL`; `sudo chown` before host `pnpm` |
 | C4 | Quality / secrets | Gitleaks ignore for dummy Web Push auth; PHPStan `@method addFlash` / CS / Rector `readonly` on throttle decorator |
@@ -24,9 +24,9 @@ Operators keep per-account login throttling that matches AuthKit nested `login_f
 
 ## Non-goals
 
-- Upstream fix inside `nowo-tech/login-throttle-bundle` (host decorator is the Beacon cut; bundle may absorb later)
 - Parallel Playwright workers (`workers: 1` retained for shared DB)
 - Automating Out of scope rows (empty-DB first user, SiteBackup restore, Native / dogfood UI)
+- Keeping a host LoginThrottle decorator after LoginThrottle **≥3.2** (kit-owned nested username as of **v1.24.4**)
 
 ## User Scenarios & Testing
 
@@ -86,7 +86,7 @@ Operators keep per-account login throttling that matches AuthKit nested `login_f
 
 ## Implementation notes
 
-- Key type (historical): host `AuthKitAwareLoginRateLimiter` (`#[AsDecorator('nowo_login_throttle.database_rate_limiter')]`) — **removed** after LoginThrottle **3.2.0** (kit-owned nested username + reset).
+- Key type (historical): host `AuthKitAwareLoginRateLimiter` (`#[AsDecorator('nowo_login_throttle.database_rate_limiter')]`) — **removed** in **v1.24.4** after LoginThrottle **3.2.0** (kit-owned nested username + reset).
 - Workflow: `.github/workflows/ci.yml` E2E job.
 - Specs file: `e2e/flows/use-cases-atomic-gaps.spec.ts`.
 

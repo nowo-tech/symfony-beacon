@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.24.3)](#unreleased-main-after-1243)
+- [Unreleased (main after 1.24.4)](#unreleased-main-after-1244)
+- [Upgrading from 1.24.3 to 1.24.4](#upgrading-from-1243-to-1244)
 - [Upgrading from 1.24.2 to 1.24.3](#upgrading-from-1242-to-1243)
 - [Upgrading from 1.24.1 to 1.24.2](#upgrading-from-1241-to-1242)
 - [Upgrading from 1.24.0 to 1.24.1](#upgrading-from-1240-to-1241)
@@ -94,11 +95,17 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.24.3)
+## Unreleased (main after 1.24.4)
+
+_No unreleased operator-facing steps yet._
+
+See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
+
+## Upgrading from 1.24.3 to 1.24.4
 
 Kit-over-shim floors (OTHER pass 40): HotReload **1.5.2**, LoginThrottle **3.2.0**, CookieConsent **1.9.7**, Pwa **1.5.0**. **No migrations.**
 
-1. Pull / checkout `main` (or the release that cuts this Unreleased).
+1. Pull / checkout `v1.24.4`.
 
 2. `composer install` — pins above (Pwa **1.5.0**). Soft-reload browsers after deploy so clients pick up SW `cache_version` **v8**.
 
@@ -109,7 +116,7 @@ Kit-over-shim floors (OTHER pass 40): HotReload **1.5.2**, LoginThrottle **3.2.0
 
 4. Optional — `bin/console nowo:hot-reload:check` in dev after `make up`.
 
-See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
+See [CHANGELOG.md](CHANGELOG.md) `[1.24.4]`.
 
 ## Upgrading from 1.24.2 to 1.24.3
 

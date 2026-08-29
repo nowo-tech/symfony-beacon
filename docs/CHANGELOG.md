@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+_No unreleased operator-facing changes yet._
+
+## [1.24.4] - 2026-08-29
+
 ### Changed
 
 - **Kit-over-shim (OTHER pass 40):** HotReload **1.5.2**, LoginThrottle **3.2.0**, CookieConsent **1.9.7**, Pwa **1.5.0**. Deleted host shims now owned by kits: `AuthKitAwareLoginRateLimiter`, `PwaStatelessCookieSubscriber`, `PushServiceWorkerListener`. Web Push uses kit `service_worker.web_push` + host `WebPushPresentation` (`title`/`body`/`tag` in the push JSON); PWA `cache_version` **v8**.
@@ -15,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - No Doctrine migrations.
 - After pull: `composer install`. Soft-reload browsers so clients pick up the new service worker. Optional: `bin/console nowo:hot-reload:check` in dev.
-- See [UPGRADING.md](UPGRADING.md) **Unreleased (main after 1.24.3)**.
+- See [UPGRADING.md](UPGRADING.md) **Upgrading from 1.24.3 to 1.24.4**.
 
 ## [1.24.3] - 2026-08-29
 
@@ -1581,7 +1585,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.3...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.4...HEAD
+[1.24.4]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.3...v1.24.4
 [1.24.3]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.2...v1.24.3
 [1.24.2]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.1...v1.24.2
 [1.24.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.0...v1.24.1

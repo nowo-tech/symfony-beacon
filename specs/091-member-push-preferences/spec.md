@@ -4,7 +4,7 @@
 
 **Created**: 2026-08-12
 
-**Status**: Implemented (shipped **v1.8.0**; LiveComponent DI polish **v1.8.1**; QA/CI follow-ups **v1.8.2**; realtime/prefs batching **v1.11.0** / `095`; Rector 2.6.2 Symfony sets **v1.23.2**)
+**Status**: Implemented (shipped **v1.8.0**; LiveComponent DI polish **v1.8.1**; QA/CI follow-ups **v1.8.2**; realtime/prefs batching **v1.11.0** / `095`; Rector 2.6.2 Symfony sets **v1.23.2**; kit `web_push` + `WebPushPresentation` **v1.24.4**)
 
 **Input**: User description: "Per-user push notifications for interesting issue events (new, regression, resolve, reopen, assign, comment, and related), configurable at account level and per project. Defaults all on (opt-out): members manually turn off noisy events/projects. Scope can be all project issues or only when the member is involved. Delivery requires account-level alerts enabled AND the specific project enabled, and only for projects the member can access."
 

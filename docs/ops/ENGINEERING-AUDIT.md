@@ -1,7 +1,7 @@
 # Engineering audit (REQ-REV)
 
 **App:** Symfony Beacon (`symfony-beacon`)  
-**Pass date:** 2026-08-15 (first pass) · **Remediation High:** 2026-08-15 · **QA-002:** 2026-08-16 · **Platform 100% close:** 2026-08-17  
+**Pass date:** 2026-08-15 (first pass) · **Remediation High:** 2026-08-15 · **QA-002:** 2026-08-16 · **Platform 100% close:** 2026-08-17 · **Kit-over-shim pass 40:** 2026-08-29 (**v1.24.4**)  
 **Scope:** REQ-REV-002…007 (+ BP-004 evidence)  
 **Verdict:** **✅ Pass** — Critical/High empty; Low backlog only (profiler CI budgets; residual kit chrome forks)
 
