@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.24.2)](#unreleased-main-after-1242)
+- [Unreleased (main after 1.24.3)](#unreleased-main-after-1243)
+- [Upgrading from 1.24.2 to 1.24.3](#upgrading-from-1242-to-1243)
 - [Upgrading from 1.24.1 to 1.24.2](#upgrading-from-1241-to-1242)
 - [Upgrading from 1.24.0 to 1.24.1](#upgrading-from-1240-to-1241)
 - [Upgrading from 1.23.3 to 1.24.0](#upgrading-from-1233-to-1240)
@@ -93,15 +94,23 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.24.2)
+## Unreleased (main after 1.24.3)
 
-Dogfood DX: auto `reload-env` when `BEACON_DSN` is stale. **No migrations.**
+_No unreleased operator-facing steps yet._
 
-1. Pull / checkout `main`.
+See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
+
+## Upgrading from 1.24.2 to 1.24.3
+
+Dogfood DX: auto `reload-env` when `BEACON_DSN` is stale; suite DB/long-content kinds. **No migrations.**
+
+1. Pull / checkout `v1.24.3`.
 
 2. No operator env changes. After `make seed` / `make dogfood` / `make ready`, containers recreate automatically when `.env.local` `BEACON_DSN` ≠ php process env. Manual: `make reload-env`. See [DSN.md](DSN.md).
 
-See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
+3. Optional — `make beacon-suite` now includes `db-sql` / `db-connection` / `long-content` probes for Query / truncation UI.
+
+See [CHANGELOG.md](CHANGELOG.md) `[1.24.3]`.
 
 ## Upgrading from 1.24.1 to 1.24.2
 

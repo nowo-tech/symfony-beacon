@@ -10,9 +10,11 @@ Add `nowo-tech/beacon-bundle` to the Beacon server for dogfooding. Seed demo key
 
 1. Composer require (Packagist) + `config/packages/nowo_beacon.yaml` + `.env.dist` vars.
 2. `ProjectApiKey::generate(..., ?secret)`; `DEMO_SECRET_KEY`; seed patches `.env.local` / `.env`.
-3. Makefile `ready` + `dogfood` + `beacon-test` + `beacon-suite` + `reclaim-demo-client-env`; docs INSTALL/DSN/README/ARCHITECTURE/constitution.
+3. Makefile `ready` + `dogfood` + `beacon-test` + `beacon-suite` + `reclaim-demo-client-env` + `reload-env` / `reload-env-if-beacon-dsn-stale`; docs INSTALL/DSN/README/ARCHITECTURE/constitution.
 4. Tests for before_send + seed DSN write + dogfood diagnostics + probe suite payloads/tags.
 5. (2026-08-16) Pin beacon-bundle **1.7.3**; host wrapper diagnostics (ACK ≠ Web Push).
 6. (2026-08-16) `nowo_beacon.ignore_exceptions`: `AccessDeniedException` + `AccessDeniedHttpException`; document in DSN.md / spec FR-010.
 7. (2026-08-17) `BeaconDogfoodProbeSuite` + `app:beacon:test --suite` / `make beacon-suite`; explicit where-it-happened client tags (FR-015 / FR-016).
 8. (2026-08-17) Spec implementation table: seven kinds, sync `EnvelopeTransport`, fingerprint `beacon-suite`+kind+token, `--check-only` preview (FR-015b). Docs: DSN.md operator matrix.
+9. (2026-08-29) After seed/dogfood/ready, compare `.env.local` `BEACON_DSN` to php `printenv`; recreate php/messenger via `make reload-env` when stale (FR-003b) — avoids ingest 401 without a separate manual restart.
+10. (2026-08-29) Suite kinds `db-sql` / `db-connection` / `long-content` for Query facts and truncation dogfood (`107`).

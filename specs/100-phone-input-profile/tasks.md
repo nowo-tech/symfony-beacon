@@ -20,7 +20,7 @@
 
 - [x] T008 Default `qr_login.mode: disabled`; enable under `when@dev` / `when@test`
 - [x] T009 Update `AccountPreferencesTest` for compound phone fields + verification hygiene
-- [x] T010 `make restart` force-recreates php/messengers so `BEACON_DSN` reloads from `.env.local`
+- [x] T010 `make restart` force-recreates php/messengers so `BEACON_DSN` reloads from `.env.local` (follow-up: `058` T016 auto `reload-env` after seed/dogfood)
 
 ## Phase 4: Specs / docs / env
 

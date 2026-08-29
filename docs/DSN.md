@@ -58,7 +58,7 @@ make beacon-test ARGS='--suite --run-token=demo --wait=15'
 - there are no `push_subscription` rows / VAPID is unset (no Web Push),
 - the event never appears (workers not running).
 
-`make beacon-suite` (`app:beacon:test --suite`) posts **seven synthetic Envelopes** synchronously (not via `nowo_beacon.transport.mode`) with fingerprint `['beacon-suite', <kind>, <runToken>]` so you can open Issues and validate UI panels. Preview without sending: `make beacon-test ARGS='--suite --check-only'`.
+`make beacon-suite` (`app:beacon:test --suite`) posts **ten synthetic Envelopes** synchronously (not via `nowo_beacon.transport.mode`) with fingerprint `['beacon-suite', <kind>, <runToken>]` so you can open Issues and validate UI panels (including Query / truncation). Preview without sending: `make beacon-test ARGS='--suite --check-only'`.
 
 | Kind | Extra / context | Client tags (plus `source=dogfood.suite`, `probe_kind`, `probe_run`) | Issue UI to check |
 |------|-----------------|---------------------------------------------------------------------|-------------------|
@@ -69,6 +69,9 @@ make beacon-test ARGS='--suite --run-token=demo --wait=15'
 | `http` | GET `project_issues_index`, `extra.http` status 500 | `url`, `http.route`, `http.method` | Request / HTTP panels |
 | `messenger` | `extra.messenger` + `extra.scheduler` | `messenger.message_class` | Messenger + Scheduler panels |
 | `breadcrumbs` | three `dogfood` crumbs | `transaction=cli://…#breadcrumbs` | Breadcrumbs trail |
+| `db-sql` | MySQL “unknown column” + `contexts.db` / query breadcrumb | `db.scenario`, `transaction=cli://…#db-sql` | Query panel / SQL facts |
+| `db-connection` | unreachable host connection error + `contexts.db` | `db.scenario`, `transaction=cli://…#db-connection` | Query / connection facts |
+| `long-content` | oversized SQL + filler extra (truncation) | `db.scenario`, `transaction=cli://…#long-content` | Truncation / long payload UI |
 
 Filter or search by tag `probe_run=<token>` (printed by the command). On real Bundle-captured failures, command/URL live in `extra` / request and appear as **system** tags; the suite also sets **client** tags so dogfood Issues are searchable. Default single-probe `make beacon-test` stays a thin ACK check. Workers must be running for events to persist. See spec `058` User Story 6 / FR-015.
 

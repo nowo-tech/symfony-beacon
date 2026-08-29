@@ -7,9 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+_No unreleased operator-facing changes yet._
+
+## [1.24.3] - 2026-08-29
+
 ### Changed
 
 - **Dogfood DX:** `make seed` / `make dogfood` / `make ready` call `reload-env-if-beacon-dsn-stale` so php/messenger recreate when `.env.local` `BEACON_DSN` differs from the container (avoids ingest 401 after project recreate). New `make reload-env` recreates without Vite. See [DSN.md](DSN.md).
+- **`make beacon-suite`:** adds kinds `db-sql`, `db-connection`, and `long-content` (Query facts / connection errors / truncation). Spec `058` FR-015.
+
+### Notes for integrators
+
+- No Doctrine migrations.
+- After pull: no env changes required for local dogfood. Prefer `make dogfood` / `make ready` (auto reload). Manual: `make reload-env`.
+- See [UPGRADING.md](UPGRADING.md) **Upgrading from 1.24.2 to 1.24.3**.
 
 ## [1.24.2] - 2026-08-29
 
@@ -1562,7 +1573,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.2...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.3...HEAD
+[1.24.3]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.2...v1.24.3
 [1.24.2]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.1...v1.24.2
 [1.24.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.0...v1.24.1
 [1.24.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.23.3...v1.24.0

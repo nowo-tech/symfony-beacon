@@ -15,3 +15,5 @@
 - [x] T013 `BeaconDogfoodProbeSuite` + `app:beacon:test --suite` / `make beacon-suite` (message/exception/console/http/messenger/breadcrumbs; unique fingerprints)
 - [x] T014 Suite client tags where-explicit (`console.command`, `url`/`http.route`, `messenger.message_class`, `transaction`) + unit tests; spec FR-015 / FR-016 / SC-008 / User Story 6; DSN.md + CHANGELOG
 - [x] T015 Spec implementation table (kinds / extras / tags / CLI) + DSN.md operator matrix; FR-015b `--check-only` preview
+- [x] T016 Auto `reload-env-if-beacon-dsn-stale` after `make seed` / `dogfood` / `ready`; `make reload-env` (no Vite); spec FR-003b / US2–US3 / SC-001; DSN.md + CHANGELOG/UPGRADING
+- [x] T017 Suite kinds `db-sql` / `db-connection` / `long-content` (+ unit tests); FR-015 amended; DSN.md matrix

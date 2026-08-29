@@ -5,7 +5,7 @@
 **Status**: Done (v1.16.0 / Phase 6.51)  
 **Roadmap**: Phase 6.51  
 
-**Input**: Account → Profile phone must use `nowo-tech/phone-input-bundle` (country prefix + E.164) instead of a free-text field; host CSP must not break the prefix picker; AuthKit QR login stays disabled in prod while remaining available under `when@dev` / `when@test` for UC-AUTH-21/22. Related ops polish: `make restart` recreates PHP workers so `BEACON_DSN` from `.env.local` is reloaded; operator working env file is `.env.local` (REQ-ENV-003).
+**Input**: Account → Profile phone must use `nowo-tech/phone-input-bundle` (country prefix + E.164) instead of a free-text field; host CSP must not break the prefix picker; AuthKit QR login stays disabled in prod while remaining available under `when@dev` / `when@test` for UC-AUTH-21/22. Related ops polish: `make restart` / `make reload-env` recreate PHP workers so `BEACON_DSN` from `.env.local` is reloaded (`058` also auto-reloads after seed/dogfood); operator working env file is `.env.local` (REQ-ENV-003).
 
 ## Summary
 
@@ -16,7 +16,7 @@
 | P3 | CSP / UX | Kit IIFE + `phone_input.css` (no host Twig/JS fork). Host `_phone_input.scss` theme bridge only (2026-08-17). |
 | P4 | QR env split | Default `qr_login.mode: disabled`; `when@dev` / `when@test` → `enabled` (096 / AUTH-005) |
 | P5 | Tests | PHPUnit submits `user_profile[phone][country_iso]` + `[national_number]`; verify/clear `phoneVerifiedAt` still holds (`095`) |
-| O1 | Dogfood ops | `make restart` → `up -d --force-recreate` for php/messengers so Compose reloads `.env.local` (`BEACON_DSN`) |
+| O1 | Dogfood ops | `make restart` / `make reload-env` → `--force-recreate` php/messengers so Compose reloads `.env.local` (`BEACON_DSN`); `058` FR-003b auto-runs the stale check after seed/dogfood/ready |
 | O2 | Env file | Operator working file is `.env.local` (from `.env.dist`); `ensure-env` / CI `COMPOSE_ENV_FILES` (REQ-ENV-003) |
 
 ## Non-goals
@@ -68,11 +68,12 @@
 
 **Why this priority**: Plain Compose `restart` keeps stale container env; after `make dogfood` / seed writes `BEACON_DSN`, workers must see the new value.
 
-**Independent Test**: Change `BEACON_DSN` in `.env.local`, run `make restart`, `printenv BEACON_DSN` inside php matches the file.
+**Independent Test**: Change `BEACON_DSN` in `.env.local`, run `make restart` (or `make reload-env`), `printenv BEACON_DSN` inside php matches the file. After `make dogfood` / `make seed`, the stale check recreates automatically when file ≠ container (`058` FR-003b).
 
 **Acceptance Scenarios**:
 
 1. **Given** an updated `.env.local` `BEACON_DSN`, **When** `make restart` runs, **Then** php / messenger / messenger-notify are recreated (`--force-recreate`) and env matches `.env.local`.
+2. **Given** `.env.local` already has the current self DSN but the php container still has a previous UUID, **When** `make dogfood` / `make seed` finishes, **Then** Make recreates php/messenger without a separate manual restart (`058` FR-003b / `make reload-env`).
 
 ## Edge Cases
 
@@ -88,7 +89,7 @@
 - **FR-003**: Prefix picker MUST be CSP-safe (kit external JS ≥ **1.3**, or equivalent). MUST NOT rely on vendor inline script. Host MUST NOT keep a Twig/Stimulus picker fork after `101`. A thin host `_phone_input.scss` **theme bridge** is allowed (token remap only — Bootstrap `--bs-*` fallbacks → Beacon `--color-*` / `data-theme`; no picker JS/Twig).
 - **FR-004**: Default AuthKit `qr_login.mode` MUST be `disabled`; MUST be `enabled` under `when@dev` and `when@test`.
 - **FR-005**: PHPUnit Account profile tests MUST exercise the compound phone fields and verification hygiene.
-- **FR-006**: `make restart` MUST recreate app containers so `.env.local` (including `BEACON_DSN`) is reloaded.
+- **FR-006**: `make restart` MUST recreate app containers so `.env.local` (including `BEACON_DSN`) is reloaded. `make reload-env` MUST recreate without Vite. After `make seed` / `make dogfood` / `make ready`, Make MUST auto-recreate when file DSN ≠ container DSN (`058` FR-003b).
 - **FR-007**: Operator working env MUST be `.env.local` (template `.env.dist`); Make/Compose/CI MUST not treat `.env` as the primary working file.
 
 ## Success Criteria
@@ -96,7 +97,7 @@
 - **SC-001**: Profile phone UX uses the kit compound widget; PHPUnit green for save / keep-verified / clear-verified paths.
 - **SC-002**: Profile page works under CSP without console script-src violations for the phone field.
 - **SC-003**: Prod QR remains disabled; local/E2E QR paths remain covered.
-- **SC-004**: After dogfood DSN write + `make restart`, container `BEACON_DSN` matches `.env.local`.
+- **SC-004**: After dogfood DSN write, container `BEACON_DSN` matches `.env.local` (auto `reload-env` after seed/dogfood/ready, or manual `make restart` / `make reload-env`).
 - **SC-005**: Fresh clone uses `cp .env.dist .env.local`; existing `.env` migrates via `make ensure-env`.
 
 ## Dependencies
@@ -114,7 +115,7 @@
 - Assets (as of `101` + 2026-08-17 theme bridge): kit `phone_input.css` + flag-icons on Profile; kit `nowo-phone-prefix-picker.js` from widget (no host Twig/Stimulus). Host `_phone_input.scss` remaps kit Bootstrap tokens to Beacon `--color-*` / `data-theme` (imported from `app.scss`).
 - Twig: kit `@NowoPhoneInputBundle/Form/phone_input_widget.html.twig` (no host override); `templates/account/profile.html.twig`
 - Tests: `tests/Functional/Identity/AccountPreferencesTest.php`
-- Make: `restart` target force-recreate
+- Make: `restart` (recreate + vite-build); `reload-env` / `reload-env-if-beacon-dsn-stale` (recreate only; auto after seed/dogfood — `058` FR-003b)
 
 ## Amendments
 
@@ -133,3 +134,7 @@ Kit `phone_input.css` still paints the prefix toggle / portaled dropdown with Bo
 ### 2026-08-25 — OTP input is not phone SMS (`105`)
 
 AuthKit **1.20** `/reset-password/complete` uses `nowo-tech/otp-input-bundle` (email/code UX). Profile phone **SMS OTP** verification remains ROADMAP Later. See `specs/105-authkit-security-kits/` and `072`.
+
+### 2026-08-29 — Auto reload after seed/dogfood (`058` FR-003b)
+
+O1 / FR-006 / SC-004 / User Story 4: `make seed` / `make dogfood` / `make ready` call `reload-env-if-beacon-dsn-stale` so operators do not need a separate `make restart` when `.env.local` already matches the self DSN but the container is stale. Manual `make reload-env` remains. Primary spec: `specs/058-self-beacon-client/`.

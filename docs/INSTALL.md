@@ -36,7 +36,7 @@ make seed-sample        # optional: PROFILE=dev samples
 # (starts Compose if php is down — no rebuild / no Vite). Use `make up` for first boot.
 ```
 
-After `make ready`, restart PHP if `BEACON_DSN` was just written (`make restart`) so the Kernel picks up dogfooding. Empty `BEACON_DSN` disables self-reporting.
+After `make ready`, Make reloads php/messenger when `.env.local` `BEACON_DSN` differs from the container (`make reload-env`) so dogfooding works without a separate manual restart. Empty `BEACON_DSN` disables self-reporting. Manual: `make reload-env` or `make restart` (also rebuilds assets). See [DSN.md](DSN.md).
 
 **Before exposing the HTTP(S) port beyond localhost:** finish `/setup` (or `make ready`). AuthKit `/login` and `/register` stay gated until catalogs/setup are complete — the first `ROLE_ADMIN` is created in the wizard `admin_user` step (or demo seed). Keep `SYMFONY_TRUSTED_PROXIES` empty unless an outer load balancer terminates TLS — see [PRODUCTION.md](PRODUCTION.md) operational inventory. If `.demo-client.env` already exists from an older seed, run `chmod 600 .demo-client.env`.
 
