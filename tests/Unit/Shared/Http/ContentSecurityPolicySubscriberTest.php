@@ -76,6 +76,58 @@ final class ContentSecurityPolicySubscriberTest extends TestCase
         self::assertStringNotContainsString('https://localhost:9447', $csp);
     }
 
+    public function testCspAppendsConfiguredConnectSourcesAfterMercure(): void
+    {
+        $response = $this->dispatch(
+            '/',
+            '<html><body>ok</body></html>',
+            kernelDebug: false,
+            mercurePublicUrl: 'https://hub.example:9443/.well-known/mercure',
+            requestUri: 'https://app.example/',
+            connectSrcExtra: [
+                'https://metrics.example.test',
+                '',
+            ],
+        );
+        $csp = (string) $response->headers->get('Content-Security-Policy');
+        self::assertStringContainsString("connect-src 'self' ws: wss: https://hub.example:9443 https://metrics.example.test", $csp);
+    }
+
+    public function testCspAppendsConfiguredScriptSources(): void
+    {
+        $response = $this->dispatch(
+            '/',
+            '<html><body>ok</body></html>',
+            kernelDebug: false,
+            scriptSrcExtra: [
+                'https://cdn.example.test',
+                '',
+            ],
+        );
+        $csp = (string) $response->headers->get('Content-Security-Policy');
+        self::assertStringContainsString('https://cdn.example.test', $csp);
+        self::assertMatchesRegularExpression("/script-src 'self' 'nonce-[A-Za-z0-9+\/=]+' https:\\/\\/cdn\\.example\\.test/", $csp);
+    }
+
+    public function testStampsNonceOnInlineScriptsWithoutNonce(): void
+    {
+        $html = '<html><body><script>window.x=1</script><script src="/app.js"></script>'
+            .'<script nonce="already">ok()</script>'
+            .'<script type="application/json">{"a":1}</script></body></html>';
+        $response = $this->dispatch('/', $html, kernelDebug: false);
+        $content = (string) $response->getContent();
+        $nonce = (string) preg_replace(
+            "/.*script-src 'self' 'nonce-([^']+)'.*/s",
+            '$1',
+            (string) $response->headers->get('Content-Security-Policy'),
+        );
+
+        self::assertStringContainsString('<script nonce="'.$nonce.'">window.x=1</script>', $content);
+        self::assertStringContainsString('<script src="/app.js"></script>', $content);
+        self::assertStringContainsString('<script nonce="already">ok()</script>', $content);
+        self::assertStringContainsString('<script type="application/json">{"a":1}</script>', $content);
+    }
+
     public function testDoesNotOverrideExistingCsp(): void
     {
         $response = new Response('<html></html>', Response::HTTP_OK, [
@@ -118,19 +170,30 @@ final class ContentSecurityPolicySubscriberTest extends TestCase
         self::assertNull($method->invoke($subscriber, 'ftp://example.test/resource'));
     }
 
+    /**
+     * @param list<string> $connectSrcExtra
+     * @param list<string> $scriptSrcExtra
+     */
     private function dispatch(
         string $path,
         string $html,
         bool $kernelDebug,
         string $mercurePublicUrl = '',
         string $requestUri = '',
+        array $connectSrcExtra = [],
+        array $scriptSrcExtra = [],
     ): Response {
         $kernel = $this->createStub(KernelInterface::class);
         $request = '' !== $requestUri
             ? Request::create($requestUri)
             : Request::create($path);
         $response = new Response($html, Response::HTTP_OK, ['Content-Type' => 'text/html; charset=UTF-8']);
-        $subscriber = new ContentSecurityPolicySubscriber($kernelDebug, $mercurePublicUrl);
+        $subscriber = new ContentSecurityPolicySubscriber(
+            kernelDebug: $kernelDebug,
+            mercurePublicUrl: $mercurePublicUrl,
+            connectSrcExtra: $connectSrcExtra,
+            scriptSrcExtra: $scriptSrcExtra,
+        );
         $subscriber(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
         $subscriber(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
 

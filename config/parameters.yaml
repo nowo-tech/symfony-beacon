@@ -23,3 +23,6 @@ parameters:
     beacon.read_api_rate_limit: '%env(int:BEACON_READ_API_RATE_LIMIT)%'
     # When true, SiteBackup setup gate also triggers if menus/breadcrumbs/cookies are missing.
     app.setup.check_platform_catalogs: true
+    # Extra CSP connect-src / script-src hosts (empty by default; no Sentry / Chart.js).
+    app.csp.connect_src_extra: []
+    app.csp.script_src_extra: []

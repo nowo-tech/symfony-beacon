@@ -31,7 +31,13 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * eval()s scripts from the /_wdt AJAX fragment.
  *
  * {@code connect-src} always includes {@code 'self' ws: wss:} plus the origin of
- * {@see $mercurePublicUrl} when that hub is absolute and cross-origin (EventSource).
+ * {@see $mercurePublicUrl} when that hub is absolute and cross-origin (EventSource),
+ * then any {@see $connectSrcExtra} hosts.
+ *
+ * Inline {@code <script>} tags from vendor Twig are stamped with the request nonce
+ * before the header is set, because a nonce in {@code script-src} disables
+ * {@code unsafe-inline} in browsers. {@see KitInlineConfigScriptSubscriber} still
+ * rewrites kit {@code window.*Config} scripts to JSON islands.
  */
 #[AsEventListener(event: KernelEvents::REQUEST, priority: 1024)]
 #[AsEventListener(event: KernelEvents::RESPONSE, priority: -100)]
@@ -43,11 +49,19 @@ final readonly class ContentSecurityPolicySubscriber
 
     private const string CSP_TAIL = "; worker-src 'self'; manifest-src 'self'";
 
+    /**
+     * @param list<string> $connectSrcExtra Extra connect-src hosts after Mercure origin
+     * @param list<string> $scriptSrcExtra  Extra script-src hosts after nonce / unsafe-eval
+     */
     public function __construct(
         #[Autowire('%kernel.debug%')]
         private bool $kernelDebug,
         #[Autowire('%beacon.mercure.env_public_url%')]
         private string $mercurePublicUrl = '',
+        #[Autowire('%app.csp.connect_src_extra%')]
+        private array $connectSrcExtra = [],
+        #[Autowire('%app.csp.script_src_extra%')]
+        private array $scriptSrcExtra = [],
     ) {
     }
 
@@ -95,6 +109,8 @@ final readonly class ContentSecurityPolicySubscriber
             return;
         }
 
+        $nonce = (string) $request->attributes->get(self::REQUEST_ATTR_NONCE, '');
+        $this->stampInlineScriptNonces($response, $nonce);
         $response->headers->set('Content-Security-Policy', $this->buildCsp($path, $request));
     }
 
@@ -123,6 +139,13 @@ final readonly class ContentSecurityPolicySubscriber
             $scriptSrc .= " 'unsafe-eval'";
         }
 
+        foreach ($this->scriptSrcExtra as $source) {
+            $source = trim((string) $source);
+            if ('' !== $source) {
+                $scriptSrc .= ' '.$source;
+            }
+        }
+
         $connectSrc = $this->buildConnectSrc($request);
 
         return self::CSP_BASE.$styleSrcElem.'; '.$styleSrcAttr.'; '.$scriptSrc.'; '.$connectSrc.self::CSP_TAIL;
@@ -136,7 +159,52 @@ final readonly class ContentSecurityPolicySubscriber
             $sources[] = $mercureOrigin;
         }
 
+        foreach ($this->connectSrcExtra as $source) {
+            $source = trim((string) $source);
+            if ('' !== $source) {
+                $sources[] = $source;
+            }
+        }
+
         return 'connect-src '.implode(' ', $sources);
+    }
+
+    /**
+     * Vendor templates often ship bare {@code <script>} blocks. With a nonce in
+     * script-src, browsers ignore unsafe-inline — stamp the request nonce onto
+     * executable inline scripts that do not already declare one.
+     */
+    private function stampInlineScriptNonces(Response $response, string $nonce): void
+    {
+        if ('' === $nonce) {
+            return;
+        }
+        $content = $response->getContent();
+        if (!\is_string($content) || !str_contains($content, '<script')) {
+            return;
+        }
+        $escapedNonce = htmlspecialchars($nonce, \ENT_QUOTES | \ENT_SUBSTITUTE, 'UTF-8');
+        $updated = preg_replace_callback(
+            '/<script(\s[^>]*)?>/i',
+            static function (array $matches) use ($escapedNonce): string {
+                $attrs = $matches[1] ?? '';
+                if (1 === preg_match('/\bnonce\s*=/i', $attrs)) {
+                    return $matches[0];
+                }
+                if (1 === preg_match('/\bsrc\s*=/i', $attrs)) {
+                    return $matches[0];
+                }
+                if (1 === preg_match('/\btype\s*=\s*(["\'])(?!module\b|text\/javascript\b|application\/javascript\b|text\/ecmascript\b)[^"\']*\1/i', $attrs)) {
+                    return $matches[0];
+                }
+
+                return '<script nonce="'.$escapedNonce.'"'.$attrs.'>';
+            },
+            $content,
+        );
+        if (\is_string($updated) && $updated !== $content) {
+            $response->setContent($updated);
+        }
     }
 
     private function originOf(string $url): ?string
