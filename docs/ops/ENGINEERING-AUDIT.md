@@ -1,7 +1,7 @@
 # Engineering audit (REQ-REV)
 
 **App:** Symfony Beacon (`symfony-beacon`)  
-**Pass date:** 2026-08-15 (first pass) · **Remediation High:** 2026-08-15 · **QA-002:** 2026-08-16 · **Platform 100% close:** 2026-08-17 · **Kit-over-shim pass 40:** 2026-08-29 (**v1.24.4**)  
+**Pass date:** 2026-08-15 (first pass) · **Remediation High:** 2026-08-15 · **QA-002:** 2026-08-16 · **Platform 100% close:** 2026-08-17 · **Kit-over-shim pass 40:** 2026-08-29 (**v1.24.4**) · **AUTH-005 docs:** 2026-08-29 (**v1.24.5**)  
 **Scope:** REQ-REV-002…007 (+ BP-004 evidence)  
 **Verdict:** **✅ Pass** — Critical/High empty; Low backlog only (profiler CI budgets; residual kit chrome forks)
 
@@ -13,7 +13,7 @@ This document is the REV-007 evidence artifact. Prior Spec Kit hardening (`087`,
 
 | Dimension | REQ | Status | Notes |
 | --------- | --- | ------ | ----- |
-| Security | REV-002 | ✅ | Guards, CSRF, throttle, MM narrow API, encrypt; **AUTH-005** default `qr_login.mode: disabled` (enabled only `when@dev`/`when@test` for E2E) |
+| Security | REV-002 | ✅ | Guards, CSRF, throttle, MM narrow API, encrypt; **AUTH-005** base `qr_login.mode: enabled` (local/PHPUnit/E2E); prod overlay `config/packages/prod/nowo_auth_kit.yaml` → `disabled` |
 | N+1 / queries | REV-003 | ✅ | Hot-path inventory + eager/batch posture below; profiler CI budgets = Low |
 | Refactor | REV-004 | ✅ | Rector/CS/PHPStan; QA-002 **100%**; kit forks inventoried + shrink started (PWA `install_links` removed) |
 | Scalability | REV-005 | ✅ | Redis sessions/cache/Messenger; `compose.infra.yaml`; health; FrankenPHP docs |
@@ -77,7 +77,7 @@ Strategy: `templates/kit/*_layout.html.twig` first; full page forks only for Adm
 
 | ID | Title | Resolution |
 | -- | ----- | ---------- |
-| SEC-001 | AUTH-005 QR enabled in prod default | `qr_login.mode: disabled` + `when@dev` / `when@test` → `enabled` for UC-AUTH-21/22 |
+| SEC-001 | AUTH-005 QR enabled in prod default | Base `qr_login.mode: enabled` (UC-AUTH-21/22); `config/packages/prod/nowo_auth_kit.yaml` sets `disabled` (partial overlays must repeat `locale.*`) |
 | REF-001 | QA-002 soft 35% vs platform 100% | Closed: PHP Clover **100.00%**; `COVERAGE_MIN=100` |
 | N1-001 | Query budgets / profiler evidence | Closed as Medium: hot-path inventory above; profiler CI budgets → Low `N1-002` |
 | REF-002 | Kit Twig forks unexplained | Closed as Medium: inventory + CONTRIBUTING; deleted PWA `install_links`; residual chrome → Low `REF-003` |
@@ -99,8 +99,8 @@ Strategy: `templates/kit/*_layout.html.twig` first; full page forks only for Adm
 ## How to re-verify
 
 ```bash
-rg -n "qr_login:" -A6 config/packages/nowo_auth_kit.yaml
-# default mode: disabled; when@dev / when@test: enabled
+rg -n "mode:" -A1 config/packages/nowo_auth_kit.yaml config/packages/prod/nowo_auth_kit.yaml
+# base: mode: enabled; prod overlay: mode: disabled
 
 make check-module-boundaries
 test ! -f templates/bundles/NowoPwaBundle/pwa/install_links.html.twig

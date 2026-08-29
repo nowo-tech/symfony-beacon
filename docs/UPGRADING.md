@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.24.4)](#unreleased-main-after-1244)
+- [Unreleased (main after 1.24.5)](#unreleased-main-after-1245)
+- [Upgrading from 1.24.4 to 1.24.5](#upgrading-from-1244-to-1245)
 - [Upgrading from 1.24.3 to 1.24.4](#upgrading-from-1243-to-1244)
 - [Upgrading from 1.24.2 to 1.24.3](#upgrading-from-1242-to-1243)
 - [Upgrading from 1.24.1 to 1.24.2](#upgrading-from-1241-to-1242)
@@ -95,11 +96,23 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.24.4)
+## Unreleased (main after 1.24.5)
 
 _No unreleased operator-facing steps yet._
 
 See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
+
+## Upgrading from 1.24.4 to 1.24.5
+
+Documentation-only AUTH-005 / QR login notes. **No migrations. No Composer pin changes.**
+
+1. Pull / checkout `v1.24.5`.
+
+2. No runtime steps. QR login remains **enabled** in base `config/packages/nowo_auth_kit.yaml` and **disabled** in `config/packages/prod/nowo_auth_kit.yaml` (partial overlays must still repeat `locale.*`).
+
+3. Prefer [API.md](API.md) and [ENGINEERING-AUDIT.md](ops/ENGINEERING-AUDIT.md) for the corrected AUTH-005 wording (do not reintroduce `when@dev` / `when@test` QR overlays).
+
+See [CHANGELOG.md](CHANGELOG.md) `[1.24.5]`.
 
 ## Upgrading from 1.24.3 to 1.24.4
 
@@ -524,7 +537,7 @@ make vite-build
 
 ## Upgrading from 1.15.1 to 1.16.0
 
-**Phone input kit + `.env.local` + CI Compose infra (`100` / 6.51)** — `nowo-tech/phone-input-bundle` **1.2.1**; CSP-safe prefix picker; AuthKit QR stays disabled in prod (`when@dev` / `when@test` enable it); operator working env is `.env.local`; `make restart` recreates workers so `BEACON_DSN` reloads. See `[1.16.0]` in [CHANGELOG.md](CHANGELOG.md).
+**Phone input kit + `.env.local` + CI Compose infra (`100` / 6.51)** — `nowo-tech/phone-input-bundle` **1.2.1**; CSP-safe prefix picker; AuthKit QR **enabled** in base config and **disabled** in `prod/` (`config/packages/prod/nowo_auth_kit.yaml`); operator working env is `.env.local`; `make restart` recreates workers so `BEACON_DSN` reloads. See `[1.16.0]` in [CHANGELOG.md](CHANGELOG.md).
 
 ```bash
 git fetch --tags
@@ -543,7 +556,7 @@ make restart            # reload BEACON_DSN / Compose env from .env.local
 1. **Env file**: move secrets to `.env.local` (`cp .env.dist .env.local` on fresh hosts; `mv .env .env.local` or `make ensure-env` when upgrading). Prefer deleting leftover `.env` so Compose does not prefer a stale copy.
 2. **Assets**: rebuild Vite (`make vite-build`) so phone-prefix picker + `_phone_input.scss` ship.
 3. **No migrations** in this cut. Existing `User.phone` values remain; Profile now edits via country + national number.
-4. **QR login**: production remains `qr_login.mode: disabled` until SMS OTP. Local/E2E use `when@dev` / `when@test`.
+4. **QR login**: production remains `qr_login.mode: disabled` (`config/packages/prod/nowo_auth_kit.yaml`) until SMS OTP. Base config keeps `enabled` for local/PHPUnit/E2E (do not rely on `when@dev` / `when@test` overlays for QR).
 5. **Dogfood DSN**: prefer `make restart` (force-recreate) after syncing `BEACON_DSN` — soft Compose restart keeps stale env.
 6. **SMS**: leave `SMS_PROVIDER=null` unless you intentionally configure `sms_bridge` (future OTP; not used by AuthKit yet). New keys are in `.env.dist`.
 

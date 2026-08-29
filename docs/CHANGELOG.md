@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _No unreleased operator-facing changes yet._
 
+## [1.24.5] - 2026-08-29
+
+### Fixed
+
+- **AUTH-005 docs:** operator docs now match the real QR login split — base `qr_login.mode: enabled` (local / PHPUnit / E2E); production disables via `config/packages/prod/nowo_auth_kit.yaml`. Corrected `ENGINEERING-AUDIT`, `API`, `UPGRADING`, and `ROADMAP` (they previously described a stale `when@dev` / `when@test` overlay pattern).
+
+### Notes for integrators
+
+- No Doctrine migrations and no Composer pin changes.
+- After pull: no runtime steps. Prefer reading AUTH-005 / QR notes in [API.md](API.md) and [ENGINEERING-AUDIT.md](ops/ENGINEERING-AUDIT.md).
+- See [UPGRADING.md](UPGRADING.md) **Upgrading from 1.24.4 to 1.24.5**.
+
 ## [1.24.4] - 2026-08-29
 
 ### Changed
@@ -1585,7 +1597,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.4...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.5...HEAD
+[1.24.5]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.4...v1.24.5
 [1.24.4]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.3...v1.24.4
 [1.24.3]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.2...v1.24.3
 [1.24.2]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.1...v1.24.2
