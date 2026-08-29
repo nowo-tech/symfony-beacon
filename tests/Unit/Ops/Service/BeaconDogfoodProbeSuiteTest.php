@@ -21,11 +21,14 @@ final class BeaconDogfoodProbeSuiteTest extends TestCase
 {
     public function testKindsCoverPlannedSuite(): void
     {
-        self::assertCount(7, BeaconDogfoodProbeSuite::KINDS);
+        self::assertCount(10, BeaconDogfoodProbeSuite::KINDS);
         self::assertContains('console', BeaconDogfoodProbeSuite::KINDS);
         self::assertContains('http', BeaconDogfoodProbeSuite::KINDS);
         self::assertContains('messenger', BeaconDogfoodProbeSuite::KINDS);
         self::assertContains('breadcrumbs', BeaconDogfoodProbeSuite::KINDS);
+        self::assertContains('db-sql', BeaconDogfoodProbeSuite::KINDS);
+        self::assertContains('db-connection', BeaconDogfoodProbeSuite::KINDS);
+        self::assertContains('long-content', BeaconDogfoodProbeSuite::KINDS);
     }
 
     public function testConsoleCaseIncludesCommandSnapshot(): void
@@ -109,6 +112,60 @@ final class BeaconDogfoodProbeSuiteTest extends TestCase
         $values = $crumbsPayload['breadcrumbs']['values'] ?? [];
         self::assertIsArray($values);
         self::assertCount(3, $values);
+    }
+
+    public function testDbSqlCasePopulatesContextsDbAndTags(): void
+    {
+        $suite = $this->suite();
+        $spec = $suite->caseSpec('db-sql', 'dbsql01');
+        self::assertSame('error', $spec['level']);
+        self::assertNotNull($spec['throwable']);
+        self::assertSame('unknown_column', $spec['extra']['db']['scenario'] ?? null);
+        self::assertCount(2, $spec['breadcrumbs']);
+
+        $payload = $this->decodePayload($suite->buildEnvelopeBody('db-sql', 'dbsql01'));
+        self::assertSame('42S22', $payload['contexts']['db']['sqlstate'] ?? null);
+        self::assertSame('1054', $payload['contexts']['db']['code'] ?? null);
+        self::assertStringContainsString('nonexistent_col', (string) ($payload['contexts']['db']['sql'] ?? ''));
+        self::assertSame('unknown_column', $payload['tags']['db.scenario'] ?? null);
+        self::assertSame('cli://app:beacon:test#db-sql', $payload['tags']['transaction'] ?? null);
+        self::assertArrayHasKey('exception', $payload);
+    }
+
+    public function testDbConnectionCasePopulatesContextsDb(): void
+    {
+        $suite = $this->suite();
+        $spec = $suite->caseSpec('db-connection', 'dbconn1');
+        self::assertSame('connection_refused', $spec['extra']['db']['scenario'] ?? null);
+
+        $payload = $this->decodePayload($suite->buildEnvelopeBody('db-connection', 'dbconn1'));
+        self::assertSame('HY000', $payload['contexts']['db']['sqlstate'] ?? null);
+        self::assertSame('2002', $payload['contexts']['db']['code'] ?? null);
+        self::assertSame('connection_refused', $payload['tags']['db.scenario'] ?? null);
+        self::assertStringContainsString('Connection refused', (string) ($payload['exception']['values'][0]['value'] ?? ''));
+    }
+
+    public function testLongContentCaseExceedsSqlScrubLimitAndCarriesDump(): void
+    {
+        $suite = $this->suite();
+        $spec = $suite->caseSpec('long-content', 'long01');
+        self::assertSame('long_sql_and_extra', $spec['extra']['db']['scenario'] ?? null);
+        self::assertGreaterThanOrEqual(
+            BeaconDogfoodProbeSuite::LONG_CONTENT_EXTRA_BYTES,
+            \strlen((string) ($spec['extra']['dump'] ?? '')),
+        );
+
+        $payload = $this->decodePayload($suite->buildEnvelopeBody('long-content', 'long01'));
+        $sql = (string) ($payload['contexts']['db']['sql'] ?? '');
+        self::assertNotSame('', $sql);
+        self::assertLessThanOrEqual(\Nowo\BeaconBundle\Context\DatabaseExceptionContext::MAX_SQL_LENGTH, mb_strlen($sql));
+        self::assertGreaterThanOrEqual(8000, mb_strlen($sql));
+        self::assertSame('long_sql_and_extra', $payload['tags']['db.scenario'] ?? null);
+        self::assertGreaterThanOrEqual(
+            BeaconDogfoodProbeSuite::LONG_CONTENT_EXTRA_BYTES,
+            \strlen((string) ($payload['extra']['dump'] ?? '')),
+        );
+        self::assertGreaterThan(400, mb_strlen((string) ($payload['message'] ?? '')));
     }
 
     public function testPreviewFailsOnEmptyDsn(): void
@@ -277,6 +334,9 @@ final class BeaconDogfoodProbeSuiteTest extends TestCase
 
         $error = $this->decodePayload($suite->buildEnvelopeBody('message-error', 'tokerr'));
         self::assertSame('cli://app:beacon:test#message-error', $error['tags']['transaction'] ?? null);
+
+        $dbSql = $this->decodePayload($suite->buildEnvelopeBody('db-sql', 'tokdb'));
+        self::assertSame('cli://app:beacon:test#db-sql', $dbSql['tags']['transaction'] ?? null);
     }
 
     public function testBuildEnvelopeBodyThrowsWhenConfiguredDsnIsEmpty(): void

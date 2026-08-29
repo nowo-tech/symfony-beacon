@@ -47,7 +47,7 @@ final class BeaconTestCommand extends Command
                 'suite',
                 null,
                 InputOption::VALUE_NONE,
-                'Send several synthetic events (message / exception / console / HTTP / messenger / breadcrumbs)',
+                'Send several synthetic events (message / exception / console / HTTP / messenger / DB / long-content / …)',
             )
             ->addOption(
                 'message',

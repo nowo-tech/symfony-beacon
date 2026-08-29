@@ -12,6 +12,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 use Nowo\BeaconBundle\Breadcrumb\BreadcrumbBuffer;
+use Nowo\BeaconBundle\Context\DatabaseExceptionContext;
 use Nowo\BeaconBundle\Dsn\BeaconDsn;
 use Nowo\BeaconBundle\Dsn\BeaconDsnParser;
 use Nowo\BeaconBundle\Dsn\InvalidBeaconDsnException;
@@ -19,6 +20,7 @@ use Nowo\BeaconBundle\Envelope\EnvelopeBuilder;
 use Nowo\BeaconBundle\Envelope\EnvelopeTransport;
 use Nowo\BeaconBundle\Envelope\SendOptions;
 use Nowo\BeaconBundle\Scope\Scope;
+use PDOException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
@@ -30,13 +32,19 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Throwable;
 
 /**
- * Posts several synthetic Envelopes so dogfood Issues exercise message / stack / console / HTTP / messenger UI.
+ * Posts several synthetic Envelopes so dogfood Issues exercise message / stack / console / HTTP / messenger / DB UI.
  *
  * Uses sync HTTP (same approach as BeaconBundle {@see \Nowo\BeaconBundle\Connection\BeaconConnectionTester})
  * regardless of `nowo_beacon.transport.mode`.
  */
 final readonly class BeaconDogfoodProbeSuite
 {
+    /** Bytes of filler in the long-content probe (stays well under default 2 MiB envelope limit). */
+    public const int LONG_CONTENT_EXTRA_BYTES = 48_000;
+
+    /** Target SQL length so Query facts / contexts.db mark truncation (> {@see DatabaseExceptionContext::MAX_SQL_LENGTH}). */
+    public const int LONG_SQL_TARGET_CHARS = 9_000;
+
     /** @var list<string> */
     public const array KINDS = [
         'message-info',
@@ -46,6 +54,9 @@ final readonly class BeaconDogfoodProbeSuite
         'http',
         'messenger',
         'breadcrumbs',
+        'db-sql',
+        'db-connection',
+        'long-content',
     ];
 
     public function __construct(
@@ -327,6 +338,9 @@ final readonly class BeaconDogfoodProbeSuite
                 ],
                 'request' => null,
             ],
+            'db-sql' => $this->dbSqlCaseSpec($label, $kind, $fingerprint, $runToken),
+            'db-connection' => $this->dbConnectionCaseSpec($label, $kind, $fingerprint, $runToken),
+            'long-content' => $this->longContentCaseSpec($label, $kind, $fingerprint, $runToken),
         };
     }
 
@@ -381,6 +395,182 @@ final readonly class BeaconDogfoodProbeSuite
     }
 
     /**
+     * Synthetic MySQL "unknown column" so Issue Query facts / contexts.db light up.
+     *
+     * @param list<string> $fingerprint
+     *
+     * @return array{
+     *     message: string,
+     *     level: string,
+     *     throwable: Throwable,
+     *     extra: array<string, mixed>,
+     *     fingerprint: list<string>,
+     *     breadcrumbs: list<array{message: string, category: string, level: string}>,
+     *     request: ?Request
+     * }
+     */
+    private function dbSqlCaseSpec(string $label, string $kind, array $fingerprint, string $runToken): array
+    {
+        $sql = 'SELECT `nonexistent_col`, `id`, `title` FROM `issue` WHERE `project_id` = ? ORDER BY `last_seen` DESC LIMIT 25';
+        $driverMessage = 'SQLSTATE[42S22]: Column not found: 1054 Unknown column \'nonexistent_col\' in \'field list\''
+            .' (Connection: mysql, SQL: '.$sql.')';
+        $throwable = $this->pdoWrappedException(
+            'An exception occurred while executing a query: '.$driverMessage,
+            '42S22',
+            1054,
+            'Unknown column \'nonexistent_col\' in \'field list\'',
+        );
+
+        return [
+            'message' => $label,
+            'level' => 'error',
+            'throwable' => $throwable,
+            'extra' => [
+                'source' => 'app:beacon:test',
+                'probe_kind' => $kind,
+                'db' => [
+                    'scenario' => 'unknown_column',
+                    'run_token' => $runToken,
+                ],
+            ],
+            'fingerprint' => $fingerprint,
+            'breadcrumbs' => [
+                ['message' => 'Opening Doctrine connection default', 'category' => 'db', 'level' => 'info'],
+                ['message' => $sql, 'category' => 'db.query', 'level' => 'error'],
+            ],
+            'request' => null,
+        ];
+    }
+
+    /**
+     * Synthetic MySQL connection failure (refused / unreachable host).
+     *
+     * @param list<string> $fingerprint
+     *
+     * @return array{
+     *     message: string,
+     *     level: string,
+     *     throwable: Throwable,
+     *     extra: array<string, mixed>,
+     *     fingerprint: list<string>,
+     *     breadcrumbs: list<array{message: string, category: string, level: string}>,
+     *     request: ?Request
+     * }
+     */
+    private function dbConnectionCaseSpec(string $label, string $kind, array $fingerprint, string $runToken): array
+    {
+        $driverMessage = 'SQLSTATE[HY000] [2002] Connection refused';
+        $throwable = $this->pdoWrappedException(
+            'An exception occurred in the driver: '.$driverMessage,
+            'HY000',
+            2002,
+            'Connection refused',
+        );
+
+        return [
+            'message' => $label,
+            'level' => 'error',
+            'throwable' => $throwable,
+            'extra' => [
+                'source' => 'app:beacon:test',
+                'probe_kind' => $kind,
+                'db' => [
+                    'scenario' => 'connection_refused',
+                    'host' => 'mysql-unreachable.invalid',
+                    'port' => 3306,
+                    'run_token' => $runToken,
+                ],
+            ],
+            'fingerprint' => $fingerprint,
+            'breadcrumbs' => [
+                ['message' => 'Connecting to mysql-unreachable.invalid:3306', 'category' => 'db', 'level' => 'info'],
+                ['message' => $driverMessage, 'category' => 'db', 'level' => 'error'],
+            ],
+            'request' => null,
+        ];
+    }
+
+    /**
+     * Oversized message / extra / SQL so UI truncation paths are exercised.
+     *
+     * @param list<string> $fingerprint
+     *
+     * @return array{
+     *     message: string,
+     *     level: string,
+     *     throwable: Throwable,
+     *     extra: array<string, mixed>,
+     *     fingerprint: list<string>,
+     *     breadcrumbs: list<array{message: string, category: string, level: string}>,
+     *     request: ?Request
+     * }
+     */
+    private function longContentCaseSpec(string $label, string $kind, array $fingerprint, string $runToken): array
+    {
+        $longSql = $this->buildLongSelectSql(self::LONG_SQL_TARGET_CHARS);
+        $driverMessage = 'SQLSTATE[42000]: Syntax error or access violation: 1110 Column \'col_1\' specified twice'
+            .' (Connection: mysql, SQL: '.$longSql.')';
+        $throwable = $this->pdoWrappedException(
+            'An exception occurred while executing a query: '.$driverMessage,
+            '42000',
+            1110,
+            'Column \'col_1\' specified twice',
+        );
+        $filler = str_repeat('████ long-content dogfood filler '.$runToken.' ', (int) ceil(self::LONG_CONTENT_EXTRA_BYTES / 40));
+        $filler = substr($filler, 0, self::LONG_CONTENT_EXTRA_BYTES);
+
+        return [
+            'message' => $label.' '.str_repeat('▓', 512),
+            'level' => 'error',
+            'throwable' => $throwable,
+            'extra' => [
+                'source' => 'app:beacon:test',
+                'probe_kind' => $kind,
+                'db' => [
+                    'scenario' => 'long_sql_and_extra',
+                    'sql_chars' => mb_strlen($longSql),
+                    'run_token' => $runToken,
+                ],
+                'dump' => $filler,
+            ],
+            'fingerprint' => $fingerprint,
+            'breadcrumbs' => [
+                ['message' => 'Building oversized dogfood payload', 'category' => 'dogfood', 'level' => 'info'],
+                ['message' => substr($longSql, 0, 200).'…', 'category' => 'db.query', 'level' => 'error'],
+            ],
+            'request' => null,
+        ];
+    }
+
+    /**
+     * Doctrine-style wrapper around PDOException so EnvelopeBuilder fills contexts.db.
+     */
+    private function pdoWrappedException(string $outerMessage, string $sqlstate, int $vendorCode, string $driverMessage): Throwable
+    {
+        $pdo = new PDOException('SQLSTATE['.$sqlstate.'] ['.$vendorCode.'] '.$driverMessage, $vendorCode);
+        $pdo->errorInfo = [$sqlstate, $vendorCode, $driverMessage];
+
+        return new RuntimeException($outerMessage, $vendorCode, $pdo);
+    }
+
+    /**
+     * Build a SELECT list long enough to exceed SQL scrub/truncation limits.
+     */
+    private function buildLongSelectSql(int $minChars): string
+    {
+        $parts = [];
+        $i = 1;
+        $sql = 'SELECT ';
+        while (mb_strlen($sql) + 40 < $minChars) {
+            $parts[] = '`col_'.$i.'`';
+            ++$i;
+            $sql = 'SELECT '.implode(', ', $parts).' FROM `huge_table` WHERE `id` = ?';
+        }
+
+        return $sql;
+    }
+
+    /**
      * Client tags that mirror where the failure happened (command / URL / message class).
      *
      * Real BeaconBundle listeners store this in `extra`; the issue UI also promotes those
@@ -428,6 +618,10 @@ final readonly class BeaconDogfoodProbeSuite
             ],
             'breadcrumbs' => $tags + [
                 'transaction' => 'cli://app:beacon:test#breadcrumbs',
+            ],
+            'db-sql', 'db-connection', 'long-content' => $tags + [
+                'db.scenario' => (string) (($spec['extra']['db']['scenario'] ?? null) ?: $kind),
+                'transaction' => 'cli://app:beacon:test#'.$kind,
             ],
             'message-info', 'message-error' => $tags + [
                 'transaction' => 'cli://app:beacon:test#'.$kind,
