@@ -14,11 +14,13 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * Fail closed outside local `dev`/`test` when SiteBackup or APP_SECRET still use
- * documented local defaults from `.env.dist`.
+ * documented local defaults from `.env.dist`, or when Redis has no AUTH
+ * (`REDIS_PASSWORD` empty and no password in `REDIS_URL`).
  *
  * Applies to `prod`, `staging`, and any other non-local environment name so misnamed
  * deployments cannot keep the public `/setup` and `/_site_backup` surfaces unlocked,
- * or ship with a known `APP_SECRET` (CSRF, remember-me, magic-login signatures).
+ * ship with a known `APP_SECRET` (CSRF, remember-me, magic-login signatures), or leave
+ * sessions / Messenger open on the shared Docker network.
  *
  * Instance latch (not static) so FrankenPHP workers do not share mutable static state.
  *
@@ -64,6 +66,10 @@ final class SiteBackupSecurityDefaultsGuard implements EventSubscriberInterface
         private readonly string $appSecret = '',
         #[Autowire('%env(default::MERCURE_JWT_SECRET)%')]
         private readonly ?string $mercureJwtSecret = null,
+        #[Autowire('%env(REDIS_URL)%')]
+        private readonly string $redisUrl = '',
+        #[Autowire('%env(default::REDIS_PASSWORD)%')]
+        private readonly ?string $redisPassword = null,
     ) {
     }
 
@@ -138,6 +144,21 @@ final class SiteBackupSecurityDefaultsGuard implements EventSubscriberInterface
                 throw new RuntimeException('MERCURE_JWT_SECRET must be at least 32 characters outside local development (dev/test) when set.');
             }
         }
+
+        if (!$this->redisIsAuthenticated()) {
+            throw new RuntimeException('REDIS_PASSWORD (or a password in REDIS_URL) must be set outside local development so sessions and the Messenger queue are not open on the shared Docker network. Also put the same password in MESSENGER_TRANSPORT_DSN when Messenger uses Redis.');
+        }
+    }
+
+    private function redisIsAuthenticated(): bool
+    {
+        if ('' !== trim((string) $this->redisPassword)) {
+            return true;
+        }
+
+        $parts = parse_url($this->redisUrl);
+
+        return \is_array($parts) && isset($parts['pass']) && '' !== (string) $parts['pass'];
     }
 
     private function isLocalDevelopmentEnvironment(): bool

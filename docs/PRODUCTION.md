@@ -28,13 +28,14 @@ CI already builds this target (`.github/workflows/ci.yml`).
 
 - `APP_SECRET`
 - `DATABASE_URL` (or Compose-equivalent MySQL vars)
-- `MESSENGER_TRANSPORT_DSN` if you run async workers (default Redis: `redis://redis-8.10.0:6379` — stream names come from `messenger.yaml`; do **not** append `/messages` on shared Redis. Drain Doctrine `messenger_messages` before switching)
-- `REDIS_URL` (sessions, `cache.app` / rate limits, Messenger streams)
+- `MESSENGER_TRANSPORT_DSN` if you run async workers (Redis with AUTH: `redis://:${REDIS_PASSWORD}@redis-8.10.0:6379` — stream names come from `messenger.yaml`; do **not** append `/messages` on shared Redis. Drain Doctrine `messenger_messages` before switching)
+- `REDIS_URL` (sessions, `cache.app` / rate limits; with AUTH: `redis://:${REDIS_PASSWORD}@…`)
+- `REDIS_PASSWORD` — required outside `dev`/`test` (or embed `pass` in `REDIS_URL`). Same value as `developer.local.server/server`. Never interpolate an empty password (`redis://:@host`). Put the same password in `MESSENGER_TRANSPORT_DSN` when Messenger uses Redis.
 - `SITE_SETUP_TOKEN` — unique secret for `/setup?token=…` (never leave empty; never reuse historically known local values). Under `APP_ENV=prod`, SiteBackup **`setup.enabled` is false** — finish the wizard (or CLI / `make ready`) before promoting to prod.
 - `SITE_BACKUP_PASSWORD_HASH` — bcrypt/argon hash for `/_site_backup` (generate with `nowo:site-backup:hash-password`; never commit). Prod also requires kit admin UIs under `/admin` to be `ROLE_ADMIN` (Symfony catch-all + bundle `access_roles`).
 - Optional: `FRANKENPHP_MODE`, `FRANKENPHP_WORKER_NUM`, `FRANKENPHP_LOOP_MAX`, `FRANKENPHP_RESET_KERNEL`
 
-`App\Setup\SiteBackupSecurityDefaultsGuard` **refuses HTTP (and most console) boots outside local `dev`/`test`** (including `prod`, `staging`, and any other `APP_ENV`) if `SITE_SETUP_TOKEN` is empty or a historically known local value, `SITE_BACKUP_PASSWORD_HASH` is empty or a historically known local hash, `APP_SECRET` is empty / still `ChangeMePleaseUseARealSecret` / shorter than 16 characters, or `MERCURE_JWT_SECRET` is set to the documented `.env.dist` placeholder / shorter than 32 characters when non-empty. Empty `MERCURE_JWT_SECRET` is allowed when Mercure is unused (admin DB override may still apply). `compose.prod.yaml` also requires secrets via `${VAR:?…}`.
+`App\Setup\SiteBackupSecurityDefaultsGuard` **refuses HTTP (and most console) boots outside local `dev`/`test`** (including `prod`, `staging`, and any other `APP_ENV`) if `SITE_SETUP_TOKEN` is empty or a historically known local value, `SITE_BACKUP_PASSWORD_HASH` is empty or a historically known local hash, `APP_SECRET` is empty / still `ChangeMePleaseUseARealSecret` / shorter than 16 characters, Redis has no AUTH (`REDIS_PASSWORD` empty and no `pass` in `REDIS_URL`), or `MERCURE_JWT_SECRET` is set to the documented `.env.dist` placeholder / shorter than 32 characters when non-empty. Empty `MERCURE_JWT_SECRET` is allowed when Mercure is unused (admin DB override may still apply). `compose.prod.yaml` also requires secrets via `${VAR:?…}`.
 
 Do **not** run `app:seed-demo` on production instances (blocked unless `--allow-non-local`, which never installs the documented stable DEMO_* API keys). Configure Prometheus scrape with a metrics Bearer token under Administration → Ops defaults (`metrics_require_token` defaults to on for new installs).
 
@@ -52,8 +53,11 @@ docker run --rm -p 8080:80 -p 8443:443 \
   -e APP_ENV=prod \
   -e APP_SECRET="$(openssl rand -hex 16)" \
   -e DATABASE_URL="mysql://app:CHANGE_ME@mysql-9.7-primary:3306/app?serverVersion=9.7&charset=utf8mb4" \
-  -e MESSENGER_TRANSPORT_DSN="redis://redis-8.10.0:6379" \
-  -e REDIS_URL="redis://redis-8.10.0:6379" \
+  -e REDIS_PASSWORD="CHANGE_ME_REDIS" \
+  -e MESSENGER_TRANSPORT_DSN="redis://:CHANGE_ME_REDIS@redis-8.10.0:6379" \
+  -e REDIS_URL="redis://:CHANGE_ME_REDIS@redis-8.10.0:6379" \
+  -e SITE_SETUP_TOKEN="CHANGE_ME_SETUP" \
+  -e SITE_BACKUP_PASSWORD_HASH='REPLACE_WITH_nowo:site-backup:hash-password_OUTPUT' \
   -e FRANKENPHP_MODE=worker \
   symfony-frankenphp:prod
 ```

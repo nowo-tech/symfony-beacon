@@ -18,12 +18,16 @@ services:
     image: redis:${REDIS_VERSION:-8.10.0}-alpine
     container_name: redis-8.10.0
     restart: unless-stopped
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+    command: >
+      sh -c 'if [ -n "$$REDIS_PASSWORD" ]; then exec redis-server --requirepass "$$REDIS_PASSWORD"; else exec redis-server; fi'
     volumes:
       - ./.data/infra/redis:/data
     networks:
       - server_network
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD-SHELL", "if [ -n \"$$REDIS_PASSWORD\" ]; then redis-cli -a \"$$REDIS_PASSWORD\" ping | grep -q PONG; else redis-cli ping | grep -q PONG; fi"]
       interval: 5s
       timeout: 3s
       retries: 10

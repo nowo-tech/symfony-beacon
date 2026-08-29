@@ -74,9 +74,15 @@ DATABASE_URL_RO="mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST_RO}:${MYSQ
 Redis + Messenger:
 
 ```env
+REDIS_PASSWORD=
 REDIS_URL=redis://${REDIS_HOST}:${REDIS_PORT}
 MESSENGER_TRANSPORT_DSN=redis://${REDIS_HOST}:${REDIS_PORT}
+# When server/.env (or this compose.infra) sets REDIS_PASSWORD:
+# REDIS_URL=redis://:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}
+# MESSENGER_TRANSPORT_DSN=redis://:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}
 ```
+
+`REDIS_PASSWORD` is the **shared Redis** secret (REQ-INFRA-SHARED-003). Empty = no AUTH. Do not interpolate an empty password into the URL.
 
 Defaults from `.env.dist`:
 
