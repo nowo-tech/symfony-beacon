@@ -95,7 +95,11 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Unreleased (main after 1.24.2)
 
-_No unreleased operator-facing steps yet._
+Dogfood DX: auto `reload-env` when `BEACON_DSN` is stale. **No migrations.**
+
+1. Pull / checkout `main`.
+
+2. No operator env changes. After `make seed` / `make dogfood` / `make ready`, containers recreate automatically when `.env.local` `BEACON_DSN` ≠ php process env. Manual: `make reload-env`. See [DSN.md](DSN.md).
 
 See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
 

@@ -1,4 +1,4 @@
-.PHONY: ensure-env  help up up-infra up-prod up-shared down down-infra down-shared build build-prod logs shell console beacon-test beacon-suite seed seed-platform seed-sample dogfood reclaim-demo-client-env bootstrap ready migrate classic worker restart mysql messenger-logs vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
+.PHONY: ensure-env  help up up-infra up-prod up-shared down down-infra down-shared build build-prod logs shell console beacon-test beacon-suite seed seed-platform seed-sample dogfood reclaim-demo-client-env bootstrap ready migrate classic worker restart reload-env reload-env-if-beacon-dsn-stale mysql messenger-logs vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
 	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage test-unit-js test-unit-js-coverage test-e2e test-e2e-isolated up-e2e down-e2e ensure-e2e-env ensure-e2e-db ensure-e2e-up ready-e2e seed-e2e kit-smoke qa qa-fix secrets-scan composer-outdated update-deps \
 	setup-hooks check-no-cursor-coauthor check-module-boundaries strip-cursor-coauthor-from-history check-envelope-goldens ensure-up ensure-halite-secrets print-urls bootstrap-shared-db
 
@@ -74,15 +74,16 @@ help:
 	@echo "  make shell           Shell in the php container"
 	@echo "  make console         bin/console (ARGS='...')"
 	@echo "  make beacon-test     Probe BEACON_DSN via app:beacon:test (ARGS='--check-only' optional)"
-	@echo "  make beacon-suite    Multi-event dogfood suite (message/exception/console/HTTP/…)"
+	@echo "  make beacon-suite    Multi-event dogfood suite (message/exception/console/HTTP/DB/…)"
 	@echo "  make seed-platform   Upsert menus/breadcrumbs/cookie consent (safe after upgrades)"
 	@echo "  make seed            Platform seed + demo user/project + .demo-client.env + server BEACON_DSN"
 	@echo "  make seed-sample     Sample telemetry (PROFILE=dev|load|huge)"
-	@echo "  make dogfood         Symfony Beacon project + ROLE_ADMIN access + sync BEACON_DSN (no new user)"
+	@echo "  make dogfood         Symfony Beacon project + ROLE_ADMIN access + sync BEACON_DSN (reloads containers if stale)"
 	@echo "  make bootstrap       Migrate DB + platform seed (after make up)"
 	@echo "  make migrate         doctrine:migrations:migrate -n (no seed)"
 	@echo "  make ready           bootstrap + seed (recommended first local run / dogfooding)"
-	@echo "  make restart         Restart php + messenger + messenger-notify (+ vite-build)"
+	@echo "  make restart         Recreate php + messenger + messenger-notify (+ vite-build)"
+	@echo "  make reload-env      Recreate php/messenger only (reload Compose env_file; no Vite)"
 	@echo "  make specify-check   Verify Specify CLI"
 	@echo ""
 	@echo "Quality:"
@@ -340,8 +341,9 @@ seed-platform: ensure-halite-secrets
 seed: seed-platform
 	$(DC) exec -T php bin/console app:seed-demo
 	@$(MAKE) reclaim-demo-client-env
+	@$(MAKE) reload-env-if-beacon-dsn-stale
 	@echo "Client env: .demo-client.env (mode 600) — in BeaconBundle/demo/symfony8 run: make sync-beacon"
-	@echo "Server dogfood: BEACON_DSN set in .env when empty (loopback 127.0.0.1)"
+	@echo "Server dogfood: BEACON_DSN in .env.local (loopback 127.0.0.1); containers reloaded if stale"
 	@echo "Optional samples: make seed-sample   (or PROFILE=load / PROFILE=huge)"
 
 seed-sample: ensure-halite-secrets
@@ -349,10 +351,12 @@ seed-sample: ensure-halite-secrets
 
 # Ensure demo project + API key exist, grant every ROLE_ADMIN membership (first registered = preferred owner),
 # write .demo-client.env, and sync server BEACON_DSN (loopback). No admin@… demo user.
+# Recreates php/messenger when .env.local BEACON_DSN differs from the running container (Compose env_file).
 dogfood: ensure-halite-secrets
 	$(DC) exec -T php bin/console app:seed-demo --skip-demo-user --sync-server-dsn
 	@$(MAKE) reclaim-demo-client-env
-	@echo "Dogfood: BEACON_DSN synced to loopback self DSN. If it changed, run: make restart"
+	@$(MAKE) reload-env-if-beacon-dsn-stale
+	@echo "Dogfood: BEACON_DSN synced to loopback self DSN (containers reloaded if needed)"
 
 # PHP container often writes .demo-client.env as root:600; host Playwright/E2E must be able to read it.
 reclaim-demo-client-env:
@@ -374,11 +378,31 @@ bootstrap: migrate
 	@echo "Next: make seed (or make ready) for demo user + dogfood DSN — or open /setup / register"
 
 ready: bootstrap seed
-	@echo "Ready: demo project seeded; restart php if BEACON_DSN was just written (make restart)"
+	@echo "Ready: demo project seeded (BEACON_DSN containers reloaded if stale)"
 	@echo "Ops panel: /_site_backup  |  Setup wizard: /setup"
+
+# Recreate app containers so Compose reloads env_file (no Vite). Prefer after seed/dogfood when DSN changes.
+reload-env: ensure-up
+	$(DC) up -d --force-recreate --no-deps php messenger messenger-notify
+	@echo "Containers recreated — Compose reloaded env_file (BEACON_DSN, etc.)."
+
+# Compare .env.local BEACON_DSN to the php container process env; recreate when they differ.
+# Catches "file already correct" + stale container after project recreate (401 on make beacon-suite).
+reload-env-if-beacon-dsn-stale: ensure-up
+	@file_dsn=$$(grep -E '^BEACON_DSN=' .env.local 2>/dev/null | head -1 | sed 's/^BEACON_DSN=//' | tr -d '\r' | tr -d '"' | tr -d "'"); \
+	container_dsn=$$($(DC) exec -T php printenv BEACON_DSN 2>/dev/null | tr -d '\r' || true); \
+	if [ -z "$$file_dsn" ]; then \
+		echo "No BEACON_DSN in .env.local — skip env reload."; \
+	elif [ "$$container_dsn" = "$$file_dsn" ]; then \
+		echo "BEACON_DSN already loaded in php container."; \
+	else \
+		echo "BEACON_DSN stale in containers vs .env.local — recreating php/messenger…"; \
+		$(MAKE) reload-env; \
+	fi
 
 # Recreate (not plain restart) so Compose reloads .env into the container
 # (e.g. BEACON_DSN after make dogfood / make seed). Plain `restart` keeps stale env.
+# Also runs vite-build; for DSN-only reload use `make reload-env`.
 restart: ensure-up
 	$(DC) up -d --force-recreate --no-deps php messenger messenger-notify
 	@$(MAKE) vite-build

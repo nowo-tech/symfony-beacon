@@ -38,7 +38,9 @@ http://PUBLIC_KEY:SECRET_KEY@127.0.0.1/{project_uuid}
 
 `make dogfood` (`--sync-server-dsn`) **re-wires** that loopback line to the current Symfony Beacon project UUID even when `BEACON_DSN` was already set (useful after DB reset / project recreate). Plain `make seed` still leaves a non-empty operator DSN unchanged.
 
-Restart PHP (`make restart`) so the Kernel reloads env. `before_send` drops events whose request path contains `/envelope/` (and `/otlp/`) to avoid ingest feedback loops. `ignore_exceptions` skips expected access denials (`AccessDeniedException`, `AccessDeniedHttpException`) so admin/ACL 403s do not flood the dogfood project. See `config/packages/nowo_beacon.yaml`.
+Compose only injects `env_file` when containers are **created**. After `make seed` / `make ready` / `make dogfood`, Make compares `.env.local` `BEACON_DSN` to the php container process env and runs **`make reload-env`** (recreate php + messenger, no Vite) when they differ — so you do not hit ingest **401** from a stale project UUID. Manual: `make reload-env` or `make restart` (also rebuilds assets).
+
+`before_send` drops events whose request path contains `/envelope/` (and `/otlp/`) to avoid ingest feedback loops. `ignore_exceptions` skips expected access denials (`AccessDeniedException`, `AccessDeniedHttpException`) so admin/ACL 403s do not flood the dogfood project. See `config/packages/nowo_beacon.yaml`.
 
 Verify the configured DSN (parse only, or live ingest ACK + local dogfood hints):
 
@@ -72,7 +74,7 @@ Filter or search by tag `probe_run=<token>` (printed by the command). On real Bu
 
 HTTP **200** only means ingest accepted the Envelope — not that a browser notification was sent. Thin client-only probe: `bin/console nowo:beacon:test`.
 
-Dogfood from inside the `php` container must use a **loopback** DSN (`http://…@127.0.0.1/{uuid}`), not `localhost:{published-port}` (that port is on the host). Prefer `make dogfood` (reactivates the stable demo key and rewrites `.env.local`) then recreate/restart so Compose reloads `env_file`.
+Dogfood from inside the `php` container must use a **loopback** DSN (`http://…@127.0.0.1/{uuid}`), not `localhost:{published-port}` (that port is on the host). Prefer `make dogfood` (reactivates the stable demo key, rewrites `.env.local`, and reloads containers when the DSN was stale).
 
 ### Local demo sync (external BeaconBundle)
 

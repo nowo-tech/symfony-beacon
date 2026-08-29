@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-_No unreleased operator-facing changes yet._
+### Changed
+
+- **Dogfood DX:** `make seed` / `make dogfood` / `make ready` call `reload-env-if-beacon-dsn-stale` so php/messenger recreate when `.env.local` `BEACON_DSN` differs from the container (avoids ingest 401 after project recreate). New `make reload-env` recreates without Vite. See [DSN.md](DSN.md).
 
 ## [1.24.2] - 2026-08-29
 
