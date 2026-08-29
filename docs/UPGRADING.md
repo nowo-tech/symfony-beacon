@@ -94,7 +94,23 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Unreleased (main after 1.24.1)
 
-_No unreleased operator-facing steps yet._
+Hot reload client **1.5.1** + CSP host helpers + shared Redis AUTH. **No migrations.**
+
+1. Pull / checkout `main` (or the release that cuts this Unreleased block).
+
+2. `composer install` — pins `nowo-tech/hot-reload-bundle` **1.5.1** (`require-dev`). Dev: optional `bin/console nowo:hot-reload:check` after `make up`. See [FRANKENPHP-HOT-RELOAD.md](ops/FRANKENPHP-HOT-RELOAD.md).
+
+3. **Shared / non-local Redis:** set `REDIS_PASSWORD` (same value as `developer.local.server/server` when using shared infra). Put the password in both DSNs — do **not** interpolate an empty password:
+
+```env
+REDIS_PASSWORD=your-shared-secret
+REDIS_URL=redis://:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}
+MESSENGER_TRANSPORT_DSN=redis://:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}
+```
+
+Local `dev`/`test` may leave `REDIS_PASSWORD` empty (no AUTH). Outside those envs, `SiteBackupSecurityDefaultsGuard` refuses boot until Redis has AUTH. Recreate infra Redis after changing the password (`compose.infra.yaml`). See [SHARED-SERVER.md](ops/SHARED-SERVER.md) and [PRODUCTION.md](PRODUCTION.md).
+
+4. Optional CSP extras stay empty by default (`app.csp.connect_src_extra` / `app.csp.script_src_extra` in `config/parameters.yaml`).
 
 See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
 

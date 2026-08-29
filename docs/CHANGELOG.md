@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-_No unreleased operator-facing changes yet._
+### Changed
+
+- **Hot reload via HotReloadBundle 1.5.1:** host config uses `auto_inject: true`, `client_mode: shared_worker` (bundle-served `/_nowo/hot-reload/*`), Idiomorph + WDT/Twig Inspector preserve selectors. See [FRANKENPHP-HOT-RELOAD.md](ops/FRANKENPHP-HOT-RELOAD.md).
+- **CSP:** stamps vendor inline `<script>` tags with `_beacon_csp_nonce` before setting the header; optional `app.csp.connect_src_extra` / `app.csp.script_src_extra` append after Mercure origin. `KitInlineConfigScriptSubscriber` unchanged.
+- **Shared Redis AUTH (REQ-INFRA-SHARED-003):** `REDIS_PASSWORD` in `.env.dist` / `.env.e2e.dist` / `compose.infra.yaml` (optional local; required outside `dev`/`test`). `SiteBackupSecurityDefaultsGuard` refuses boot when Redis has no AUTH (`REDIS_PASSWORD` empty and no `pass` in `REDIS_URL`). Never interpolate an empty password (`redis://:@host`). See [SHARED-SERVER.md](ops/SHARED-SERVER.md) and [PRODUCTION.md](PRODUCTION.md).
 
 ## [1.24.1] - 2026-08-26
 
