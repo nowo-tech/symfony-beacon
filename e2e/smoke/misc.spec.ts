@@ -22,7 +22,7 @@ test.describe('Appearance & PWA smoke', () => {
 
   test('PWA manifest does not set session cookies (UC-ACC-16)', async ({ request }) => {
     const res = await request.get('/manifest.webmanifest');
-    // Tolerate builds without a manifest; when present, stay cookie-free (PwaStatelessCookieSubscriber).
+    // Tolerate builds without a manifest; when present, stay cookie-free (PwaBundle ≥1.4).
     if (res.status() >= 400) {
       test.skip(true, 'manifest not exposed in this build');
       return;

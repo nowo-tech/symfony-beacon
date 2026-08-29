@@ -2,7 +2,7 @@
 
 Local Docker uses FrankenPHP’s built-in **hot reload**: when you change PHP, Twig, config, or assets, the browser updates without a manual refresh.
 
-This is **dev-only**. The **server** side is Caddy `php_server { hot_reload }` plus the built-in Mercure hub. The **client** comes from [`nowo-tech/hot-reload-bundle`](https://github.com/nowo-tech/HotReloadBundle) ≥**1.5** (`auto_inject: true`, `client_mode: shared_worker`).
+This is **dev-only**. The **server** side is Caddy `php_server { hot_reload }` plus the built-in Mercure hub. The **client** comes from [`nowo-tech/hot-reload-bundle`](https://github.com/nowo-tech/HotReloadBundle) ≥**1.5.2** (`auto_inject: true`, `client_mode: shared_worker`).
 
 Official server docs: [frankenphp.dev/docs/hot-reload](https://frankenphp.dev/docs/hot-reload/). Bundle: [CONFIGURATION.md](https://github.com/nowo-tech/HotReloadBundle/blob/main/docs/CONFIGURATION.md) / [USAGE.md](https://github.com/nowo-tech/HotReloadBundle/blob/main/docs/USAGE.md). CLI: `bin/console nowo:hot-reload:check`.
 
@@ -14,7 +14,7 @@ This is independent of Vite HMR: Vite still owns frontend module HMR; FrankenPHP
 |-------|------|
 | `.docker/frankenphp/Caddyfile` | `php_server { hot_reload { watch … } }` + built-in `mercure` (dev only); HTTP Mercure is reverse-proxied to that hub for Messenger |
 | `FRANKENPHP_WORKER_CONFIG=watch` | With `make worker`, restarts PHP workers when watched files change |
-| `nowo-tech/hot-reload-bundle` **≥1.5** (`require-dev`) | Dev/test only: `auto_inject: true`, `client_mode: shared_worker`, CSP nonce (`_beacon_csp_nonce`) + `script-src` augment (`cdn.jsdelivr.net`), Web Debug Toolbar panel `nowo_hot_reload`. CLI: `bin/console nowo:hot-reload:check`. |
+| `nowo-tech/hot-reload-bundle` **≥1.5.2** (`require-dev`) | Dev/test only: `auto_inject: true`, `client_mode: shared_worker`, CSP nonce (`_beacon_csp_nonce`) + `script-src` augment (`cdn.jsdelivr.net`), Web Debug Toolbar panel `nowo_hot_reload`. CLI: `bin/console nowo:hot-reload:check`. |
 | `/_nowo/hot-reload/client.js` + `shared-worker.js` | Bundle-served same-origin client (one Mercure SSE for all tabs) |
 | `.docker/frankenphp/Caddyfile.prod` | **No** hot reload (production) |
 

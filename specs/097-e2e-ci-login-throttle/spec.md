@@ -15,7 +15,7 @@ Operators keep per-account login throttling that matches AuthKit nested `login_f
 
 | ID | Area | Deliverable |
 |----|------|-------------|
-| C1 | Login throttle | `AuthKitAwareLoginRateLimiter` decorates `nowo_login_throttle.database_rate_limiter`: expose nested username; clear DB attempts on successful `reset()` |
+| C1 | Login throttle | **Superseded (pass 40):** LoginThrottle **≥3.2** extracts nested AuthKit `login_form[_username]` in-kit. Former host `AuthKitAwareLoginRateLimiter` removed. |
 | C2 | PHPUnit | `LoginThrottleTest` asserts unrelated username is not locked after peer exhausts attempts on same IP |
 | C3 | CI E2E job | `timeout-minutes: 90`; `docker compose --profile mail up -d`; Mailpit readiness wait; `PLAYWRIGHT_MAILPIT_URL`; `sudo chown` before host `pnpm` |
 | C4 | Quality / secrets | Gitleaks ignore for dummy Web Push auth; PHPStan `@method addFlash` / CS / Rector `readonly` on throttle decorator |
@@ -86,7 +86,7 @@ Operators keep per-account login throttling that matches AuthKit nested `login_f
 
 ## Implementation notes
 
-- Key type: `src/Identity/Security/AuthKitAwareLoginRateLimiter.php` (`#[AsDecorator('nowo_login_throttle.database_rate_limiter')]`).
+- Key type (historical): host `AuthKitAwareLoginRateLimiter` (`#[AsDecorator('nowo_login_throttle.database_rate_limiter')]`) — **removed** after LoginThrottle **3.2.0** (kit-owned nested username + reset).
 - Workflow: `.github/workflows/ci.yml` E2E job.
 - Specs file: `e2e/flows/use-cases-atomic-gaps.spec.ts`.
 
@@ -117,4 +117,4 @@ Cross-ref: `specs/104-isolated-e2e-stack/`, `e2e/README.md`.
 
 ## Amendment (Device-keyed extra limits, 2026-08-25 / `105`)
 
-AuthKit `device_intelligence.device_rate_limit: true` adds a **device-keyed** limit on register / reset / magic. It does **not** replace `AuthKitAwareLoginRateLimiter` (`097` C1). Login brute-force isolation by username remains required. See `specs/105-authkit-security-kits/`.
+AuthKit `device_intelligence.device_rate_limit: true` adds a **device-keyed** limit on register / reset / magic. It does **not** replace LoginThrottle nested-username keying (`097` C1 — kit ≥3.2). Login brute-force isolation by username remains required. See `specs/105-authkit-security-kits/`.

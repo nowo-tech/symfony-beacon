@@ -7,6 +7,10 @@
 when@dev: &nowo_hot_reload
     nowo_hot_reload:
         auto_inject: true
+        # ≥1.5.2 — skip WDT/profiler HTML fragments (fragment eval would SyntaxError on JSON config).
+        ignore_path_prefixes:
+            - '/_wdt'
+            - '/_profiler'
         client_mode: shared_worker
         csp_nonce_request_attribute: '_beacon_csp_nonce'
         idiomorph: true

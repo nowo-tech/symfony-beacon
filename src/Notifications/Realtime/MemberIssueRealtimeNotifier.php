@@ -9,6 +9,7 @@ use App\Notifications\Enum\MemberAlertEvent;
 use App\Notifications\Message\DeliverWebPushForProjectMessage;
 use App\Notifications\Service\MemberAlertPreferenceEvaluator;
 use App\Notifications\Service\WebPushClientFactory;
+use App\Notifications\Service\WebPushPresentation;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Shared\Mercure\ConfiguredMercure;
@@ -29,6 +30,7 @@ final readonly class MemberIssueRealtimeNotifier implements MemberIssueRealtimeN
         private ProjectMembershipRepository $membershipRepository,
         private MessageBusInterface $bus,
         private LoggerInterface $logger,
+        private WebPushPresentation $webPushPresentation,
     ) {
     }
 
@@ -80,6 +82,10 @@ final readonly class MemberIssueRealtimeNotifier implements MemberIssueRealtimeN
             return;
         }
 
-        $this->bus->dispatch(new DeliverWebPushForProjectMessage($projectId, $payload, $eligibleIds));
+        $this->bus->dispatch(new DeliverWebPushForProjectMessage(
+            $projectId,
+            $this->webPushPresentation->enrich($event, $payload),
+            $eligibleIds,
+        ));
     }
 }

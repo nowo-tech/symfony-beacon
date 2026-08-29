@@ -96,7 +96,18 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Unreleased (main after 1.24.3)
 
-_No unreleased operator-facing steps yet._
+Kit-over-shim floors (OTHER pass 40): HotReload **1.5.2**, LoginThrottle **3.2.0**, CookieConsent **1.9.7**, Pwa **1.5.0**. **No migrations.**
+
+1. Pull / checkout `main` (or the release that cuts this Unreleased).
+
+2. `composer install` — pins above (Pwa **1.5.0**). Soft-reload browsers after deploy so clients pick up SW `cache_version` **v8**.
+
+3. **Host shims removed** (kits own the behaviour now):
+   - LoginThrottle nested AuthKit username (`AuthKitAwareLoginRateLimiter`)
+   - PWA bootstrap `Set-Cookie` strip (`PwaStatelessCookieSubscriber`)
+   - SW Web Push append (`PushServiceWorkerListener` → kit `service_worker.web_push: true`; product chrome via `WebPushPresentation`)
+
+4. Optional — `bin/console nowo:hot-reload:check` in dev after `make up`.
 
 See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
 

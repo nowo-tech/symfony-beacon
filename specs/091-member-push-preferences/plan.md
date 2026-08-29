@@ -97,7 +97,7 @@ src/Project/Controller/ProjectController.php      # settings shortcut + POST sav
 src/Issues/Repository/IssueMentionRepository.php  # isUserMentionedOnIssue
 
 assets/controllers/issue_realtime_controller.ts   # user topic + safe toast URLs
-src/Shared/Pwa/PushServiceWorkerListener.php      # event titles / preview body
+src/Notifications/Service/WebPushPresentation.php  # push title/body/tag for kit web_push SW
 templates/account/display_notifications.html.twig
 templates/project/settings.html.twig              # #member-alerts (Settings-gated UI)
 

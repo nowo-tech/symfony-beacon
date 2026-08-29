@@ -16,6 +16,7 @@ use App\Notifications\Repository\MemberProjectAlertEventRepository;
 use App\Notifications\Repository\MemberProjectAlertPreferenceRepository;
 use App\Notifications\Service\MemberAlertPreferenceEvaluator;
 use App\Notifications\Service\WebPushClientFactory;
+use App\Notifications\Service\WebPushPresentation;
 use App\Project\Entity\Project;
 use App\Project\Repository\ProjectMembershipRepository;
 use App\Shared\Mercure\ConfiguredMercure;
@@ -60,6 +61,8 @@ final class MemberIssueRealtimeNotifierTest extends TestCase
                 self::assertInstanceOf(DeliverWebPushForProjectMessage::class, $message);
                 self::assertSame(5, $message->projectId);
                 self::assertSame([11], $message->eligibleUserIds);
+                self::assertSame('Issue assigned', $message->payload['title'] ?? null);
+                self::assertSame('issue.assigned', $message->payload['event'] ?? null);
 
                 return true;
             },
@@ -72,6 +75,7 @@ final class MemberIssueRealtimeNotifierTest extends TestCase
             $memberships,
             $bus,
             $this->createStub(LoggerInterface::class),
+            new WebPushPresentation(),
         );
         $notifier->notify(MemberAlertEvent::IssueAssigned, $project, $issue, ['summary' => 'hello']);
 
@@ -111,6 +115,7 @@ final class MemberIssueRealtimeNotifierTest extends TestCase
             $memberships,
             $bus,
             $logger,
+            new WebPushPresentation(),
         );
         $notifier->notify(MemberAlertEvent::IssueNew, $project, $issue, []);
     }
@@ -140,6 +145,7 @@ final class MemberIssueRealtimeNotifierTest extends TestCase
             $memberships,
             $bus,
             $this->createStub(LoggerInterface::class),
+            new WebPushPresentation(),
         );
         $notifier->notify(MemberAlertEvent::IssueCommented, $project, $issue, []);
     }

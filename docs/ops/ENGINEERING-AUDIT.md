@@ -67,7 +67,7 @@ Strategy: `templates/kit/*_layout.html.twig` first; full page forks only for Adm
 | UiKit | shell / burger / toasts / pagination | Intentional product chrome |
 | Dashboard Menu / Breadcrumb / RoutingKit / HttpLog / CookieConsent admin / SiteBackup panel | Administration list/form chrome | Intentional until upstream hooks (`081`) |
 | AuthKit | `layout` + thin `security/*` (`form/_fields`) | Thin FormKit painting |
-| PWA | `install_prompt` only | **`install_links` fork removed** (2026-08-17) — SCSS BEM + Preferences hint |
+| PWA | `install_prompt` only; Web Push via kit `web_push` + `WebPushPresentation` | **`install_links` fork removed** (2026-08-17); host SW/cookie shims removed (Pwa **1.5.0**, pass 40) |
 | MaintenanceMode | public 503 + panel | Product chrome (`092`) |
 | TwigBundle Exception / Nelmio Swagger | branded errors / shell | Product |
 

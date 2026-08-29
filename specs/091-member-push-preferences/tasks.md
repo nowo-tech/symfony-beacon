@@ -128,7 +128,7 @@
 - [X] T041 Replace `requireSettingsSurface` with `requireAccess` on `MemberProjectAlertPreferencesLive::save` and `project_member_alerts_save` in `src/Twig/Components/` + `src/Project/Controller/ProjectController.php`
 - [X] T042 [P] Document Account-primary + Settings shortcut + `requireAccess` in `specs/091-member-push-preferences/contracts/account-member-alerts.md`, `spec.md` (FR-013), `docs/product/NOTIFICATIONS.md`
 - [X] T043 Functional: viewer saves project override from Account / Settings forbidden in `tests/Functional/Notifications/MemberAlertPreferencesFunctionalTest.php`
-- [X] T044 [P] Same-origin toast URL guard + vitest in `assets/controllers/issue_realtime_controller.ts` (+ `.test.ts`); align SW event titles in `PushServiceWorkerListener`
+- [X] T044 [P] Same-origin toast URL guard + vitest in `assets/controllers/issue_realtime_controller.ts` (+ `.test.ts`); push chrome via `WebPushPresentation` + kit `service_worker.web_push` (was host SW append)
 
 ---
 

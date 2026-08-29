@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-_No unreleased operator-facing changes yet._
+### Changed
+
+- **Kit-over-shim (OTHER pass 40):** HotReload **1.5.2**, LoginThrottle **3.2.0**, CookieConsent **1.9.7**, Pwa **1.5.0**. Deleted host shims now owned by kits: `AuthKitAwareLoginRateLimiter`, `PwaStatelessCookieSubscriber`, `PushServiceWorkerListener`. Web Push uses kit `service_worker.web_push` + host `WebPushPresentation` (`title`/`body`/`tag` in the push JSON); PWA `cache_version` **v8**.
+
+### Notes for integrators
+
+- No Doctrine migrations.
+- After pull: `composer install`. Soft-reload browsers so clients pick up the new service worker. Optional: `bin/console nowo:hot-reload:check` in dev.
+- See [UPGRADING.md](UPGRADING.md) **Unreleased (main after 1.24.3)**.
 
 ## [1.24.3] - 2026-08-29
 

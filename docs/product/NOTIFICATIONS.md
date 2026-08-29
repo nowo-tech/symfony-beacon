@@ -45,7 +45,7 @@ Summary:
 ### Web Push (PWA)
 
 1. Generate VAPID keys and set `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, and `VAPID_SUBJECT` (e.g. `mailto:ops@example.com`). Leave keys empty to hide the Account push option.
-2. Members keep member alerts on (matrix). Browser push preference defaults **on**; the browser still asks for notification permission under **Account → Display → Notifications → Browser push**. The service worker (`/sw.js`, with push handlers) shows notifications; taps open the issue URL.
+2. Members keep member alerts on (matrix). Browser push preference defaults **on**; the browser still asks for notification permission under **Account → Display → Notifications → Browser push**. The service worker (`/sw.js`) uses kit `service_worker.web_push` handlers; the server sends resolved `title` / `body` / `url` / `tag` (`WebPushPresentation`). Taps open the issue URL.
 3. Subscription endpoints are stored encrypted in `push_subscription`. Opting out deletes stored subscriptions. Recipients are filtered through the same preference evaluator as Mercure.
 
 **Privacy:** Web Push is a device subscription, not a marketing cookie. Still offer Privacy / Terms / Cookie settings for operators; use `nowo-tech/cookie-consent-bundle` when adding non-essential tracking.

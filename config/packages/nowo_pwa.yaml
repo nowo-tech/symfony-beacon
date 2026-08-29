@@ -27,9 +27,17 @@ nowo_pwa:
     service_worker:
         enabled: true
         strategy: network-first
-        # Bump when deny/precache rules change so browsers drop stale SW caches.
-        cache_version: v6
+        # Bump when deny/precache/web_push rules change so browsers drop stale SW caches.
+        cache_version: v8
         cache_name_prefix: beacon-pwa
+        # Kit Web Push / notificationclick (JSON title/body/url from WebPushPresentation).
+        web_push: true
+        web_push_defaults:
+            title: Beacon
+            icon: /icons/icon-192.png
+            badge: /icons/icon-192.png
+            url: /dashboard
+            tag: beacon
         # Never precache auth HTML: pathname.endsWith('/login') also matches /es/login.
         precache_urls:
             - /offline

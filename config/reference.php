@@ -1359,6 +1359,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  * @psalm-type NowoHotReloadConfig = array{
  *     enabled?: bool|Param, // Master switch. When false, nothing is injected even if FRANKENPHP_HOT_RELOAD is set. // Default: true
  *     auto_inject?: bool|Param, // When true, HotReloadResponseSubscriber injects assets into HTML responses. // Default: true
+ *     ignore_path_prefixes?: list<scalar|Param|null>,
  *     client_mode?: "cdn"|"visibility"|"shared_worker"|"always"|Param, // Browser Mercure client strategy: cdn (default ESM), visibility (SSE while tab visible), shared_worker (one SSE for all tabs), always (SSE per tab). // Default: "cdn"
  *     require_frankenphp_env?: bool|Param, // When true (default), inject only if FRANKENPHP_HOT_RELOAD is set or mercure_url is configured. // Default: true
  *     allow_production?: bool|Param, // When false (default), enabling this bundle in the prod environment raises InvalidConfigurationException. // Default: false
@@ -2222,6 +2223,15 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         deny_cache_patterns?: mixed, // Substring patterns never cached. Defaults exclude auth/admin/API/profiler paths. An explicit empty list disables the defaults. // Default: ["/login","/logout","/register","/reset-password","/admin","/api/","/_profiler","/_wdt","/setup","/_site_backup"]
  *         offline_url?: scalar|Param|null, // Default: null
  *         runtime_cache_max_entries?: int|Param, // Default: 0
+ *         web_push?: bool|Param, // When true, append the kit Web Push / notificationclick handlers (JSON: title, body, url, …). Prefer this over a host SW rewrite. // Default: false
+ *         web_push_defaults?: array{
+ *             title?: scalar|Param|null, // Default: "Notification"
+ *             icon?: scalar|Param|null, // Default: "/icons/icon-192.png"
+ *             badge?: scalar|Param|null, // Default: "/icons/icon-192.png"
+ *             url?: scalar|Param|null, // Default: "/"
+ *             tag?: scalar|Param|null, // Default: "nowo-pwa"
+ *         },
+ *         append_script?: scalar|Param|null, // Optional raw JavaScript appended after the kit web_push handlers (if enabled). Prefer web_push: true for standard push UI. // Default: null
  *     },
  *     install_prompt?: array{
  *         enabled?: bool|Param, // Default: true
@@ -2270,6 +2280,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         manifest_cache_max_age?: int|Param, // Default: 3600
  *         service_worker_cache_max_age?: int|Param, // Default: 0
  *         manifest_public_cache?: bool|Param, // Default: true
+ *         strip_set_cookie_on_bootstrap?: bool|Param, // Remove Set-Cookie from manifest and service worker responses so anonymous fetches cannot overwrite the session cookie. // Default: true
  *     },
  *     routes?: array{
  *         manifest?: array{
@@ -2460,8 +2471,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  * }
  * @psalm-type MercureConfig = array{
  *     hubs?: array<string, array{ // Default: []
- *         url?: scalar|Param|null, // URL of the hub's publish endpoint // Default: null
- *         public_url?: scalar|Param|null, // URL of the hub's public endpoint
+ *         url?: scalar|Param|null, // URL of the hub's publish endpoint
+ *         public_url?: scalar|Param|null, // URL of the hub's public endpoint // Default: null
  *         jwt?: Param|string|array{ // JSON Web Token configuration.
  *             value?: scalar|Param|null, // JSON Web Token to use to publish to this hub.
  *             provider?: scalar|Param|null, // The ID of a service to call to provide the JSON Web Token.

@@ -436,7 +436,7 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v1.24.1** | Setup token gate default (`SITE_SETUP_TOKEN=beacon-local-setup` + 403 paste form); versioned `.env.e2e.dist` for isolated Playwright (`104`) |
 | **v1.24.2** | HotReloadBundle **1.5.1** `shared_worker`; CSP vendor inline nonce stamp + `app.csp.*_extra`; Redis AUTH required outside `dev`/`test` (REQ-INFRA-SHARED-003); E2E slide-to-confirm PointerEvents |
 | **v1.24.3** | Dogfood auto `reload-env` when `BEACON_DSN` stale; `beacon-suite` kinds `db-sql` / `db-connection` / `long-content` (`058`) |
-| **Unreleased** | — |
+| **Unreleased** | Kit-over-shim (OTHER pass 40): HotReload **1.5.2**, LoginThrottle **3.2.0**, CookieConsent **1.9.7**, Pwa **1.5.0** `web_push`; host throttle/PWA/SW shims removed |
 | **Next** | Later Phase 6+ (SSO/SAML, WebAuthn, QR SMS OTP, Hotwire Native `008`, …) when specified |
 
 Versions are indicative; cut releases when exit criteria for a phase (or a coherent subset) are met.
@@ -448,4 +448,4 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 1. Pull items from **Later** when prioritized.
 2. Mark rows **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-08-29 (v1.24.3 dogfood reload-env + suite DB/long-content).
+Last updated: 2026-08-29 (Unreleased kit-over-shim pass 40 after v1.24.3).
