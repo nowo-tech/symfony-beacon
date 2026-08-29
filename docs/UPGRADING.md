@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.24.1)](#unreleased-main-after-1241)
+- [Unreleased (main after 1.24.2)](#unreleased-main-after-1242)
+- [Upgrading from 1.24.1 to 1.24.2](#upgrading-from-1241-to-1242)
 - [Upgrading from 1.24.0 to 1.24.1](#upgrading-from-1240-to-1241)
 - [Upgrading from 1.23.3 to 1.24.0](#upgrading-from-1233-to-1240)
 - [Upgrading from 1.23.2 to 1.23.3](#upgrading-from-1232-to-1233)
@@ -92,11 +93,17 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.24.1)
+## Unreleased (main after 1.24.2)
+
+_No unreleased operator-facing steps yet._
+
+See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
+
+## Upgrading from 1.24.1 to 1.24.2
 
 Hot reload client **1.5.1** + CSP host helpers + shared Redis AUTH. **No migrations.**
 
-1. Pull / checkout `main` (or the release that cuts this Unreleased block).
+1. Pull / checkout `v1.24.2`.
 
 2. `composer install` — pins `nowo-tech/hot-reload-bundle` **1.5.1** (`require-dev`). Dev: optional `bin/console nowo:hot-reload:check` after `make up`. See [FRANKENPHP-HOT-RELOAD.md](ops/FRANKENPHP-HOT-RELOAD.md).
 
@@ -112,7 +119,7 @@ Local `dev`/`test` may leave `REDIS_PASSWORD` empty (no AUTH). Outside those env
 
 4. Optional CSP extras stay empty by default (`app.csp.connect_src_extra` / `app.csp.script_src_extra` in `config/parameters.yaml`).
 
-See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
+See [CHANGELOG.md](CHANGELOG.md) `[1.24.2]`.
 
 ## Upgrading from 1.24.0 to 1.24.1
 

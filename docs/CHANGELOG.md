@@ -7,11 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+_No unreleased operator-facing changes yet._
+
+## [1.24.2] - 2026-08-29
+
 ### Changed
 
 - **Hot reload via HotReloadBundle 1.5.1:** host config uses `auto_inject: true`, `client_mode: shared_worker` (bundle-served `/_nowo/hot-reload/*`), Idiomorph + WDT/Twig Inspector preserve selectors. See [FRANKENPHP-HOT-RELOAD.md](ops/FRANKENPHP-HOT-RELOAD.md).
 - **CSP:** stamps vendor inline `<script>` tags with `_beacon_csp_nonce` before setting the header; optional `app.csp.connect_src_extra` / `app.csp.script_src_extra` append after Mercure origin. `KitInlineConfigScriptSubscriber` unchanged.
 - **Shared Redis AUTH (REQ-INFRA-SHARED-003):** `REDIS_PASSWORD` in `.env.dist` / `.env.e2e.dist` / `compose.infra.yaml` (optional local; required outside `dev`/`test`). `SiteBackupSecurityDefaultsGuard` refuses boot when Redis has no AUTH (`REDIS_PASSWORD` empty and no `pass` in `REDIS_URL`). Never interpolate an empty password (`redis://:@host`). See [SHARED-SERVER.md](ops/SHARED-SERVER.md) and [PRODUCTION.md](PRODUCTION.md).
+
+### Fixed
+
+- **E2E:** slide-to-confirm confirmed with in-page `PointerEvent`s (CI-friendly drag) instead of brittle host pointer injection.
+
+### Notes for integrators
+
+- No Doctrine migrations.
+- After pull: `composer install` (pins `nowo-tech/hot-reload-bundle` **1.5.1** `require-dev`). Outside `dev`/`test`, set `REDIS_PASSWORD` and put the same password in `REDIS_URL` / `MESSENGER_TRANSPORT_DSN` (never `redis://:@host`). Dev: optional `bin/console nowo:hot-reload:check` after `make up`.
+- See [UPGRADING.md](UPGRADING.md) **Upgrading from 1.24.1 to 1.24.2**.
 
 ## [1.24.1] - 2026-08-26
 
@@ -1546,7 +1560,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.1...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.2...HEAD
+[1.24.2]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.1...v1.24.2
 [1.24.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.0...v1.24.1
 [1.24.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.23.3...v1.24.0
 [1.23.3]: https://github.com/nowo-tech/symfony-beacon/compare/v1.23.2...v1.23.3
