@@ -4,95 +4,26 @@ import {
   expectAuthenticatedPage,
   resolveDemoProjectUuid,
 } from '../support/helpers';
+import {
+  assertBoxesAligned,
+  assertNearTarget,
+  assertPageHasKitChrome,
+  assertShellAesthetics,
+  assertStandardForm,
+  assertStandardTable,
+  BEACON_BTN_TARGET,
+  formOnPageOrDialog,
+  readChromeBox,
+  samplePageChrome,
+  type ChromeBox,
+} from '../support/kit-chrome';
 
 /**
  * Structural / aesthetic chrome: FormKit-style forms, kit admin tables, Beacon tokens.
- * Catches Bootstrap leftovers, missing CSRF, orphan tables, and broken shell layout.
+ * Inventory: `e2e/admin/KIT-CHROME-SCREENS.md`.
+ * Catches Bootstrap leftovers, missing CSRF, orphan tables, broken shell layout,
+ * and cross-page CSS drift on buttons / inputs / panels.
  */
-
-async function assertShellAesthetics(page: Page): Promise<void> {
-  // Dogfood users may prefer es; dual-locale apps use en|es.
-  await expect(page.locator('html')).toHaveAttribute('lang', /^(en|es)(-|$)/i);
-  await expect(page.locator('html')).toHaveAttribute('data-theme', /.+/);
-  await expect(page.getByRole('main')).toBeVisible();
-
-  const tokens = await page.evaluate(() => {
-    const styles = getComputedStyle(document.documentElement);
-    return {
-      ink: styles.getPropertyValue('--color-ink').trim(),
-      moss: styles.getPropertyValue('--color-moss').trim(),
-      sand: styles.getPropertyValue('--color-sand').trim(),
-    };
-  });
-  expect(tokens.ink.length, 'Beacon --color-ink token').toBeGreaterThan(0);
-  expect(tokens.moss.length, 'Beacon --color-moss token').toBeGreaterThan(0);
-  expect(tokens.sand.length, 'Beacon --color-sand token').toBeGreaterThan(0);
-
-  // Host line is Tailwind + kit tokens — no Bootstrap utility soup on the shell.
-  await expect(page.locator('link[href*="bootstrap"]')).toHaveCount(0);
-}
-
-async function assertStandardForm(page: Page, formLocator = page.getByRole('main').locator('form').first()): Promise<void> {
-  await expect(formLocator).toBeVisible();
-
-  // Symfony / FormKit CSRF: `_token`, `foo[_token]`, or `foo[_csrf_token]`.
-  const token = formLocator.locator(
-    'input[type="hidden"][name="_token"], input[type="hidden"][name$="[_token]"], input[type="hidden"][name*="csrf"], input[name*="[_csrf_token]"]',
-  );
-  // Some filter GET forms omit CSRF; require token OR labelled kit fields.
-  if ((await token.count()) > 0) {
-    await expect(token.first()).toBeAttached();
-  } else {
-    await expect(formLocator.locator('label, .form-group, input, select, textarea').first()).toBeVisible();
-  }
-
-  // Prefer explicit kit buttons — appearance presets use type=submit on card wrappers.
-  const kitSubmit = formLocator.locator(
-    'button.btn-primary[type="submit"], button.btn-danger[type="submit"], button.btn-ghost[type="submit"], button.btn-secondary[type="submit"], button.nowo-ui-btn[type="submit"], input.btn-primary[type="submit"]',
-  );
-  if ((await kitSubmit.count()) > 0) {
-    await expect(kitSubmit.first()).toBeVisible();
-    return;
-  }
-
-  const submit = formLocator.locator('button[type="submit"], input[type="submit"]').first();
-  await expect(submit).toBeVisible();
-  const submitClass = (await submit.getAttribute('class')) ?? '';
-  expect(
-    /btn-primary|btn-danger|btn-ghost|btn-secondary|nowo-ui-|border-\[var\(--color-moss\)\]/.test(submitClass),
-    `submit should use kit button or Beacon token classes, got: ${submitClass}`,
-  ).toBeTruthy();
-}
-
-async function assertStandardTable(
-  page: Page,
-  tableLocator = page.getByRole('main').locator('table').first(),
-): Promise<void> {
-  await expect(tableLocator).toBeVisible();
-  await expect(tableLocator.locator('thead th').first()).toBeVisible();
-  await expect(tableLocator.locator('tbody')).toBeVisible();
-  // Table may sit directly in main without a panel wrapper.
-  const wrap = tableLocator.locator(
-    'xpath=ancestor::*[contains(@class,"panel") or contains(@class,"table") or contains(@class,"kit-admin") or @data-testid][1]',
-  );
-  if ((await wrap.count()) > 0) {
-    await expect(wrap).toBeVisible();
-  } else {
-    await expect(page.getByRole('main')).toBeVisible();
-  }
-}
-
-/** Prefer the POST/kit form inside an open dialog when create routes open modals. */
-async function formOnPageOrDialog(page: Page) {
-  const openDialog = page.locator('dialog[open], dialog.confirm-dialog[open], [role="dialog"]:not([aria-hidden="true"])').first();
-  if ((await openDialog.count()) > 0 && (await openDialog.isVisible().catch(() => false))) {
-    const dialogForm = openDialog.locator('form').first();
-    if ((await dialogForm.count()) > 0) {
-      return dialogForm;
-    }
-  }
-  return page.getByRole('main').locator('form').filter({ has: page.locator('button[type="submit"], input[type="submit"]') }).first();
-}
 
 test.describe('Kit chrome standardization — forms & tables', () => {
   test('admin hub shell aesthetics', async ({ page }) => {
@@ -518,6 +449,256 @@ test.describe('Kit chrome standardization — tabs, dropdown, modal, alert, back
       await page.waitForLoadState('domcontentloaded');
       await expect(page.locator('link[href*="bootstrap"]')).toHaveCount(0);
       await expect(page.getByRole('main').locator('.panel, form, table').first()).toBeVisible();
+    }
+  });
+});
+
+/** Static GET screens that were missing from the baseline kit-chrome pass. */
+const MISSING_AUTHENTICATED_STATIC = [
+  '/dashboard/activity',
+  '/dashboard/alerts',
+  '/dashboard/assignments',
+  '/dashboard/mentions',
+  '/dashboard/summary',
+  '/dashboard/new-in-release',
+  '/account',
+  '/account/preferences',
+  '/account/projects',
+  '/account/groups',
+  '/account/security/activity',
+  '/account/security/devices',
+  '/account/security/history',
+  '/account/display/panels',
+  '/account/display/tours',
+  '/admin/ops',
+  '/admin/social-login',
+  '/admin/social-login/new',
+  '/admin/permissions/new',
+  // `/admin/menus/menu/new` is a modal-only form partial (no host layout) — covered via menus index modal.
+  '/breadcrumb-kit-admin/collections/new',
+  '/_site_backup/history',
+] as const;
+
+const MISSING_GUEST_STATIC = [
+  '/register',
+  '/reset-password',
+  '/login/magic',
+  '/login/qr',
+  '/en/legal/privacy',
+  '/en/legal/terms',
+  '/en/legal/cookies',
+  '/en/legal/notice',
+] as const;
+
+test.describe('Kit chrome — missing product screens (gap-close)', () => {
+  test('authenticated dashboard + account screens smoke kit chrome', async ({ page }) => {
+    test.setTimeout(180_000);
+    const paths = MISSING_AUTHENTICATED_STATIC.filter((p) => p.startsWith('/dashboard') || p.startsWith('/account'));
+    for (const path of paths) {
+      await expectAuthenticatedPage(page, path);
+      await dismissProductTour(page);
+      await assertPageHasKitChrome(page);
+    }
+  });
+
+  test('authenticated admin remainder screens smoke kit chrome', async ({ page }) => {
+    test.setTimeout(120_000);
+    const paths = MISSING_AUTHENTICATED_STATIC.filter((p) => p.startsWith('/admin') || p.startsWith('/breadcrumb') || p.startsWith('/_site'));
+    for (const path of paths) {
+      await expectAuthenticatedPage(page, path);
+      await dismissProductTour(page);
+      await assertPageHasKitChrome(page);
+    }
+
+    // Dashboard-menu "new" is modal-hosted on the index (GET /menu/new is a bare partial).
+    await expectAuthenticatedPage(page, '/admin/menus/');
+    await dismissProductTour(page);
+    await assertShellAesthetics(page);
+    const openNewMenu = page.locator('button[data-nowo-modal-target="modal-menu-new"]').first();
+    if ((await openNewMenu.count()) > 0) {
+      await openNewMenu.click();
+    } else {
+      await page.getByRole('button', { name: /new menu|nuevo menú/i }).first().click();
+    }
+    const menuDialog = page.locator('dialog#modal-menu-new');
+    await expect(menuDialog).toBeVisible({ timeout: 10_000 });
+    await assertStandardForm(page, menuDialog.locator('form').first());
+  });
+
+  test('project remainder screens smoke kit chrome', async ({ page }) => {
+    test.setTimeout(120_000);
+    const uuid = await resolveDemoProjectUuid(page);
+    const paths = [
+      `/projects/${uuid}`,
+      `/projects/${uuid}/analytics`,
+      `/projects/${uuid}/performance`,
+      `/projects/${uuid}/releases`,
+      `/projects/${uuid}/notifications/new`,
+      `/projects/${uuid}/threshold-rules/new`,
+      '/projects/new',
+    ];
+    for (const path of paths) {
+      await expectAuthenticatedPage(page, path);
+      await dismissProductTour(page);
+      await assertPageHasKitChrome(page);
+    }
+  });
+
+  test('admin show/edit follow first list row when present', async ({ page }) => {
+    test.setTimeout(180_000);
+    const lists: Array<{ list: string; linkRe: RegExp }> = [
+      { list: '/admin/users', linkRe: /\/admin\/users\/\d+/ },
+      { list: '/admin/groups', linkRe: /\/admin\/groups\/\d+/ },
+      { list: '/admin/projects', linkRe: /\/admin\/projects\/\d+/ },
+      { list: '/admin/roles', linkRe: /\/admin\/roles\/\d+/ },
+    ];
+    for (const { list, linkRe } of lists) {
+      await expectAuthenticatedPage(page, list);
+      await dismissProductTour(page);
+      const hrefs = await page.locator('main a[href]').evaluateAll((anchors, reSource) => {
+        const re = new RegExp(reSource);
+        return anchors
+          .map((a) => (a as HTMLAnchorElement).getAttribute('href') ?? '')
+          .filter((href) => re.test(href) && !/\/(new|export|import|delete)/.test(href));
+      }, linkRe.source);
+      if (hrefs.length === 0) {
+        continue;
+      }
+      await expectAuthenticatedPage(page, hrefs[0]);
+      await dismissProductTour(page);
+      await assertPageHasKitChrome(page);
+
+      const edit = page.locator(`main a[href*="/edit"]`).first();
+      if ((await edit.count()) > 0) {
+        const editHref = await edit.getAttribute('href');
+        if (editHref) {
+          await expectAuthenticatedPage(page, editHref);
+          await dismissProductTour(page);
+          await assertPageHasKitChrome(page);
+        }
+      }
+    }
+  });
+
+  test('guest auth + legal screens smoke kit chrome', async ({ page }) => {
+    test.setTimeout(120_000);
+    await page.context().clearCookies();
+    for (const path of MISSING_GUEST_STATIC) {
+      await page.goto(path, { waitUntil: 'domcontentloaded' });
+      await assertShellAesthetics(page);
+      const shell = page.locator('main, .nowo-auth-kit__panel, .nowo-auth-kit, article.legal, .legal-page').first();
+      await expect(shell).toBeVisible();
+      await expect(page.locator('link[href*="bootstrap"]')).toHaveCount(0);
+      const form = page.locator('main form, .nowo-auth-kit__panel form, .nowo-auth-kit form').first();
+      if ((await form.count()) > 0 && (await form.isVisible().catch(() => false))) {
+        if ((await form.locator('button[type="submit"], input[type="submit"]').count()) > 0) {
+          await assertStandardForm(page, form);
+        }
+      }
+    }
+  });
+
+  test('issue detail tabs + duplicate confirm-dialog when an issue exists', async ({ page }) => {
+    const uuid = await resolveDemoProjectUuid(page);
+    await expectAuthenticatedPage(page, `/projects/${uuid}/issues`);
+    await dismissProductTour(page);
+    const issueLink = page.locator('main a[href*="/issues/"]').first();
+    if ((await issueLink.count()) === 0) {
+      test.info().annotations.push({ type: 'note', description: 'no issues — skip detail chrome' });
+      return;
+    }
+    await issueLink.click();
+    await expect(page).toHaveURL(/\/issues\//);
+    await dismissProductTour(page);
+    await assertShellAesthetics(page);
+    await expect(page.locator('[data-testid="issue-detail-tabs"], .beacon-tabs').first()).toBeVisible();
+    await expect(page.getByRole('main').locator('.panel, [data-testid], form').first()).toBeVisible();
+
+    const dupHost = page.locator('[data-testid="mark-duplicate"][data-controller="confirm-dialog"]');
+    if ((await dupHost.count()) > 0) {
+      const openBtn = dupHost.locator('[data-action*="confirm-dialog#open"]').first();
+      if ((await openBtn.count()) > 0) {
+        await openBtn.click();
+        const dialog = page.locator('dialog.confirm-dialog').first();
+        await expect(dialog).toBeVisible({ timeout: 10_000 });
+        await expect(dialog.locator('.confirm-dialog__title, .confirm-dialog__header, form').first()).toBeVisible();
+        await dialog.locator('[data-confirm-dialog-close], button.btn-ghost').first().click();
+      }
+    }
+  });
+});
+
+test.describe('Kit chrome — CSS standardization layer', () => {
+  test('btn-primary / inputs / panels stay size-aligned across product screens', async ({ page }) => {
+    test.setTimeout(180_000);
+    const uuid = await resolveDemoProjectUuid(page);
+    const samplePaths = [
+      '/dashboard',
+      '/admin/users',
+      '/admin/mailer',
+      '/account/profile',
+      `/projects/${uuid}/settings`,
+      `/projects/${uuid}/issues`,
+      '/admin/http-log',
+    ];
+
+    const btnSamples: Array<{ path: string; box: ChromeBox }> = [];
+    const inputSamples: Array<{ path: string; box: ChromeBox }> = [];
+    const panelSamples: Array<{ path: string; box: ChromeBox }> = [];
+
+    for (const path of samplePaths) {
+      await expectAuthenticatedPage(page, path);
+      await dismissProductTour(page);
+      await assertShellAesthetics(page);
+      const sample = await samplePageChrome(page, path);
+      if (sample.btn) {
+        btnSamples.push({ path, box: sample.btn });
+        assertNearTarget(sample.btn, BEACON_BTN_TARGET, `btn-primary@${path}`);
+      }
+      if (sample.input) {
+        inputSamples.push({ path, box: sample.input });
+      }
+      if (sample.panel) {
+        panelSamples.push({ path, box: sample.panel });
+      }
+    }
+
+    expect(btnSamples.length, 'collected btn-primary samples').toBeGreaterThanOrEqual(4);
+    expect(inputSamples.length, 'collected input samples').toBeGreaterThanOrEqual(3);
+
+    assertBoxesAligned(btnSamples, 'btn-primary', ['paddingTop', 'paddingLeft', 'fontSize'], 2);
+    assertBoxesAligned(inputSamples, 'text-input', ['paddingTop', 'fontSize'], 3);
+    if (panelSamples.length >= 2) {
+      assertBoxesAligned(panelSamples, 'panel', ['paddingTop', 'paddingLeft'], 4);
+    }
+  });
+
+  test('confirm-dialog and AuthKit guest controls match kit button metrics', async ({ page }) => {
+    await expectAuthenticatedPage(page, '/dashboard');
+    await dismissProductTour(page);
+    await page.locator('[data-tour="new-project"], button[data-action*="confirm-dialog#open"]').first().click();
+    const dialog = page.locator('dialog.confirm-dialog').first();
+    await expect(dialog).toBeVisible({ timeout: 10_000 });
+    const dialogBtn = dialog.locator('button.btn-primary, button.btn-danger, button.btn-ghost').first();
+    const dialogBox = await readChromeBox(dialogBtn);
+    expect(dialogBox, 'dialog kit button metrics').not.toBeNull();
+    if (dialogBox) {
+      expect(Math.abs(dialogBox.fontSize - BEACON_BTN_TARGET.fontSizePx)).toBeLessThanOrEqual(2);
+      expect(Math.abs(dialogBox.paddingTop - BEACON_BTN_TARGET.paddingYPx)).toBeLessThanOrEqual(2);
+    }
+    await dialog.locator('[data-confirm-dialog-close], button.btn-ghost').first().click();
+
+    await page.context().clearCookies();
+    await page.goto('/login');
+    await assertShellAesthetics(page);
+    const loginSubmit = page.locator('.nowo-auth-kit__panel button[type="submit"], form[name="login_form"] button[type="submit"]').first();
+    const loginBox = await readChromeBox(loginSubmit);
+    expect(loginBox, 'login submit metrics').not.toBeNull();
+    if (loginBox) {
+      expect(Math.abs(loginBox.fontSize - BEACON_BTN_TARGET.fontSizePx)).toBeLessThanOrEqual(2);
+      expect(loginBox.paddingTop).toBeGreaterThanOrEqual(BEACON_BTN_TARGET.paddingYPx - 1);
+      expect(loginBox.paddingTop).toBeLessThanOrEqual(14);
+      expect(Math.abs(loginBox.paddingLeft - BEACON_BTN_TARGET.paddingXPx)).toBeLessThanOrEqual(2);
     }
   });
 });

@@ -12,19 +12,24 @@ test.describe('Admin kit mutations & deeper shells', () => {
   test('dashboard menu new form can create ephemeral menu (UC-ADM-22)', async ({ page }) => {
     const suffix = Date.now().toString(36);
     const name = `e2e-menu-${suffix}`;
-    await expectAuthenticatedPage(page, '/admin/menus/menu/new');
-    const form = page.locator('form').filter({ has: page.locator('input[name*="[name]"], input[name*="[code]"], input[name*="[label]"]') }).first();
-    await expect(form).toBeVisible({ timeout: 15_000 });
-    const nameField = form.locator('input[name*="[name]"], input[name*="[label]"]').first();
-    await nameField.fill(name);
-    const code = form.locator('input[name*="[code]"], input[name*="[slug]"]');
-    if ((await code.count()) > 0) {
-      await code.first().fill(`e2e_${suffix}`);
+    const code = `e2e_${suffix}`;
+    await expectAuthenticatedPage(page, '/admin/menus/');
+    const open = page.locator('button[data-nowo-modal-target="modal-menu-new"]').first();
+    if ((await open.count()) > 0) {
+      await open.click();
+    } else {
+      await page.getByRole('button', { name: /new menu|nuevo menú/i }).first().click();
     }
+    await expect(page.locator('dialog#modal-menu-new')).toBeVisible({ timeout: 10_000 });
+    const form = page.locator('dialog#modal-menu-new form').first();
+    await expect(form).toBeVisible({ timeout: 15_000 });
+    const codeField = form.locator('input[name*="[definition][code]"], input[name*="[code]"]').first();
+    const nameField = form.locator('input[name*="[definition][name]"], input[name*="[name]"]').first();
+    await codeField.fill(code);
+    await nameField.fill(name);
     await form.locator('button[type="submit"]').first().click();
     await waitForPageLoader(page);
     await expect(page).not.toHaveURL(/\/login/);
-    // Best-effort: list contains the new menu or we landed on show.
     await page.goto('/admin/menus/');
     await dismissProductTour(page);
     await expect(page.getByRole('main')).toContainText(new RegExp(name.slice(0, 12), 'i'), { timeout: 15_000 });

@@ -65,6 +65,10 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-AUTH-24 | Localized logout (`/{locale}/logout`) | ✅ Covered | `smoke/use-cases-auth-flows.spec.ts` |
 | UC-AUTH-25 | QR login shows challenge image (PNG/SVG data URI) | ✅ Covered | `flows/use-cases-atomic-gaps.spec.ts` |
 | UC-AUTH-26 | Password reset code entry page (`/reset-password/complete`) | ✅ Covered | `flows/use-cases-atomic-gaps.spec.ts` |
+| UC-AUTH-27 | Forged magic-login check never reaches dashboard | ✅ Covered | `flows/use-cases-behavioral-depth.spec.ts` |
+| UC-AUTH-28 | Forged password-reset token rejected | ✅ Covered | `flows/use-cases-behavioral-depth.spec.ts` |
+| UC-AUTH-29 | Magic-login link replay after confirm rejected | ✅ Covered | `flows/use-cases-behavioral-depth.spec.ts` (Mailpit) |
+| UC-AUTH-30 | Reset password rejects mismatched confirmation (old password still works) | ✅ Covered | `flows/use-cases-behavioral-depth.spec.ts` (Mailpit) |
 
 ---
 
@@ -126,8 +130,8 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ACC-15 | Mercure realtime config endpoint | ✅ Covered | `account/use-cases-account-chrome.spec.ts` |
 | UC-ACC-16 | PWA manifest / SW / offline | ✅ Covered | `smoke/misc.spec.ts` (reachability + manifest without `Set-Cookie`) |
 | UC-ACC-17 | Save profile display name | ✅ Covered | `account/use-cases-account-mutations.spec.ts` (display name); Slack user id via hooks happy-path profile linkage |
-| UC-ACC-18 | Change email with current-password confirm | ✅ Covered | `account/use-cases-account-mutations.spec.ts` (reject without current password) |
-| UC-ACC-19 | Change password from security | ✅ Covered | `account/use-cases-account-mutations.spec.ts` (wrong current + weak password rejected; no demo-password round-trip — strong policy blocks restoring `admin123`) |
+| UC-ACC-18 | Change email with current-password confirm | ✅ Covered | `account/use-cases-account-mutations.spec.ts` (reject without current password); success path on ephemeral user `flows/use-cases-behavioral-depth.spec.ts` |
+| UC-ACC-19 | Change password from security | ✅ Covered | `account/use-cases-account-mutations.spec.ts` (wrong current + weak password rejected); success + old-password rejected on ephemeral user `flows/use-cases-behavioral-depth.spec.ts` |
 | UC-ACC-20 | Account index / preferences redirects | ✅ Covered | `admin/use-cases-legal-mutations.spec.ts` |
 | UC-ACC-21 | Mark product tour seen (POST) | ✅ Covered | `smoke/use-cases-ops-remaining.spec.ts` |
 | UC-ACC-22 | PWA offline document loads | ✅ Covered | `account/use-cases-account-mutations.spec.ts` (`/offline`) |
@@ -136,6 +140,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ACC-25 | Linked social accounts panel on security | ✅ Covered | `flows/use-cases-atomic-gaps.spec.ts` |
 | UC-ACC-26 | Morphicons chrome (theme / content-width / sidebar / password) | ✅ Covered | `account/use-cases-morphicons-chrome.spec.ts` (`is-morph-ready` + SVG morph hosts) |
 | UC-ACC-27 | Profile PhoneInput (country + national → E.164) | ✅ Covered | `account/use-cases-account-mutations.spec.ts` (kit country ISO + national number; restore after save) |
+| UC-ACC-28 | Trusted devices trust / revoke + forged CSRF | ✅ Covered | `flows/use-cases-behavioral-depth.spec.ts` |
 
 ---
 
@@ -170,13 +175,13 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-PROJ-03 | Project nav tabs (issues / analytics / performance / releases / settings) | ✅ Covered | `smoke/navigation-ui.spec.ts` |
 | UC-PROJ-04 | Settings sections (general, keys, members, governance, notifications, health, danger) | ✅ Covered | `project/use-cases-project.spec.ts`, `flows/use-cases-partials-closing.spec.ts` (general/access/alerts/data/danger) |
 | UC-PROJ-05 | Create / rotate / revoke API key + DSN flash | ✅ Covered | `project/project-settings-deep.spec.ts`, `notifications/use-cases-notifications-keys.spec.ts` |
-| UC-PROJ-06 | Add / change role / deactivate / remove member | ✅ Covered | `project/use-cases-members-viewer.spec.ts`, `flows/use-cases-partials-closing.spec.ts` |
+| UC-PROJ-06 | Add / change role / deactivate / remove member | ✅ Covered | `project/use-cases-members-viewer.spec.ts`, `flows/use-cases-partials-closing.spec.ts`; viewer→admin promotion grants settings `flows/use-cases-behavioral-depth.spec.ts` |
 | UC-PROJ-07 | Add / role / remove group access | ✅ Covered | `flows/use-cases-partials-closing.spec.ts` |
 | UC-PROJ-08 | Save governance (retention / rate / quota) | ✅ Covered | `flows/mutations.spec.ts` |
 | UC-PROJ-09 | Create share link (project-wide) | ✅ Covered | `flows/mutations.spec.ts`, `project/share-access.spec.ts` |
-| UC-PROJ-10 | Create share link (issue-scoped + max uses) | ✅ Covered | `project/use-cases-share.spec.ts` |
-| UC-PROJ-11 | Revoke share link | ✅ Covered | `project/use-cases-share.spec.ts` |
-| UC-PROJ-12 | Guest opens valid share token (viewer) | ✅ Covered | `project/use-cases-share.spec.ts` (login then consume) |
+| UC-PROJ-10 | Create share link (issue-scoped + max uses) | ✅ Covered | `project/use-cases-share.spec.ts`; non-member lands on scoped issue `flows/use-cases-behavioral-depth.spec.ts` |
+| UC-PROJ-11 | Revoke share link | ✅ Covered | `project/use-cases-share.spec.ts`; revoked token rejects outsider `flows/use-cases-behavioral-depth.spec.ts` |
+| UC-PROJ-12 | Guest opens valid share token (viewer) | ✅ Covered | `project/use-cases-share.spec.ts` (login then consume); non-member isolation vs settings/admin `flows/use-cases-behavioral-depth.spec.ts` |
 | UC-PROJ-13 | Invalid share token | ✅ Covered | `project/share-access.spec.ts` |
 | UC-PROJ-14 | Mint / revoke read API token | ✅ Covered | `flows/mutations.spec.ts` |
 | UC-PROJ-15 | Member-alerts project override save | ✅ Covered | `account/member-alerts.spec.ts` |
@@ -274,6 +279,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-NOTIF-16 | Reject SSRF / private endpoint URL | ✅ Covered | `notifications/use-cases-channel-matrix.spec.ts` |
 | UC-NOTIF-17 | Flush digests console/cron | ✅ Covered | `notifications/use-cases-digest-flush.spec.ts` (`make test-e2e` writes `var/e2e/flush-digests.last`) |
 | UC-NOTIF-18 | Reject `javascript:` destination URL | ✅ Covered | `security/edge-guards.spec.ts` (same as UC-SEC-37) |
+| UC-NOTIF-19 | Volume threshold fires after ingest + delivery attempt recorded | ✅ Covered | `notifications/use-cases-threshold-delivery.spec.ts` (HTTP dest + `volume.threshold` + errorCount=1) |
 
 ---
 
@@ -352,10 +358,10 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ADM-18 | Legacy `/settings/*` redirects | ✅ Covered | `admin/settings-deep.spec.ts` |
 | UC-ADM-19 | Kit shells: HTTP log / menus / breadcrumbs / RoutingKit | ✅ Covered | `admin/kit-admin-deep.spec.ts` (list/show/new form shells) |
 | UC-ADM-20 | Unlink user↔project / group↔project | ✅ Covered | `admin/use-cases-admin-remaining.spec.ts` (affordance when linked) |
-| UC-ADM-21 | HTTP log export / purge / delete | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` |
-| UC-ADM-22 | Dashboard menu create / edit / delete / import / export / reorder | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` |
-| UC-ADM-23 | Breadcrumb collection/item CRUD + import/export | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (new form) |
-| UC-ADM-24 | RoutingKit create / edit / delete / conflicts / clear-cache / import-export | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (create form; persist when #[Routable] candidates exist) |
+| UC-ADM-21 | HTTP log export / purge / delete | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts`; CSV export depth `admin/use-cases-kit-crud-depth.spec.ts` |
+| UC-ADM-22 | Dashboard menu create / edit / delete / import / export / reorder | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (modal create); full edit/delete `admin/use-cases-kit-crud-depth.spec.ts` |
+| UC-ADM-23 | Breadcrumb collection/item CRUD + import/export | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (new form); full CRUD `admin/use-cases-kit-crud-depth.spec.ts` |
+| UC-ADM-24 | RoutingKit create / edit / delete / conflicts / clear-cache / import-export | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (create); edit/delete/clear-cache depth `admin/use-cases-kit-crud-depth.spec.ts` |
 | UC-ADM-25 | Permissions create / edit / delete | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` |
 | UC-ADM-26 | Roles create / edit / delete + assign users | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` |
 | UC-ADM-27 | Admin create project | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` |
@@ -374,6 +380,9 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ADM-40 | Instance role permissions matrix save | ✅ Covered | `flows/use-cases-atomic-gaps.spec.ts` |
 | UC-ADM-41 | Copy dashboard menu | ✅ Covered | `flows/use-cases-atomic-gaps.spec.ts` |
 | UC-ADM-42 | Clear Mailer DSN control on mailer settings | ✅ Covered | `flows/use-cases-atomic-gaps.spec.ts` (control present; not submitted) |
+| UC-ADM-43 | Duplicate admin user email rejected | ✅ Covered | `flows/use-cases-behavioral-depth.spec.ts` |
+| UC-ADM-44 | Admin cannot disable self | ✅ Covered | `flows/use-cases-behavioral-depth.spec.ts` |
+| UC-ADM-45 | Empty admin group name rejected | ✅ Covered | `flows/use-cases-behavioral-depth.spec.ts` |
 
 ---
 
@@ -406,7 +415,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 **Definition complete:** every primary product route family and operator mutation above has a `UC-*` row (surface catalog ≈ 100% of application product surface).
 
-**Automation status (2026-08-25):** ~316 Covered / ~0 Partial / ~0 Gap / ~8 Out of scope. Remaining Out of scope: empty-DB first user (AUTH-10), incomplete platform catalog fixture (SETUP-02 / SETUP-07), SiteBackup restore (OPS-14), roadmap Later (Native / dogfood UI / dogfood suite CLI / hot-reload). Browser Push *permission* prompt remains external. Cold `/setup` wizard + POST advance stay intentionally unexercised on seeded installs. Local Playwright uses `retries: 1` and hardened `gotoStable` (WSL `ERR_NETWORK_CHANGED` / `chrome-error`). Limit/abuse batch UC-SEC-40..57 lives in `security/limit-guards.spec.ts`.
+**Automation status (2026-08-30):** ~325 Covered / ~0 Partial / ~0 Gap / ~8 Out of scope. Depth batch `flows/use-cases-behavioral-depth.spec.ts` closes credential success paths, share isolation for non-members, trusted devices, forged/replay auth tokens, and admin validation edges. Remaining Out of scope: empty-DB first user (AUTH-10), incomplete platform catalog fixture (SETUP-02 / SETUP-07), SiteBackup restore (OPS-14), roadmap Later (Native / dogfood UI / dogfood suite CLI / hot-reload). Browser Push *permission* prompt remains external. Cold `/setup` wizard + POST advance stay intentionally unexercised on seeded installs. Local Playwright uses `retries: 1` and hardened `gotoStable` (WSL `ERR_NETWORK_CHANGED` / `chrome-error`). Limit/abuse batch UC-SEC-40..57 lives in `security/limit-guards.spec.ts`.
 
 **Closed Gap batches:**
 
@@ -428,6 +437,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 16. ~~Unwanted-action / abuse guards UC-SEC-13..27, UC-ING-19..22, UC-HOOK-13/14, UC-ISS-30/31, UC-PROJ-28~~ → Covered (`security/unwanted-actions.spec.ts`, `ingest/use-cases-ingest-abuse.spec.ts`, `hooks/use-cases-hooks-negatives.spec.ts`).
 17. ~~Edge guards UC-SEC-28..39, UC-ISS-32, UC-NOTIF-18, UC-ING-23~~ → Covered (`security/edge-guards.spec.ts`).
 18. ~~Limit / abuse guards UC-SEC-40..57~~ → Covered (`security/limit-guards.spec.ts`).
+19. ~~Behavioral depth AUTH-27..30, ACC-18/19 success, ACC-28, PROJ-06/10..12 isolation, ADM-43..45, SEC-10 toggle~~ → Covered (`flows/use-cases-behavioral-depth.spec.ts`).
 
 When adding a case: give it a **UC-*** ID here, set status, and name the spec file under `e2e/<domain>/`.
 
@@ -448,7 +458,7 @@ Focused suite proving **blocked** access — HTTP 403 branded gates, login redir
 | UC-SEC-07 | Demote `admin` → `viewer` then settings/notifications blocked | ✅ Covered | `security/access-denials.spec.ts` |
 | UC-SEC-08 | Deactivated membership revokes project access (403) | ✅ Covered | `security/access-denials.spec.ts` |
 | UC-SEC-09 | Invalid credentials stay on login | ✅ Covered | `security/auth-gates.spec.ts` |
-| UC-SEC-10 | Disabled account cannot authenticate | ✅ Covered | `security/auth-gates.spec.ts` |
+| UC-SEC-10 | Disabled account cannot authenticate | ✅ Covered | `security/auth-gates.spec.ts`; disable→block→re-enable round-trip `flows/use-cases-behavioral-depth.spec.ts` |
 | UC-SEC-11 | Password reset + QR/magic login stay public (no dashboard leak) | ✅ Covered | `security/auth-gates.spec.ts` |
 | UC-SEC-12 | `/register` closed when users exist | ✅ Covered | `security/auth-gates.spec.ts` |
 | UC-SEC-13 | Forged CSRF on issue comment rejected | ✅ Covered | `security/unwanted-actions.spec.ts` |

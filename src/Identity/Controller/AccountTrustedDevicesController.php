@@ -47,7 +47,7 @@ final class AccountTrustedDevicesController extends AbstractController
         $devices = $this->accountTrustedDevices->listFor($user, $device);
         $revokeForms = [];
         foreach ($devices as $row) {
-            $revokeForms[$row->deviceId] = $this->csrfOnlyFormFactory->create(
+            $revokeForms[$row->deviceId] = $this->csrfOnlyFormFactory->createNamed(
                 $this->generateUrl('account_security_devices_revoke', ['deviceId' => $row->deviceId]),
                 'account_device_revoke_'.$row->deviceId,
             )->createView();
@@ -66,7 +66,7 @@ final class AccountTrustedDevicesController extends AbstractController
             'current_label' => $currentLabel,
             'current_id' => $currentId,
             'devices' => $devices,
-            'trustForm' => $this->csrfOnlyFormFactory->create(
+            'trustForm' => $this->csrfOnlyFormFactory->createNamed(
                 $this->generateUrl('account_security_devices_trust'),
                 'account_device_trust',
             )->createView(),
@@ -80,7 +80,7 @@ final class AccountTrustedDevicesController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $form = $this->csrfOnlyFormFactory->create(
+        $form = $this->csrfOnlyFormFactory->createNamed(
             $this->generateUrl('account_security_devices_trust'),
             'account_device_trust',
         );
@@ -116,7 +116,7 @@ final class AccountTrustedDevicesController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $form = $this->csrfOnlyFormFactory->create(
+        $form = $this->csrfOnlyFormFactory->createNamed(
             $this->generateUrl('account_security_devices_revoke', ['deviceId' => $deviceId]),
             'account_device_revoke_'.$deviceId,
         );
