@@ -82,9 +82,9 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-LEGAL-04 | Consent persists across navigations | ✅ Covered | `smoke/cookie-consent.spec.ts` |
 | UC-LEGAL-05 | Cookie consent config JSON endpoints | ✅ Covered | `smoke/cookie-consent.spec.ts` |
 | UC-LEGAL-06 | Admin cookie consent settings / definitions | ✅ Covered | `admin/kit-admin-deep.spec.ts` |
-| UC-LEGAL-07 | Consent necessary-only / reject non-essential | ✅ Covered | `admin/use-cases-legal-mutations.spec.ts` (necessary-only) |
-| UC-LEGAL-08 | Cookie definition CRUD (new/edit/delete) | ✅ Covered | `admin/use-cases-legal-mutations.spec.ts` |
-| UC-LEGAL-09 | Cookie consent settings section tabs save | ✅ Covered | `admin/use-cases-legal-mutations.spec.ts` |
+| UC-LEGAL-07 | Consent necessary-only / reject non-essential | ✅ Covered | `admin/use-cases-legal-mutations.spec.ts` (necessary-only); guest customize `admin/use-cases-legal-depth.spec.ts` |
+| UC-LEGAL-08 | Cookie definition CRUD (new/edit/delete) | ✅ Covered | `admin/use-cases-legal-mutations.spec.ts` (create); edit/delete `admin/use-cases-legal-depth.spec.ts` |
+| UC-LEGAL-09 | Cookie consent settings section tabs save | ✅ Covered | `admin/use-cases-legal-mutations.spec.ts`; tab field persistence `admin/use-cases-legal-depth.spec.ts` |
 
 ---
 
@@ -191,7 +191,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-PROJ-19 | Delete project | ✅ Covered | `flows/use-cases-destructive-safe.spec.ts` (ephemeral project; type-to-confirm) |
 | UC-PROJ-20 | Notification help page | ✅ Covered | `project/project-settings-deep.spec.ts` |
 | UC-PROJ-21 | Health / delivery history panel | ✅ Covered | `notifications/use-cases-thresholds-health.spec.ts` |
-| UC-PROJ-22 | Edit project name / description (general) | ✅ Covered | `admin/use-cases-legal-mutations.spec.ts` (admin edit) |
+| UC-PROJ-22 | Edit project name / description (general) | ✅ Covered | `admin/use-cases-legal-mutations.spec.ts` (admin edit); owner rename `flows/use-cases-product-depth.spec.ts` |
 | UC-PROJ-23 | Share link max-uses exhausted rejects | ✅ Covered | `project/use-cases-remaining-gaps.spec.ts` |
 | UC-PROJ-24 | `full` membership role capabilities | ✅ Covered | `admin/use-cases-final-gaps.spec.ts` (settings/danger delete; no transfer) |
 | UC-PROJ-25 | New-project form fragment (`/_new_form`) | ✅ Covered | `project/use-cases-remaining-gaps.spec.ts` |
@@ -218,10 +218,10 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ISS-11 | Export events CSV/JSON | ✅ Covered | `project/dashboard-project.spec.ts` |
 | UC-ISS-12 | Open issue detail | ✅ Covered | `project/dashboard-project.spec.ts`, `issues/issues-deep.spec.ts` (path tabs `main` / `similar` / `history` — `102`) |
 | UC-ISS-13 | Add comment | ✅ Covered | `flows/mutations.spec.ts` |
-| UC-ISS-14 | Resolve / reopen status | ✅ Covered | `flows/mutations.spec.ts` |
+| UC-ISS-14 | Resolve / reopen status | ✅ Covered | `flows/mutations.spec.ts`; history tab depth `flows/use-cases-product-depth.spec.ts` |
 | UC-ISS-15 | Ignore status | ✅ Covered | `issues/use-cases-issues.spec.ts` |
 | UC-ISS-16 | Change priority | ✅ Covered | `flows/mutations.spec.ts` |
-| UC-ISS-17 | Assign / clear assignee | ✅ Covered | `flows/mutations.spec.ts` |
+| UC-ISS-17 | Assign / clear assignee | ✅ Covered | `flows/mutations.spec.ts` (clear); assign member `flows/use-cases-product-depth.spec.ts` |
 | UC-ISS-18 | Mark duplicate (+ optional merge) | ✅ Covered | `flows/use-cases-partials-closing.spec.ts` (without merge); `flows/use-cases-destructive-safe.spec.ts` (with merge_events) |
 | UC-ISS-19 | Similar issues panel | ✅ Covered | `notifications/use-cases-thresholds-health.spec.ts` (`…/similar` tab / `issue-detail-tabs` — `041` / `102`) |
 | UC-ISS-20 | Copy for AI (md/json export) | ✅ Covered | `issues/issues-deep.spec.ts` |
@@ -264,7 +264,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-NOTIF-01 | Create destination form loads | ✅ Covered | `issues/issues-deep.spec.ts` |
 | UC-NOTIF-02 | Create Slack/Discord/Teams/Telegram/email/HTTP destination | ✅ Covered | `notifications/use-cases-notifications-keys.spec.ts` (HTTP); Slack/Teams also in hooks-happy |
 | UC-NOTIF-03 | Edit / toggle / resume / delete destination | ✅ Covered | `notifications/use-cases-notifications-keys.spec.ts` (toggle+delete) |
-| UC-NOTIF-04 | Send test notification | ✅ Covered | `flows/use-cases-destructive-safe.spec.ts` (HTTP destination → queued flash; delivery async) |
+| UC-NOTIF-04 | Send test notification | ✅ Covered | `flows/use-cases-destructive-safe.spec.ts` (queued flash); delivery health `flows/use-cases-product-depth.spec.ts` |
 | UC-NOTIF-05 | Quiet hours + digests + lifecycle categories | ✅ Covered | `notifications/use-cases-thresholds-health.spec.ts` (save quiet hours + digest on HTTP dest) |
 | UC-NOTIF-06 | Threshold rule create form | ✅ Covered | `issues/issues-deep.spec.ts` |
 | UC-NOTIF-07 | Threshold rule CRUD + toggle | ✅ Covered | `notifications/use-cases-thresholds-health.spec.ts` |
@@ -359,9 +359,9 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ADM-19 | Kit shells: HTTP log / menus / breadcrumbs / RoutingKit | ✅ Covered | `admin/kit-admin-deep.spec.ts` (list/show/new form shells) |
 | UC-ADM-20 | Unlink user↔project / group↔project | ✅ Covered | `admin/use-cases-admin-remaining.spec.ts` (affordance when linked) |
 | UC-ADM-21 | HTTP log export / purge / delete | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts`; CSV export depth `admin/use-cases-kit-crud-depth.spec.ts` |
-| UC-ADM-22 | Dashboard menu create / edit / delete / import / export / reorder | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (modal create); full edit/delete `admin/use-cases-kit-crud-depth.spec.ts` |
-| UC-ADM-23 | Breadcrumb collection/item CRUD + import/export | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (new form); full CRUD `admin/use-cases-kit-crud-depth.spec.ts` |
-| UC-ADM-24 | RoutingKit create / edit / delete / conflicts / clear-cache / import-export | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (create); edit/delete/clear-cache depth `admin/use-cases-kit-crud-depth.spec.ts` |
+| UC-ADM-22 | Dashboard menu create / edit / delete / import / export / reorder | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (modal create); CRUD `admin/use-cases-kit-crud-depth.spec.ts`; items/import/export `admin/use-cases-kit-behavioral-depth.spec.ts` |
+| UC-ADM-23 | Breadcrumb collection/item CRUD + import/export | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (new form); collection CRUD `admin/use-cases-kit-crud-depth.spec.ts`; item CRUD `admin/use-cases-kit-behavioral-depth.spec.ts` |
+| UC-ADM-24 | RoutingKit create / edit / delete / conflicts / clear-cache / import-export | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (create); edit/delete/clear-cache `admin/use-cases-kit-crud-depth.spec.ts`; conflict guard `admin/use-cases-kit-behavioral-depth.spec.ts` |
 | UC-ADM-25 | Permissions create / edit / delete | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` |
 | UC-ADM-26 | Roles create / edit / delete + assign users | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` |
 | UC-ADM-27 | Admin create project | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` |
@@ -415,7 +415,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 **Definition complete:** every primary product route family and operator mutation above has a `UC-*` row (surface catalog ≈ 100% of application product surface).
 
-**Automation status (2026-08-30):** ~325 Covered / ~0 Partial / ~0 Gap / ~8 Out of scope. Depth batch `flows/use-cases-behavioral-depth.spec.ts` closes credential success paths, share isolation for non-members, trusted devices, forged/replay auth tokens, and admin validation edges. Remaining Out of scope: empty-DB first user (AUTH-10), incomplete platform catalog fixture (SETUP-02 / SETUP-07), SiteBackup restore (OPS-14), roadmap Later (Native / dogfood UI / dogfood suite CLI / hot-reload). Browser Push *permission* prompt remains external. Cold `/setup` wizard + POST advance stay intentionally unexercised on seeded installs. Local Playwright uses `retries: 1` and hardened `gotoStable` (WSL `ERR_NETWORK_CHANGED` / `chrome-error`). Limit/abuse batch UC-SEC-40..57 lives in `security/limit-guards.spec.ts`.
+**Automation status (2026-08-31):** ~340 Covered / ~0 Partial / ~0 Gap / ~8 Out of scope. Latest depth batches: `flows/use-cases-behavioral-depth.spec.ts`, `admin/use-cases-kit-crud-depth.spec.ts`, `notifications/use-cases-threshold-delivery.spec.ts`, `admin/use-cases-kit-behavioral-depth.spec.ts`, `admin/use-cases-legal-depth.spec.ts`, `flows/use-cases-product-depth.spec.ts`. Remaining Out of scope: empty-DB first user (AUTH-10), incomplete platform catalog fixture (SETUP-02 / SETUP-07), SiteBackup restore (OPS-14), HTTP log purge on shared DB, roadmap Later (Native / dogfood UI / dogfood suite CLI / hot-reload). Browser Push *permission* prompt remains external.
 
 **Closed Gap batches:**
 
@@ -438,6 +438,8 @@ Membership roles: see [ROLES.md](ROLES.md).
 17. ~~Edge guards UC-SEC-28..39, UC-ISS-32, UC-NOTIF-18, UC-ING-23~~ → Covered (`security/edge-guards.spec.ts`).
 18. ~~Limit / abuse guards UC-SEC-40..57~~ → Covered (`security/limit-guards.spec.ts`).
 19. ~~Behavioral depth AUTH-27..30, ACC-18/19 success, ACC-28, PROJ-06/10..12 isolation, ADM-43..45, SEC-10 toggle~~ → Covered (`flows/use-cases-behavioral-depth.spec.ts`).
+20. ~~Kit CRUD depth ADM-21..24, NOTIF-19 threshold delivery~~ → Covered (`admin/use-cases-kit-crud-depth.spec.ts`, `notifications/use-cases-threshold-delivery.spec.ts`).
+21. ~~Product depth ADM-22-D1/D2, ADM-23-D1, ADM-24-D1, LEGAL-07-D1/08-D1/09-D1, PROJ-22-D1, ISS-14-D1/17-D1, NOTIF-04-D1~~ → Covered (`admin/use-cases-kit-behavioral-depth.spec.ts`, `admin/use-cases-legal-depth.spec.ts`, `flows/use-cases-product-depth.spec.ts`).
 
 When adding a case: give it a **UC-*** ID here, set status, and name the spec file under `e2e/<domain>/`.
 
