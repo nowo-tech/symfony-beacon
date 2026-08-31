@@ -39,12 +39,16 @@ async function createEphemeralBreadcrumbCollection(page: Page, suffix: string): 
   }
   await create.locator('button[type="submit"]').first().click();
   await waitForPageLoader(page);
-  await page.goto('/breadcrumb-kit-admin/collections');
-  await dismissProductTour(page);
-  const row = page.locator('tr').filter({ hasText: code }).first();
-  await expect(row).toBeVisible({ timeout: 15_000 });
-  const itemsHref = await row.locator('a[href*="/collections/"]').first().getAttribute('href');
-  const collectionId = itemsHref?.match(/collections\/(\d+)/)?.[1] ?? '';
+
+  let collectionId = page.url().match(/collections\/(\d+)/)?.[1] ?? '';
+  if (!collectionId) {
+    await page.goto(`/breadcrumb-kit-admin/collections?q=${encodeURIComponent(code)}`);
+    await dismissProductTour(page);
+    const row = page.locator('tr').filter({ hasText: code }).first();
+    await expect(row).toBeVisible({ timeout: 15_000 });
+    const itemsHref = await row.locator('a[href*="/collections/"]').first().getAttribute('href');
+    collectionId = itemsHref?.match(/collections\/(\d+)/)?.[1] ?? '';
+  }
   expect(collectionId).toBeTruthy();
   return { code, collectionId };
 }
@@ -140,55 +144,63 @@ test.describe('Kit admin behavioral depth', () => {
     test.setTimeout(120_000);
     const suffix = Date.now().toString(36);
     const itemLabel = `BK item ${suffix}`;
+    const routeName = `e2e_bk_item_${suffix}`;
     const { collectionId } = await createEphemeralBreadcrumbCollection(page, suffix);
     await page.goto(`/breadcrumb-kit-admin/collections/${collectionId}/items/new`);
     await dismissProductTour(page);
-    const routeInput = page.getByLabel(/nombre de ruta|route name/i).first();
-    const labelInput = page.getByLabel(/etiqueta por defecto|default label/i).first();
-    await expect(routeInput).toBeVisible({ timeout: 15_000 });
-    await routeInput.fill('nowo_dashboard_menu_dashboard_index');
-    await labelInput.fill(itemLabel);
-    await page.getByRole('button', { name: /crear|create/i }).first().click();
-    await waitForPageLoader(page);
-    if (page.url().includes('/items/new')) {
-      await expect(page.locator('body')).toContainText(/error|invalid|inválid|duplicate|duplicad|required|obligatorio/i);
-      test.skip(true, 'breadcrumb item create rejected — route may already exist in collection');
-      return;
-    }
-    await expect(page).toHaveURL(new RegExp(`/collections/${collectionId}/items/?(?:\\?|$)`), { timeout: 15_000 });
-    await expect(page.locator('[data-testid="breadcrumb-kit-items-table"]')).toContainText(itemLabel, { timeout: 15_000 });
-
-    const row = page.locator('[data-testid="breadcrumb-kit-items-table"] tr').filter({ hasText: itemLabel }).first();
-    const editLink = row.locator('a[href*="/edit"]').first();
-    if ((await editLink.count()) > 0) {
-      await editLink.click();
-    } else {
-      await row.getByRole('button', { name: /editar|edit/i }).first().click();
-    }
-    await waitForPageLoader(page);
-    const editForm = page.locator('form').filter({
-      has: page.locator('input[name*="[label]"], input[name*="[name]"]'),
+    const form = page.locator('form').filter({
+      has: page.locator('input[name="breadcrumb_item[routeName]"]'),
     }).first();
-    await expect(editForm).toBeVisible({ timeout: 15_000 });
-    const editLabel = editForm.locator('input[name*="[label]"], input[name*="[name]"]');
-    if ((await editLabel.count()) > 0) {
-      await editLabel.first().fill(`${itemLabel} edited`);
-      await editForm.locator('button[type="submit"]').first().click({ force: true });
-      await waitForPageLoader(page);
-    }
-
-    await page.goto(`/breadcrumb-kit-admin/collections/${collectionId}/items`);
-    await dismissProductTour(page);
-    const delRow = page.locator('[data-testid="breadcrumb-kit-items-table"] tr').filter({ hasText: itemLabel }).first();
-    await delRow.locator('button.btn-bk-delete').first().click();
-    const confirm = await waitForKitModal(page, 'modal-bk-delete');
-    await confirm.locator('button[type="submit"], button.btn-danger, button.btn-primary').filter({
-      hasText: /delete|eliminar|borrar|confirm/i,
-    }).last().click({ force: true });
+    await expect(form).toBeVisible({ timeout: 15_000 });
+    await form.locator('input[name="breadcrumb_item[routeName]"]').fill(routeName);
+    await form.locator('input[name="breadcrumb_item[label]"]').fill(itemLabel);
+    await form.locator('button[type="submit"]').first().click();
     await waitForPageLoader(page);
-    await expect(page.locator('[data-testid="breadcrumb-kit-items-table"] tr').filter({ hasText: itemLabel })).toHaveCount(0, {
+    // BreadcrumbKit redirectToRefererOr may bounce to /items/new after create — assert via filtered list.
+    await page.goto(
+      `/breadcrumb-kit-admin/collections/${collectionId}/items?q=${encodeURIComponent(routeName)}`,
+    );
+    await dismissProductTour(page);
+    await expect(page.locator('[data-testid="breadcrumb-kit-items-table"]')).toContainText(itemLabel, {
       timeout: 15_000,
     });
+
+    const row = page.locator('[data-testid="breadcrumb-kit-items-table"] tr').filter({ hasText: itemLabel }).first();
+    const bkUrl = await row.locator('button.btn-bk-item-form').first().getAttribute('data-bk-url');
+    const itemId = bkUrl?.match(/items\/(\d+)\/edit/)?.[1];
+    expect(itemId, 'breadcrumb item id').toBeTruthy();
+    await page.goto(`/breadcrumb-kit-admin/collections/${collectionId}/items/${itemId}/edit`);
+    await dismissProductTour(page);
+    const editForm = page.locator('form').filter({
+      has: page.locator('input[name="breadcrumb_item[label]"]'),
+    }).first();
+    await expect(editForm).toBeVisible({ timeout: 15_000 });
+    const editedLabel = `${itemLabel} edited`;
+    await editForm.locator('input[name="breadcrumb_item[label]"]').fill(editedLabel);
+    await editForm.locator('button[type="submit"]').first().click();
+    await waitForPageLoader(page);
+    await expect(page.getByRole('main')).toContainText(/actualiz|updated|editad|item/i, { timeout: 15_000 });
+
+    await page.goto(
+      `/breadcrumb-kit-admin/collections/${collectionId}/items?q=${encodeURIComponent(routeName)}`,
+    );
+    await dismissProductTour(page);
+    const delRow = page.locator('[data-testid="breadcrumb-kit-items-table"] tr').filter({ hasText: editedLabel }).first();
+    await expect(delRow).toBeVisible({ timeout: 15_000 });
+    const deleteBtn = delRow.locator('button.btn-bk-delete').first();
+    await expect(deleteBtn).toBeVisible({ timeout: 10_000 });
+    await deleteBtn.click();
+    const confirm = page.locator('#modal-bk-delete');
+    await expect(confirm).toBeVisible({ timeout: 15_000 });
+    await confirm.locator('#form-bk-delete-confirm button[type="submit"]').click({ force: true });
+    await waitForPageLoader(page);
+    await page.goto(
+      `/breadcrumb-kit-admin/collections/${collectionId}/items?q=${encodeURIComponent(routeName)}`,
+    );
+    await dismissProductTour(page);
+    await expect(
+      page.locator('[data-testid="breadcrumb-kit-items-table"] tr').filter({ hasText: routeName }),
+    ).toHaveCount(0, { timeout: 15_000 });
   });
 
   test('RoutingKit duplicate path surfaces conflicts (UC-ADM-24-D1)', async ({ page }) => {
