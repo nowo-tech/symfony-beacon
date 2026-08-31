@@ -185,7 +185,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-PROJ-13 | Invalid share token | ✅ Covered | `project/share-access.spec.ts` |
 | UC-PROJ-14 | Mint / revoke read API token | ✅ Covered | `flows/mutations.spec.ts` |
 | UC-PROJ-15 | Member-alerts project override save | ✅ Covered | `account/member-alerts.spec.ts` |
-| UC-PROJ-16 | Config export / import (project) | ✅ Covered | `project/project-config.spec.ts` |
+| UC-PROJ-16 | Config export / import (project) | ✅ Covered | `project/project-config.spec.ts` (round-trip); retention mutate+restore `flows/use-cases-export-config-depth.spec.ts` |
 | UC-PROJ-17 | Clear history (danger zone) | ✅ Covered | `flows/use-cases-destructive-safe.spec.ts` (ephemeral project; slide-to-confirm) |
 | UC-PROJ-18 | Transfer ownership | ✅ Covered | `flows/use-cases-destructive-safe.spec.ts` (ephemeral project + second member) |
 | UC-PROJ-19 | Delete project | ✅ Covered | `flows/use-cases-destructive-safe.spec.ts` (ephemeral project; type-to-confirm) |
@@ -214,7 +214,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ISS-07 | Save named view | ✅ Covered | `flows/mutations.spec.ts` |
 | UC-ISS-08 | Apply saved view | ✅ Covered | `issues/use-cases-issues.spec.ts` |
 | UC-ISS-09 | Delete saved view | ✅ Covered | `issues/use-cases-issues.spec.ts` |
-| UC-ISS-10 | Export issues CSV/JSON | ✅ Covered | `project/dashboard-project.spec.ts` |
+| UC-ISS-10 | Export issues CSV/JSON | ✅ Covered | `project/dashboard-project.spec.ts` (reachability); filtered CSV `level=error` rows `flows/use-cases-export-config-depth.spec.ts` |
 | UC-ISS-11 | Export events CSV/JSON | ✅ Covered | `project/dashboard-project.spec.ts` |
 | UC-ISS-12 | Open issue detail | ✅ Covered | `project/dashboard-project.spec.ts`, `issues/issues-deep.spec.ts` (path tabs `main` / `similar` / `history` — `102`) |
 | UC-ISS-13 | Add comment | ✅ Covered | `flows/mutations.spec.ts` |
@@ -359,11 +359,11 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ADM-19 | Kit shells: HTTP log / menus / breadcrumbs / RoutingKit | ✅ Covered | `admin/kit-admin-deep.spec.ts` (list/show/new form shells) |
 | UC-ADM-20 | Unlink user↔project / group↔project | ✅ Covered | `admin/use-cases-admin-remaining.spec.ts` (affordance when linked) |
 | UC-ADM-21 | HTTP log export / purge / delete | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts`; CSV export depth `admin/use-cases-kit-crud-depth.spec.ts` |
-| UC-ADM-22 | Dashboard menu create / edit / delete / import / export / reorder | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (modal create); CRUD `admin/use-cases-kit-crud-depth.spec.ts`; items/import/export `admin/use-cases-kit-behavioral-depth.spec.ts` |
-| UC-ADM-23 | Breadcrumb collection/item CRUD + import/export | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (new form); collection CRUD `admin/use-cases-kit-crud-depth.spec.ts`; item CRUD `admin/use-cases-kit-behavioral-depth.spec.ts` |
+| UC-ADM-22 | Dashboard menu create / edit / delete / import / export / reorder | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (modal create); CRUD `admin/use-cases-kit-crud-depth.spec.ts`; items/import/export `admin/use-cases-kit-behavioral-depth.spec.ts`; move-up/down + sortable shell `admin/use-cases-kit-reorder-export.spec.ts` |
+| UC-ADM-23 | Breadcrumb collection/item CRUD + import/export | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (new form); collection CRUD `admin/use-cases-kit-crud-depth.spec.ts`; item CRUD `admin/use-cases-kit-behavioral-depth.spec.ts`; collection export JSON `admin/use-cases-kit-reorder-export.spec.ts` |
 | UC-ADM-24 | RoutingKit create / edit / delete / conflicts / clear-cache / import-export | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (create); edit/delete/clear-cache `admin/use-cases-kit-crud-depth.spec.ts`; conflict guard `admin/use-cases-kit-behavioral-depth.spec.ts` |
-| UC-ADM-25 | Permissions create / edit / delete | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` |
-| UC-ADM-26 | Roles create / edit / delete + assign users | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` |
+| UC-ADM-25 | Permissions create / edit / delete | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (create); edit/delete `admin/use-cases-rbac-depth.spec.ts` |
+| UC-ADM-26 | Roles create / edit / delete + assign users | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (create); edit/delete `admin/use-cases-rbac-depth.spec.ts`; matrix `flows/use-cases-atomic-gaps.spec.ts` |
 | UC-ADM-27 | Admin create project | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` |
 | UC-ADM-28 | Admin delete project | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` |
 | UC-ADM-29 | Admin project members / groups mutate | ✅ Covered | `admin/use-cases-final-gaps.spec.ts` (add/role/remove + optional group link) |
@@ -440,6 +440,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 19. ~~Behavioral depth AUTH-27..30, ACC-18/19 success, ACC-28, PROJ-06/10..12 isolation, ADM-43..45, SEC-10 toggle~~ → Covered (`flows/use-cases-behavioral-depth.spec.ts`).
 20. ~~Kit CRUD depth ADM-21..24, NOTIF-19 threshold delivery~~ → Covered (`admin/use-cases-kit-crud-depth.spec.ts`, `notifications/use-cases-threshold-delivery.spec.ts`).
 21. ~~Product depth ADM-22-D1/D2, ADM-23-D1, ADM-24-D1, LEGAL-07-D1/08-D1/09-D1, PROJ-22-D1, ISS-14-D1/17-D1, NOTIF-04-D1~~ → Covered (`admin/use-cases-kit-behavioral-depth.spec.ts`, `admin/use-cases-legal-depth.spec.ts`, `flows/use-cases-product-depth.spec.ts`).
+22. ~~RBAC/kit reorder/export depth ADM-25-D1/26-D1/22-D3/23-D2, ISS-10-D1, PROJ-16-D1~~ → Covered (`admin/use-cases-rbac-depth.spec.ts`, `admin/use-cases-kit-reorder-export.spec.ts`, `flows/use-cases-export-config-depth.spec.ts`).
 
 When adding a case: give it a **UC-*** ID here, set status, and name the spec file under `e2e/<domain>/`.
 
