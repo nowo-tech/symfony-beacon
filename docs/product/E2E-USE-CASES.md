@@ -82,7 +82,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-LEGAL-04 | Consent persists across navigations | ✅ Covered | `smoke/cookie-consent.spec.ts` |
 | UC-LEGAL-05 | Cookie consent config JSON endpoints | ✅ Covered | `smoke/cookie-consent.spec.ts` |
 | UC-LEGAL-06 | Admin cookie consent settings / definitions | ✅ Covered | `admin/kit-admin-deep.spec.ts` |
-| UC-LEGAL-07 | Consent necessary-only / reject non-essential | ✅ Covered | `admin/use-cases-legal-mutations.spec.ts` (necessary-only); guest customize `admin/use-cases-legal-depth.spec.ts` |
+| UC-LEGAL-07 | Consent necessary-only / reject non-essential | ✅ Covered | `admin/use-cases-legal-mutations.spec.ts` (necessary-only); guest one-/two-step preferences `admin/use-cases-legal-depth.spec.ts` |
 | UC-LEGAL-08 | Cookie definition CRUD (new/edit/delete) | ✅ Covered | `admin/use-cases-legal-mutations.spec.ts` (create); edit/delete `admin/use-cases-legal-depth.spec.ts` |
 | UC-LEGAL-09 | Cookie consent settings section tabs save | ✅ Covered | `admin/use-cases-legal-mutations.spec.ts`; tab field persistence `admin/use-cases-legal-depth.spec.ts` |
 
@@ -360,8 +360,8 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ADM-20 | Unlink user↔project / group↔project | ✅ Covered | `admin/use-cases-admin-remaining.spec.ts` (affordance when linked) |
 | UC-ADM-21 | HTTP log export / purge / delete | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts`; CSV export `admin/use-cases-kit-crud-depth.spec.ts`; purge affordance + show/delete `admin/use-cases-routing-http-log-depth.spec.ts` (purge not submitted on shared DB) |
 | UC-ADM-22 | Dashboard menu create / edit / delete / import / export / reorder | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (modal create); CRUD `admin/use-cases-kit-crud-depth.spec.ts`; items/import/export `admin/use-cases-kit-behavioral-depth.spec.ts`; move-up/down + sortable shell `admin/use-cases-kit-reorder-export.spec.ts` |
-| UC-ADM-23 | Breadcrumb collection/item CRUD + import/export | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (new form); collection CRUD `admin/use-cases-kit-crud-depth.spec.ts`; item CRUD `admin/use-cases-kit-behavioral-depth.spec.ts`; collection export JSON `admin/use-cases-kit-reorder-export.spec.ts` |
-| UC-ADM-24 | RoutingKit create / edit / delete / conflicts / clear-cache / import-export | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (create); edit/delete/clear-cache `admin/use-cases-kit-crud-depth.spec.ts`; conflict guard `admin/use-cases-kit-behavioral-depth.spec.ts`; export/import round-trip `admin/use-cases-routing-http-log-depth.spec.ts` |
+| UC-ADM-23 | Breadcrumb collection/item CRUD + import/export | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (new form); collection CRUD `admin/use-cases-kit-crud-depth.spec.ts`; item CRUD `admin/use-cases-kit-behavioral-depth.spec.ts`; collection export JSON `admin/use-cases-kit-reorder-export.spec.ts`; invalid import `admin/use-cases-kit-negatives-depth.spec.ts` |
+| UC-ADM-24 | RoutingKit create / edit / delete / conflicts / clear-cache / import-export | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (create); edit/delete/clear-cache `admin/use-cases-kit-crud-depth.spec.ts`; conflict guard `admin/use-cases-kit-behavioral-depth.spec.ts`; export/import round-trip `admin/use-cases-routing-http-log-depth.spec.ts`; GET 405 + conflicts JSON + empty path `admin/use-cases-kit-negatives-depth.spec.ts` |
 | UC-ADM-25 | Permissions create / edit / delete | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (create); edit/delete `admin/use-cases-rbac-depth.spec.ts` |
 | UC-ADM-26 | Roles create / edit / delete + assign users | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (create); edit/delete `admin/use-cases-rbac-depth.spec.ts`; matrix `flows/use-cases-atomic-gaps.spec.ts` |
 | UC-ADM-27 | Admin create project | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` |
@@ -442,6 +442,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 21. ~~Product depth ADM-22-D1/D2, ADM-23-D1, ADM-24-D1, LEGAL-07-D1/08-D1/09-D1, PROJ-22-D1, ISS-14-D1/17-D1, NOTIF-04-D1~~ → Covered (`admin/use-cases-kit-behavioral-depth.spec.ts`, `admin/use-cases-legal-depth.spec.ts`, `flows/use-cases-product-depth.spec.ts`).
 22. ~~RBAC/kit reorder/export depth ADM-25-D1/26-D1/22-D3/23-D2, ISS-10-D1, PROJ-16-D1~~ → Covered (`admin/use-cases-rbac-depth.spec.ts`, `admin/use-cases-kit-reorder-export.spec.ts`, `flows/use-cases-export-config-depth.spec.ts`).
 23. ~~RoutingKit import/export + HTTP log show/delete + breadcrumb item CRUD ADM-24-D2/D3, ADM-21-D1, ADM-23-D1~~ → Covered (`admin/use-cases-routing-http-log-depth.spec.ts`, `admin/use-cases-kit-behavioral-depth.spec.ts`; host `EmptyNamedCsrfOnlyFormSubmitExtension` so Symfony 8 empty CSRF-only delete forms submit).
+24. ~~Kit negatives + LEGAL-07 one-step preferences ADM-24-D4..D6, ADM-23-D3, LEGAL-07-D1~~ → Covered (`admin/use-cases-kit-negatives-depth.spec.ts`, hardened `admin/use-cases-legal-depth.spec.ts` + breadcrumb collection `?q=` delete in `admin/use-cases-kit-crud-depth.spec.ts`).
 
 When adding a case: give it a **UC-*** ID here, set status, and name the spec file under `e2e/<domain>/`.
 

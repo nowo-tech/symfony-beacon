@@ -178,32 +178,50 @@ test.describe('Legal guest customize consent', () => {
       return;
     }
 
-    const customize = modal.locator(
-      'button:has-text("Customize"), button:has-text("Personalizar"), button:has-text("Configure"), #cookie_consent_show_details',
+    // Two-step: banner → preferences. One-step: preference sections already in the modal.
+    const showPreferences = modal.locator(
+      '[data-nowo-show-preferences], button:has-text("Customize"), button:has-text("Personalizar"), button:has-text("Configure"), #cookie_consent_show_details',
     ).first();
-    if (!(await customize.isVisible().catch(() => false))) {
-      test.skip(true, 'Customize control missing');
-      return;
+    if (await showPreferences.isVisible().catch(() => false)) {
+      await showPreferences.click();
+      await expect(modal.locator('[data-nowo-step="preferences"], .nowo-cookie-consent__preferences-body, input[type="checkbox"]')).toBeVisible({
+        timeout: 10_000,
+      });
     }
-    await customize.click();
 
     const analyticsToggle = modal.locator(
-      'input[type="checkbox"][name*="analytics"], input[type="checkbox"][id*="analytics"], input[type="checkbox"][data-category="analytics"]',
+      'input[type="checkbox"][name*="analytics"], input[type="checkbox"][id*="analytics"], input[type="checkbox"][data-category="analytics"], input[type="checkbox"][name*="categories"]',
     ).first();
-    if ((await analyticsToggle.count()) > 0 && (await analyticsToggle.isChecked().catch(() => true))) {
-      await analyticsToggle.uncheck({ force: true }).catch(async () => {
-        await analyticsToggle.locator('xpath=ancestor::label[1]').click({ force: true });
+    if ((await analyticsToggle.count()) > 0) {
+      if (await analyticsToggle.isChecked().catch(() => false)) {
+        await analyticsToggle.uncheck({ force: true }).catch(async () => {
+          await analyticsToggle.locator('xpath=ancestor::label[1]').click({ force: true });
+        });
+      }
+    } else {
+      test.info().annotations.push({
+        type: 'note',
+        description: 'no analytics checkbox — save preferences shell only',
       });
     }
 
     const save = modal.locator(
-      'button:has-text("Save"), button:has-text("Guardar"), button:has-text("Accept selection"), #cookie_consent_save_selection',
-    ).first();
-    await expect(save).toBeVisible({ timeout: 10_000 });
-    await save.evaluate((el: HTMLElement) => el.click());
+      'button[name="cookie_consent[save]"], button:has-text("Save"), button:has-text("Guardar"), button:has-text("Accept selection"), #cookie_consent_save_selection, button[type="submit"]',
+    ).filter({ hasNotText: /accept all|aceptar todas|use all|todas/i }).first();
+    if (!(await save.isVisible().catch(() => false))) {
+      // One-step footer may only expose accept-all / necessary; necessary-only still counts as reject non-essential.
+      const necessary = modal.locator(
+        'button[name*="use_only_functional"], button:has-text("necessary"), button:has-text("necesarias"), button:has-text("Solo cookies")',
+      ).first();
+      await expect(necessary).toBeVisible({ timeout: 10_000 });
+      await necessary.evaluate((el: HTMLElement) => el.click());
+    } else {
+      await save.evaluate((el: HTMLElement) => el.click());
+    }
     await modal.waitFor({ state: 'hidden', timeout: 15_000 });
 
-    await page.goto('/en/legal/terms', { waitUntil: 'domcontentloaded' });
+    // Login is auto-open targeted — consent cookie must suppress the banner.
+    await page.goto('/en/login', { waitUntil: 'domcontentloaded' });
     await waitForPageLoader(page);
     await expect(page.locator('#cookieconsent[data-nowo-open="true"]:not(.hidden)')).toHaveCount(0, { timeout: 10_000 });
   });

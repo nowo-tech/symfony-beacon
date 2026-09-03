@@ -89,15 +89,16 @@ test.describe('Kit admin CRUD depth', () => {
     await waitForPageLoader(page);
     await expect(page).not.toHaveURL(/\/login/);
 
-    await page.goto('/breadcrumb-kit-admin/collections');
-    await dismissProductTour(page);
-    const row = page.locator('tr').filter({ hasText: code }).first();
-    await expect(row).toBeVisible({ timeout: 15_000 });
-
-    const itemsHref = await row.locator('a[href*="/collections/"]').first().getAttribute('href');
-    const idMatch = itemsHref?.match(/collections\/(\d+)/);
-    expect(idMatch?.[1], 'collection id from items link').toBeTruthy();
-    const collectionId = idMatch![1];
+    let collectionId = page.url().match(/collections\/(\d+)/)?.[1] ?? '';
+    if (!collectionId) {
+      await page.goto(`/breadcrumb-kit-admin/collections?q=${encodeURIComponent(code)}`);
+      await dismissProductTour(page);
+      const row = page.locator('tr').filter({ hasText: code }).first();
+      await expect(row).toBeVisible({ timeout: 15_000 });
+      const itemsHref = await row.locator('a[href*="/collections/"]').first().getAttribute('href');
+      collectionId = itemsHref?.match(/collections\/(\d+)/)?.[1] ?? '';
+    }
+    expect(collectionId, 'collection id').toBeTruthy();
 
     await page.goto(`/breadcrumb-kit-admin/collections/${collectionId}/edit`);
     await dismissProductTour(page);
@@ -109,24 +110,20 @@ test.describe('Kit admin CRUD depth', () => {
     await waitForPageLoader(page);
     await expect(page.getByRole('main')).toContainText(/actualizada|updated|colección/i, { timeout: 15_000 });
 
-    await page.goto('/breadcrumb-kit-admin/collections');
+    await page.goto(`/breadcrumb-kit-admin/collections?q=${encodeURIComponent(code)}`);
     await dismissProductTour(page);
     await expect(page.locator('tr').filter({ hasText: code })).toContainText(`${name} edited`, { timeout: 15_000 });
 
-    await page.goto('/breadcrumb-kit-admin/collections');
-    await dismissProductTour(page);
     const delRow = page.locator('tr').filter({ hasText: code }).first();
     const deleteBtn = delRow.locator('button.btn-bk-delete').first();
     await expect(deleteBtn).toBeVisible({ timeout: 10_000 });
     await deleteBtn.click();
-    const confirm = page.locator('#modal-bk-delete, dialog#modal-bk-delete, .nowo-ui-modal').filter({
-      has: page.locator('button[type="submit"], form'),
-    }).last();
+    const confirm = page.locator('#modal-bk-delete');
     await expect(confirm).toBeVisible({ timeout: 10_000 });
-    await confirm.locator('button[type="submit"], button.btn-danger, button.btn-primary').filter({
-      hasText: /delete|eliminar|borrar|confirm/i,
-    }).last().click({ force: true });
+    await confirm.locator('#form-bk-delete-confirm button[type="submit"]').click({ force: true });
     await waitForPageLoader(page);
+    await page.goto(`/breadcrumb-kit-admin/collections?q=${encodeURIComponent(code)}`);
+    await dismissProductTour(page);
     await expect(page.locator('tr').filter({ hasText: code })).toHaveCount(0, { timeout: 15_000 });
   });
 
