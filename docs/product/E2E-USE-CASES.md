@@ -99,7 +99,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-OPS-05 | Maintenance mode 503 surfaces | ✅ Covered | `smoke/use-cases-auth-chrome.spec.ts` (`/_maintenance_preview` + admin panel) |
 | UC-OPS-06 | Admin ops overview | ✅ Covered | `account/use-cases-account-chrome.spec.ts` |
 | UC-OPS-07 | Prometheus metrics expose Beacon series | ✅ Covered | `smoke/use-cases-ops-remaining.spec.ts` |
-| UC-OPS-08 | Maintenance enable / disable / schedule / history | ✅ Covered | `smoke/use-cases-ops-remaining.spec.ts` (history + schedule/enable forms; live toggle avoided) |
+| UC-OPS-08 | Maintenance enable / disable / schedule / history | ✅ Covered | `smoke/use-cases-ops-remaining.spec.ts` (history + schedule/enable forms; live toggle avoided); far-future schedule+clear `admin/use-cases-admin-settings-depth.spec.ts` (no live enable) |
 | UC-OPS-09 | SiteBackup admin panel (`/_site_backup`) | ✅ Covered | `smoke/use-cases-ops-remaining.spec.ts` |
 | UC-OPS-10 | Twig inspector / template link (dev) | ✅ Covered | `smoke/use-cases-remaining-oos.spec.ts` (`#_twig_inspector__icon`; skips without WDT) |
 | UC-OPS-11 | Live component endpoint without 5xx | ✅ Covered | `smoke/use-cases-ops-remaining.spec.ts` |
@@ -127,7 +127,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ACC-12 | Content-width toggle | ✅ Covered | `smoke/navigation-ui.spec.ts` |
 | UC-ACC-13 | Member alert matrix (Live / Push / scope / projects) | ✅ Covered | `account/member-alerts.spec.ts` |
 | UC-ACC-14 | Web Push subscribe / unsubscribe | ✅ Covered | `flows/use-cases-oos-closing.spec.ts` (unavailable shell without VAPID); live browser Push permission Out of scope |
-| UC-ACC-15 | Mercure realtime config endpoint | ✅ Covered | `account/use-cases-account-chrome.spec.ts` |
+| UC-ACC-15 | Mercure realtime config endpoint | ✅ Covered | `account/use-cases-account-chrome.spec.ts`; JSON shape `admin/use-cases-admin-settings-depth.spec.ts` |
 | UC-ACC-16 | PWA manifest / SW / offline | ✅ Covered | `smoke/misc.spec.ts` (reachability + manifest without `Set-Cookie`) |
 | UC-ACC-17 | Save profile display name | ✅ Covered | `account/use-cases-account-mutations.spec.ts` (display name); Slack user id via hooks happy-path profile linkage |
 | UC-ACC-18 | Change email with current-password confirm | ✅ Covered | `account/use-cases-account-mutations.spec.ts` (reject without current password); success path on ephemeral user `flows/use-cases-behavioral-depth.spec.ts` |
@@ -354,11 +354,11 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ADM-14 | Mercure settings form | ✅ Covered | `smoke/navigation-ui.spec.ts` |
 | UC-ADM-15 | Appearance tabs / colors / presets | ✅ Covered | `admin/settings-deep.spec.ts`, `smoke/misc.spec.ts`; accent color mutate+reset `admin/use-cases-appearance-mutations.spec.ts` |
 | UC-ADM-16 | Ops defaults tabs | ✅ Covered | `admin/settings-deep.spec.ts` |
-| UC-ADM-17 | Instance config export / import | ✅ Covered | `admin/settings-deep.spec.ts` |
+| UC-ADM-17 | Instance config export / import | ✅ Covered | `admin/settings-deep.spec.ts`; invalid JSON import `admin/use-cases-admin-settings-depth.spec.ts` |
 | UC-ADM-18 | Legacy `/settings/*` redirects | ✅ Covered | `admin/settings-deep.spec.ts` |
 | UC-ADM-19 | Kit shells: HTTP log / menus / breadcrumbs / RoutingKit | ✅ Covered | `admin/kit-admin-deep.spec.ts` (list/show/new form shells) |
 | UC-ADM-20 | Unlink user↔project / group↔project | ✅ Covered | `admin/use-cases-admin-remaining.spec.ts` (affordance when linked) |
-| UC-ADM-21 | HTTP log export / purge / delete | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts`; CSV export `admin/use-cases-kit-crud-depth.spec.ts`; purge affordance + show/delete `admin/use-cases-routing-http-log-depth.spec.ts` (purge not submitted on shared DB) |
+| UC-ADM-21 | HTTP log export / purge / delete | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts`; CSV export `admin/use-cases-kit-crud-depth.spec.ts`; purge affordance + show/delete `admin/use-cases-routing-http-log-depth.spec.ts` (purge not submitted on shared DB); path filter + JSON export + GET 405 `admin/use-cases-admin-settings-depth.spec.ts` |
 | UC-ADM-22 | Dashboard menu create / edit / delete / import / export / reorder | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (modal create); CRUD `admin/use-cases-kit-crud-depth.spec.ts`; items/import/export `admin/use-cases-kit-behavioral-depth.spec.ts`; move-up/down + sortable shell `admin/use-cases-kit-reorder-export.spec.ts` |
 | UC-ADM-23 | Breadcrumb collection/item CRUD + import/export | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (new form); collection CRUD `admin/use-cases-kit-crud-depth.spec.ts`; item CRUD `admin/use-cases-kit-behavioral-depth.spec.ts`; collection export JSON `admin/use-cases-kit-reorder-export.spec.ts`; invalid import `admin/use-cases-kit-negatives-depth.spec.ts` |
 | UC-ADM-24 | RoutingKit create / edit / delete / conflicts / clear-cache / import-export | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (create); edit/delete/clear-cache `admin/use-cases-kit-crud-depth.spec.ts`; conflict guard `admin/use-cases-kit-behavioral-depth.spec.ts`; export/import round-trip `admin/use-cases-routing-http-log-depth.spec.ts`; GET 405 + conflicts JSON + empty path `admin/use-cases-kit-negatives-depth.spec.ts` |
@@ -369,9 +369,9 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-ADM-29 | Admin project members / groups mutate | ✅ Covered | `admin/use-cases-final-gaps.spec.ts` (add/role/remove + optional group link) |
 | UC-ADM-30 | Admin projects bulk export / import | ✅ Covered | `admin/use-cases-final-gaps.spec.ts` (download JSON + import round-trip) |
 | UC-ADM-31 | Appearance save theme / brand / layout / colors | ✅ Covered | `admin/use-cases-kit-mutations.spec.ts` (smoke save); full mutate+restore `admin/use-cases-appearance-mutations.spec.ts` (theme preset, brand, layout, colors) |
-| UC-ADM-32 | Ops defaults save (governance / ingest / metrics / inbound / notifications) | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` |
+| UC-ADM-32 | Ops defaults save (governance / ingest / metrics / inbound / notifications) | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts`; ingest `envelopeMaxBytes` mutate+restore `admin/use-cases-admin-settings-depth.spec.ts` |
 | UC-ADM-33 | Mailer send-test delivers (Mailpit) | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` (Mailpit soft-skip if down) |
-| UC-ADM-34 | Mercure settings save | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` |
+| UC-ADM-34 | Mercure settings save | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts`; unsafe hub URL rejected `admin/use-cases-admin-settings-depth.spec.ts` |
 | UC-ADM-35 | Social login edit / delete provider | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` |
 | UC-ADM-36 | Group edit / delete | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` |
 | UC-ADM-37 | Admin user activity filters | ✅ Covered | `admin/use-cases-admin-gaps.spec.ts` |
@@ -415,7 +415,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 **Definition complete:** every primary product route family and operator mutation above has a `UC-*` row (surface catalog ≈ 100% of application product surface).
 
-**Automation status (2026-08-31):** ~340 Covered / ~0 Partial / ~0 Gap / ~8 Out of scope. Latest depth batches: `flows/use-cases-behavioral-depth.spec.ts`, `admin/use-cases-kit-crud-depth.spec.ts`, `notifications/use-cases-threshold-delivery.spec.ts`, `admin/use-cases-kit-behavioral-depth.spec.ts`, `admin/use-cases-legal-depth.spec.ts`, `flows/use-cases-product-depth.spec.ts`. Remaining Out of scope: empty-DB first user (AUTH-10), incomplete platform catalog fixture (SETUP-02 / SETUP-07), SiteBackup restore (OPS-14), HTTP log purge on shared DB, roadmap Later (Native / dogfood UI / dogfood suite CLI / hot-reload). Browser Push *permission* prompt remains external.
+**Automation status (2026-09-04):** ~340 Covered / ~0 Partial / ~0 Gap / ~8 Out of scope. Latest depth batches: kit negatives (`admin/use-cases-kit-negatives-depth.spec.ts`), admin settings (`admin/use-cases-admin-settings-depth.spec.ts`). Remaining Out of scope: empty-DB first user (AUTH-10), incomplete platform catalog fixture (SETUP-02 / SETUP-07), SiteBackup restore (OPS-14), HTTP log purge on shared DB, roadmap Later (Native / dogfood UI / dogfood suite CLI / hot-reload). Browser Push *permission* prompt remains external.
 
 **Closed Gap batches:**
 
@@ -443,6 +443,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 22. ~~RBAC/kit reorder/export depth ADM-25-D1/26-D1/22-D3/23-D2, ISS-10-D1, PROJ-16-D1~~ → Covered (`admin/use-cases-rbac-depth.spec.ts`, `admin/use-cases-kit-reorder-export.spec.ts`, `flows/use-cases-export-config-depth.spec.ts`).
 23. ~~RoutingKit import/export + HTTP log show/delete + breadcrumb item CRUD ADM-24-D2/D3, ADM-21-D1, ADM-23-D1~~ → Covered (`admin/use-cases-routing-http-log-depth.spec.ts`, `admin/use-cases-kit-behavioral-depth.spec.ts`; host `EmptyNamedCsrfOnlyFormSubmitExtension` so Symfony 8 empty CSRF-only delete forms submit).
 24. ~~Kit negatives + LEGAL-07 one-step preferences ADM-24-D4..D6, ADM-23-D3, LEGAL-07-D1~~ → Covered (`admin/use-cases-kit-negatives-depth.spec.ts`, hardened `admin/use-cases-legal-depth.spec.ts` + breadcrumb collection `?q=` delete in `admin/use-cases-kit-crud-depth.spec.ts`).
+25. ~~Admin settings depth ADM-21-D2/D3, ADM-32-D1, ADM-34-D1, ACC-15-D1, ADM-17-D1, OPS-08-D1~~ → Covered (`admin/use-cases-admin-settings-depth.spec.ts`; HTTP purge still not submitted on shared DB).
 
 When adding a case: give it a **UC-*** ID here, set status, and name the spec file under `e2e/<domain>/`.
 
