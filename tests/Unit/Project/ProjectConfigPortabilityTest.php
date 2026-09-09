@@ -719,6 +719,130 @@ final class ProjectConfigPortabilityTest extends TestCase
         self::assertStringContainsString('full ignored', $result['warnings'][0]);
     }
 
+    public function testNormalizeRejectsInvalidUuid(): void
+    {
+        $normalizeMethod = new ReflectionMethod(ProjectConfigPortability::class, 'normalizeProjects');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('invalid_uuid:not-a-uuid');
+        $normalizeMethod->invoke($this->service(), [
+            'schema' => ProjectConfigPortability::SCHEMA,
+            'version' => 1,
+            'projects' => [[
+                'code' => 'acme',
+                'name' => 'Acme',
+                'uuid' => 'not-a-uuid',
+            ]],
+        ]);
+    }
+
+    public function testCountValidatedProjectsAcceptsRfcUuid(): void
+    {
+        $uuid = '0192f3c4-5d6e-7a8b-9c0d-1e2f3a4b5c6d';
+        $count = $this->service()->countValidatedProjects([
+            'schema' => ProjectConfigPortability::SCHEMA,
+            'version' => 1,
+            'projects' => [[
+                'code' => 'acme',
+                'name' => 'Acme',
+                'uuid' => $uuid,
+            ]],
+        ]);
+        self::assertSame(1, $count);
+    }
+
+    public function testUpsertRejectsUuidMismatchOnExistingCode(): void
+    {
+        $existing = new Project();
+        $existing->setName('Acme');
+        $existing->setSlug('acme');
+        $existing->setCode('acme-prod');
+        $existing->assignUuid('0192f3c4-5d6e-7a8b-9c0d-1e2f3a4b5c6d');
+
+        $projectRepo = $this->createStub(ProjectRepository::class);
+        $projectRepo->method('findOneBy')->willReturnCallback(static function (array $criteria) use ($existing): ?Project {
+            if (($criteria['code'] ?? null) === 'acme-prod') {
+                return $existing;
+            }
+
+            return null;
+        });
+
+        $service = new ProjectConfigPortability(
+            $projectRepo,
+            $this->createStub(UserRepository::class),
+            new PortableUserProvisioner(
+                $this->createStub(UserRepository::class),
+                $this->createStub(UserPasswordHasherInterface::class),
+            ),
+            new ProjectFactory($projectRepo, new ProjectApiKeyFactory($this->createStub(EntityManagerInterface::class))),
+        );
+
+        $upsertMethod = new ReflectionMethod(ProjectConfigPortability::class, 'upsertProject');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('uuid_mismatch:acme-prod:');
+        $upsertMethod->invoke($service, [
+            'code' => 'acme-prod',
+            'uuid' => '0192f3c4-aaaa-bbbb-cccc-1e2f3a4b5c6d',
+            'slug' => 'acme',
+            'name' => 'Acme',
+            'description' => null,
+            'ingest_enabled' => true,
+            'retention_days' => null,
+            'retention_max_events' => null,
+            'ingest_rate_limit_per_minute' => null,
+            'event_quota_daily' => null,
+            'event_quota_monthly' => null,
+            'memberships' => [],
+        ], $this->user('actor@example.com', 'Actor'), true);
+    }
+
+    public function testUpsertRejectsUuidConflictOnCreate(): void
+    {
+        $other = new Project();
+        $other->setName('Other');
+        $other->setSlug('other');
+        $other->setCode('other');
+        $uuid = '0192f3c4-5d6e-7a8b-9c0d-ffffffffffff';
+        $other->assignUuid($uuid);
+
+        $projectRepo = $this->createStub(ProjectRepository::class);
+        $projectRepo->method('findOneBy')->willReturnCallback(static function (array $criteria) use ($other, $uuid): ?Project {
+            if (($criteria['uuid'] ?? null) === $uuid) {
+                return $other;
+            }
+
+            return null;
+        });
+
+        $service = new ProjectConfigPortability(
+            $projectRepo,
+            $this->createStub(UserRepository::class),
+            new PortableUserProvisioner(
+                $this->createStub(UserRepository::class),
+                $this->createStub(UserPasswordHasherInterface::class),
+            ),
+            new ProjectFactory($projectRepo, new ProjectApiKeyFactory($this->createStub(EntityManagerInterface::class))),
+        );
+
+        $upsertMethod = new ReflectionMethod(ProjectConfigPortability::class, 'upsertProject');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('uuid_conflict:'.$uuid);
+        $upsertMethod->invoke($service, [
+            'code' => 'new-code',
+            'uuid' => $uuid,
+            'slug' => 'new',
+            'name' => 'New',
+            'description' => null,
+            'ingest_enabled' => true,
+            'retention_days' => null,
+            'retention_max_events' => null,
+            'ingest_rate_limit_per_minute' => null,
+            'event_quota_daily' => null,
+            'event_quota_monthly' => null,
+            'memberships' => [],
+        ], $this->user('actor@example.com', 'Actor'), true);
+    }
+
     private function service(): ProjectConfigPortability
     {
         $projectRepo = $this->createStub(ProjectRepository::class);

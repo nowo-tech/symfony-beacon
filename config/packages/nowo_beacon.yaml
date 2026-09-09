@@ -41,3 +41,12 @@ nowo_beacon:
 when@dev:
     nowo_beacon:
         verify_peer: false
+
+when@test:
+    nowo_beacon:
+        # Keep enabled: true so beacon-bundle ≥1.7.3 registers BeaconTraceMiddleware.
+        # Empty BEACON_DSN still uses NullBeaconClient at runtime (REQ-BEACON-003).
+        register_error_listener: false
+        register_console_listener: false
+        register_messenger_listener: false
+        auto_http_transaction: false

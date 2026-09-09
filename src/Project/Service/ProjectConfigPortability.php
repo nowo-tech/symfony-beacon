@@ -14,6 +14,7 @@ use App\Project\Repository\ProjectRepository;
 use App\Shared\Portability\ConfigPortabilityEnvelope;
 use InvalidArgumentException;
 use Symfony\Component\String\Slugger\AsciiSlugger;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * Export/import project metadata + memberships (089).
@@ -105,6 +106,16 @@ final readonly class ProjectConfigPortability
             'event_quota_monthly' => $project->getEventQuotaMonthly(),
             'memberships' => $memberships,
         ];
+    }
+
+    /**
+     * Validate bundle schema/version/rows (including optional UUIDs) without writing.
+     *
+     * @param array<string, mixed> $payload
+     */
+    public function countValidatedProjects(array $payload): int
+    {
+        return \count($this->normalizeProjects($payload));
     }
 
     /**
@@ -266,9 +277,14 @@ final readonly class ProjectConfigPortability
                 }
             }
 
+            $uuid = trim((string) ($item['uuid'] ?? ''));
+            if ('' !== $uuid && !Uuid::isValid($uuid)) {
+                throw new InvalidArgumentException(\sprintf('invalid_uuid:%s', $uuid));
+            }
+
             $out[] = [
                 'code' => $code,
-                'uuid' => (string) ($item['uuid'] ?? ''),
+                'uuid' => $uuid,
                 'slug' => $slug,
                 'name' => $name,
                 'description' => isset($item['description']) && \is_string($item['description']) && '' !== trim($item['description'])
@@ -306,6 +322,14 @@ final readonly class ProjectConfigPortability
     {
         $existing = $this->projectRepository->findOneBy(['code' => $row['code']]);
         if ($existing instanceof Project) {
+            if ('' !== $row['uuid'] && $existing->getUuid() !== $row['uuid']) {
+                throw new InvalidArgumentException(\sprintf(
+                    'uuid_mismatch:%s:%s:%s',
+                    $row['code'],
+                    $existing->getUuid(),
+                    $row['uuid'],
+                ));
+            }
             $this->applyProjectFields($existing, $row);
 
             return $existing;
@@ -325,6 +349,13 @@ final readonly class ProjectConfigPortability
 
         $project = $this->projectFactory->create($actor, $row['name'], $row['description'], $slug);
         $project->setCode($row['code']);
+        if ('' !== $row['uuid']) {
+            $clash = $this->projectRepository->findOneBy(['uuid' => $row['uuid']]);
+            if ($clash instanceof Project) {
+                throw new InvalidArgumentException(\sprintf('uuid_conflict:%s', $row['uuid']));
+            }
+            $project->assignUuid($row['uuid']);
+        }
         $this->applyProjectFields($project, $row);
         $this->projectRepository->save($project);
 

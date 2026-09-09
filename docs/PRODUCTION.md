@@ -39,6 +39,23 @@ CI already builds this target (`.github/workflows/ci.yml`).
 
 Do **not** run `app:seed-demo` on production instances (blocked unless `--allow-non-local`, which never installs the documented stable DEMO_* API keys). Configure Prometheus scrape with a metrics Bearer token under Administration → Ops defaults (`metrics_require_token` defaults to on for new installs).
 
+### Operator project preload (devops-owned)
+
+Real **Project** tenants + ingest API keys must not be committed to this repo. Keep JSON under the sibling **devops** tree (`ansible/.secrets/beacon-preload/`, examples in `ansible/files/beacon-preload/`). After admin setup + `app:seed-platform`:
+
+```bash
+php bin/console app:preload-projects \
+  --bundle=/app/var/beacon-preload/projects.json \
+  --api-keys=/app/var/beacon-preload/api-keys.json \
+  --dry-run
+php bin/console app:preload-projects \
+  --bundle=/app/var/beacon-preload/projects.json \
+  --api-keys=/app/var/beacon-preload/api-keys.json
+```
+
+`--dry-run` validates bundle schema/UUIDs and optional api-keys shape without writing. The real run wraps project import + API key create in one DB transaction.
+Ansible mounts `./var/beacon-preload` read-only into the prod php container via `docker-compose.shared-vps.yml`.
+
 Image builds (`frankenphp_prod` `composer post-install-cmd` → `cache:clear`) skip the guard for `cache:clear` / `cache:warmup` / `assets:install` only, so the Docker bake can warm caches without embedding runtime SiteBackup secrets. The first real HTTP request still fails closed until operators inject unique secrets.
 
 The prod image runs `pnpm install --frozen-lockfile` and `pnpm run build` so `public/build/` is baked in (no Vite HMR container in production).
