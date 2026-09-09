@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.24.5)](#unreleased-main-after-1245)
+- [Unreleased (main after 1.25.0)](#unreleased-main-after-1250)
+- [Upgrading from 1.24.5 to 1.25.0](#upgrading-from-1245-to-1250)
 - [Upgrading from 1.24.4 to 1.24.5](#upgrading-from-1244-to-1245)
 - [Upgrading from 1.24.3 to 1.24.4](#upgrading-from-1243-to-1244)
 - [Upgrading from 1.24.2 to 1.24.3](#upgrading-from-1242-to-1243)
@@ -96,11 +97,30 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.24.5)
+## Unreleased (main after 1.25.0)
 
 _No unreleased operator-facing steps yet._
 
 See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
+
+## Upgrading from 1.24.5 to 1.25.0
+
+Operator preload command, Composer pin refresh, BreadcrumbKit delete CSRF host fix, and E2E depth. **No migrations.**
+
+1. Pull / checkout `v1.25.0`.
+
+2. `composer install` — Symfony **8.1.6**, doctrine/orm **3.7.0**, beacon-bundle **1.8.1**, auth-kit **1.20.1**, phone-input **1.4.0**, password-strength **2.3.0**, password-toggle **2.2.0**, otp-input **1.5.0**, and related pins in `composer.lock`.
+
+3. Optional — production tenants: place devops-owned JSON under the mounted preload path and run:
+   ```bash
+   php bin/console app:preload-projects --bundle=…/projects.json --api-keys=…/api-keys.json --dry-run
+   php bin/console app:preload-projects --bundle=…/projects.json --api-keys=…/api-keys.json
+   ```
+   Do **not** commit API key secrets into this repository. See [PRODUCTION.md](PRODUCTION.md).
+
+4. No Doctrine migrate step for this release. Clear cache / reinstall assets if your deploy pipeline does not already.
+
+See [CHANGELOG.md](CHANGELOG.md) `[1.25.0]`.
 
 ## Upgrading from 1.24.4 to 1.24.5
 

@@ -9,6 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _No unreleased operator-facing changes yet._
 
+## [1.25.0] - 2026-09-09
+
+### Added
+
+- **Operator project preload:** `app:preload-projects` imports a devops-owned `beacon-project-bundle` JSON (optional `beacon-api-keys` file). Secrets stay outside this repo; `--dry-run` validates bundle UUIDs + api-keys shape; real runs wrap project import and key create in one DB transaction. Stable project UUIDs via `assignUuid()` (RFC validation; fail on `uuid_conflict` / `uuid_mismatch`). See [INSTALL.md](INSTALL.md) and [PRODUCTION.md](PRODUCTION.md).
+
+### Changed
+
+- **Composer pins:** Symfony **8.1.6** (console/form/framework/messenger/security/validator/yaml/…; serializer now exact-pinned), **doctrine/orm** **3.7.0**, kits auth-kit **1.20.1**, beacon-bundle **1.8.1**, device-intelligence **1.1.3**, otp-input **1.5.0**, password-strength **2.3.0**, password-toggle **2.2.0**, phone-input **1.4.0**, tag-input **1.2.0**, nelmio/api-doc **5.12.1**. Dev: phpstan **2.2.13**, phpunit **13.3.3**, rector **2.6.6**, twig-cs-fixer **4.1.1**, php-cs-fixer **3.95.25**.
+- **E2E depth:** kit chrome + behavioral/CRUD/reorder/export/negatives, legal customize, admin settings (HTTP log filters/JSON/405, ops defaults mutate+restore, Mercure unsafe URL, instance-config invalid import, maintenance schedule without live enable), RoutingKit import/export, RBAC, threshold delivery. Catalog: [product/E2E-USE-CASES.md](product/E2E-USE-CASES.md).
+- **Test env Beacon:** `when@test` keeps the client enabled for middleware registration but disables error/console/messenger listeners and auto HTTP transactions (empty `BEACON_DSN` still uses `NullBeaconClient`).
+
+### Fixed
+
+- **BreadcrumbKit delete confirms** under Symfony 8: host `EmptyNamedCsrfOnlyFormSubmitExtension` adds a dummy `_confirm` field so empty-named CSRF-only forms submit (CSRF stays enforced). Prefer upstreaming to breadcrumb-kit / FormKit later.
+- **Trusted devices** CSRF uses named tokens for trust/revoke actions.
+
+### Notes for integrators
+
+- No Doctrine migrations.
+- After pull: `composer install` (and `php bin/console cache:clear` / `assets:install` as usual). Optional prod: mount operator JSON and run `app:preload-projects --dry-run` then without `--dry-run` (see [PRODUCTION.md](PRODUCTION.md)).
+- Dogfood / clients: prefer `nowo-tech/beacon-bundle` **≥ 1.8.1**.
+- See [UPGRADING.md](UPGRADING.md) **Upgrading from 1.24.5 to 1.25.0**.
+
 ## [1.24.5] - 2026-08-29
 
 ### Fixed
@@ -1597,7 +1621,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.5...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.25.0...HEAD
+[1.25.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.5...v1.25.0
 [1.24.5]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.4...v1.24.5
 [1.24.4]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.3...v1.24.4
 [1.24.3]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.2...v1.24.3
