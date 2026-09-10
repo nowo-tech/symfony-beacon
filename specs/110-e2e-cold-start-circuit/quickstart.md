@@ -22,4 +22,6 @@ make test-e2e-cold           # wipe + up + Playwright project `cold` (workers=1)
 
 Token: `SITE_SETUP_TOKEN=beacon-local-setup` (`X-Setup-Token` or `?token=`). Warm suites must **never** `POST /setup/api/advance`.
 
+Setup wizard **documentation** screenshots (not the circuit assert suite): `make docs-manual-screenshots-setup` — see `specs/111-product-ui-manual/quickstart.md`.
+
 See `e2e/README.md` and `docs/product/E2E-USE-CASES.md` (UC-SETUP-01 / UC-SETUP-07 / UC-AUTH-10).

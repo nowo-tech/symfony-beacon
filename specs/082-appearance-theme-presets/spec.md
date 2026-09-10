@@ -88,3 +88,7 @@ Colors section paints color inputs via Beacon form theme block **`color_row`** (
 - Uploading custom theme JSON packs.
 - Live preview without Save for Brand/Layout/Colors (Themes apply is immediate POST).
 - `plan.md` / contracts artifacts (as-built documented in this spec + tasks only).
+
+## Cross-refs
+
+- Product UI manual (day/night + locale demos): `specs/111-product-ui-manual/`, `docs/manual/07-appearance.md`
