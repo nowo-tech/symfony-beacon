@@ -2,7 +2,7 @@
 
 **Feature Branch**: `110-e2e-cold-start-circuit`  
 **Created**: 2026-09-10  
-**Status**: Shipped (main / Phase 6.62; Unreleased until version cut)  
+**Status**: Shipped (v1.27.0 / Phase 6.62)  
 **Roadmap**: Phase 6.62  
 
 **Input**: Product Playwright runs against a **seeded** smoke DB (`ready-e2e`), so cold SETUP / AuthKit-gated-until-setup / wizard-first-admin stayed Out of scope on the warm suite. Operators need a **serial** disposable stack that boots an empty schema, drives SiteBackup `/setup` to completion, then proves AuthKit is usable — a full install circuit from zero without destroying dogfood or warm `app_e2e`.

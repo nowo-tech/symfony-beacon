@@ -9,6 +9,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _No unreleased operator-facing changes yet._
 
+## [1.27.0] - 2026-09-10
+
+### Added
+
+- **Cold-start E2E circuit (Phase 6.62 / `110`):** disposable Compose project `symfony-beacon-e2e-cold` on schema `app_e2e_cold` (HTTPS `:9461`, Redis DB `2`, dedicated SiteBackup volume). Make: `wipe-e2e-cold` / `up-e2e-cold` / `test-e2e-cold` / `down-e2e-cold` — **no** `ready-e2e`. Playwright project `cold` (`e2e/cold/circuit.spec.ts`) drives SiteBackup guided `fresh_install` via `/setup/api/advance`, then AuthKit login. Covers UC-SETUP-01 / UC-SETUP-07 / UC-AUTH-10. CI job `e2e-cold`. Spec: `specs/110-e2e-cold-start-circuit/`.
+- **Setup advance time budget:** `SetupAdvanceTimeLimitSubscriber` calls `set_time_limit()` on `/setup` routes using SiteBackup `process_timeout` (900); FrankenPHP `max_execution_time = 900` in `10-app.ini` so long migrate/seed Process steps are not killed mid-pipe.
+
+### Changed
+
+- **Isolated E2E Make:** `DC_E2E` is recursively expanded and accepts `E2E_COMPOSE_PROJECT` / `E2E_COMPOSE_EXTRA` / env file overrides (warm + cold).
+- **Cold stack runtime:** FrankenPHP **classic** + `RESET_KERNEL=true` by default for the cold circuit (warm `app_e2e` stays worker-default).
+- **E2E catalog:** AUTH-10 / SETUP-07 → Covered; remaining Out of scope ≈ SETUP-02, OPS-14, Later. See [product/E2E-USE-CASES.md](product/E2E-USE-CASES.md).
+
+### Fixed
+
+- **Idempotent index migration** `Version20260815231000`: live SchemaManager check before creating `idx_issue_project_last_environment` (avoids duplicate-key after a partially committed migrate interrupted by a web timeout).
+
+### Notes for integrators
+
+- No new Doctrine migration versions and no Composer pin changes. Existing installs that already applied `Version20260815231000` need no action; the PHP change is idempotent for cold/retry paths.
+- After pull: recreate PHP containers if you bind-mount `.docker/frankenphp/conf.d/` so `max_execution_time=900` applies. Optional: `make test-e2e-cold`.
+- See [UPGRADING.md](UPGRADING.md) **Upgrading from 1.26.0 to 1.27.0**.
+
 ## [1.26.0] - 2026-09-10
 
 ### Added
@@ -1640,7 +1663,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.26.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.27.0...HEAD
+[1.27.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.26.0...v1.27.0
 [1.26.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.25.0...v1.26.0
 [1.25.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.5...v1.25.0
 [1.24.5]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.4...v1.24.5

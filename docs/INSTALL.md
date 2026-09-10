@@ -13,6 +13,7 @@ Cold-start UI is provided by [`nowo-tech/site-backup-bundle`](https://packagist.
 | Ready | `make ready` | `bootstrap` + `seed` — recommended first local run |
 | Setup UI | `/setup` | SiteBackup wizard (bootstrap choice, migrations, platform seed, admin / optional sample, or full SQL dump) |
 | Isolated E2E | `make up-e2e` / `ready-e2e` / `test-e2e-isolated` | Parallel Compose stack on schema `app_e2e` (`:9460`); template `.env.e2e.dist` → gitignored `.env.e2e.local` — see [`e2e/README.md`](../e2e/README.md) |
+| Cold-start E2E | `make wipe-e2e-cold` / `up-e2e-cold` / `test-e2e-cold` | Empty schema `app_e2e_cold` (`:9461`) → SiteBackup `/setup` → AuthKit login; **no** `ready-e2e` — see `specs/110-e2e-cold-start-circuit/` |
 | Prod preload | `app:preload-projects` | Operator-owned `beacon-project-bundle` + optional `beacon-api-keys` JSON (stored in **devops**, not this repo) |
 
 ## Fresh install

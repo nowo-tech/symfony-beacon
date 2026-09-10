@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.26.0)](#unreleased-main-after-1260)
+- [Unreleased (main after 1.27.0)](#unreleased-main-after-1270)
+- [Upgrading from 1.26.0 to 1.27.0](#upgrading-from-1260-to-1270)
 - [Upgrading from 1.25.0 to 1.26.0](#upgrading-from-1250-to-1260)
 - [Upgrading from 1.24.5 to 1.25.0](#upgrading-from-1245-to-1250)
 - [Upgrading from 1.24.4 to 1.24.5](#upgrading-from-1244-to-1245)
@@ -98,11 +99,33 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.26.0)
+## Unreleased (main after 1.27.0)
 
 _No unreleased operator-facing steps yet._
 
 See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
+
+## Upgrading from 1.26.0 to 1.27.0
+
+Cold-start Playwright circuit (`app_e2e_cold` / `:9461`), setup advance time-limit hardening, and catalog coverage for SETUP-01/07 + AUTH-10. **No new migration versions. No Composer pin changes.**
+
+1. Pull / checkout `v1.27.0`.
+
+2. Recreate the PHP service so bind-mounted `10-app.ini` picks up `max_execution_time = 900` (aligns with SiteBackup `process_timeout`):
+   ```bash
+   docker compose up -d --force-recreate php
+   # or: make restart / make up-e2e (as applicable)
+   ```
+
+3. Optional — run the disposable cold install circuit (does **not** touch dogfood or warm `app_e2e`):
+   ```bash
+   make wipe-e2e-cold && make up-e2e-cold && make test-e2e-cold
+   ```
+   Warm product E2E stays `make test-e2e-isolated`. Worker-safe stays `make test-e2e-worker-safe`.
+
+4. If a prior interrupted `/setup` migrate left a duplicate-index error on `idx_issue_project_last_environment`, re-run migrate / the wizard — `Version20260815231000` is now SchemaManager-idempotent.
+
+See [CHANGELOG.md](CHANGELOG.md) `[1.27.0]`, [e2e/README.md](../e2e/README.md), and `specs/110-e2e-cold-start-circuit/`.
 
 ## Upgrading from 1.25.0 to 1.26.0
 
