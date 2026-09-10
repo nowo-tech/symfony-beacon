@@ -124,7 +124,7 @@ Original ship retained Playwright **`workers: 1`** for shared-DB stability. As o
 - Kernel-isolation suite: `make test-e2e-worker-safe` (forces `WORKER_NUM=1`); CI job `e2e-worker-safe`.
 - Product CI job `e2e` remains `make test-e2e` on dogfood (may stay classic).
 
-Assumptions above about “full suite remains single-worker” are superseded for product runs. Cross-ref: `specs/108-frankenphp-worker-safe-e2e/`, `specs/104-isolated-e2e-stack/`.
+Assumptions above about “full suite remains single-worker” are superseded for product runs. Cross-ref: `specs/108-frankenphp-worker-safe-e2e/` (shipped **v1.26.0**), `specs/104-isolated-e2e-stack/`.
 
 ## Amendment (Device-keyed extra limits, 2026-08-25 / `105`)
 

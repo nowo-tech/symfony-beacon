@@ -83,4 +83,4 @@ As a maintainer, the Symfony Flex debug `umask(0000)` in PHPUnit bootstrap remai
 
 ## Amendment (runtime worker-safe verification, 2026-09-10 / `108`)
 
-Static PHPStan (`094`) remains the compile-time gate. Runtime shared-Kernel verification is **`108`**: `/health/live` `runtime` probe + `make test-e2e-worker-safe` on the isolated stack (`WORKER_NUM=1`, `RESET_KERNEL=false`). Dogfood `.env.dist` MAY stay `FRANKENPHP_MODE=classic`; isolated E2E defaults to **worker**. Non-goal “Changing default local `FRANKENPHP_MODE` from classic to worker” still applies to dogfood — not to `.env.e2e.dist`. Cross-ref: `specs/108-frankenphp-worker-safe-e2e/`.
+Static PHPStan (`094`) remains the compile-time gate. Runtime shared-Kernel verification is **`108`** (shipped **v1.26.0**): `/health/live` `runtime` probe + `make test-e2e-worker-safe` on the isolated stack (`WORKER_NUM=1`, `RESET_KERNEL=false`). Dogfood `.env.dist` MAY stay `FRANKENPHP_MODE=classic`; isolated E2E defaults to **worker**. Non-goal “Changing default local `FRANKENPHP_MODE` from classic to worker” still applies to dogfood — not to `.env.e2e.dist`. Cross-ref: `specs/108-frankenphp-worker-safe-e2e/`.

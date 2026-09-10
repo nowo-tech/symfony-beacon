@@ -1,7 +1,7 @@
 # Implementation Plan: FrankenPHP worker-safe E2E
 
 **Feature**: `108-frankenphp-worker-safe-e2e`  
-**Status**: Done (implemented on main)
+**Status**: Done (shipped **v1.26.0** / Phase 6.60)
 
 ## Approach
 
@@ -14,3 +14,8 @@
 ## Out of scope
 
 See `spec.md` Non-goals. Product catalog depth and dogfood classic default remain unchanged.
+
+## Ship
+
+- Tag: `v1.26.0` (2026-09-10)
+- Changelog / upgrading: `docs/CHANGELOG.md` `[1.26.0]`, `docs/UPGRADING.md` (1.25.0 → 1.26.0)

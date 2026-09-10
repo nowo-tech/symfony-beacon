@@ -107,4 +107,4 @@ Extends the isolated stack (does **not** replace product catalog E2E):
 | Worker-safe | `make test-e2e-worker-safe` forces **`WORKER_NUM=1`** + Playwright 1 worker + `e2e/worker/`; `ready-e2e-lite` skips sample seed; CI job `e2e-worker-safe` |
 | Probe | `/health/live` `runtime` block — see `specs/108-frankenphp-worker-safe-e2e/` |
 
-Cross-ref: `specs/108-frankenphp-worker-safe-e2e/`, `e2e/README.md`, `docs/ops/FRANKENPHP-CODING.md`.
+Cross-ref: `specs/108-frankenphp-worker-safe-e2e/` (shipped **v1.26.0**), `e2e/README.md`, `docs/ops/FRANKENPHP-CODING.md`.

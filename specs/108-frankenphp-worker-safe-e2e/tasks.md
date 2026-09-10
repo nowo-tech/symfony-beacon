@@ -1,6 +1,6 @@
 # Tasks: FrankenPHP worker-safe E2E (`108`)
 
-**Status**: All complete (implemented on main, 2026-09-10)
+**Status**: All complete — shipped **v1.26.0** (2026-09-10)
 
 ## Phase 1: Health runtime probe
 
@@ -18,4 +18,5 @@
 
 - [x] T007 `e2e/support/frankenphp.ts` + `e2e/worker/kernel-isolation.spec.ts`
 - [x] T008 CI job `e2e-worker-safe`
-- [x] T009 Docs: `e2e/README.md`, `docs/ops/FRANKENPHP-CODING.md`
+- [x] T009 Docs: `e2e/README.md`, `docs/ops/FRANKENPHP-CODING.md`, `docs/API.md`
+- [x] T010 Spec kit + ROADMAP Phase 6.60; release notes in `[1.26.0]`

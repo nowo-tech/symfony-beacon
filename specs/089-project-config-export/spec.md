@@ -111,6 +111,10 @@ As a project admin with members manage, I disable a member’s access without re
 - Disabled user creation for admin import lives in Identity `PortableUserProvisioner` (not Project).
 - JSON import uploads MUST be ≤ **2 MiB** (`JsonUploadReader::DEFAULT_MAX_BYTES`) for panel and Administration (and sibling instance-config import).
 
+## Amendment (Operator preload CLI, 2026-09-09 / `109` / v1.25.0)
+
+Console `app:preload-projects` applies the same `beacon-project-bundle` schema outside the UI for devops-owned files (optional `beacon-api-keys`). Adds RFC UUID validation, `uuid_mismatch` / `uuid_conflict`, `--dry-run` via `countValidatedProjects()`, and a single DB transaction for import + key create. Secrets MUST stay outside this repository. Spec: `specs/109-operator-project-preload/`.
+
 ## Cross-links
 
 - `002-identity-project` — FR-013/FR-014 settings + members surfaces
@@ -118,4 +122,5 @@ As a project admin with members manage, I disable a member’s access without re
 - `019-admin-projects-ops` — admin project list export/import UI
 - `044-instance-config-export` — instance-level sibling pattern
 - `088-project-full-role` — roles in membership payload
+- `109-operator-project-preload` — CLI preload + UUID guards (v1.25.0)
 - `docs/product/ROLES.md`
