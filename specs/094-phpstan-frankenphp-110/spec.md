@@ -80,3 +80,7 @@ As a maintainer, the Symfony Flex debug `umask(0000)` in PHPUnit bootstrap remai
 ## Amendment (empty baseline + injectable seams, 2026-08-25 / `106`)
 
 `phpstan-baseline.neon` is empty (`parameters: {}`). `phpstan.neon.dist` MUST NOT list `ignoreErrors`: association nullability uses `doctrine.allowNullablePropertyForRequiredField`; FrankenPHP worker/hardening stays green via injectable Clock, `HostnameDnsLookup`, and `HaliteSecretsFilesystem` (no process-wide umask in PHPUnit bootstrap, no path-scoped `frankenphp.worker.*` ignores on `src/`). Issue query traits MUST NOT use `phpstan-require-extends` (unit harnesses compose them without pretending to be `ServiceEntityRepository`). `tests/` MUST analyse clean at level 6 without ignores. Rector owns semantic upgrades only; CS-Fixer owns PER-CS / imports / native `\fn()`; `make qa-fix` runs Rector then CS-Fixer. Production gate remains `rules.neon` (`094` P2). See `specs/106-ops-ingest-hardening/` H10.
+
+## Amendment (runtime worker-safe verification, 2026-09-10 / `108`)
+
+Static PHPStan (`094`) remains the compile-time gate. Runtime shared-Kernel verification is **`108`**: `/health/live` `runtime` probe + `make test-e2e-worker-safe` on the isolated stack (`WORKER_NUM=1`, `RESET_KERNEL=false`). Dogfood `.env.dist` MAY stay `FRANKENPHP_MODE=classic`; isolated E2E defaults to **worker**. Non-goal “Changing default local `FRANKENPHP_MODE` from classic to worker” still applies to dogfood — not to `.env.e2e.dist`. Cross-ref: `specs/108-frankenphp-worker-safe-e2e/`.

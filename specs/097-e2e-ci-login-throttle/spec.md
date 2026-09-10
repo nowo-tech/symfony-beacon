@@ -115,6 +115,17 @@ Local dogfood hygiene (`104` / Phase 6.55): parallel Compose project `symfony-be
 
 Cross-ref: `specs/104-isolated-e2e-stack/`, `e2e/README.md`.
 
+## Amendment (FrankenPHP worker-safe + Playwright multi-worker, 2026-09-10 / `108`)
+
+Original ship retained Playwright **`workers: 1`** for shared-DB stability. As of Phase **6.60** (`108`):
+
+- Product Playwright: `fullyParallel: true`, local **4** / CI **2** workers (`PLAYWRIGHT_WORKERS`).
+- Isolated stack defaults to FrankenPHP **worker** + `WORKER_NUM=4` + `RESET_KERNEL=false`.
+- Kernel-isolation suite: `make test-e2e-worker-safe` (forces `WORKER_NUM=1`); CI job `e2e-worker-safe`.
+- Product CI job `e2e` remains `make test-e2e` on dogfood (may stay classic).
+
+Assumptions above about “full suite remains single-worker” are superseded for product runs. Cross-ref: `specs/108-frankenphp-worker-safe-e2e/`, `specs/104-isolated-e2e-stack/`.
+
 ## Amendment (Device-keyed extra limits, 2026-08-25 / `105`)
 
 AuthKit `device_intelligence.device_rate_limit: true` adds a **device-keyed** limit on register / reset / magic. It does **not** replace LoginThrottle nested-username keying (`097` C1 — kit ≥3.2). Login brute-force isolation by username remains required. See `specs/105-authkit-security-kits/`.

@@ -92,7 +92,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 | ID | Use case | Status | E2E file(s) |
 |----|----------|--------|-------------|
-| UC-OPS-01 | `GET /health/live` → 200 | ✅ Covered | `smoke/public.spec.ts` |
+| UC-OPS-01 | `GET /health/live` → 200 | ✅ Covered | `smoke/public.spec.ts`; `runtime` FrankenPHP signals asserted in `worker/kernel-isolation.spec.ts` (`108`) |
 | UC-OPS-02 | `GET /health/ready` (DB) | ✅ Covered | `smoke/public.spec.ts` |
 | UC-OPS-03 | `GET /metrics` without 5xx | ✅ Covered | `smoke/navigation-ui.spec.ts` |
 | UC-OPS-04 | Branded HTTP error pages (404/403) | ✅ Covered | `smoke/use-cases-auth.spec.ts` |

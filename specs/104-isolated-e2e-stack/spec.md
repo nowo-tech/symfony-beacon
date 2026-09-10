@@ -12,7 +12,7 @@
 | ID | Area | Deliverable |
 |----|------|-------------|
 | I1 | Compose | `compose.e2e.yaml` + versioned `.env.e2e.dist` → generated `.env.e2e.local` (gitignored); project `symfony-beacon-e2e` (`-p`); ports `:9085` / `:9460`; Redis DB index `1`; named volumes for `var/cache` / `var/log` |
-| I2 | Make | `up-e2e` / `ready-e2e` / `seed-e2e` / `test-e2e-isolated` / `down-e2e`; force process env for ports so a sourced `.env.local` cannot steal bindings |
+| I2 | Make | `up-e2e` / `ready-e2e` / `ready-e2e-lite` / `seed-e2e` / `test-e2e-isolated` / `test-e2e-worker-safe` / `down-e2e`; force process env for ports so a sourced `.env.local` cannot steal bindings |
 | I3 | Seed | `app:seed-demo --server-env-file=.env.e2e.local` writes loopback `BEACON_DSN` only there; `--write-client-env=.demo-client.e2e.env`; never rewrite dogfood `.env.local` |
 | I4 | Playwright | `PLAYWRIGHT_ISOLATED=1` → base URL `:9460`, auth `e2e/.auth/admin.e2e.json`, credentials from `.demo-client.e2e.env` |
 | I5 | Dogfood | `E2E_BEACON_TARGET=self\|dogfood\|off` — E2E BeaconBundle reports into `app_e2e` (default), dogfood project, or nowhere |
@@ -20,9 +20,10 @@
 ## Non-goals
 
 - Changing CI default (`make test-e2e` still seeds the ephemeral CI dogfood DB)
-- Parallel Playwright workers
 - Automating Out of scope UC rows
 - Doctrine migrations / production operator steps
+
+<!-- Parallel Playwright workers: deferred at original ship; enabled 2026-09-10 — see Amendment `108`. -->
 
 ## User Scenarios & Testing
 
@@ -63,12 +64,13 @@ As an operator, isolated seed must not rewrite `.env.local` `BEACON_DSN` or recr
 
 ## Functional Requirements
 
-- **FR-001**: Makefile MUST expose `up-e2e`, `ready-e2e`, `seed-e2e`, `test-e2e-isolated`, `down-e2e` (and helpers `ensure-e2e-env` / `ensure-e2e-db`).
+- **FR-001**: Makefile MUST expose `up-e2e`, `ready-e2e`, `ready-e2e-lite`, `seed-e2e`, `test-e2e-isolated`, `test-e2e-worker-safe`, `test-e2e-worker-safe-classic`, `down-e2e` (and helpers `ensure-e2e-env` / `ensure-e2e-db`).
 - **FR-002**: Isolated stack MUST use a distinct MySQL schema (default `app_e2e`), Redis DB index (default `1`), Compose project name (`symfony-beacon-e2e`), and host ports (defaults `9085` / `9460`).
 - **FR-003**: `app:seed-demo` MUST support `--server-env-file` (write loopback `BEACON_DSN` only there) and MUST remain mutually exclusive with `--skip-server-dsn` / `--sync-server-dsn`.
 - **FR-004**: Playwright isolated mode MUST use separate storage state and `.demo-client.e2e.env` credentials.
 - **FR-005**: `E2E_BEACON_TARGET` MUST select self / dogfood / off reporting for E2E containers without mutating dogfood `.env.local`.
 - **FR-006**: Docs (`e2e/README.md`, CONTRIBUTING, INSTALL, UPGRADING, CHANGELOG) MUST describe the parallel-stack workflow.
+- **FR-007**: Isolated FrankenPHP defaults and worker-safe Make/CI targets MUST follow `specs/108-frankenphp-worker-safe-e2e/` (worker mode, `WORKER_NUM`, Kernel isolation suite).
 
 ## Success Criteria
 
@@ -93,3 +95,16 @@ Isolated stack inherits `/_device` PUBLIC_ACCESS + PWA deny-cache. No extra Comp
 ### 2026-08-26 — `.env.e2e.dist` template
 
 Isolated E2E MUST version `.env.e2e.dist` (sibling of `.env.dist`). Working file `.env.e2e.local` MUST stay gitignored. `ensure-e2e-env.sh` copies the dist template, overlays shared infra / secrets from `.env.local` (not isolation keys), then applies Make `E2E_*` overrides. Never commit `.env.local` or `.env.e2e.local`.
+
+### 2026-09-10 — FrankenPHP worker defaults + worker-safe suite (`108` / Phase 6.60)
+
+Extends the isolated stack (does **not** replace product catalog E2E):
+
+| Area | Behaviour |
+|------|-----------|
+| Defaults | `FRANKENPHP_MODE=worker`, `FRANKENPHP_WORKER_NUM=4`, `FRANKENPHP_RESET_KERNEL=false` in `.env.e2e.dist`; Make `E2E_FRANKENPHP_*`; FrankenPHP keys are isolation keys (dogfood `classic` MUST NOT overwrite) |
+| Product Playwright | `fullyParallel: true`; local 4 / CI 2 workers (`PLAYWRIGHT_WORKERS`) — former non-goal “Parallel Playwright workers” is lifted for product runs |
+| Worker-safe | `make test-e2e-worker-safe` forces **`WORKER_NUM=1`** + Playwright 1 worker + `e2e/worker/`; `ready-e2e-lite` skips sample seed; CI job `e2e-worker-safe` |
+| Probe | `/health/live` `runtime` block — see `specs/108-frankenphp-worker-safe-e2e/` |
+
+Cross-ref: `specs/108-frankenphp-worker-safe-e2e/`, `e2e/README.md`, `docs/ops/FRANKENPHP-CODING.md`.
