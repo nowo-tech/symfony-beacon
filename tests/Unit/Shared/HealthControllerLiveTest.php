@@ -19,6 +19,12 @@ final class HealthControllerLiveTest extends TestCase
 
         $response = new HealthController($em, new NullLogger())->live();
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
-        self::assertSame(['status' => 'ok'], json_decode((string) $response->getContent(), true));
+        $payload = json_decode((string) $response->getContent(), true);
+        self::assertIsArray($payload);
+        self::assertSame('ok', $payload['status'] ?? null);
+        self::assertIsArray($payload['runtime'] ?? null);
+        self::assertArrayHasKey('frankenphp_mode', $payload['runtime']);
+        self::assertArrayHasKey('frankenphp_worker', $payload['runtime']);
+        self::assertArrayHasKey('reset_kernel', $payload['runtime']);
     }
 }

@@ -32,18 +32,32 @@ final readonly class HealthController
     #[OA\Get(path: '/health/live', operationId: 'healthLive', description: 'Returns 200 when the PHP process can serve HTTP. Does not check the database.', summary: 'Liveness probe', security: [], tags: ['Health'])]
     #[OA\Response(
         response: 200,
-        description: 'Process is alive.',
+        description: 'Process is alive. Includes non-secret FrankenPHP runtime signals for worker-safety checks.',
         content: new OA\JsonContent(
-            required: ['status'],
+            required: ['status', 'runtime'],
             properties: [
                 new OA\Property(property: 'status', type: 'string', example: 'ok'),
+                new OA\Property(
+                    property: 'runtime',
+                    properties: [
+                        new OA\Property(property: 'frankenphp_mode', type: 'string', example: 'worker'),
+                        new OA\Property(property: 'frankenphp_worker', type: 'boolean', example: true),
+                        new OA\Property(property: 'reset_kernel', type: 'boolean', example: false),
+                        new OA\Property(property: 'app_runtime_mode', type: 'string', nullable: true, example: 'web=1&worker=1'),
+                        new OA\Property(property: 'worker_num', type: 'integer', nullable: true, example: 1),
+                    ],
+                    type: 'object',
+                ),
             ],
             type: 'object',
         ),
     )]
     public function live(): JsonResponse
     {
-        return new JsonResponse(['status' => 'ok']);
+        return new JsonResponse([
+            'status' => 'ok',
+            'runtime' => FrankenPhpRuntime::snapshot(),
+        ]);
     }
 
     #[Route('/health/ready', name: 'health_ready', methods: ['GET'])]
