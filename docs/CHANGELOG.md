@@ -9,6 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _No unreleased operator-facing changes yet._
 
+## [1.26.0] - 2026-09-10
+
+### Added
+
+- **FrankenPHP runtime probe:** `GET /health/live` returns a non-secret `runtime` block (`frankenphp_mode`, `frankenphp_worker`, `reset_kernel`, `app_runtime_mode`, `worker_num`) via `FrankenPhpRuntime` — for ops checks and worker-safety asserts.
+- **Worker-safe E2E (Phase 6.60 / `108`):** isolated stack defaults to `FRANKENPHP_MODE=worker`, `FRANKENPHP_WORKER_NUM=4`, `FRANKENPHP_RESET_KERNEL=false`; `make test-e2e-worker-safe` forces `WORKER_NUM=1` + Playwright 1 worker and runs `e2e/worker/kernel-isolation.spec.ts` (locale / theme / logout / CSRF isolation). Contrast: `make test-e2e-worker-safe-classic`. Lite seed: `make ready-e2e-lite`. CI job `e2e-worker-safe`. Spec: `specs/108-frankenphp-worker-safe-e2e/`.
+
+### Changed
+
+- **Playwright product parallelism:** `fullyParallel: true`; local **4** / CI **2** workers (`PLAYWRIGHT_WORKERS` override; Make passes the env into the Playwright container).
+- **Isolated E2E env:** `ensure-e2e-env` treats FrankenPHP keys as isolation keys (dogfood `classic` does not overwrite). See [e2e/README.md](../e2e/README.md) and [FRANKENPHP-CODING.md](ops/FRANKENPHP-CODING.md).
+
+### Notes for integrators
+
+- No Doctrine migrations and no Composer pin changes required for this release.
+- After pull: optional `make up-e2e && make ready-e2e-lite && make test-e2e-worker-safe` to verify shared-Kernel hygiene. Dogfood `.env.dist` remains `FRANKENPHP_MODE=classic` unless you run `make worker`.
+- `/health/live` JSON shape gains `runtime` (additive; existing `status` unchanged).
+- See [UPGRADING.md](UPGRADING.md) **Upgrading from 1.25.0 to 1.26.0**.
+
 ## [1.25.0] - 2026-09-09
 
 ### Added
@@ -1621,7 +1640,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.25.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.26.0...HEAD
+[1.26.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.25.0...v1.26.0
 [1.25.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.5...v1.25.0
 [1.24.5]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.4...v1.24.5
 [1.24.4]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.3...v1.24.4

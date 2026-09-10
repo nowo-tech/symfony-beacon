@@ -57,7 +57,7 @@ Out of scope for OTLP v1 adapters: gRPC, protobuf Content-Type, time-series stor
 
 | Endpoint | Purpose |
 |----------|---------|
-| `GET /health/live` | Liveness |
+| `GET /health/live` | Liveness. Body includes `status` plus non-secret FrankenPHP `runtime` (`frankenphp_mode`, `frankenphp_worker`, `reset_kernel`, `app_runtime_mode`, `worker_num`) — see `108` / [FRANKENPHP-CODING.md](ops/FRANKENPHP-CODING.md). |
 | `GET /health/ready` | Readiness (database). On failure, body uses a generic `error: unavailable` — no exception text (`050`). Messenger backlog is on authenticated `/metrics`, not this probe. |
 
 Bind these carefully in production ([PRODUCTION.md](PRODUCTION.md)).

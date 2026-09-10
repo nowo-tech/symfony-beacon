@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.25.0)](#unreleased-main-after-1250)
+- [Unreleased (main after 1.26.0)](#unreleased-main-after-1260)
+- [Upgrading from 1.25.0 to 1.26.0](#upgrading-from-1250-to-1260)
 - [Upgrading from 1.24.5 to 1.25.0](#upgrading-from-1245-to-1250)
 - [Upgrading from 1.24.4 to 1.24.5](#upgrading-from-1244-to-1245)
 - [Upgrading from 1.24.3 to 1.24.4](#upgrading-from-1243-to-1244)
@@ -97,11 +98,30 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.25.0)
+## Unreleased (main after 1.26.0)
 
 _No unreleased operator-facing steps yet._
 
 See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
+
+## Upgrading from 1.25.0 to 1.26.0
+
+FrankenPHP worker-safe E2E harness, `/health/live` runtime probe, and Playwright multi-worker defaults on the isolated stack. **No migrations. No Composer pin changes.**
+
+1. Pull / checkout `v1.26.0`.
+
+2. No `composer install` required solely for this release (pins unchanged from 1.25.0). Clear cache if your pipeline always does.
+
+3. Optional — verify shared-Kernel hygiene on the isolated stack:
+   ```bash
+   make up-e2e && make ready-e2e-lite
+   make test-e2e-worker-safe
+   ```
+   Product E2E stays `make test-e2e` / `make test-e2e-isolated`. Isolated defaults: `FRANKENPHP_MODE=worker`, `FRANKENPHP_WORKER_NUM=4`, `FRANKENPHP_RESET_KERNEL=false`. Dogfood `.env.dist` remains classic unless you run `make worker`.
+
+4. Integrators scraping `/health/live`: expect an additive `runtime` object alongside `status` (see [API.md](API.md) / OpenAPI if regenerated).
+
+See [CHANGELOG.md](CHANGELOG.md) `[1.26.0]` and `specs/108-frankenphp-worker-safe-e2e/`.
 
 ## Upgrading from 1.24.5 to 1.25.0
 
