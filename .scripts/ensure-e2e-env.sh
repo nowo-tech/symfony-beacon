@@ -68,7 +68,7 @@ else
   echo "Note: no .env.local — ${OUT} uses ${DIST} placeholders. Run make ensure-env if shared infra secrets differ." >&2
 fi
 
-upsert COMPOSE_PROJECT_NAME "symfony-beacon-e2e" "$OUT"
+upsert COMPOSE_PROJECT_NAME "${E2E_COMPOSE_PROJECT:-symfony-beacon-e2e}" "$OUT"
 upsert HTTP_PORT "$E2E_HTTP_PORT" "$OUT"
 upsert HTTPS_PORT "$E2E_HTTPS_PORT" "$OUT"
 upsert HTTP3_PORT "$E2E_HTTPS_PORT" "$OUT"

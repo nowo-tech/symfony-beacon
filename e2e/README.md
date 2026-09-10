@@ -27,6 +27,19 @@ make test-e2e-worker-safe       # PLAYWRIGHT_WORKERS=1 + e2e/worker
 make test-e2e-worker-safe-classic
 ```
 
+### Cold-start circuit (empty DB → `/setup` → login)
+
+Disposable stack for **UC-SETUP-07 / UC-SETUP-01 / UC-AUTH-10** (wizard admin). Uses Compose project `symfony-beacon-e2e-cold`, schema `app_e2e_cold`, HTTPS `:9461`, Redis DB `2`, dedicated `var/site-backup` volume, and **`FRANKENPHP_MODE=classic`** (wizard migrate/seed is long-running; classic avoids worker request-timer edge cases). **Never** run `ready-e2e` here.
+
+```bash
+make wipe-e2e-cold    # drop schema + remove cold volumes
+make up-e2e-cold      # start empty stack (migrate happens inside the wizard)
+make test-e2e-cold    # wipe + up + Playwright project `cold` (workers=1)
+# optional: make down-e2e-cold
+```
+
+Warm product specs `testIgnore` `e2e/cold/`. Do **not** POST `/setup/api/advance` against seeded `app_e2e` / dogfood.
+
 `/health/live` exposes a non-secret `runtime` block (`frankenphp_mode`, `frankenphp_worker`, `reset_kernel`, `app_runtime_mode`, `worker_num`) for asserts.
 
 There is **no** SQL smoke dump/restore for E2E. The “smoke DB” is built by **seed**: `make ready-e2e` (migrate + `seed-e2e` + `app:seed-sample`). Re-seed with `make seed-e2e` / `make ready-e2e` when the schema is dirty. SiteBackup mysqldump is ops/product (`/_site_backup`), not the Playwright bootstrap path.
@@ -103,6 +116,8 @@ Specs are grouped by product domain (Playwright still uses `testDir: ./e2e`):
 | `notifications/` | Destinations, thresholds, health |
 | `flows/` | Cross-cutting mutations and closing suites |
 | `security/` | Negative access control: 403 denials, guest redirects, role demotion, inactive membership, auth gates, CSRF/IDOR/XSS/open-redirect/confirmation guards, edge guards (transfer/anonymize confirm, triage abuse, revoked Read API, `javascript:` URLs), limit guards (share range, API-key CSRF/IDOR, AJAX theme/width abuse, privacy confirm, viewer escalate, `file://`, clear-history skip, password mismatch, quiet-hours TZ, email endpoint mismatch, oversized display name) |
+| `worker/` | FrankenPHP shared-Kernel isolation (not product catalog) |
+| `cold/` | Cold-start setup circuit (`make test-e2e-cold`; empty `app_e2e_cold`) |
 | `z-late/` | Specs that must run last (Read API IP rate limit) |
 
 ## Product use-case catalog
@@ -111,7 +126,7 @@ Specs are grouped by product domain (Playwright still uses `testDir: ./e2e`):
 
 [`docs/product/E2E-USE-CASES.md`](../docs/product/E2E-USE-CASES.md)
 
-That catalog aims at **100% product-surface definition** (routes + primary operator mutations). Automation is ~284 Covered / ~0 Gap (~8 Out of scope). Extend specs under the matching domain folder when product surface grows.
+That catalog aims at **100% product-surface definition** (routes + primary operator mutations). Automation is ~326 Covered / ~0 Gap (~6 Out of scope). Extend specs under the matching domain folder when product surface grows.
 
 Security denials (`UC-SEC-01`…`57`): `e2e/security/` — run with:
 
@@ -120,7 +135,7 @@ make test-e2e ARGS='e2e/security'
 make test-e2e-isolated ARGS='e2e/security/limit-guards.spec.ts'
 ```
 
-Warm setup surfaces (`UC-SETUP-04` GET progress / `UC-SETUP-05` done page): `e2e/smoke/use-cases-setup-warm.spec.ts` — never GET `/setup` or POST advance on a seeded install. On warm installs with SiteBackup `durable_done`, `/setup/api/*` may 302 to home (accepted).
+Warm setup surfaces (`UC-SETUP-04` GET progress / `UC-SETUP-05` done page): `e2e/smoke/use-cases-setup-warm.spec.ts` — never GET `/setup` or POST advance on a seeded install. On warm installs with SiteBackup `durable_done`, `/setup/api/*` may 302 to home (accepted). Cold wizard + AuthKit gate: `e2e/cold/circuit.spec.ts` (`make test-e2e-cold`).
 
 Atomic gaps batch (`UC-AUTH-25/26`, `UC-ACC-24/25`, `UC-DASH-15`, `UC-OPS-12/13`, `UC-SETUP-06`, `UC-ADM-38..42`, `UC-PROJ-27`): `e2e/flows/use-cases-atomic-gaps.spec.ts`.
 

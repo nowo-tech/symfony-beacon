@@ -1,5 +1,5 @@
 .PHONY: ensure-env  help up up-infra up-prod up-shared down down-infra down-shared build build-prod logs shell console beacon-test beacon-suite seed seed-platform seed-sample dogfood reclaim-demo-client-env bootstrap ready migrate classic worker restart reload-env reload-env-if-beacon-dsn-stale mysql messenger-logs vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
-	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage test-unit-js test-unit-js-coverage test-e2e test-e2e-isolated test-e2e-worker-safe test-e2e-worker-safe-classic up-e2e down-e2e ensure-e2e-env ensure-e2e-db ensure-e2e-up ready-e2e ready-e2e-lite seed-e2e kit-smoke qa qa-fix secrets-scan composer-outdated update-deps \
+	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage test-unit-js test-unit-js-coverage test-e2e test-e2e-isolated test-e2e-worker-safe test-e2e-worker-safe-classic test-e2e-cold up-e2e down-e2e up-e2e-cold down-e2e-cold wipe-e2e-cold ensure-e2e-env ensure-e2e-db ensure-e2e-up ready-e2e ready-e2e-lite seed-e2e kit-smoke qa qa-fix secrets-scan composer-outdated update-deps \
 	setup-hooks check-no-cursor-coauthor check-module-boundaries strip-cursor-coauthor-from-history check-envelope-goldens ensure-up ensure-halite-secrets print-urls bootstrap-shared-db
 
 # App Compose (dev). Infra is a separate project (`shared-infra` via compose.infra.yaml).
@@ -19,11 +19,14 @@ COVERAGE_MIN ?= 100
 # Shared stack (developer.local.server/server) when this repo lives under repositories/other/
 SHARED_SERVER_DIR := $(abspath $(CURDIR)/../../../server)
 # Isolated E2E defaults (override: E2E_HTTPS_PORT=9450 make up-e2e).
-# Must be defined before DC_E2E (immediate := expansion).
+# Must be defined before DC_E2E (used by recursive expansion).
 E2E_HTTP_PORT ?= 9085
 E2E_HTTPS_PORT ?= 9460
 E2E_MYSQL_DATABASE ?= app_e2e
 E2E_REDIS_DB ?= 1
+E2E_COMPOSE_PROJECT ?= symfony-beacon-e2e
+# Extra compose files after compose.yaml + compose.override.yaml + compose.e2e.yaml
+E2E_COMPOSE_EXTRA ?=
 # FrankenPHP HTTP mode for isolated E2E (compose.yaml `environment:` needs a process env).
 E2E_FRANKENPHP_MODE ?= worker
 # Default 4 FrankenPHP worker processes for product E2E parallelism.
@@ -39,7 +42,8 @@ PLAYWRIGHT_E2E_BASE_URL ?= https://localhost:$(E2E_HTTPS_PORT)
 # Force HTTP(S)_PORT (+ Redis DSNs for compose.e2e interpolation) on the process env so a
 # sourced .env.local / empty shell var cannot override --env-file (Compose prefers the
 # process environment). Messenger uses ?dbindex= — path would steal stream names.
-DC_E2E := HTTP_PORT=$(E2E_HTTP_PORT) HTTPS_PORT=$(E2E_HTTPS_PORT) HTTP3_PORT=$(E2E_HTTPS_PORT) \
+# Recursive `=` so recipe / sub-make overrides (cold ports, WORKER_NUM=1) rebind DC_E2E.
+DC_E2E = HTTP_PORT=$(E2E_HTTP_PORT) HTTPS_PORT=$(E2E_HTTPS_PORT) HTTP3_PORT=$(E2E_HTTPS_PORT) \
 	DEFAULT_URI=https://localhost:$(E2E_HTTPS_PORT) \
 	MYSQL_DATABASE=$(E2E_MYSQL_DATABASE) \
 	FRANKENPHP_MODE=$(E2E_FRANKENPHP_MODE) \
@@ -47,9 +51,18 @@ DC_E2E := HTTP_PORT=$(E2E_HTTP_PORT) HTTPS_PORT=$(E2E_HTTPS_PORT) HTTP3_PORT=$(E
 	FRANKENPHP_RESET_KERNEL=$(E2E_FRANKENPHP_RESET_KERNEL) \
 	REDIS_URL=redis://$${REDIS_HOST:-redis-8.10.0}:$${REDIS_PORT:-6379}/$(E2E_REDIS_DB) \
 	MESSENGER_TRANSPORT_DSN=redis://$${REDIS_HOST:-redis-8.10.0}:$${REDIS_PORT:-6379}?dbindex=$(E2E_REDIS_DB) \
-	COMPOSE_PROJECT_NAME=symfony-beacon-e2e COMPOSE_ENV_FILES=$(E2E_ENV_FILE) \
-	docker compose -p symfony-beacon-e2e --env-file $(E2E_ENV_FILE) \
-	-f compose.yaml -f compose.override.yaml -f compose.e2e.yaml
+	COMPOSE_PROJECT_NAME=$(E2E_COMPOSE_PROJECT) COMPOSE_ENV_FILES=$(E2E_ENV_FILE) \
+	docker compose -p $(E2E_COMPOSE_PROJECT) --env-file $(E2E_ENV_FILE) \
+	-f compose.yaml -f compose.override.yaml -f compose.e2e.yaml $(E2E_COMPOSE_EXTRA)
+
+# Cold-start E2E (empty schema → /setup → login). Spec `110`.
+E2E_COLD_HTTP_PORT ?= 9086
+E2E_COLD_HTTPS_PORT ?= 9461
+E2E_COLD_MYSQL_DATABASE ?= app_e2e_cold
+E2E_COLD_REDIS_DB ?= 2
+E2E_COLD_ENV_FILE ?= .env.e2e.cold.local
+E2E_COLD_COMPOSE_PROJECT ?= symfony-beacon-e2e-cold
+PLAYWRIGHT_E2E_COLD_BASE_URL ?= https://localhost:$(E2E_COLD_HTTPS_PORT)
 
 ensure-env:
 	@./.scripts/ensure-env-local.sh
@@ -111,6 +124,8 @@ help:
 	@echo "  make test-e2e-isolated  Playwright against isolated stack (app_e2e / :$(E2E_HTTPS_PORT); needs make ready-e2e)"
 	@echo "  make test-e2e-worker-safe  FrankenPHP worker Kernel isolation (WORKER_NUM=1, RESET=false; e2e/worker)"
 	@echo "  make test-e2e-worker-safe-classic  Same probe under FRANKENPHP_MODE=classic (contrast)"
+	@echo "  make test-e2e-cold   Cold-start circuit (empty app_e2e_cold / :$(E2E_COLD_HTTPS_PORT); wipe + /setup → login)"
+	@echo "  make wipe-e2e-cold / up-e2e-cold / down-e2e-cold  Disposable cold Compose stack"
 	@echo "  make up-e2e          Start isolated E2E Compose project (does not stop dogfood stack)"
 	@echo "  make ready-e2e       Migrate + seed + seed-sample on app_e2e"
 	@echo "  make down-e2e        Stop isolated E2E Compose project (keeps app_e2e schema)"
@@ -508,6 +523,7 @@ ensure-e2e-env: ensure-env
 		E2E_FRANKENPHP_MODE="$(E2E_FRANKENPHP_MODE)" \
 		E2E_FRANKENPHP_WORKER_NUM="$(E2E_FRANKENPHP_WORKER_NUM)" \
 		E2E_FRANKENPHP_RESET_KERNEL="$(E2E_FRANKENPHP_RESET_KERNEL)" \
+		E2E_COMPOSE_PROJECT="$(E2E_COMPOSE_PROJECT)" \
 		E2E_ENV_DIST="$(E2E_ENV_DIST)" E2E_ENV_FILE="$(E2E_ENV_FILE)" ./.scripts/ensure-e2e-env.sh
 
 ensure-e2e-db: up-infra ensure-e2e-env
@@ -651,6 +667,86 @@ test-e2e-worker-safe-classic: ensure-e2e-up
 		E2E_FRANKENPHP_WORKER_NUM=1 \
 		E2E_FRANKENPHP_RESET_KERNEL=false
 	$(DC_E2E) up -d --force-recreate php
+
+# --- Cold-start E2E (empty schema → /setup → login; spec 110 / Phase 6.62) ---
+# Never call ready-e2e / seed-e2e on this stack.
+E2E_COLD_MAKE_VARS = \
+	E2E_ENV_FILE=$(E2E_COLD_ENV_FILE) \
+	E2E_HTTP_PORT=$(E2E_COLD_HTTP_PORT) \
+	E2E_HTTPS_PORT=$(E2E_COLD_HTTPS_PORT) \
+	E2E_MYSQL_DATABASE=$(E2E_COLD_MYSQL_DATABASE) \
+	E2E_REDIS_DB=$(E2E_COLD_REDIS_DB) \
+	E2E_COMPOSE_PROJECT=$(E2E_COLD_COMPOSE_PROJECT) \
+	E2E_COMPOSE_EXTRA="-f compose.e2e.cold.yaml" \
+	E2E_BEACON_TARGET=off \
+	E2E_FRANKENPHP_MODE=classic \
+	E2E_FRANKENPHP_WORKER_NUM=1 \
+	E2E_FRANKENPHP_RESET_KERNEL=true
+
+wipe-e2e-cold:
+	@$(MAKE) ensure-e2e-env $(E2E_COLD_MAKE_VARS)
+	@if [ -f "$(E2E_COLD_ENV_FILE)" ]; then \
+		$(MAKE) down-e2e $(E2E_COLD_MAKE_VARS) || true; \
+		HTTP_PORT=$(E2E_COLD_HTTP_PORT) HTTPS_PORT=$(E2E_COLD_HTTPS_PORT) HTTP3_PORT=$(E2E_COLD_HTTPS_PORT) \
+		DEFAULT_URI=https://localhost:$(E2E_COLD_HTTPS_PORT) \
+		MYSQL_DATABASE=$(E2E_COLD_MYSQL_DATABASE) \
+		COMPOSE_PROJECT_NAME=$(E2E_COLD_COMPOSE_PROJECT) COMPOSE_ENV_FILES=$(E2E_COLD_ENV_FILE) \
+		docker compose -p $(E2E_COLD_COMPOSE_PROJECT) --env-file $(E2E_COLD_ENV_FILE) \
+			-f compose.yaml -f compose.override.yaml -f compose.e2e.yaml -f compose.e2e.cold.yaml \
+			down -v || true; \
+	fi
+	@$(MAKE) up-infra
+	@set -a; . ./$(ENV_FILE); set +a; \
+	DB="$(E2E_COLD_MYSQL_DATABASE)"; \
+	echo "Wiping MySQL schema \`$$DB\`…"; \
+	docker exec -i -e MYSQL_PWD="$$MYSQL_ROOT_PASSWORD" mysql-9.7-primary \
+		mysql -uroot -e "DROP DATABASE IF EXISTS \`$$DB\`; CREATE DATABASE \`$$DB\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; \
+GRANT ALL PRIVILEGES ON \`$$DB\`.* TO '$${MYSQL_USER}'@'%'; FLUSH PRIVILEGES;"
+	@docker exec redis-8.10.0 redis-cli -n $(E2E_COLD_REDIS_DB) FLUSHDB >/dev/null 2>&1 || true
+	@echo "Cold E2E wiped (DB=$(E2E_COLD_MYSQL_DATABASE)). Next: make up-e2e-cold"
+
+up-e2e-cold:
+	$(MAKE) up-e2e $(E2E_COLD_MAKE_VARS)
+	@echo "Cold E2E stack: DB=$(E2E_COLD_MYSQL_DATABASE)  HTTPS=$(PLAYWRIGHT_E2E_COLD_BASE_URL)"
+	@echo "Do NOT run ready-e2e on this stack. Next: make test-e2e-cold"
+
+down-e2e-cold:
+	$(MAKE) down-e2e $(E2E_COLD_MAKE_VARS)
+
+test-e2e-cold:
+	$(MAKE) wipe-e2e-cold
+	$(MAKE) up-e2e-cold
+	@echo "Waiting for cold E2E /health/live…"
+	@for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30; do \
+		if curl -kfsS "$(PLAYWRIGHT_E2E_COLD_BASE_URL)/health/live" >/dev/null 2>&1; then \
+			echo "Cold stack live"; \
+			break; \
+		fi; \
+		if [ "$$i" -eq 30 ]; then \
+			echo "Cold stack failed to become live"; \
+			$(MAKE) down-e2e $(E2E_COLD_MAKE_VARS) || true; \
+			exit 1; \
+		fi; \
+		sleep 2; \
+	done
+ifeq ($(PLAYWRIGHT_ON_HOST),1)
+	PLAYWRIGHT_COLD=1 \
+	PLAYWRIGHT_BASE_URL="$(PLAYWRIGHT_E2E_COLD_BASE_URL)" \
+	PLAYWRIGHT_WORKERS=1 \
+	pnpm exec playwright test $(ARGS)
+else
+	docker run --rm --network=host \
+		--user "$(shell id -u):$(shell id -g)" \
+		-v "$(CURDIR):/work" -w /work \
+		-e PLAYWRIGHT_COLD=1 \
+		-e PLAYWRIGHT_BASE_URL="$(PLAYWRIGHT_E2E_COLD_BASE_URL)" \
+		-e PLAYWRIGHT_WORKERS=1 \
+		-e CI="$(CI)" \
+		-e HOME=/tmp \
+		-e XDG_CACHE_HOME=/tmp/.cache \
+		$(PLAYWRIGHT_IMAGE) \
+		bash -lc 'mkdir -p /tmp/.cache && ./node_modules/.bin/playwright test $(ARGS)'
+endif
 
 # Fast AuthKit / identity smoke after kit bumps (see docs/CONTRIBUTING.md).
 kit-smoke: ensure-up

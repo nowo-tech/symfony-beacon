@@ -5,10 +5,13 @@ import { defineConfig, devices } from '@playwright/test';
  *
  * Dogfood: `make up` + `make seed` (+ sample) → `make test-e2e` (default :9447).
  * Isolated DB: `make up-e2e` + `make ready-e2e` → `make test-e2e-isolated` (:9460 / app_e2e).
+ * Cold install: `make wipe-e2e-cold` + `make up-e2e-cold` → `make test-e2e-cold` (:9461 / app_e2e_cold).
  */
+const cold = process.env.PLAYWRIGHT_COLD === '1';
 const isolated = process.env.PLAYWRIGHT_ISOLATED === '1';
 const baseURL =
-  process.env.PLAYWRIGHT_BASE_URL ?? (isolated ? 'https://localhost:9460' : 'https://localhost:9447');
+  process.env.PLAYWRIGHT_BASE_URL ??
+  (cold ? 'https://localhost:9461' : isolated ? 'https://localhost:9460' : 'https://localhost:9447');
 const authFile =
   process.env.PLAYWRIGHT_AUTH_FILE ??
   (isolated ? 'e2e/.auth/admin.e2e.json' : 'e2e/.auth/admin.json');
@@ -21,12 +24,12 @@ const workers = process.env.PLAYWRIGHT_WORKERS
 
 export default defineConfig({
   testDir: './e2e',
-  fullyParallel: true,
+  fullyParallel: !cold,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 1,
-  workers,
-  timeout: 60_000,
-  expect: { timeout: 15_000 },
+  workers: cold ? 1 : workers,
+  timeout: cold ? 600_000 : 60_000,
+  expect: { timeout: cold ? 60_000 : 15_000 },
   reporter: process.env.CI ? [['github'], ['list']] : [['list'], ['html', { open: 'never' }]],
   outputDir: 'test-results',
   use: {
@@ -36,24 +39,35 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     locale: 'en-US',
-    navigationTimeout: 45_000,
+    navigationTimeout: cold ? 120_000 : 45_000,
     actionTimeout: 15_000,
     // Prefer DOM ready over full load — FrankenPHP/WSL often stalls on "load".
     // Specs that need networkidle still override per-call.
   },
-  projects: [
-    {
-      name: 'setup',
-      testMatch: /auth\.setup\.ts/,
-    },
-    {
-      name: 'chromium',
-      use: {
-        ...devices['Desktop Chrome'],
-        storageState: authFile,
-      },
-      dependencies: ['setup'],
-      testIgnore: /auth\.setup\.ts/,
-    },
-  ],
+  projects: cold
+    ? [
+        {
+          name: 'cold',
+          testMatch: /cold\/.*\.spec\.ts/,
+          use: {
+            ...devices['Desktop Chrome'],
+            storageState: { cookies: [], origins: [] },
+          },
+        },
+      ]
+    : [
+        {
+          name: 'setup',
+          testMatch: /auth\.setup\.ts/,
+        },
+        {
+          name: 'chromium',
+          use: {
+            ...devices['Desktop Chrome'],
+            storageState: authFile,
+          },
+          dependencies: ['setup'],
+          testIgnore: [/auth\.setup\.ts/, /cold\//],
+        },
+      ],
 });

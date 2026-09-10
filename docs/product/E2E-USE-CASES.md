@@ -48,7 +48,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 | UC-AUTH-07 | Password reset page loads | ✅ Covered | `smoke/public.spec.ts` |
 | UC-AUTH-08 | Remember-me checkbox / cookie | ✅ Covered | `smoke/use-cases-auth-chrome.spec.ts` (checkbox); `flows/use-cases-destructive-safe.spec.ts` (REMEMBERME survives session clear) |
 | UC-AUTH-09 | Login throttle after N failures | ✅ Covered | `flows/use-cases-oos-closing.spec.ts` (ephemeral username; suite start clears `login_attempts`) |
-| UC-AUTH-10 | First-user registration when DB empty | ❌ Out of scope | Destructive / empty DB |
+| UC-AUTH-10 | First-user registration when DB empty | ✅ Covered | Cold circuit: wizard admin + login (`e2e/cold/circuit.spec.ts`; `make test-e2e-cold`) — AuthKit register remains `first_user_only` after setup |
 | UC-AUTH-11 | `/register` redirects to login when users exist | ✅ Covered | `smoke/use-cases-auth.spec.ts` |
 | UC-AUTH-12 | Logout returns to login | ✅ Covered | `project/dashboard-project.spec.ts` |
 | UC-AUTH-13 | Guest locale switch | ✅ Covered | `smoke/navigation-ui.spec.ts`; path locale + visible login copy `account/use-cases-theme-locale-mutations.spec.ts` |
@@ -390,13 +390,13 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 | ID | Use case | Status | E2E file(s) |
 |----|----------|--------|-------------|
-| UC-SETUP-01 | SiteBackup `/setup` wizard (empty catalogs) | ✅ Covered | Marker hygiene (`smoke/use-cases-auth.spec.ts`); full cold wizard remains Out of scope — never leave `setup.required` |
+| UC-SETUP-01 | SiteBackup `/setup` wizard (empty catalogs) | ✅ Covered | Cold circuit `e2e/cold/circuit.spec.ts` (`make test-e2e-cold`); warm marker hygiene remains in `smoke/use-cases-auth.spec.ts` — never POST advance on seeded installs |
 | UC-SETUP-02 | Platform catalog redirect when incomplete | ❌ Out of scope | Needs incomplete catalog fixture |
 | UC-SETUP-03 | Seed layers / demo project | ✅ Covered | `smoke/use-cases-remaining-oos.spec.ts` (demo project on dashboard after `make seed`); Makefile seed itself remains ops |
 | UC-SETUP-04 | Setup progress / advance APIs | ✅ Covered | `smoke/use-cases-setup-warm.spec.ts` (GET progress + POST-only advance; durable_done may 302 `/setup/api/*` to home on warm installs — accepted) |
 | UC-SETUP-05 | Setup done page | ✅ Covered | `smoke/use-cases-setup-warm.spec.ts` (`/setup/done` on warm install) |
 | UC-SETUP-06 | Incomplete-setup banner on dashboard (admin) | ✅ Covered | `flows/use-cases-atomic-gaps.spec.ts` (instance-config import toggles `setup_completed`) |
-| UC-SETUP-07 | AuthKit gated until SiteBackup setup finishes (`/login`+`/register` → `/setup`) | ❌ Out of scope | Same incomplete-catalog fixture cost as UC-SETUP-02; covered by `tests/Unit/Setup/PlatformCatalogsSetupRedirectSubscriberTest.php` |
+| UC-SETUP-07 | AuthKit gated until SiteBackup setup finishes (`/login`+`/register` → `/setup`) | ✅ Covered | `e2e/cold/circuit.spec.ts` (UC-SETUP-07); unit: `PlatformCatalogsSetupRedirectSubscriberTest` |
 
 ---
 
@@ -415,7 +415,7 @@ Membership roles: see [ROLES.md](ROLES.md).
 
 **Definition complete:** every primary product route family and operator mutation above has a `UC-*` row (surface catalog ≈ 100% of application product surface).
 
-**Automation status (2026-09-04):** ~340 Covered / ~0 Partial / ~0 Gap / ~8 Out of scope. Latest depth batches: kit negatives (`admin/use-cases-kit-negatives-depth.spec.ts`), admin settings (`admin/use-cases-admin-settings-depth.spec.ts`). Remaining Out of scope: empty-DB first user (AUTH-10), incomplete platform catalog fixture (SETUP-02 / SETUP-07), SiteBackup restore (OPS-14), HTTP log purge on shared DB, roadmap Later (Native / dogfood UI / dogfood suite CLI / hot-reload). Browser Push *permission* prompt remains external.
+**Automation status (2026-09-10):** ~326 Covered / ~0 Partial / ~0 Gap / ~6 Out of scope. Cold-start circuit (`110` / Phase 6.62) covers SETUP-01 (API wizard), SETUP-07, AUTH-10 (wizard admin). Remaining Out of scope: incomplete platform catalog fixture (SETUP-02), SiteBackup restore (OPS-14), roadmap Later (Native / dogfood UI / dogfood suite CLI / hot-reload). Browser Push *permission* prompt remains external.
 
 **Closed Gap batches:**
 
@@ -426,14 +426,14 @@ Membership roles: see [ROLES.md](ROLES.md).
 5. ~~Ingest edges UC-ING-13..18~~ → Covered (`ingest/use-cases-ingest-edges.spec.ts` + OpenAPI HTML in kit mutations).
 6. ~~Hook negatives UC-HOOK-08..12~~ → Covered (`hooks/use-cases-hooks-negatives.spec.ts`).
 7. ~~Remaining Gaps UC-PROJ-24, UC-ADM-29/30~~ → Covered (`admin/use-cases-final-gaps.spec.ts`).
-8. Keep Out of scope rows as-is (empty DB, incomplete catalog fixture, roadmap Later).
+8. Keep remaining Out of scope rows (incomplete catalog SETUP-02, SiteBackup restore OPS-14, roadmap Later).
 9. ~~Mailbox token capture UC-AUTH-18/20~~ → Covered via Mailpit (`make mailpit`).
 10. ~~AUTH-23 / OPS-10 / SETUP-03 / ACC-23~~ → Covered (`smoke/use-cases-remaining-oos.spec.ts`; local VAPID in `.env`).
 11. ~~SETUP-04/05 + NOTIF-17~~ → Covered (`smoke/use-cases-setup-warm.spec.ts`, `notifications/use-cases-digest-flush.spec.ts`).
 12. ~~Atomic definition gaps AUTH-25/26, ACC-24/25, DASH-15, OPS-12/13, SETUP-06, ADM-38..42, PROJ-27~~ → Covered (`flows/use-cases-atomic-gaps.spec.ts`); OPS-14 remains Out of scope.
 13. ~~Security denials UC-SEC-01..12~~ → Covered (`security/access-denials.spec.ts`, `security/auth-gates.spec.ts`).
 14. ~~Morphicons + PhoneInput + PWA cookie-free manifest UC-ACC-26/27 (+ UC-ACC-16 assert)~~ → Covered (`account/use-cases-morphicons-chrome.spec.ts`, `account/use-cases-account-mutations.spec.ts`, `smoke/misc.spec.ts`).
-15. Document SETUP-07 / LATER-03 / LATER-04 as Out of scope (unit/CLI/dev owners).
+15. ~~SETUP-07~~ → Covered (`e2e/cold`); LATER-03 / LATER-04 remain Out of scope (CLI/dev owners).
 16. ~~Unwanted-action / abuse guards UC-SEC-13..27, UC-ING-19..22, UC-HOOK-13/14, UC-ISS-30/31, UC-PROJ-28~~ → Covered (`security/unwanted-actions.spec.ts`, `ingest/use-cases-ingest-abuse.spec.ts`, `hooks/use-cases-hooks-negatives.spec.ts`).
 17. ~~Edge guards UC-SEC-28..39, UC-ISS-32, UC-NOTIF-18, UC-ING-23~~ → Covered (`security/edge-guards.spec.ts`).
 18. ~~Limit / abuse guards UC-SEC-40..57~~ → Covered (`security/limit-guards.spec.ts`).

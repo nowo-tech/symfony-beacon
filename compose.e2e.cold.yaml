@@ -1,0 +1,32 @@
+# Isolated cold-start E2E — empty schema + dedicated SiteBackup volume
+#
+#   make wipe-e2e-cold && make up-e2e-cold && make test-e2e-cold
+#
+# Extends compose.e2e.yaml; Compose project MUST be `symfony-beacon-e2e-cold`
+# so named volumes do not collide with warm `app_e2e`.
+# Env file is cold-only (do not reuse `.env.e2e.local`).
+services:
+  php:
+    env_file: !override
+      - .env.e2e.cold.local
+    volumes:
+      - e2e_cold_site_backup:/app/var/site-backup
+
+  messenger:
+    env_file: !override
+      - .env.e2e.cold.local
+    volumes:
+      - e2e_cold_site_backup:/app/var/site-backup
+
+  messenger-notify:
+    env_file: !override
+      - .env.e2e.cold.local
+    volumes:
+      - e2e_cold_site_backup:/app/var/site-backup
+
+  mercure:
+    env_file: !override
+      - .env.e2e.cold.local
+
+volumes:
+  e2e_cold_site_backup:

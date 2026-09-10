@@ -6,6 +6,7 @@
 /.env.local
 /.env.local.php
 /.env.e2e.local
+/.env.e2e.cold.local
 /.env.*.local
 /.env.dev
 /.env.prod
