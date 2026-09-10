@@ -16,6 +16,23 @@ make test-e2e-isolated
 # optional: make down-e2e   # stop E2E containers; schema app_e2e is kept
 ```
 
+FrankenPHP on the E2E stack defaults to **`FRANKENPHP_MODE=worker`**, **`FRANKENPHP_WORKER_NUM=4`**, **`FRANKENPHP_RESET_KERNEL=false`** (`.env.e2e.dist` / Make `E2E_FRANKENPHP_*`). Product E2E can fan out across 4 PHP workers. **`make test-e2e-worker-safe`** temporarily forces **`WORKER_NUM=1`** so parallel browser contexts share one Kernel (leak detection). Compare with classic: `E2E_FRANKENPHP_MODE=classic make up-e2e` (force-recreate). This is HTTP worker mode — not Messenger.
+
+**Worker-safety suite** (shared Kernel hygiene — not product catalog):
+
+```bash
+make up-e2e && make ready-e2e   # or seed-e2e after migrate
+make test-e2e-worker-safe       # PLAYWRIGHT_WORKERS=1 + e2e/worker
+# optional contrast:
+make test-e2e-worker-safe-classic
+```
+
+`/health/live` exposes a non-secret `runtime` block (`frankenphp_mode`, `frankenphp_worker`, `reset_kernel`, `app_runtime_mode`, `worker_num`) for asserts.
+
+There is **no** SQL smoke dump/restore for E2E. The “smoke DB” is built by **seed**: `make ready-e2e` (migrate + `seed-e2e` + `app:seed-sample`). Re-seed with `make seed-e2e` / `make ready-e2e` when the schema is dirty. SiteBackup mysqldump is ops/product (`/_site_backup`), not the Playwright bootstrap path.
+
+Playwright product suite runs **multiple workers** against this smoke DB (`fullyParallel: true`, default 4 local / 2 CI). Force serial for debugging mutation flakes: `PLAYWRIGHT_WORKERS=1 make test-e2e-isolated`.
+
 ### BeaconBundle during isolated E2E (detect errors while tests run)
 
 After `make ready-e2e`, the **E2E** PHP containers get `BEACON_DSN` in `.env.e2e.local` only (`.env.local` / dogfood DSN unchanged). Exceptions and Monolog `error+` from the app under test are reported via `nowo-tech/beacon-bundle` (same as dogfood), with `DropSelfIngestBeforeSend` avoiding ingest feedback loops.

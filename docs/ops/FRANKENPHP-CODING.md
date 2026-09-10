@@ -146,8 +146,9 @@ That implies it also works in classic and with reset-true.
 - [ ] Stateful services implement `ResetInterface` (or are request-scoped via factory patterns that do not leak)
 - [ ] No reliance on “process dies after the request”
 - [ ] No request secrets written to `$_ENV`
-- [ ] Verified homepage flags for the target mode (`FRANKENPHP_WORKER` / `APP_RUNTIME_MODE`)
+- [ ] Verified `/health/live` `runtime` flags for the target mode (`frankenphp_worker` / `app_runtime_mode`)
 - [ ] Smoke-tested both `make classic` and `make worker` when the change touches shared services
+- [ ] For Kernel-isolation regressions: `make test-e2e-worker-safe` (isolated stack, `WORKER_NUM=1`, `RESET=false`)
 
 ## References
 
