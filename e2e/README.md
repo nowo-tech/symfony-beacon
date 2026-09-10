@@ -118,6 +118,7 @@ Specs are grouped by product domain (Playwright still uses `testDir: ./e2e`):
 | `security/` | Negative access control: 403 denials, guest redirects, role demotion, inactive membership, auth gates, CSRF/IDOR/XSS/open-redirect/confirmation guards, edge guards (transfer/anonymize confirm, triage abuse, revoked Read API, `javascript:` URLs), limit guards (share range, API-key CSRF/IDOR, AJAX theme/width abuse, privacy confirm, viewer escalate, `file://`, clear-history skip, password mismatch, quiet-hours TZ, email endpoint mismatch, oversized display name) |
 | `worker/` | FrankenPHP shared-Kernel isolation (not product catalog) |
 | `cold/` | Cold-start setup circuit (`make test-e2e-cold`; empty `app_e2e_cold`) |
+| `manual/` | Docs screenshot crawl (`make docs-manual-screenshots`; not part of product CI) |
 | `z-late/` | Specs that must run last (Read API IP rate limit) |
 
 ## Product use-case catalog

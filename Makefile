@@ -1,5 +1,5 @@
 .PHONY: ensure-env  help up up-infra up-prod up-shared down down-infra down-shared build build-prod logs shell console beacon-test beacon-suite seed seed-platform seed-sample dogfood reclaim-demo-client-env bootstrap ready migrate classic worker restart reload-env reload-env-if-beacon-dsn-stale mysql messenger-logs vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
-	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage test-unit-js test-unit-js-coverage test-e2e test-e2e-isolated test-e2e-worker-safe test-e2e-worker-safe-classic test-e2e-cold up-e2e down-e2e up-e2e-cold down-e2e-cold wipe-e2e-cold ensure-e2e-env ensure-e2e-db ensure-e2e-up ready-e2e ready-e2e-lite seed-e2e kit-smoke qa qa-fix secrets-scan composer-outdated update-deps \
+	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage test-unit-js test-unit-js-coverage test-e2e test-e2e-isolated test-e2e-worker-safe test-e2e-worker-safe-classic test-e2e-cold docs-manual-screenshots docs-manual-screenshots-setup up-e2e down-e2e up-e2e-cold down-e2e-cold wipe-e2e-cold ensure-e2e-env ensure-e2e-db ensure-e2e-up ready-e2e ready-e2e-lite seed-e2e kit-smoke qa qa-fix secrets-scan composer-outdated update-deps \
 	setup-hooks check-no-cursor-coauthor check-module-boundaries strip-cursor-coauthor-from-history check-envelope-goldens ensure-up ensure-halite-secrets print-urls bootstrap-shared-db
 
 # App Compose (dev). Infra is a separate project (`shared-infra` via compose.infra.yaml).
@@ -125,6 +125,8 @@ help:
 	@echo "  make test-e2e-worker-safe  FrankenPHP worker Kernel isolation (WORKER_NUM=1, RESET=false; e2e/worker)"
 	@echo "  make test-e2e-worker-safe-classic  Same probe under FRANKENPHP_MODE=classic (contrast)"
 	@echo "  make test-e2e-cold   Cold-start circuit (empty app_e2e_cold / :$(E2E_COLD_HTTPS_PORT); wipe + /setup → login)"
+	@echo "  make docs-manual-screenshots  Capture production-like PNGs into docs/manual/images (isolated E2E stack)"
+	@echo "  make docs-manual-screenshots-setup  Setup wizard PNGs (cold stack; wipe + up first)"
 	@echo "  make wipe-e2e-cold / up-e2e-cold / down-e2e-cold  Disposable cold Compose stack"
 	@echo "  make up-e2e          Start isolated E2E Compose project (does not stop dogfood stack)"
 	@echo "  make ready-e2e       Migrate + seed + seed-sample on app_e2e"
@@ -622,6 +624,59 @@ else
 		$(PLAYWRIGHT_IMAGE) \
 		bash -lc 'mkdir -p /tmp/.cache && ./node_modules/.bin/playwright test $(ARGS)'
 endif
+
+# Capture production-like PNGs for docs/manual/ (hides WDT / Twig Inspector). Needs sample data.
+# Fixed viewport 1440×900 (no fullPage stretch). Prereq: make up-e2e && make ready-e2e
+docs-manual-screenshots: ensure-e2e-up
+	@mkdir -p docs/manual/images
+	@$(DC_E2E) exec -T php bin/console dbal:run-sql "DELETE FROM login_attempts" >/dev/null 2>&1 || true
+ifeq ($(PLAYWRIGHT_ON_HOST),1)
+	PLAYWRIGHT_MANUAL=1 PLAYWRIGHT_ISOLATED=1 PLAYWRIGHT_WORKERS=1 \
+	PLAYWRIGHT_BASE_URL="$(PLAYWRIGHT_E2E_BASE_URL)" \
+	PLAYWRIGHT_INGEST_BASE_URL="http://localhost:$(E2E_HTTP_PORT)" \
+	PLAYWRIGHT_REQUIRE_SAMPLE=1 \
+	pnpm exec playwright test e2e/manual/capture-screens.spec.ts --retries=0
+else
+	docker run --rm --network=host \
+		--user "$(shell id -u):$(shell id -g)" \
+		--shm-size=1g \
+		-m 4g \
+		-v "$(CURDIR):/work" -w /work \
+		-e PLAYWRIGHT_MANUAL=1 \
+		-e PLAYWRIGHT_ISOLATED=1 \
+		-e PLAYWRIGHT_WORKERS=1 \
+		-e PLAYWRIGHT_BASE_URL="$(PLAYWRIGHT_E2E_BASE_URL)" \
+		-e PLAYWRIGHT_INGEST_BASE_URL="http://localhost:$(E2E_HTTP_PORT)" \
+		-e PLAYWRIGHT_REQUIRE_SAMPLE=1 \
+		-e HOME=/tmp \
+		-e XDG_CACHE_HOME=/tmp/.cache \
+		$(PLAYWRIGHT_IMAGE) \
+		bash -lc 'mkdir -p /tmp/.cache docs/manual/images && ./node_modules/.bin/playwright test e2e/manual/capture-screens.spec.ts --retries=0'
+endif
+	@echo "Screenshots written to docs/manual/images/ — see docs/manual/README.md"
+
+# Setup wizard shots against disposable cold stack (never against warm app_e2e / dogfood).
+# Prereq: make wipe-e2e-cold && make up-e2e-cold
+docs-manual-screenshots-setup:
+	@mkdir -p docs/manual/images
+	@curl -kfsS "$(PLAYWRIGHT_E2E_COLD_BASE_URL)/health/live" >/dev/null || { \
+		echo "Cold stack not live at $(PLAYWRIGHT_E2E_COLD_BASE_URL) — run: make wipe-e2e-cold && make up-e2e-cold"; \
+		exit 1; \
+	}
+	docker run --rm --network=host \
+		--user "$(shell id -u):$(shell id -g)" \
+		--shm-size=1g \
+		-m 3g \
+		-v "$(CURDIR):/work" -w /work \
+		-e PLAYWRIGHT_MANUAL=1 \
+		-e PLAYWRIGHT_COLD=1 \
+		-e PLAYWRIGHT_WORKERS=1 \
+		-e PLAYWRIGHT_BASE_URL="$(PLAYWRIGHT_E2E_COLD_BASE_URL)" \
+		-e HOME=/tmp \
+		-e XDG_CACHE_HOME=/tmp/.cache \
+		$(PLAYWRIGHT_IMAGE) \
+		bash -lc 'mkdir -p /tmp/.cache docs/manual/images && ./node_modules/.bin/playwright test e2e/manual/capture-setup.spec.ts --retries=0'
+	@echo "Setup screenshots written to docs/manual/images/ — see docs/manual/00-setup.md"
 
 # FrankenPHP shared-Kernel hygiene (not product catalog). Forces 1 PHP worker + RESET=false.
 # Prereq: make up-e2e && make ready-e2e (or seed-e2e after migrate).

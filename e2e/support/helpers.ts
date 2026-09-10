@@ -355,6 +355,176 @@ export async function openFirstIssue(page: Page, projectUuid: string): Promise<s
   return match?.[1] ?? null;
 }
 
+/** CSS that strips Symfony/dev overlays so screenshots look production-like. */
+export const MANUAL_DEV_CHROME_HIDE_CSS = `
+  .sf-toolbar,
+  [id^="sfwdt"],
+  .sf-toolbar-clearer,
+  .sf-minitoolbar,
+  [id^="_twig_inspector"],
+  ._twig_inspector__filter_highlight,
+  vite-error-overlay,
+  .flash-toast,
+  .nowo-ui-toast,
+  .nowo-ui-toast__container,
+  .nowo-cookie-consent__preferences-bubble,
+  #cookieconsent .nowo-cookie-consent__preferences-bubble {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+`;
+
+/**
+ * Force English UI for documentation shots (manual is English; demo users may prefer es).
+ */
+export async function ensureEnglishUi(page: Page): Promise<void> {
+  const htmlLang = (await page.locator('html').getAttribute('lang'))?.toLowerCase() ?? '';
+  if (htmlLang === 'en' || htmlLang.startsWith('en-')) {
+    return;
+  }
+
+  const switcher = page.locator('.locale-switcher').first();
+  if (!(await switcher.isVisible().catch(() => false))) {
+    return;
+  }
+
+  const details = switcher.locator('details.locale-switcher__details').first();
+  const summary = switcher.locator('summary.locale-switcher__summary').first();
+  if (await details.count()) {
+    const open = await details.getAttribute('open');
+    if (open === null && (await summary.isVisible().catch(() => false))) {
+      await summary.click({ force: true }).catch(() => undefined);
+    }
+  }
+
+  const enOption = page
+    .locator(
+      [
+        'form[action*="/account/locale/en"] button.locale-switcher__option',
+        'form[action*="/locale/en"] button.locale-switcher__option',
+        'a.locale-switcher__option[hreflang="en"]',
+        'button.locale-switcher__option[hreflang="en"]',
+        'button.locale-switcher__option[lang="en"]',
+      ].join(', '),
+    )
+    .first();
+
+  if (!(await enOption.isVisible().catch(() => false))) {
+    return;
+  }
+
+  await Promise.all([
+    page.waitForLoadState('domcontentloaded').catch(() => undefined),
+    enOption.click({ force: true }),
+  ]);
+  await waitForPageLoader(page);
+}
+
+/**
+ * Prepare the page for documentation screenshots: dismiss product UX overlays
+ * and hide development chrome (WDT, Twig Inspector, Vite error overlay, toasts).
+ */
+export async function prepareProductionScreenshot(page: Page): Promise<void> {
+  await waitForPageLoader(page);
+  await dismissCookieConsent(page);
+  await dismissProductTour(page);
+  await ensureEnglishUi(page);
+  await dismissCookieConsent(page);
+  await dismissProductTour(page);
+  await page.addStyleTag({ content: MANUAL_DEV_CHROME_HIDE_CSS }).catch(() => undefined);
+  await page
+    .evaluate(() => {
+      document
+        .querySelectorAll(
+          '.sf-toolbar, [id^="sfwdt"], .sf-toolbar-clearer, .sf-minitoolbar, [id^="_twig_inspector"], vite-error-overlay, .flash-toast, .nowo-ui-toast, .nowo-ui-toast__container, .nowo-cookie-consent__preferences-bubble',
+        )
+        .forEach((el) => el.remove());
+    })
+    .catch(() => undefined);
+  await page.waitForTimeout(150);
+}
+
+/** Fixed documentation viewport — never fullPage (keeps aside/chrome aspect ratio). */
+export const MANUAL_VIEWPORT = { width: 1440, height: 900 } as const;
+
+export type ManualTheme = 'light' | 'dark';
+
+/**
+ * Force day/night theme for screenshots (overrides user preference + localStorage).
+ */
+export async function setManualTheme(page: Page, theme: ManualTheme): Promise<void> {
+  try {
+    await page.evaluate((t) => {
+      localStorage.setItem('beacon-theme', t);
+      const root = document.documentElement;
+      root.dataset.theme = t;
+      root.dataset.userTheme = t;
+      window.__BEACON_USER_THEME__ = t;
+    }, theme);
+  } catch {
+    // about:blank / opaque origins deny localStorage — caller should navigate first.
+    return;
+  }
+  await page.waitForTimeout(100);
+}
+
+export type CaptureManualOptions = {
+  /** Default light. Dark shots are saved as `{name}-dark.png`. */
+  theme?: ManualTheme;
+  /** Extra same-size scrolls for tall pages (default 1 = only above-the-fold). Max 3. */
+  maxParts?: number;
+};
+
+/**
+ * Capture fixed-size viewport PNGs (1440×900). Tall pages get `-2` / `-3` companions
+ * of the same dimensions after scrolling — never a stretched full-page image.
+ */
+export async function captureManualScreenshot(
+  page: Page,
+  outDir: string,
+  name: string,
+  options: CaptureManualOptions = {},
+): Promise<void> {
+  const theme = options.theme ?? 'light';
+  const maxParts = Math.min(Math.max(options.maxParts ?? 1, 1), 3);
+  await setManualTheme(page, theme);
+  await prepareProductionScreenshot(page);
+  // Re-apply theme after prepare (locale switch may reload).
+  await setManualTheme(page, theme);
+  await page.setViewportSize(MANUAL_VIEWPORT);
+  fs.mkdirSync(outDir, { recursive: true });
+
+  const baseName = theme === 'dark' ? `${name}-dark` : name;
+  const viewportHeight = MANUAL_VIEWPORT.height;
+
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(80);
+
+  for (let part = 1; part <= maxParts; part++) {
+    if (part > 1) {
+      await page.evaluate((y) => window.scrollTo(0, y), (part - 1) * viewportHeight);
+      await page.waitForTimeout(120);
+    }
+    const scrollHeight = await page.evaluate(() =>
+      Math.max(document.documentElement.scrollHeight, document.body?.scrollHeight ?? 0),
+    );
+    const maxScroll = Math.max(0, scrollHeight - viewportHeight);
+    const at = (part - 1) * viewportHeight;
+    if (part > 1 && at > maxScroll + 40) {
+      break;
+    }
+    const fileName = part === 1 ? `${baseName}.png` : `${baseName}-${part}.png`;
+    await page.screenshot({
+      path: path.join(outDir, fileName),
+      fullPage: false,
+      animations: 'disabled',
+      caret: 'hide',
+    });
+  }
+  await page.evaluate(() => window.scrollTo(0, 0));
+}
+
 /** Complete a SlideToConfirm widget (hidden checkbox is the submitted value) and submit the form. */
 export async function completeSlideToConfirm(form: import('@playwright/test').Locator): Promise<void> {
   const slider = form.locator('nowo-slide-to-confirm, .nowo-slide-to-confirm').first();

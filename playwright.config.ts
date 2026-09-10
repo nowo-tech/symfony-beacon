@@ -6,8 +6,10 @@ import { defineConfig, devices } from '@playwright/test';
  * Dogfood: `make up` + `make seed` (+ sample) → `make test-e2e` (default :9447).
  * Isolated DB: `make up-e2e` + `make ready-e2e` → `make test-e2e-isolated` (:9460 / app_e2e).
  * Cold install: `make wipe-e2e-cold` + `make up-e2e-cold` → `make test-e2e-cold` (:9461 / app_e2e_cold).
+ * Docs manual: `make docs-manual-screenshots` / `make docs-manual-screenshots-setup`.
  */
 const cold = process.env.PLAYWRIGHT_COLD === '1';
+const manual = process.env.PLAYWRIGHT_MANUAL === '1';
 const isolated = process.env.PLAYWRIGHT_ISOLATED === '1';
 const baseURL =
   process.env.PLAYWRIGHT_BASE_URL ??
@@ -22,13 +24,18 @@ const workers = process.env.PLAYWRIGHT_WORKERS
     ? 2
     : 4;
 
+const desktopManual = {
+  ...devices['Desktop Chrome'],
+  viewport: { width: 1440, height: 900 },
+};
+
 export default defineConfig({
   testDir: './e2e',
-  fullyParallel: !cold,
+  fullyParallel: !cold && !manual,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 1,
-  workers: cold ? 1 : workers,
-  timeout: cold ? 600_000 : 60_000,
+  workers: cold || manual ? 1 : workers,
+  timeout: cold || manual ? 600_000 : 60_000,
   expect: { timeout: cold ? 60_000 : 15_000 },
   reporter: process.env.CI ? [['github'], ['list']] : [['list'], ['html', { open: 'never' }]],
   outputDir: 'test-results',
@@ -41,33 +48,59 @@ export default defineConfig({
     locale: 'en-US',
     navigationTimeout: cold ? 120_000 : 45_000,
     actionTimeout: 15_000,
-    // Prefer DOM ready over full load — FrankenPHP/WSL often stalls on "load".
-    // Specs that need networkidle still override per-call.
   },
-  projects: cold
-    ? [
-        {
-          name: 'cold',
-          testMatch: /cold\/.*\.spec\.ts/,
-          use: {
-            ...devices['Desktop Chrome'],
-            storageState: { cookies: [], origins: [] },
+  projects:
+    cold && manual
+      ? [
+          {
+            name: 'manual-setup',
+            testMatch: /manual\/capture-setup\.spec\.ts/,
+            use: {
+              ...desktopManual,
+              storageState: { cookies: [], origins: [] },
+            },
           },
-        },
-      ]
-    : [
-        {
-          name: 'setup',
-          testMatch: /auth\.setup\.ts/,
-        },
-        {
-          name: 'chromium',
-          use: {
-            ...devices['Desktop Chrome'],
-            storageState: authFile,
-          },
-          dependencies: ['setup'],
-          testIgnore: [/auth\.setup\.ts/, /cold\//],
-        },
-      ],
+        ]
+      : cold
+        ? [
+            {
+              name: 'cold',
+              testMatch: /cold\/.*\.spec\.ts/,
+              use: {
+                ...devices['Desktop Chrome'],
+                storageState: { cookies: [], origins: [] },
+              },
+            },
+          ]
+        : manual
+          ? [
+              {
+                name: 'setup',
+                testMatch: /auth\.setup\.ts/,
+              },
+              {
+                name: 'manual',
+                testMatch: /manual\/capture-screens\.spec\.ts/,
+                use: {
+                  ...desktopManual,
+                  storageState: authFile,
+                },
+                dependencies: ['setup'],
+              },
+            ]
+          : [
+              {
+                name: 'setup',
+                testMatch: /auth\.setup\.ts/,
+              },
+              {
+                name: 'chromium',
+                use: {
+                  ...devices['Desktop Chrome'],
+                  storageState: authFile,
+                },
+                dependencies: ['setup'],
+                testIgnore: [/auth\.setup\.ts/, /cold\//, /manual\//],
+              },
+            ],
 });
