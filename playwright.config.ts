@@ -12,13 +12,19 @@ const baseURL =
 const authFile =
   process.env.PLAYWRIGHT_AUTH_FILE ??
   (isolated ? 'e2e/.auth/admin.e2e.json' : 'e2e/.auth/admin.json');
+/** Multi-worker against smoke DB (REQ-QA-003). Serial debug: PLAYWRIGHT_WORKERS=1 */
+const workers = process.env.PLAYWRIGHT_WORKERS
+  ? Number(process.env.PLAYWRIGHT_WORKERS)
+  : process.env.CI
+    ? 2
+    : 4;
 
 export default defineConfig({
   testDir: './e2e',
-  fullyParallel: false,
+  fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 1,
-  workers: 1,
+  workers,
   timeout: 60_000,
   expect: { timeout: 15_000 },
   reporter: process.env.CI ? [['github'], ['list']] : [['list'], ['html', { open: 'never' }]],

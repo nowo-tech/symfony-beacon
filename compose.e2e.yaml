@@ -17,6 +17,10 @@ services:
       # Force isolation for keys Make always sets on the process env (see DC_E2E).
       MYSQL_DATABASE: ${MYSQL_DATABASE:-app_e2e}
       DEFAULT_URI: ${DEFAULT_URI:-https://localhost:9460}
+      # Default worker for E2E; override: E2E_FRANKENPHP_MODE=classic make up-e2e
+      FRANKENPHP_MODE: ${FRANKENPHP_MODE:-worker}
+      FRANKENPHP_WORKER_NUM: ${FRANKENPHP_WORKER_NUM:-4}
+      FRANKENPHP_RESET_KERNEL: ${FRANKENPHP_RESET_KERNEL:-false}
     volumes:
       - ./:/app
       # Bind-mount covers /app; these named volumes shadow cache/log for the E2E project.

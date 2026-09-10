@@ -1,5 +1,5 @@
 .PHONY: ensure-env  help up up-infra up-prod up-shared down down-infra down-shared build build-prod logs shell console beacon-test beacon-suite seed seed-platform seed-sample dogfood reclaim-demo-client-env bootstrap ready migrate classic worker restart reload-env reload-env-if-beacon-dsn-stale mysql messenger-logs vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
-	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage test-unit-js test-unit-js-coverage test-e2e test-e2e-isolated up-e2e down-e2e ensure-e2e-env ensure-e2e-db ensure-e2e-up ready-e2e seed-e2e kit-smoke qa qa-fix secrets-scan composer-outdated update-deps \
+	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage test-unit-js test-unit-js-coverage test-e2e test-e2e-isolated test-e2e-worker-safe test-e2e-worker-safe-classic up-e2e down-e2e ensure-e2e-env ensure-e2e-db ensure-e2e-up ready-e2e ready-e2e-lite seed-e2e kit-smoke qa qa-fix secrets-scan composer-outdated update-deps \
 	setup-hooks check-no-cursor-coauthor check-module-boundaries strip-cursor-coauthor-from-history check-envelope-goldens ensure-up ensure-halite-secrets print-urls bootstrap-shared-db
 
 # App Compose (dev). Infra is a separate project (`shared-infra` via compose.infra.yaml).
@@ -24,6 +24,12 @@ E2E_HTTP_PORT ?= 9085
 E2E_HTTPS_PORT ?= 9460
 E2E_MYSQL_DATABASE ?= app_e2e
 E2E_REDIS_DB ?= 1
+# FrankenPHP HTTP mode for isolated E2E (compose.yaml `environment:` needs a process env).
+E2E_FRANKENPHP_MODE ?= worker
+# Default 4 FrankenPHP worker processes for product E2E parallelism.
+# Worker-safe suite (`make test-e2e-worker-safe`) forces NUM=1 so contexts share one Kernel.
+E2E_FRANKENPHP_WORKER_NUM ?= 4
+E2E_FRANKENPHP_RESET_KERNEL ?= false
 # BeaconBundle on the E2E stack: self (app_e2e issues @ :9460) | dogfood (report into :9447 project) | off
 E2E_BEACON_TARGET ?= self
 PLAYWRIGHT_E2E_BASE_URL ?= https://localhost:$(E2E_HTTPS_PORT)
@@ -36,6 +42,9 @@ PLAYWRIGHT_E2E_BASE_URL ?= https://localhost:$(E2E_HTTPS_PORT)
 DC_E2E := HTTP_PORT=$(E2E_HTTP_PORT) HTTPS_PORT=$(E2E_HTTPS_PORT) HTTP3_PORT=$(E2E_HTTPS_PORT) \
 	DEFAULT_URI=https://localhost:$(E2E_HTTPS_PORT) \
 	MYSQL_DATABASE=$(E2E_MYSQL_DATABASE) \
+	FRANKENPHP_MODE=$(E2E_FRANKENPHP_MODE) \
+	FRANKENPHP_WORKER_NUM=$(E2E_FRANKENPHP_WORKER_NUM) \
+	FRANKENPHP_RESET_KERNEL=$(E2E_FRANKENPHP_RESET_KERNEL) \
 	REDIS_URL=redis://$${REDIS_HOST:-redis-8.10.0}:$${REDIS_PORT:-6379}/$(E2E_REDIS_DB) \
 	MESSENGER_TRANSPORT_DSN=redis://$${REDIS_HOST:-redis-8.10.0}:$${REDIS_PORT:-6379}?dbindex=$(E2E_REDIS_DB) \
 	COMPOSE_PROJECT_NAME=symfony-beacon-e2e COMPOSE_ENV_FILES=$(E2E_ENV_FILE) \
@@ -100,6 +109,8 @@ help:
 	@echo "  make test-unit-js-coverage  Vitest + V8 coverage → var/coverage-js/"
 	@echo "  make test-e2e        Playwright E2E against dogfood stack (make up + seed[+sample]; mutates MYSQL_DATABASE)"
 	@echo "  make test-e2e-isolated  Playwright against isolated stack (app_e2e / :$(E2E_HTTPS_PORT); needs make ready-e2e)"
+	@echo "  make test-e2e-worker-safe  FrankenPHP worker Kernel isolation (WORKER_NUM=1, RESET=false; e2e/worker)"
+	@echo "  make test-e2e-worker-safe-classic  Same probe under FRANKENPHP_MODE=classic (contrast)"
 	@echo "  make up-e2e          Start isolated E2E Compose project (does not stop dogfood stack)"
 	@echo "  make ready-e2e       Migrate + seed + seed-sample on app_e2e"
 	@echo "  make down-e2e        Stop isolated E2E Compose project (keeps app_e2e schema)"
@@ -494,6 +505,9 @@ ensure-e2e-env: ensure-env
 	@E2E_HTTP_PORT="$(E2E_HTTP_PORT)" E2E_HTTPS_PORT="$(E2E_HTTPS_PORT)" \
 		E2E_MYSQL_DATABASE="$(E2E_MYSQL_DATABASE)" E2E_REDIS_DB="$(E2E_REDIS_DB)" \
 		E2E_BEACON_TARGET="$(E2E_BEACON_TARGET)" \
+		E2E_FRANKENPHP_MODE="$(E2E_FRANKENPHP_MODE)" \
+		E2E_FRANKENPHP_WORKER_NUM="$(E2E_FRANKENPHP_WORKER_NUM)" \
+		E2E_FRANKENPHP_RESET_KERNEL="$(E2E_FRANKENPHP_RESET_KERNEL)" \
 		E2E_ENV_DIST="$(E2E_ENV_DIST)" E2E_ENV_FILE="$(E2E_ENV_FILE)" ./.scripts/ensure-e2e-env.sh
 
 ensure-e2e-db: up-infra ensure-e2e-env
@@ -549,6 +563,14 @@ ready-e2e: ensure-e2e-up
 	$(DC_E2E) exec -T php bin/console app:seed-sample --size=$${PROFILE:-dev}
 	@echo "E2E DB ready. Run: make test-e2e-isolated"
 
+# Migrate + demo seed only (no sample telemetry) — enough for auth + worker-safe.
+ready-e2e-lite: ensure-e2e-up
+	@$(DC_E2E) exec -T php sh -c 'mkdir -p var/secrets && chmod 770 var/secrets'
+	$(DC_E2E) exec -T php bin/console doctrine:migrations:migrate -n
+	$(DC_E2E) exec -T php bin/console messenger:setup-transports --no-interaction
+	@$(MAKE) seed-e2e
+	@echo "E2E DB lite ready (no sample). Run: make test-e2e-worker-safe"
+
 test-e2e-isolated: ensure-e2e-up
 	@$(DC_E2E) exec -T php bin/console dbal:run-sql "DELETE FROM login_attempts" >/dev/null 2>&1 || true
 	@$(DC_E2E) exec -T php sh -c 'mkdir -p var/e2e && bin/console app:notifications:flush-digests --force > var/e2e/flush-digests.last 2>&1'
@@ -559,6 +581,10 @@ ifeq ($(PLAYWRIGHT_ON_HOST),1)
 	PLAYWRIGHT_MAILPIT_URL="$(PLAYWRIGHT_MAILPIT_URL)" \
 	PLAYWRIGHT_REQUIRE_MAILPIT="$(PLAYWRIGHT_REQUIRE_MAILPIT)" \
 	PLAYWRIGHT_REQUIRE_SAMPLE="$(PLAYWRIGHT_REQUIRE_SAMPLE)" \
+	PLAYWRIGHT_WORKERS="$(PLAYWRIGHT_WORKERS)" \
+	PLAYWRIGHT_EXPECT_FRANKENPHP_MODE="$(PLAYWRIGHT_EXPECT_FRANKENPHP_MODE)" \
+	PLAYWRIGHT_EXPECT_RESET_KERNEL="$(PLAYWRIGHT_EXPECT_RESET_KERNEL)" \
+	PLAYWRIGHT_EXPECT_WORKER_NUM="$(PLAYWRIGHT_EXPECT_WORKER_NUM)" \
 	pnpm exec playwright test $(ARGS)
 else
 	docker run --rm --network=host \
@@ -570,12 +596,61 @@ else
 		-e PLAYWRIGHT_MAILPIT_URL="$(PLAYWRIGHT_MAILPIT_URL)" \
 		-e PLAYWRIGHT_REQUIRE_SAMPLE="$(PLAYWRIGHT_REQUIRE_SAMPLE)" \
 		-e PLAYWRIGHT_REQUIRE_MAILPIT="$(PLAYWRIGHT_REQUIRE_MAILPIT)" \
+		-e PLAYWRIGHT_WORKERS="$(PLAYWRIGHT_WORKERS)" \
+		-e PLAYWRIGHT_EXPECT_FRANKENPHP_MODE="$(PLAYWRIGHT_EXPECT_FRANKENPHP_MODE)" \
+		-e PLAYWRIGHT_EXPECT_RESET_KERNEL="$(PLAYWRIGHT_EXPECT_RESET_KERNEL)" \
+		-e PLAYWRIGHT_EXPECT_WORKER_NUM="$(PLAYWRIGHT_EXPECT_WORKER_NUM)" \
 		-e CI="$(CI)" \
 		-e HOME=/tmp \
 		-e XDG_CACHE_HOME=/tmp/.cache \
 		$(PLAYWRIGHT_IMAGE) \
 		bash -lc 'mkdir -p /tmp/.cache && ./node_modules/.bin/playwright test $(ARGS)'
 endif
+
+# FrankenPHP shared-Kernel hygiene (not product catalog). Forces 1 PHP worker + RESET=false.
+# Prereq: make up-e2e && make ready-e2e (or seed-e2e after migrate).
+test-e2e-worker-safe: ensure-e2e-up
+	@$(MAKE) ensure-e2e-env \
+		E2E_FRANKENPHP_MODE=worker \
+		E2E_FRANKENPHP_WORKER_NUM=1 \
+		E2E_FRANKENPHP_RESET_KERNEL=false
+	$(DC_E2E) up -d --force-recreate php
+	@echo "Waiting for E2E worker /health/live…"
+	@for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do \
+		if curl -kfsS "$(PLAYWRIGHT_E2E_BASE_URL)/health/live" >/dev/null 2>&1; then break; fi; \
+		sleep 2; \
+	done
+	@$(DC_E2E) exec -T php printenv FRANKENPHP_MODE FRANKENPHP_WORKER_NUM FRANKENPHP_RESET_KERNEL || true
+	$(MAKE) test-e2e-isolated \
+		PLAYWRIGHT_WORKERS=1 \
+		PLAYWRIGHT_EXPECT_FRANKENPHP_MODE=worker \
+		PLAYWRIGHT_EXPECT_RESET_KERNEL=false \
+		PLAYWRIGHT_EXPECT_WORKER_NUM=1 \
+		ARGS='e2e/worker $(ARGS)'
+
+# Contrast: same suite under classic (runtime probe only; isolation tests skip).
+test-e2e-worker-safe-classic: ensure-e2e-up
+	@$(MAKE) ensure-e2e-env \
+		E2E_FRANKENPHP_MODE=classic \
+		E2E_FRANKENPHP_WORKER_NUM=1 \
+		E2E_FRANKENPHP_RESET_KERNEL=false
+	$(DC_E2E) up -d --force-recreate php
+	@for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do \
+		if curl -kfsS "$(PLAYWRIGHT_E2E_BASE_URL)/health/live" >/dev/null 2>&1; then break; fi; \
+		sleep 2; \
+	done
+	$(MAKE) test-e2e-isolated \
+		PLAYWRIGHT_WORKERS=1 \
+		PLAYWRIGHT_EXPECT_FRANKENPHP_MODE=classic \
+		PLAYWRIGHT_EXPECT_RESET_KERNEL=false \
+		PLAYWRIGHT_EXPECT_WORKER_NUM= \
+		ARGS='e2e/worker $(ARGS)'
+	@# Restore default E2E worker contract after classic contrast.
+	@$(MAKE) ensure-e2e-env \
+		E2E_FRANKENPHP_MODE=worker \
+		E2E_FRANKENPHP_WORKER_NUM=1 \
+		E2E_FRANKENPHP_RESET_KERNEL=false
+	$(DC_E2E) up -d --force-recreate php
 
 # Fast AuthKit / identity smoke after kit bumps (see docs/CONTRIBUTING.md).
 kit-smoke: ensure-up
