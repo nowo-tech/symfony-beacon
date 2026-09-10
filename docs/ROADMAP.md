@@ -326,7 +326,7 @@ Baseline is solid for self-hosted use: AuthKit + login throttle, CSRF on privile
 | 6.60 | **FrankenPHP worker-safe E2E**: `/health/live` runtime probe; isolated stack `worker` + `WORKER_NUM=4` + `RESET=false`; Playwright multi-worker; `make test-e2e-worker-safe` (`NUM=1` Kernel isolation) + CI job | Beacon | `108-frankenphp-worker-safe-e2e` | **Done** (v1.26.0) |
 | 6.61 | **Operator project preload**: `app:preload-projects` (UUID-safe, transactional, `--dry-run`); devops-owned bundle + optional api-keys; extends `089` portability | Beacon | `109-operator-project-preload` | **Done** (v1.25.0; spec folder retroactive) |
 | 6.62 | **E2E cold-start circuit**: disposable `app_e2e_cold` / `:9461`; wipe → SiteBackup `/setup` API → wizard admin login; covers SETUP-01/07 + AUTH-10; CI job `e2e-cold` | Beacon | `110-e2e-cold-start-circuit` | **Done** (v1.27.0) |
-| 6.63 | **Product UI manual**: English `docs/manual/` + fixed 1440×900 Playwright captures (warm inventory + cold setup); theme/locale demos once public + private; `make docs-manual-screenshots{,-setup}` | Beacon | `111-product-ui-manual` | **Implemented** (PR #53) |
+| 6.63 | **Product UI manual**: English `docs/manual/` + fixed 1440×900 Playwright captures (warm inventory + cold setup); theme/locale demos once public + private; `make docs-manual-screenshots{,-setup}` | Beacon | `111-product-ui-manual` | **Done** (v1.28.0; PR #53) |
 
 ### Next (immediate queue)
 
@@ -445,6 +445,7 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v1.25.0** | Operator `app:preload-projects` (`109` / 6.61, UUID-safe, transactional); Composer pins (Symfony **8.1.6**, ORM **3.7**, kits); BreadcrumbKit empty CSRF-only delete host fix; deep E2E catalog |
 | **v1.26.0** | FrankenPHP worker-safe E2E (`108` / 6.60): `/health/live` runtime; isolated worker defaults (`WORKER_NUM=4`); Playwright multi-worker; `test-e2e-worker-safe` + CI |
 | **v1.27.0** | Cold-start E2E (`110` / 6.62): disposable `app_e2e_cold` / `:9461`; wipe → `/setup` API → wizard admin login; CI `e2e-cold`; setup time-limit hardening |
+| **v1.28.0** | Product UI manual (`111` / 6.63): `docs/manual/` + Playwright regenerators; worker-safe Make `WORKER_NUM=1` recreate fix; CS + coverage hardening |
 | **Unreleased** | — |
 | **Next** | Later Phase 6+ (SSO/SAML, WebAuthn, QR SMS OTP, Hotwire Native `008`, …) when specified |
 
@@ -457,4 +458,4 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 1. Pull items from **Later** when prioritized.
 2. Mark rows **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-09-10 (Phase 6.63 product UI manual / `111` PR #53; v1.27.0 cold-start E2E / Phase 6.62; `108` shipped v1.26.0; retroactive `109` preload for v1.25.0 / Phase 6.61).
+Last updated: 2026-09-10 (v1.28.0 product UI manual / Phase 6.63 / `111`; v1.27.0 cold-start E2E / Phase 6.62; `108` shipped v1.26.0; retroactive `109` preload for v1.25.0 / Phase 6.61).

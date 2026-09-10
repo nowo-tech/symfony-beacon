@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.27.0)](#unreleased-main-after-1270)
+- [Unreleased (main after 1.28.0)](#unreleased-main-after-1280)
+- [Upgrading from 1.27.0 to 1.28.0](#upgrading-from-1270-to-1280)
 - [Upgrading from 1.26.0 to 1.27.0](#upgrading-from-1260-to-1270)
 - [Upgrading from 1.25.0 to 1.26.0](#upgrading-from-1250-to-1260)
 - [Upgrading from 1.24.5 to 1.25.0](#upgrading-from-1245-to-1250)
@@ -99,11 +100,33 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.27.0)
+## Unreleased (main after 1.28.0)
 
 _No unreleased operator-facing steps yet._
 
 See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
+
+## Upgrading from 1.27.0 to 1.28.0
+
+Product UI manual (`docs/manual/`), worker-safe Make env fix, PHP-CS-Fixer + PHPUnit coverage hardening. **No migrations. No Composer pin changes.**
+
+1. Pull / checkout `v1.28.0`.
+
+2. No `composer install` required solely for this release (pins unchanged).
+
+3. Optional — browse the English product UI manual: [manual/README.md](manual/README.md). Regenerators (warm + cold setup):
+   ```bash
+   make docs-manual-screenshots
+   make docs-manual-screenshots-setup
+   ```
+
+4. Optional — re-verify FrankenPHP worker-safe E2E (now correctly forces `WORKER_NUM=1` on recreate):
+   ```bash
+   make up-e2e && make ready-e2e-lite
+   make test-e2e-worker-safe
+   ```
+
+See [CHANGELOG.md](CHANGELOG.md) `[1.28.0]` and `specs/111-product-ui-manual/`.
 
 ## Upgrading from 1.26.0 to 1.27.0
 

@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _No unreleased operator-facing changes yet._
 
+## [1.28.0] - 2026-09-10
+
+### Added
+
+- **Product UI manual (Phase 6.63 / `111`):** English operator guide under [`docs/manual/`](manual/) with fixed **1440×900** Playwright screenshots (warm product inventory + cold setup wizard). Theme/locale preference demos once on public (`/login`) and private (`/dashboard`). Make: `docs-manual-screenshots` / `docs-manual-screenshots-setup`. Spec: `specs/111-product-ui-manual/`.
+
+### Fixed
+
+- **`make test-e2e-worker-safe`:** force-recreate PHP with `E2E_FRANKENPHP_WORKER_NUM=1` on the same Make invocation that expands `DC_E2E` (process env was overriding `.env.e2e.local` and leaving `worker_num=4`).
+- **PHP-CS-Fixer:** style drift on a handful of PHP sources that failed `php-cs-fixer check` in CI.
+- **PHPUnit coverage:** close remaining includable gaps (preload command apply paths, WebPush body branches, CSP empty-nonce stamp, CSRF form extension early return, portability UUID create return).
+
+### Notes for integrators
+
+- Docs / QA / Make only — **no** Doctrine migrations and **no** Composer pin changes.
+- Optional: regenerate manual images with `make docs-manual-screenshots` (warm stack) and `make docs-manual-screenshots-setup` (cold setup).
+- See [UPGRADING.md](UPGRADING.md) **Upgrading from 1.27.0 to 1.28.0**.
+
 ## [1.27.0] - 2026-09-10
 
 ### Added
@@ -1663,7 +1681,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.27.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.28.0...HEAD
+[1.28.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.27.0...v1.28.0
 [1.27.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.26.0...v1.27.0
 [1.26.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.25.0...v1.26.0
 [1.25.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.24.5...v1.25.0
