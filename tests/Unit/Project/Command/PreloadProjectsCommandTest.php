@@ -264,20 +264,23 @@ final class PreloadProjectsCommandTest extends TestCase
         $users->method('findOneByEmail')->willReturn($admin);
         $users->method('findIndexedByEmails')->willReturn([]);
 
-        $storedProject = null;
+        $holder = new class {
+            public ?Project $project = null;
+        };
         $projects = $this->createMock(ProjectRepository::class);
         $projects->method('findOneBy')->willReturnCallback(
-            static function (array $criteria) use (&$storedProject): ?Project {
-                if (isset($criteria['code']) && $storedProject instanceof Project && $storedProject->getCode() === $criteria['code']) {
-                    return $storedProject;
+            static function (array $criteria) use ($holder): ?Project {
+                $stored = $holder->project;
+                if (!isset($criteria['code']) || !$stored instanceof Project) {
+                    return null;
                 }
 
-                return null;
+                return $stored->getCode() === $criteria['code'] ? $stored : null;
             },
         );
         $projects->expects(self::atLeastOnce())->method('save')->willReturnCallback(
-            static function (Project $project) use (&$storedProject): void {
-                $storedProject = $project;
+            static function (Project $project) use ($holder): void {
+                $holder->project = $project;
             },
         );
         $projects->expects(self::once())->method('hydrateMembershipsForProjects');
@@ -310,8 +313,8 @@ final class PreloadProjectsCommandTest extends TestCase
             self::assertStringContainsString('skip public_key already present (existing-public)', $tester->getDisplay());
             self::assertStringContainsString('created key label=preload project=acme public=created-public', $tester->getDisplay());
             self::assertStringContainsString('API keys created=1 skipped=1', $tester->getDisplay());
-            self::assertInstanceOf(Project::class, $storedProject);
-            self::assertCount(2, $storedProject->getApiKeys());
+            self::assertInstanceOf(Project::class, $holder->project);
+            self::assertCount(2, $holder->project->getApiKeys());
         } finally {
             unlink($bundle);
             unlink($keys);

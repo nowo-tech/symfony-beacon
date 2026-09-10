@@ -211,13 +211,12 @@ final class PreloadProjectsCommand extends Command
         $payload = $this->readJsonObject($path);
         // Shape already validated in dry-run / pre-flight; re-check for safety.
         $this->validateApiKeysFile($path);
+        /** @var list<array<string, mixed>> $rows */
         $rows = $payload['keys'];
-        \assert(\is_array($rows));
 
         $created = 0;
         $skipped = 0;
         foreach ($rows as $i => $row) {
-            \assert(\is_array($row));
             $code = strtolower(trim((string) ($row['project_code'] ?? '')));
             $label = trim((string) ($row['label'] ?? 'preload'));
             $publicKey = trim((string) ($row['public_key'] ?? ''));
