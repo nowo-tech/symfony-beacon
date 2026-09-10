@@ -371,6 +371,99 @@ jobs:
           docker compose --profile hmr --profile mail down -v || true
           make down-infra || true
 
+  e2e-worker-safe:
+    name: E2E FrankenPHP worker-safe
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      CI: "1"
+      COMPOSER_ALLOW_SUPERUSER: "1"
+      PLAYWRIGHT_REQUIRE_SAMPLE: "0"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Prepare environment
+        run: cp .env.dist .env.local
+
+      - name: Start shared infra (MySQL + Redis)
+        run: make up-infra
+
+      - name: Build image + vendor
+        run: |
+          docker compose build
+          docker compose run --rm --no-deps php \
+            composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Start isolated E2E stack (worker, num=4; worker-safe forces num=1)
+        run: |
+          make up-e2e
+          NET="$(grep -E '^SHARED_DOCKER_NETWORK=' .env.local | cut -d= -f2- || true)"
+          NET="${NET:-server_network}"
+          for svc in php messenger messenger-notify; do
+            cid="$(docker compose -p symfony-beacon-e2e ps -q "$svc" 2>/dev/null || true)"
+            if [ -n "$cid" ]; then
+              docker network connect "$NET" "$cid" 2>/dev/null || true
+            fi
+          done
+          for i in $(seq 1 60); do
+            if curl -kfsS https://localhost:9460/health/live >/dev/null 2>&1 \
+              && docker compose -p symfony-beacon-e2e exec -T php test -f vendor/autoload_runtime.php; then
+              echo "E2E stack live"
+              curl -kfsS https://localhost:9460/health/live | tee /tmp/e2e-live.json
+              exit 0
+            fi
+            echo "Waiting for E2E HTTPS… (${i}/60)"
+            sleep 5
+          done
+          docker compose -p symfony-beacon-e2e logs --tail=200
+          exit 1
+
+      - name: Setup Node (host Playwright deps mount)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@10.12.4 --activate
+
+      - name: Ensure node_modules on host
+        run: |
+          sudo chown -R "$(id -u):$(id -g)" node_modules vendor public/build 2>/dev/null || true
+          if [ ! -d node_modules/@playwright/test ]; then
+            pnpm install --frozen-lockfile
+          fi
+
+      - name: Build frontend assets
+        run: make vite-build
+
+      - name: Seed E2E lite (no sample)
+        run: make ready-e2e-lite
+
+      - name: Playwright worker-safe
+        run: make test-e2e-worker-safe
+
+      - name: Upload Playwright artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-worker-safe-report
+          path: |
+            playwright-report
+            test-results
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Tear down
+        if: always()
+        run: |
+          make down-e2e || true
+          make down-infra || true
+
   docker:
     name: Docker build
     runs-on: ubuntu-latest
