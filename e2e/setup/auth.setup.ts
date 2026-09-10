@@ -53,7 +53,8 @@ setup('authenticate as demo admin', async ({ page }) => {
   await page.locator('input[name="login_form[_password]"]').fill(password);
   await page.locator('.nowo-auth-kit__panel button[type="submit"], form[name="login_form"] button[type="submit"]').first().click();
 
-  await page.waitForURL(/\/dashboard(\?|$)/, { timeout: 45_000 });
+  // FrankenPHP/WSL often never fires full "load"; DOM ready is enough for storageState.
+  await page.waitForURL(/\/dashboard(\?|$)/, { timeout: 45_000, waitUntil: 'domcontentloaded' });
   await dismissProductTour(page);
 
   await page.context().storageState({ path: authFile });

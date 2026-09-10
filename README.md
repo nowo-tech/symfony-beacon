@@ -196,6 +196,7 @@ CI runs PHPUnit on every push/PR and a separate **Coverage** job (PCOV) that upl
 
 Index: **[docs/README.md](docs/README.md)** (canonical manuals + categorized guides).
 
+- [Product UI manual (screenshots)](docs/manual/README.md)
 - [Install & seed layers](docs/INSTALL.md)
 - [Architecture rationale](docs/ARCHITECTURE.md)
 - [Database schema (Mermaid ER)](docs/dev/DATABASE.md)
