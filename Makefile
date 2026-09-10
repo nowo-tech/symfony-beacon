@@ -1,5 +1,5 @@
 .PHONY: ensure-env  help up up-infra up-prod up-shared down down-infra down-shared build build-prod logs shell console beacon-test beacon-suite seed seed-platform seed-sample dogfood reclaim-demo-client-env bootstrap ready migrate classic worker restart reload-env reload-env-if-beacon-dsn-stale mysql messenger-logs vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
-	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage test-unit-js test-unit-js-coverage test-e2e test-e2e-isolated test-e2e-worker-safe test-e2e-worker-safe-classic test-e2e-cold docs-manual-screenshots docs-manual-screenshots-setup up-e2e down-e2e up-e2e-cold down-e2e-cold wipe-e2e-cold ensure-e2e-env ensure-e2e-db ensure-e2e-up ready-e2e ready-e2e-lite seed-e2e kit-smoke qa qa-fix secrets-scan composer-outdated update-deps \
+	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage test-unit-js test-unit-js-coverage test-e2e test-e2e-isolated test-e2e-worker-safe test-e2e-worker-safe-classic test-e2e-cold docs-manual-screenshots docs-manual-screenshots-setup wiki-push-home up-e2e down-e2e up-e2e-cold down-e2e-cold wipe-e2e-cold ensure-e2e-env ensure-e2e-db ensure-e2e-up ready-e2e ready-e2e-lite seed-e2e kit-smoke qa qa-fix secrets-scan composer-outdated update-deps \
 	setup-hooks check-no-cursor-coauthor check-module-boundaries strip-cursor-coauthor-from-history check-envelope-goldens ensure-up ensure-halite-secrets print-urls bootstrap-shared-db
 
 # App Compose (dev). Infra is a separate project (`shared-infra` via compose.infra.yaml).
@@ -127,6 +127,7 @@ help:
 	@echo "  make test-e2e-cold   Cold-start circuit (empty app_e2e_cold / :$(E2E_COLD_HTTPS_PORT); wipe + /setup → login)"
 	@echo "  make docs-manual-screenshots  Capture production-like PNGs into docs/manual/images (isolated E2E stack)"
 	@echo "  make docs-manual-screenshots-setup  Setup wizard PNGs (cold stack; wipe + up first)"
+	@echo "  make wiki-push-home  Push docs/wiki/Home.md to GitHub wiki (index → docs/manual links)"
 	@echo "  make wipe-e2e-cold / up-e2e-cold / down-e2e-cold  Disposable cold Compose stack"
 	@echo "  make up-e2e          Start isolated E2E Compose project (does not stop dogfood stack)"
 	@echo "  make ready-e2e       Migrate + seed + seed-sample on app_e2e"
@@ -654,6 +655,12 @@ else
 		bash -lc 'mkdir -p /tmp/.cache docs/manual/images && ./node_modules/.bin/playwright test e2e/manual/capture-screens.spec.ts --retries=0'
 endif
 	@echo "Screenshots written to docs/manual/images/ — see docs/manual/README.md"
+
+# Push docs/wiki/Home.md to the GitHub wiki Home (chapter index linking into docs/manual/).
+# One-time: open https://github.com/nowo-tech/symfony-beacon/wiki and Create the first page if clone fails.
+wiki-push-home:
+	@chmod +x .scripts/wiki-push-home.sh
+	@sh .scripts/wiki-push-home.sh
 
 # Setup wizard shots against disposable cold stack (never against warm app_e2e / dogfood).
 # Prereq: make wipe-e2e-cold && make up-e2e-cold

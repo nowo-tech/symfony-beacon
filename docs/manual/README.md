@@ -2,6 +2,8 @@
 
 Operator guide for the self-hosted Beacon web UI. Screenshots are English, day-theme captures at a fixed viewport (development overlays removed).
 
+**Wiki index:** [symfony-beacon/wiki](https://github.com/nowo-tech/symfony-beacon/wiki) (chapter table linking here). Canonical wiki Home source: [`docs/wiki/Home.md`](../wiki/Home.md) — push with `make wiki-push-home`.
+
 ## Conventions
 
 | Item | Value |
