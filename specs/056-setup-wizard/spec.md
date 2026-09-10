@@ -120,3 +120,7 @@ Browser automation of US1 / FR-014 + full guided `fresh_install` + wizard admin 
 | Host | `SetupAdvanceTimeLimitSubscriber` + `max_execution_time=900` aligned with `process_timeout` |
 
 Cross-ref: `specs/110-e2e-cold-start-circuit/`, `e2e/README.md`.
+
+### 2026-09-10 — Product UI manual setup shots (`111` / Phase 6.63)
+
+Operator-facing setup screenshots for `docs/manual/00-setup.md` reuse this cold stack via `make docs-manual-screenshots-setup` (not the assert circuit). Cross-ref: `specs/111-product-ui-manual/`.

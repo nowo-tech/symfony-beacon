@@ -62,5 +62,6 @@
 - Setup product: `specs/056-setup-wizard/`
 - Warm E2E: `specs/104-isolated-e2e-stack/`, `e2e/smoke/use-cases-setup-warm.spec.ts`
 - Worker-safe (warm): `specs/108-frankenphp-worker-safe-e2e/`
+- Product UI manual (setup screenshots on this stack): `specs/111-product-ui-manual/`
 - Catalog: `docs/product/E2E-USE-CASES.md`
 - Quickstart: `specs/110-e2e-cold-start-circuit/quickstart.md`
