@@ -12,7 +12,7 @@
 | ID | Area | Deliverable |
 |----|------|-------------|
 | I1 | Compose | `compose.e2e.yaml` + versioned `.env.e2e.dist` → generated `.env.e2e.local` (gitignored); project `symfony-beacon-e2e` (`-p`); ports `:9085` / `:9460`; Redis DB index `1`; named volumes for `var/cache` / `var/log` |
-| I2 | Make | `up-e2e` / `ready-e2e` / `ready-e2e-lite` / `seed-e2e` / `test-e2e-isolated` / `test-e2e-worker-safe` / `down-e2e`; force process env for ports so a sourced `.env.local` cannot steal bindings |
+| I2 | Make | `up-e2e` / `ready-e2e` / `ready-e2e-lite` / `seed-e2e` / `test-e2e-isolated` / `test-e2e-worker-safe` / `down-e2e`; force process env for ports so a sourced `.env.local` cannot steal bindings. Cold sibling Make targets: see Amendment `110`. |
 | I3 | Seed | `app:seed-demo --server-env-file=.env.e2e.local` writes loopback `BEACON_DSN` only there; `--write-client-env=.demo-client.e2e.env`; never rewrite dogfood `.env.local` |
 | I4 | Playwright | `PLAYWRIGHT_ISOLATED=1` → base URL `:9460`, auth `e2e/.auth/admin.e2e.json`, credentials from `.demo-client.e2e.env` |
 | I5 | Dogfood | `E2E_BEACON_TARGET=self\|dogfood\|off` — E2E BeaconBundle reports into `app_e2e` (default), dogfood project, or nowhere |
@@ -108,3 +108,16 @@ Extends the isolated stack (does **not** replace product catalog E2E):
 | Probe | `/health/live` `runtime` block — see `specs/108-frankenphp-worker-safe-e2e/` |
 
 Cross-ref: `specs/108-frankenphp-worker-safe-e2e/` (shipped **v1.26.0**), `e2e/README.md`, `docs/ops/FRANKENPHP-CODING.md`.
+
+### 2026-09-10 — Cold-start sibling stack (`110` / Phase 6.62)
+
+Empty-schema install circuit is a **second** Compose project (does **not** replace warm `app_e2e`):
+
+| Area | Behaviour |
+|------|-----------|
+| Isolation | `symfony-beacon-e2e-cold`, `app_e2e_cold`, `:9461` / `:9086`, Redis DB `2`, `.env.e2e.cold.local`, SiteBackup named volume |
+| Make | `wipe-e2e-cold` / `up-e2e-cold` / `test-e2e-cold` / `down-e2e-cold`; parameterized `DC_E2E` |
+| Runtime | FrankenPHP **classic** (wizard migrate/seed); warm stack stays worker-default |
+| Playwright | `PLAYWRIGHT_COLD=1` project `cold`; warm `chromium` `testIgnore`s `e2e/cold/` |
+
+Cross-ref: `specs/110-e2e-cold-start-circuit/`, `e2e/README.md`.

@@ -100,6 +100,7 @@ As a maintainer, GitHub Actions runs an isolated worker-safe job in addition to 
 
 - Coding contract: `docs/ops/FRANKENPHP-CODING.md`
 - Isolated stack base: `specs/104-isolated-e2e-stack/`
+- Cold-start circuit (classic, empty DB): `specs/110-e2e-cold-start-circuit/` — separate Compose project; not worker-isolation
 - PHPStan gate: `specs/094-phpstan-frankenphp-110/`
 - Product E2E catalog: `docs/product/E2E-USE-CASES.md` (out of scope for Kernel isolation)
 - Operator guide: `e2e/README.md`

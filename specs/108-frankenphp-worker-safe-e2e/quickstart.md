@@ -34,3 +34,7 @@ docker compose exec -T php vendor/bin/phpunit \
 ```
 
 See `docs/ops/FRANKENPHP-CODING.md` and `e2e/README.md`.
+
+## Cold-start (separate stack)
+
+Empty DB → `/setup` → login lives on `app_e2e_cold` / `:9461` (FrankenPHP **classic**). See `specs/110-e2e-cold-start-circuit/quickstart.md` — do not mix with `test-e2e-worker-safe`.

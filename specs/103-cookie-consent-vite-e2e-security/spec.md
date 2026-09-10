@@ -90,3 +90,7 @@ As a maintainer, CI proves guest redirects, role denials, membership demotion/de
 ## Amendment (Required `di_obs` cookie, 2026-08-25 / `105`)
 
 Device Intelligence cookie `di_obs` is inventoried as **required** account-security (HttpOnly observation pointer; not a credential; not analytics). Seed: `src/Setup/Demo/fixtures/cookie_consent.default.json`. Docs: `docs/product/LEGAL-AND-COOKIES.md`. PWA `cache_version` **v6** (deny `/_device`). See `specs/105-authkit-security-kits/`.
+
+## Amendment (Cold-start E2E circuit, 2026-09-10 / `110`)
+
+Non-goal “empty-DB first user” from this feature’s original Out of scope list is Covered by the disposable cold stack (`110` / Phase 6.62): `make test-e2e-cold`, UC-SETUP-01 / UC-SETUP-07 / UC-AUTH-10. SiteBackup restore (OPS-14) and Later rows remain Out of scope. Cross-ref: `specs/110-e2e-cold-start-circuit/`.

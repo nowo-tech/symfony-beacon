@@ -126,6 +126,16 @@ Original ship retained Playwright **`workers: 1`** for shared-DB stability. As o
 
 Assumptions above about “full suite remains single-worker” are superseded for product runs. Cross-ref: `specs/108-frankenphp-worker-safe-e2e/` (shipped **v1.26.0**), `specs/104-isolated-e2e-stack/`.
 
+## Amendment (Cold-start E2E circuit, 2026-09-10 / `110`)
+
+Empty-DB first user / AuthKit gated until setup / cold wizard (non-goals at `097` ship) are Covered on a disposable stack:
+
+- `make test-e2e-cold` → `e2e/cold/circuit.spec.ts` (UC-SETUP-01 / UC-SETUP-07 / UC-AUTH-10)
+- Does **not** change warm product CI `e2e` or parallel workers
+- Remaining Out of scope: SETUP-02 incomplete catalog, OPS-14 restore, Later roadmap
+
+Cross-ref: `specs/110-e2e-cold-start-circuit/`, `docs/product/E2E-USE-CASES.md`.
+
 ## Amendment (Device-keyed extra limits, 2026-08-25 / `105`)
 
 AuthKit `device_intelligence.device_rate_limit: true` adds a **device-keyed** limit on register / reset / magic. It does **not** replace LoginThrottle nested-username keying (`097` C1 — kit ≥3.2). Login brute-force isolation by username remains required. See `specs/105-authkit-security-kits/`.

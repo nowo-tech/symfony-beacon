@@ -108,3 +108,15 @@ Cold-start previously excluded AuthKit paths so `/login` and `/register` could r
 ### 2026-08-25 — Durable-done short-circuit + device collect (`105`)
 
 SiteBackup **1.13.7+** `setup.short_circuit_when_done: true` (default in kit; Beacon documents it explicitly) so `PlatformCatalogsSetupNeedDetector` MUST NOT reopen `/setup` after durable done. `/_device` is excluded from the setup gate so Device Intelligence collect can run while AuthKit HTML stays gated (FR-014). Pins: SiteBackup **1.13.8**. See `specs/105-authkit-security-kits/`.
+
+### 2026-09-10 — Playwright cold-start circuit (`110` / Phase 6.62)
+
+Browser automation of US1 / FR-014 + full guided `fresh_install` + wizard admin login lives on a disposable stack (`app_e2e_cold` / `:9461`), not the warm smoke DB:
+
+| Area | Behaviour |
+|------|-----------|
+| Make | `wipe-e2e-cold` / `up-e2e-cold` / `test-e2e-cold` — **no** `ready-e2e` |
+| Specs | `e2e/cold/circuit.spec.ts` covers UC-SETUP-01 / UC-SETUP-07 / UC-AUTH-10 |
+| Host | `SetupAdvanceTimeLimitSubscriber` + `max_execution_time=900` aligned with `process_timeout` |
+
+Cross-ref: `specs/110-e2e-cold-start-circuit/`, `e2e/README.md`.
