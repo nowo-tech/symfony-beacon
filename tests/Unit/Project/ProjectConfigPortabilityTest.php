@@ -843,6 +843,43 @@ final class ProjectConfigPortabilityTest extends TestCase
         ], $this->user('actor@example.com', 'Actor'), true);
     }
 
+    public function testUpsertCreatesProjectWithRequestedUuid(): void
+    {
+        $uuid = '0192f3c4-5d6e-7a8b-9c0d-eeeeeeeeeeee';
+        $projectRepo = $this->createMock(ProjectRepository::class);
+        $projectRepo->method('findOneBy')->willReturn(null);
+        $projectRepo->expects(self::atLeastOnce())->method('save');
+        $service = new ProjectConfigPortability(
+            $projectRepo,
+            $this->createStub(UserRepository::class),
+            new PortableUserProvisioner(
+                $this->createStub(UserRepository::class),
+                $this->createStub(UserPasswordHasherInterface::class),
+            ),
+            new ProjectFactory($projectRepo, new ProjectApiKeyFactory($this->createStub(EntityManagerInterface::class))),
+        );
+
+        $upsertMethod = new ReflectionMethod(ProjectConfigPortability::class, 'upsertProject');
+        $project = $upsertMethod->invoke($service, [
+            'code' => 'new-code',
+            'uuid' => $uuid,
+            'slug' => 'new',
+            'name' => 'New',
+            'description' => null,
+            'ingest_enabled' => true,
+            'retention_days' => null,
+            'retention_max_events' => null,
+            'ingest_rate_limit_per_minute' => null,
+            'event_quota_daily' => null,
+            'event_quota_monthly' => null,
+            'memberships' => [],
+        ], $this->user('actor@example.com', 'Actor'), true);
+
+        self::assertInstanceOf(Project::class, $project);
+        self::assertSame($uuid, $project->getUuid());
+        self::assertSame('new-code', $project->getCode());
+    }
+
     private function service(): ProjectConfigPortability
     {
         $projectRepo = $this->createStub(ProjectRepository::class);

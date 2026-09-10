@@ -170,6 +170,17 @@ final class ContentSecurityPolicySubscriberTest extends TestCase
         self::assertNull($method->invoke($subscriber, 'ftp://example.test/resource'));
     }
 
+    public function testStampInlineScriptNoncesReturnsEarlyForEmptyNonce(): void
+    {
+        $method = new ReflectionMethod(ContentSecurityPolicySubscriber::class, 'stampInlineScriptNonces');
+        $subscriber = new ContentSecurityPolicySubscriber(kernelDebug: false);
+        $response = new Response('<script>window.x=1</script>');
+
+        $method->invoke($subscriber, $response, '');
+
+        self::assertSame('<script>window.x=1</script>', $response->getContent());
+    }
+
     /**
      * @param list<string> $connectSrcExtra
      * @param list<string> $scriptSrcExtra

@@ -24,7 +24,7 @@ final class FrankenPhpRuntime
     {
         $read = $env ?? static function (string $key): ?string {
             // Prefer $_SERVER (request/process env). Avoid $_ENV writes elsewhere; reads here are probe-only.
-            if (array_key_exists($key, $_SERVER) && is_scalar($_SERVER[$key])) {
+            if (\array_key_exists($key, $_SERVER) && \is_scalar($_SERVER[$key])) {
                 return (string) $_SERVER[$key];
             }
 
@@ -35,17 +35,17 @@ final class FrankenPhpRuntime
         $mode = \in_array($modeRaw, ['classic', 'worker'], true) ? $modeRaw : 'classic';
 
         $workerFlag = strtolower(trim((string) ($read('FRANKENPHP_WORKER') ?? '')));
-        $frankenphpWorker = $workerFlag === '1' || $workerFlag === 'true';
+        $frankenphpWorker = '1' === $workerFlag || 'true' === $workerFlag;
 
         $resetRaw = strtolower(trim((string) ($read('FRANKENPHP_RESET_KERNEL') ?? 'false')));
         $resetKernel = \in_array($resetRaw, ['1', 'true', 'yes', 'on'], true);
 
         $runtimeMode = $read('APP_RUNTIME_MODE');
-        $runtimeMode = $runtimeMode !== null && $runtimeMode !== '' ? $runtimeMode : null;
+        $runtimeMode = null !== $runtimeMode && '' !== $runtimeMode ? $runtimeMode : null;
 
         $workerNumRaw = $read('FRANKENPHP_WORKER_NUM');
         $workerNum = null;
-        if ($workerNumRaw !== null && $workerNumRaw !== '' && ctype_digit($workerNumRaw)) {
+        if (null !== $workerNumRaw && '' !== $workerNumRaw && ctype_digit($workerNumRaw)) {
             $workerNum = (int) $workerNumRaw;
         }
 

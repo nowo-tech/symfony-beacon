@@ -680,19 +680,26 @@ docs-manual-screenshots-setup:
 
 # FrankenPHP shared-Kernel hygiene (not product catalog). Forces 1 PHP worker + RESET=false.
 # Prereq: make up-e2e && make ready-e2e (or seed-e2e after migrate).
+# IMPORTANT: pass E2E_FRANKENPHP_* on the same Make invocation that expands DC_E2E —
+# process-env FRANKENPHP_WORKER_NUM from DC_E2E overrides .env.e2e.local.
 test-e2e-worker-safe: ensure-e2e-up
 	@$(MAKE) ensure-e2e-env \
 		E2E_FRANKENPHP_MODE=worker \
 		E2E_FRANKENPHP_WORKER_NUM=1 \
 		E2E_FRANKENPHP_RESET_KERNEL=false
-	$(DC_E2E) up -d --force-recreate php
+	@$(MAKE) E2E_FRANKENPHP_MODE=worker E2E_FRANKENPHP_WORKER_NUM=1 E2E_FRANKENPHP_RESET_KERNEL=false \
+		_e2e-force-recreate-php
 	@echo "Waiting for E2E worker /health/live…"
 	@for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do \
 		if curl -kfsS "$(PLAYWRIGHT_E2E_BASE_URL)/health/live" >/dev/null 2>&1; then break; fi; \
 		sleep 2; \
 	done
-	@$(DC_E2E) exec -T php printenv FRANKENPHP_MODE FRANKENPHP_WORKER_NUM FRANKENPHP_RESET_KERNEL || true
+	@$(MAKE) E2E_FRANKENPHP_MODE=worker E2E_FRANKENPHP_WORKER_NUM=1 E2E_FRANKENPHP_RESET_KERNEL=false \
+		_e2e-print-frankenphp-env
 	$(MAKE) test-e2e-isolated \
+		E2E_FRANKENPHP_MODE=worker \
+		E2E_FRANKENPHP_WORKER_NUM=1 \
+		E2E_FRANKENPHP_RESET_KERNEL=false \
 		PLAYWRIGHT_WORKERS=1 \
 		PLAYWRIGHT_EXPECT_FRANKENPHP_MODE=worker \
 		PLAYWRIGHT_EXPECT_RESET_KERNEL=false \
@@ -705,12 +712,16 @@ test-e2e-worker-safe-classic: ensure-e2e-up
 		E2E_FRANKENPHP_MODE=classic \
 		E2E_FRANKENPHP_WORKER_NUM=1 \
 		E2E_FRANKENPHP_RESET_KERNEL=false
-	$(DC_E2E) up -d --force-recreate php
+	@$(MAKE) E2E_FRANKENPHP_MODE=classic E2E_FRANKENPHP_WORKER_NUM=1 E2E_FRANKENPHP_RESET_KERNEL=false \
+		_e2e-force-recreate-php
 	@for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do \
 		if curl -kfsS "$(PLAYWRIGHT_E2E_BASE_URL)/health/live" >/dev/null 2>&1; then break; fi; \
 		sleep 2; \
 	done
 	$(MAKE) test-e2e-isolated \
+		E2E_FRANKENPHP_MODE=classic \
+		E2E_FRANKENPHP_WORKER_NUM=1 \
+		E2E_FRANKENPHP_RESET_KERNEL=false \
 		PLAYWRIGHT_WORKERS=1 \
 		PLAYWRIGHT_EXPECT_FRANKENPHP_MODE=classic \
 		PLAYWRIGHT_EXPECT_RESET_KERNEL=false \
@@ -719,10 +730,17 @@ test-e2e-worker-safe-classic: ensure-e2e-up
 	@# Restore default E2E worker contract after classic contrast.
 	@$(MAKE) ensure-e2e-env \
 		E2E_FRANKENPHP_MODE=worker \
-		E2E_FRANKENPHP_WORKER_NUM=1 \
+		E2E_FRANKENPHP_WORKER_NUM=4 \
 		E2E_FRANKENPHP_RESET_KERNEL=false
+	@$(MAKE) E2E_FRANKENPHP_MODE=worker E2E_FRANKENPHP_WORKER_NUM=4 E2E_FRANKENPHP_RESET_KERNEL=false \
+		_e2e-force-recreate-php
+
+# Internal: recreate php with current E2E_FRANKENPHP_* (must be passed on the Make cmdline).
+_e2e-force-recreate-php:
 	$(DC_E2E) up -d --force-recreate php
 
+_e2e-print-frankenphp-env:
+	@$(DC_E2E) exec -T php printenv FRANKENPHP_MODE FRANKENPHP_WORKER_NUM FRANKENPHP_RESET_KERNEL || true
 # --- Cold-start E2E (empty schema → /setup → login; spec 110 / Phase 6.62) ---
 # Never call ready-e2e / seed-e2e on this stack.
 E2E_COLD_MAKE_VARS = \

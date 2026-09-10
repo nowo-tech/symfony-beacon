@@ -53,7 +53,7 @@ final class DispatchIngestNotificationsHandlerTest extends TestCase
         $projects->method('find')->willReturn($project);
 
         $em = $this->createStub(EntityManagerInterface::class);
-        $em->method('find')->willReturnCallback(static function (string $class, int $id) use ($issue, $tx): object|null {
+        $em->method('find')->willReturnCallback(static function (string $class, int $id) use ($issue, $tx): ?object {
             if (Issue::class === $class && 11 === $id) {
                 return $issue;
             }

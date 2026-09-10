@@ -323,12 +323,7 @@ final readonly class ProjectConfigPortability
         $existing = $this->projectRepository->findOneBy(['code' => $row['code']]);
         if ($existing instanceof Project) {
             if ('' !== $row['uuid'] && $existing->getUuid() !== $row['uuid']) {
-                throw new InvalidArgumentException(\sprintf(
-                    'uuid_mismatch:%s:%s:%s',
-                    $row['code'],
-                    $existing->getUuid(),
-                    $row['uuid'],
-                ));
+                throw new InvalidArgumentException(\sprintf('uuid_mismatch:%s:%s:%s', $row['code'], $existing->getUuid(), $row['uuid']));
             }
             $this->applyProjectFields($existing, $row);
 

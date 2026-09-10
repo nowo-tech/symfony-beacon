@@ -42,4 +42,40 @@ final class WebPushPresentationTest extends TestCase
         self::assertSame('beacon-issue', $payload['tag']);
         self::assertSame('/dashboard', $payload['url']);
     }
+
+    public function testBodyUsesIssuePreviewWithoutProjectName(): void
+    {
+        $payload = (new WebPushPresentation())->enrich(MemberAlertEvent::IssueReopened, [
+            'issue' => ['culprit' => 'CheckoutController::submit'],
+        ]);
+
+        self::assertSame('CheckoutController::submit', $payload['body']);
+    }
+
+    public function testBodyUsesProjectNameWithoutIssuePreview(): void
+    {
+        $payload = (new WebPushPresentation())->enrich(MemberAlertEvent::IssueResolved, [
+            'project' => ['name' => 'Payments'],
+        ]);
+
+        self::assertSame('Payments', $payload['body']);
+    }
+
+    public function testBodyFallsBackToEventTitleWhenSummaryMatchesIt(): void
+    {
+        $payload = (new WebPushPresentation())->enrich(MemberAlertEvent::IssueCommented, [
+            'summary' => 'New comment',
+        ]);
+
+        self::assertSame('New comment', $payload['body']);
+    }
+
+    public function testBodyTruncatesLongSummaryWithEllipsis(): void
+    {
+        $payload = (new WebPushPresentation())->enrich(MemberAlertEvent::IssueNew, [
+            'summary' => str_repeat('a', 111),
+        ]);
+
+        self::assertSame(str_repeat('a', 109).'…', $payload['body']);
+    }
 }

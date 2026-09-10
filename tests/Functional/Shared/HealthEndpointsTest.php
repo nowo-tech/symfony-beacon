@@ -22,7 +22,6 @@ final class HealthEndpointsTest extends DatabaseWebTestCase
         self::assertIsArray($live['runtime'] ?? null);
         self::assertArrayHasKey('frankenphp_mode', $live['runtime']);
 
-
         $client->request(Request::METHOD_GET, '/health/ready');
         self::assertResponseIsSuccessful();
         $payload = json_decode($client->getResponse()->getContent() ?: '[]', true);
