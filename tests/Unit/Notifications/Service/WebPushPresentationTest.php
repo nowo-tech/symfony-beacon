@@ -12,7 +12,7 @@ final class WebPushPresentationTest extends TestCase
 {
     public function testEnrichAddsChromeFieldsForKitServiceWorker(): void
     {
-        $payload = (new WebPushPresentation())->enrich(MemberAlertEvent::IssueAssigned, [
+        $payload = new WebPushPresentation()->enrich(MemberAlertEvent::IssueAssigned, [
             'summary' => 'ignored when issue present',
             'project' => ['name' => 'Demo'],
             'issue' => [
@@ -33,7 +33,7 @@ final class WebPushPresentationTest extends TestCase
 
     public function testEnrichFallsBackToSummaryAndDashboard(): void
     {
-        $payload = (new WebPushPresentation())->enrich(MemberAlertEvent::IssueNew, [
+        $payload = new WebPushPresentation()->enrich(MemberAlertEvent::IssueNew, [
             'summary' => 'New issue: [error] Boom',
         ]);
 
@@ -45,7 +45,7 @@ final class WebPushPresentationTest extends TestCase
 
     public function testBodyUsesIssuePreviewWithoutProjectName(): void
     {
-        $payload = (new WebPushPresentation())->enrich(MemberAlertEvent::IssueReopened, [
+        $payload = new WebPushPresentation()->enrich(MemberAlertEvent::IssueReopened, [
             'issue' => ['culprit' => 'CheckoutController::submit'],
         ]);
 
@@ -54,7 +54,7 @@ final class WebPushPresentationTest extends TestCase
 
     public function testBodyUsesProjectNameWithoutIssuePreview(): void
     {
-        $payload = (new WebPushPresentation())->enrich(MemberAlertEvent::IssueResolved, [
+        $payload = new WebPushPresentation()->enrich(MemberAlertEvent::IssueResolved, [
             'project' => ['name' => 'Payments'],
         ]);
 
@@ -63,7 +63,7 @@ final class WebPushPresentationTest extends TestCase
 
     public function testBodyFallsBackToEventTitleWhenSummaryMatchesIt(): void
     {
-        $payload = (new WebPushPresentation())->enrich(MemberAlertEvent::IssueCommented, [
+        $payload = new WebPushPresentation()->enrich(MemberAlertEvent::IssueCommented, [
             'summary' => 'New comment',
         ]);
 
@@ -72,7 +72,7 @@ final class WebPushPresentationTest extends TestCase
 
     public function testBodyTruncatesLongSummaryWithEllipsis(): void
     {
-        $payload = (new WebPushPresentation())->enrich(MemberAlertEvent::IssueNew, [
+        $payload = new WebPushPresentation()->enrich(MemberAlertEvent::IssueNew, [
             'summary' => str_repeat('a', 111),
         ]);
 

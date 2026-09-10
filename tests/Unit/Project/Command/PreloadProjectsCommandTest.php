@@ -285,7 +285,7 @@ final class PreloadProjectsCommandTest extends TestCase
         );
         $projects->expects(self::once())->method('hydrateMembershipsForProjects');
 
-        $existingProject = (new Project())->setName('Existing')->setSlug('existing');
+        $existingProject = new Project()->setName('Existing')->setSlug('existing');
         $existingKey = ProjectApiKey::generate($existingProject, 'Existing', 'existing-public', 'existing-secret');
         $keyRepository = $this->createStub(EntityRepository::class);
         $keyRepository->method('findOneBy')->willReturnCallback(

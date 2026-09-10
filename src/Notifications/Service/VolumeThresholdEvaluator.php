@@ -88,14 +88,12 @@ final readonly class VolumeThresholdEvaluator
                 $release = $rule->getReleaseVersion();
                 $window = $rule->getWindowMinutes();
                 $groupKey = ($environment ?? '')."\0".($release ?? '')."\0".$window;
-                if (!isset($countGroups[$groupKey])) {
-                    $countGroups[$groupKey] = [
-                        'environment' => $environment,
-                        'release' => $release,
-                        'window' => $window,
-                        'rules' => [],
-                    ];
-                }
+                $countGroups[$groupKey] ??= [
+                    'environment' => $environment,
+                    'release' => $release,
+                    'window' => $window,
+                    'rules' => [],
+                ];
                 $countGroups[$groupKey]['rules'][] = $rule;
             }
         }

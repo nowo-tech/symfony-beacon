@@ -16,6 +16,6 @@ final class EmptyNamedCsrfOnlyFormSubmitExtensionTest extends TestCase
         $builder->expects(self::once())->method('has')->with('_confirm')->willReturn(true);
         $builder->expects(self::never())->method('add');
 
-        (new EmptyNamedCsrfOnlyFormSubmitExtension())->buildForm($builder, []);
+        new EmptyNamedCsrfOnlyFormSubmitExtension()->buildForm($builder, []);
     }
 }

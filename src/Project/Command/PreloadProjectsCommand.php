@@ -195,7 +195,7 @@ final class PreloadProjectsCommand extends Command
             $code = strtolower(trim((string) ($row['project_code'] ?? '')));
             $publicKey = trim((string) ($row['public_key'] ?? ''));
             $secretKey = trim((string) ($row['secret_key'] ?? ''));
-            if ('' === $code || '' === $publicKey || '' === $secretKey) {
+            if (\in_array('', [$code, $publicKey, $secretKey], true)) {
                 throw new RuntimeException(\sprintf('keys[%d] requires project_code, public_key, secret_key', $i));
             }
         }
