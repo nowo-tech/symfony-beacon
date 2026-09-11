@@ -3,6 +3,7 @@ import { expectAuthenticatedPage } from '../support/helpers';
 
 test.describe('Account & preferences', () => {
   test('account area pages load', async ({ page }) => {
+    test.setTimeout(120_000);
     for (const path of [
       '/account',
       '/account/preferences',

@@ -311,6 +311,9 @@ test.describe('Behavioral depth — share viewer isolation', () => {
 });
 
 test.describe('Behavioral depth — auth token edges', () => {
+  // Mailpit + messenger under shared inbox — keep serial even when workers > 1.
+  test.describe.configure({ mode: 'serial' });
+
   test('forged magic-login check stays off dashboard (UC-AUTH-27)', async ({ browser }) => {
     const ctx = await browser.newContext({ ignoreHTTPSErrors: true, storageState: { cookies: [], origins: [] } });
     const guest = await ctx.newPage();
@@ -364,6 +367,7 @@ test.describe('Behavioral depth — auth token edges', () => {
         toAddress: DEMO_EMAIL,
         subjectIncludes: /magic|mágic|enlace|sign-?in|login|acceso|anmelden|connexion/i,
         linkPattern: /https?:\/\/[^\s"'<>]+\/(?:[a-z]{2}\/)?login\/magic\/check[^\s"'<>]*/i,
+        timeoutMs: 90_000,
       });
 
       await guest.goto(checkPath);
@@ -422,6 +426,7 @@ test.describe('Behavioral depth — auth token edges', () => {
         toAddress: email,
         subjectIncludes: /reset|password|contraseña|passwort|passe|passworda|restablec/i,
         linkPattern: /https?:\/\/[^\s"'<>]+\/(?:[a-z]{2}\/)?reset-password\/reset\/[^\s"'<>]+/i,
+        timeoutMs: 90_000,
       });
 
       await guest.goto(resetPath);

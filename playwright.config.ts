@@ -100,7 +100,8 @@ export default defineConfig({
                   storageState: authFile,
                 },
                 dependencies: ['setup'],
-                testIgnore: [/auth\.setup\.ts/, /cold\//, /manual\//],
+                // cold/manual: dedicated Make targets; worker/: FrankenPHP isolation (classic dogfood ≠ worker probe).
+                testIgnore: [/auth\.setup\.ts/, /cold\//, /manual\//, /worker\//],
               },
             ],
 });

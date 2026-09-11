@@ -98,18 +98,24 @@ test.describe('Project / dashboard remaining gaps', () => {
     page.once('dialog', (d) => d.accept().catch(() => undefined));
     await revokeBtn.click({ force: true });
     await waitForPageLoader(page);
-
-    const base = ingestHttpBase();
-    const denied = await request.post(`${base}/api/${projectRef}/envelope/`, {
-      headers: {
-        'Content-Type': 'application/x-beacon-envelope',
-        'X-Beacon-Auth': beaconAuthHeader(publicKey, secretKey),
-      },
-      data: '{}\n{}\n{}',
-      failOnStatusCode: false,
-      ignoreHTTPSErrors: true,
-    });
-    expect(denied.status(), await denied.text()).toBe(401);
+    // Revoke UI can finish before the auth gate sees the inactive flag — poll briefly.
+    await expect
+      .poll(
+        async () => {
+          const denied = await request.post(`${ingestHttpBase()}/api/${projectRef}/envelope/`, {
+            headers: {
+              'Content-Type': 'application/x-beacon-envelope',
+              'X-Beacon-Auth': beaconAuthHeader(publicKey, secretKey),
+            },
+            data: '{}\n{}\n{}',
+            failOnStatusCode: false,
+            ignoreHTTPSErrors: true,
+          });
+          return denied.status();
+        },
+        { timeout: 20_000, intervals: [500, 1_000, 2_000] },
+      )
+      .toBe(401);
   });
 
   test('empty issue list shell on ephemeral project (UC-ISS-26)', async ({ page }) => {

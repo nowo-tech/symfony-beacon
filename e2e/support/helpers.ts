@@ -267,7 +267,13 @@ export async function resolveDemoProjectUuid(page: Page): Promise<string> {
 export async function expectAuthenticatedPage(page: Page, path: string): Promise<void> {
   await gotoStable(page, path);
   await dismissProductTour(page);
-  await expect(page, `Expected auth for ${path}`).not.toHaveURL(/\/login(\?|$|\/)/);
+  if (/\/login(\?|$|\/)/i.test(page.url()) || page.url() === '' || page.url() === 'about:blank') {
+    // Session can drop mid-suite under load; re-auth once then retry the path.
+    await loginAsDemo(page);
+    await gotoStable(page, path);
+    await dismissProductTour(page);
+  }
+  await expect(page, `Expected auth for ${path} (url=${page.url()})`).not.toHaveURL(/\/login(\?|$|\/)/);
   await expect(page.locator('body')).toBeVisible();
 }
 

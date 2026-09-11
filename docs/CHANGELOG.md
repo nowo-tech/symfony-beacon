@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **CI product E2E:** warm Playwright suite runs as **4 parallel shards** (`--shard=N/4`, ~55m timeout each) plus an `E2E (Playwright)` gate job; cold-start and worker-safe jobs unchanged.
+- **CI product E2E:** warm Playwright suite runs as **4 parallel shards** (`--shard=N/4`, ~55m timeout each, `PLAYWRIGHT_WORKERS=1` per shard) plus an `E2E (Playwright)` gate job; cold-start and worker-safe jobs unchanged.
+- **Product Playwright catalog:** `e2e/worker/` is ignored by the chromium project (worker probe only via `make test-e2e-worker-safe`).
 
 ## [1.28.1] - 2026-09-11
 

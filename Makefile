@@ -501,6 +501,7 @@ test-e2e: ensure-up
 	@$(DC) exec -T php sh -c 'mkdir -p var/e2e && bin/console app:notifications:flush-digests --force > var/e2e/flush-digests.last 2>&1'
 ifeq ($(PLAYWRIGHT_ON_HOST),1)
 	PLAYWRIGHT_INGEST_BASE_URL="$(PLAYWRIGHT_INGEST_BASE_URL)" \
+	PLAYWRIGHT_WORKERS="$(PLAYWRIGHT_WORKERS)" \
 	PLAYWRIGHT_MAILPIT_URL="$(PLAYWRIGHT_MAILPIT_URL)" PLAYWRIGHT_REQUIRE_MAILPIT="$(PLAYWRIGHT_REQUIRE_MAILPIT)" pnpm exec playwright test $(ARGS)
 else
 	docker run --rm --network=host \
@@ -511,6 +512,7 @@ else
 		-e PLAYWRIGHT_MAILPIT_URL="$(PLAYWRIGHT_MAILPIT_URL)" \
 		-e PLAYWRIGHT_REQUIRE_SAMPLE="$(PLAYWRIGHT_REQUIRE_SAMPLE)" \
 		-e PLAYWRIGHT_REQUIRE_MAILPIT="$(PLAYWRIGHT_REQUIRE_MAILPIT)" \
+		-e PLAYWRIGHT_WORKERS="$(PLAYWRIGHT_WORKERS)" \
 		-e CI="$(CI)" \
 		-e HOME=/tmp \
 		-e XDG_CACHE_HOME=/tmp/.cache \

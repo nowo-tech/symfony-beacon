@@ -99,7 +99,7 @@ PLAYWRIGHT_BASE_URL=https://localhost:9447 make test-e2e
 
 ### GitHub Actions (product E2E)
 
-CI runs the warm product suite as **four parallel jobs** (`E2E (Playwright) 1/4` … `4/4`), each with its own Compose + Mailpit stack and `playwright test --shard=N/4`. A gate job named **`E2E (Playwright)`** requires all shards. Cold-start and FrankenPHP worker-safe stay separate jobs. Artifact names on failure: `playwright-report-N-of-4`.
+CI runs the warm product suite as **four parallel jobs** (`E2E (Playwright) 1/4` … `4/4`), each with its own Compose + Mailpit stack, `PLAYWRIGHT_WORKERS=1`, and `playwright test --shard=N/4`. A gate job named **`E2E (Playwright)`** requires all shards. Cold-start and FrankenPHP worker-safe stay separate jobs. Artifact names on failure: `playwright-report-N-of-4`.
 
 When `CI=1` or `PLAYWRIGHT_REQUIRE_SAMPLE=1`, tests that need sample/demo data **fail** instead of skipping (see `requireSampleOrSkip` in `support/helpers.ts`).
 
@@ -121,7 +121,7 @@ Specs are grouped by product domain (Playwright still uses `testDir: ./e2e`):
 | `notifications/` | Destinations, thresholds, health |
 | `flows/` | Cross-cutting mutations and closing suites |
 | `security/` | Negative access control: 403 denials, guest redirects, role demotion, inactive membership, auth gates, CSRF/IDOR/XSS/open-redirect/confirmation guards, edge guards (transfer/anonymize confirm, triage abuse, revoked Read API, `javascript:` URLs), limit guards (share range, API-key CSRF/IDOR, AJAX theme/width abuse, privacy confirm, viewer escalate, `file://`, clear-history skip, password mismatch, quiet-hours TZ, email endpoint mismatch, oversized display name) |
-| `worker/` | FrankenPHP shared-Kernel isolation (not product catalog) |
+| `worker/` | FrankenPHP shared-Kernel isolation (`make test-e2e-worker-safe`; ignored by product chromium) |
 | `cold/` | Cold-start setup circuit (`make test-e2e-cold`; empty `app_e2e_cold`) |
 | `manual/` | Docs screenshot crawl (`make docs-manual-screenshots`; not part of product CI) |
 | `z-late/` | Specs that must run last (Read API IP rate limit) |

@@ -51,7 +51,7 @@ export async function mailpitWaitForLink(options: {
   linkPattern: RegExp;
   timeoutMs?: number;
 }): Promise<string> {
-  const timeoutMs = options.timeoutMs ?? 30_000;
+  const timeoutMs = options.timeoutMs ?? (process.env.CI ? 60_000 : 30_000);
   const deadline = Date.now() + timeoutMs;
   const to = options.toAddress.toLowerCase();
 

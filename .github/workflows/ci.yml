@@ -269,6 +269,8 @@ jobs:
     env:
       CI: "1"
       PLAYWRIGHT_REQUIRE_SAMPLE: "1"
+      # Shards already parallelize across runners; keep 1 worker per stack to cut session/Mailpit races.
+      PLAYWRIGHT_WORKERS: "1"
       PLAYWRIGHT_BASE_URL: https://localhost:9447
       PLAYWRIGHT_MAILPIT_URL: http://127.0.0.1:18026
       COMPOSER_ALLOW_SUPERUSER: "1"
