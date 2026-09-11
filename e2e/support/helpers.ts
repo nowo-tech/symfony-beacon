@@ -218,15 +218,24 @@ export async function dismissProductTour(page: Page): Promise<void> {
  * That mode blanks FormKit fields and denies project settings (403).
  */
 export async function exitViewAsMember(page: Page): Promise<void> {
-  const exit = page.locator('form[action*="/admin/view-as-member/disable"] button[type="submit"]').first();
+  const exitLocator = () =>
+    page
+      .locator('form[action*="/admin/view-as-member/disable"] button[type="submit"]')
+      .or(page.getByRole('button', { name: /Exit view-as-member|Salir de ver.?como.?miembro/i }))
+      .first();
+
+  let exit = exitLocator();
   if ((await exit.count()) === 0 || !(await exit.isVisible().catch(() => false))) {
-    return;
+    // Enable redirects to project settings (often 403 under view-as-member) — no banner there.
+    await page.goto('/dashboard');
+    await dismissProductTour(page);
+    exit = exitLocator();
+    if ((await exit.count()) === 0 || !(await exit.isVisible().catch(() => false))) {
+      return;
+    }
   }
   await exit.click({ force: true });
   await waitForPageLoader(page);
-  await expect(page.locator('form[action*="/admin/view-as-member/disable"]')).toHaveCount(0, {
-    timeout: 15_000,
-  });
 }
 
 /**
@@ -662,31 +671,41 @@ export async function openNewBreadcrumbCollectionForm(page: Page): Promise<Locat
   return form;
 }
 
-/** Create an ephemeral breadcrumb collection via modal; returns code + numeric id. */
+/**
+ * Create an ephemeral breadcrumb collection (full-page /new).
+ * Modal create posts `_modal=1` and on validation error returns a bare partial — that breaks
+ * Playwright navigation and made CI flake when the kit form rejected the submit.
+ */
 export async function createEphemeralBreadcrumbCollection(
   page: Page,
   suffix: string,
 ): Promise<{ code: string; collectionId: string; name: string }> {
   const code = `e2e_bk_${suffix}`;
   const name = `E2E BK ${suffix}`;
-  const form = await openNewBreadcrumbCollectionForm(page);
+  await expectAuthenticatedPage(page, '/breadcrumb-kit-admin/collections/new');
+  const form = page
+    .locator('form')
+    .filter({ has: page.locator('input[name*="[code]"]') })
+    .first();
+  await expect(form.locator('input[name*="[code]"]').first()).toBeVisible({ timeout: 15_000 });
   await form.locator('input[name*="[code]"]').first().fill(code);
   const nameField = form.locator('input[name*="[name]"]');
   if ((await nameField.count()) > 0) {
     await nameField.first().fill(name);
   }
-  await form.locator('button[type="submit"]').first().click({ force: true });
-  await waitForPageLoader(page);
-
-  let collectionId = page.url().match(/collections\/(\d+)/)?.[1] ?? '';
-  if (!collectionId) {
-    await page.goto(`/breadcrumb-kit-admin/collections?q=${encodeURIComponent(code)}`);
-    await dismissProductTour(page);
-    const row = page.locator('tr').filter({ hasText: code }).first();
-    await expect(row).toBeVisible({ timeout: 15_000 });
-    const itemsHref = await row.locator('a[href*="/collections/"]').first().getAttribute('href');
-    collectionId = itemsHref?.match(/collections\/(\d+)/)?.[1] ?? '';
+  const jsonField = form.locator('textarea[name*="[responsiveConfigJson]"]');
+  if ((await jsonField.count()) > 0) {
+    await jsonField.first().fill('');
   }
+  // Kit redirectToRefererOr sends us back to /new (Referer), not /collections/{id}/edit.
+  await form.locator('button[type="submit"]').first().click();
+  await waitForPageLoader(page);
+  await page.goto(`/breadcrumb-kit-admin/collections?q=${encodeURIComponent(code)}`);
+  await dismissProductTour(page);
+  const row = page.locator('tr').filter({ hasText: code }).first();
+  await expect(row).toBeVisible({ timeout: 20_000 });
+  const itemsHref = await row.locator('a[href*="/collections/"]').first().getAttribute('href');
+  const collectionId = itemsHref?.match(/collections\/(\d+)/)?.[1] ?? '';
   expect(collectionId, 'breadcrumb collection id').toBeTruthy();
   return { code, collectionId, name };
 }

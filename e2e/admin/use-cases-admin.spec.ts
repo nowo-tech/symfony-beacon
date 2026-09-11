@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { dismissProductTour, expectAuthenticatedPage } from '../support/helpers';
+import { dismissProductTour, expectAuthenticatedPage, exitViewAsMember, waitForPageLoader } from '../support/helpers';
 
 test.describe('Administration — use cases', () => {
   test('social login index and new provider form (UC-ADM-12)', async ({ page }) => {
@@ -64,26 +64,26 @@ test.describe('Administration — use cases', () => {
     await dismissProductTour(page);
 
     const enable = page.locator('form[action*="/admin/view-as-member/enable"] button[type="submit"]').first();
-    if (await enable.isVisible().catch(() => false)) {
-      await enable.click();
-      await dismissProductTour(page);
-      await expect(page).not.toHaveURL(/\/login/);
+    if (!(await enable.isVisible().catch(() => false))) {
+      return;
     }
+    await enable.click();
+    await waitForPageLoader(page);
+    // Enable form redirects to project settings; under view-as-member that is often 403 without banner.
+    await page.goto('/dashboard');
+    await dismissProductTour(page);
+    await expect(page).not.toHaveURL(/\/login/);
+    await expect(
+      page.getByRole('status').filter({ hasText: /viewing projects as a member|viendo proyectos como miembro|ver proyectos como miembro/i }),
+    ).toBeVisible({ timeout: 15_000 });
 
-    try {
-      await expect(page.locator('form[action*="/admin/view-as-member/disable"]')).toBeVisible({ timeout: 10_000 });
-    } finally {
-      // Shared PHP session cookie must not leave view-as-member on for later shard tests.
-      const disable = page.locator('form[action*="/admin/view-as-member/disable"] button[type="submit"]').first();
-      if (await disable.isVisible().catch(() => false)) {
-        await disable.click();
-        await dismissProductTour(page);
-        await expect(page).not.toHaveURL(/\/login/);
-      }
-      await expect(page.locator('form[action*="/admin/view-as-member/disable"]')).toHaveCount(0, {
-        timeout: 15_000,
-      });
-    }
+    // Always clear session flag — later tests share the PHP session id from storageState.
+    await exitViewAsMember(page);
+    await page.goto('/dashboard');
+    await dismissProductTour(page);
+    await expect(
+      page.getByRole('status').filter({ hasText: /viewing projects as a member|viendo proyectos como miembro|ver proyectos como miembro/i }),
+    ).toHaveCount(0, { timeout: 15_000 });
   });
 
   test('admin projects new form loads (UC-ADM-06)', async ({ page }) => {
