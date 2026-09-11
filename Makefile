@@ -1,5 +1,5 @@
 .PHONY: ensure-env  help up up-infra up-prod up-shared down down-infra down-shared build build-prod logs shell console beacon-test beacon-suite seed seed-platform seed-sample dogfood reclaim-demo-client-env bootstrap ready migrate classic worker restart reload-env reload-env-if-beacon-dsn-stale mysql messenger-logs vite vite-hmr vite-build vite-watch pnpm mailpit mailpit-logs specify-check \
-	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage test-unit-js test-unit-js-coverage test-e2e test-e2e-isolated test-e2e-worker-safe test-e2e-worker-safe-classic test-e2e-cold docs-manual-screenshots docs-manual-screenshots-setup wiki-push-home up-e2e down-e2e up-e2e-cold down-e2e-cold wipe-e2e-cold ensure-e2e-env ensure-e2e-db ensure-e2e-up ready-e2e ready-e2e-lite seed-e2e kit-smoke qa qa-fix secrets-scan composer-outdated update-deps \
+	cs cs-fix twig-cs twig-cs-fix phpstan rector rector-fix test test-coverage test-unit-js test-unit-js-coverage test-e2e test-e2e-isolated test-e2e-smoke test-e2e-worker-safe test-e2e-worker-safe-classic test-e2e-cold test-e2e-clean docs-manual-screenshots docs-manual-screenshots-setup wiki-push-home up-e2e down-e2e up-e2e-cold down-e2e-cold wipe-e2e-cold ensure-e2e-env ensure-e2e-db ensure-e2e-up ready-e2e ready-e2e-lite seed-e2e kit-smoke qa qa-fix secrets-scan composer-outdated update-deps \
 	setup-hooks check-no-cursor-coauthor check-module-boundaries strip-cursor-coauthor-from-history check-envelope-goldens ensure-up ensure-halite-secrets print-urls bootstrap-shared-db
 
 # App Compose (dev). Infra is a separate project (`shared-infra` via compose.infra.yaml).
@@ -123,9 +123,11 @@ help:
 	@echo "  make test-e2e        Playwright E2E against dogfood stack (make up + seed[+sample]; mutates MYSQL_DATABASE)"
 	@echo "                       Filter/shard: ARGS='e2e/smoke' or ARGS='--shard=1/4' (CI uses 4 shards)"
 	@echo "  make test-e2e-isolated  Playwright against isolated stack (app_e2e / :$(E2E_HTTPS_PORT); needs make ready-e2e)"
+	@echo "  make test-e2e-smoke  Warm smoke lane only (e2e/smoke/ on seeded smoke DB)"
 	@echo "  make test-e2e-worker-safe  FrankenPHP worker Kernel isolation (WORKER_NUM=1, RESET=false; e2e/worker)"
 	@echo "  make test-e2e-worker-safe-classic  Same probe under FRANKENPHP_MODE=classic (contrast)"
 	@echo "  make test-e2e-cold   Cold-start circuit (empty app_e2e_cold / :$(E2E_COLD_HTTPS_PORT); wipe + /setup → login)"
+	@echo "  make test-e2e-clean  Alias of test-e2e-cold (clean install lane)"
 	@echo "  make docs-manual-screenshots  Capture production-like PNGs into docs/manual/images (isolated E2E stack)"
 	@echo "  make docs-manual-screenshots-setup  Setup wizard PNGs (cold stack; wipe + up first)"
 	@echo "  make wiki-push-home  Push docs/wiki/Home.md to GitHub wiki (index → docs/manual links)"
@@ -637,6 +639,10 @@ else
 		bash -lc 'mkdir -p /tmp/.cache && ./node_modules/.bin/playwright test $(ARGS)'
 endif
 
+# Warm smoke lane only (seeded smoke DB). Prereq: make up-e2e && make ready-e2e (or ready-e2e-lite).
+test-e2e-smoke: ensure-e2e-up
+	$(MAKE) test-e2e-isolated ARGS='e2e/smoke $(ARGS)'
+
 # Capture production-like PNGs for docs/manual/ (hides WDT / Twig Inspector). Needs sample data.
 # Fixed viewport 1440×900 (no fullPage stretch). Prereq: make up-e2e && make ready-e2e
 docs-manual-screenshots: ensure-e2e-up
@@ -840,6 +846,9 @@ else
 		$(PLAYWRIGHT_IMAGE) \
 		bash -lc 'mkdir -p /tmp/.cache && ./node_modules/.bin/playwright test $(ARGS)'
 endif
+
+# Clean install lane (alias of cold-start circuit). Same as test-e2e-cold.
+test-e2e-clean: test-e2e-cold
 
 # Fast AuthKit / identity smoke after kit bumps (see docs/CONTRIBUTING.md).
 kit-smoke: ensure-up

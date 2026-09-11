@@ -14,7 +14,7 @@
 | W1 | Health probe | `GET /health/live` returns non-secret `runtime` (`frankenphp_mode`, `frankenphp_worker`, `reset_kernel`, `app_runtime_mode`, `worker_num`) via `FrankenPhpRuntime` |
 | W2 | Isolated stack defaults | `.env.e2e.dist` / Make `E2E_FRANKENPHP_*`: `MODE=worker`, `WORKER_NUM=4`, `RESET_KERNEL=false`; `ensure-e2e-env` does not inherit dogfood `classic` |
 | W3 | Playwright product parallelism | `fullyParallel: true`; local **4** / CI **2** workers (`PLAYWRIGHT_WORKERS` override); Make passes the env into the Playwright container |
-| W4 | Worker-safe suite | `e2e/worker/kernel-isolation.spec.ts` + `e2e/support/frankenphp.ts`; `make test-e2e-worker-safe` forces `WORKER_NUM=1` + Playwright 1 worker |
+| W4 | Worker-safe suite | `e2e/worker/kernel-isolation.spec.ts` + `e2e/support/frankenphp.ts`; `make test-e2e-worker-safe` forces `WORKER_NUM=1` + Playwright 1 worker + **`PLAYWRIGHT_WORKER_SUITE=1`** (product chromium ignores `e2e/worker/` otherwise — see `113`) |
 | W5 | Classic contrast | `make test-e2e-worker-safe-classic` (probe under classic; isolation tests skip) |
 | W6 | Seed lite | `make ready-e2e-lite` — migrate + demo seed without `seed-sample` |
 | W7 | CI | Job `e2e-worker-safe` on isolated stack (`ready-e2e-lite` + `test-e2e-worker-safe`) |
@@ -77,18 +77,19 @@ As a maintainer, GitHub Actions runs an isolated worker-safe job in addition to 
 **Acceptance Scenarios**:
 
 1. **Given** CI, **When** `e2e-worker-safe` runs, **Then** it does not require `seed-sample` and uploads Playwright artifacts on failure.
-2. **Given** product job `e2e`, **When** it runs, **Then** behaviour remains `make test-e2e` on the dogfood CI stack (unchanged by this feature’s default).
+2. **Given** product job(s) `E2E (Playwright)` / shards (`113`), **When** they run, **Then** they do **not** execute `e2e/worker/` unless `PLAYWRIGHT_WORKER_SUITE=1` (worker-safe remains this dedicated job).
 
 ## Functional Requirements
 
 - **FR-001**: `FrankenPhpRuntime::snapshot()` MUST derive mode / worker flag / reset / `APP_RUNTIME_MODE` / `WORKER_NUM` from process `$_SERVER` (injectable for unit tests).
 - **FR-002**: `HealthController::live()` MUST include `runtime` without secrets or stack traces.
 - **FR-003**: Isolated E2E MUST default to `FRANKENPHP_MODE=worker`, `FRANKENPHP_RESET_KERNEL=false`, `FRANKENPHP_WORKER_NUM=4`.
-- **FR-004**: `make test-e2e-worker-safe` MUST force `WORKER_NUM=1`, Playwright 1 worker, and `ARGS` scoped to `e2e/worker`.
+- **FR-004**: `make test-e2e-worker-safe` MUST force `WORKER_NUM=1`, Playwright 1 worker, `PLAYWRIGHT_WORKER_SUITE=1`, and `ARGS` scoped to `e2e/worker`.
 - **FR-005**: `make test-e2e-worker-safe-classic` MUST contrast classic mode then restore worker defaults.
 - **FR-006**: `make ready-e2e-lite` MUST migrate + `seed-e2e` without sample telemetry.
 - **FR-007**: CI MUST include job `e2e-worker-safe` using the isolated stack.
 - **FR-008**: Docs MUST state that worker-safe ≠ product catalog coverage and that Messenger `messenger` services are not FrankenPHP HTTP workers.
+- **FR-009** (amendment `113`): Product `chromium` MUST `testIgnore` `e2e/worker/` when `PLAYWRIGHT_WORKER_SUITE` is unset so sharded product CI never “No tests found” / double-runs isolation specs.
 
 ## Success Criteria
 
@@ -100,8 +101,9 @@ As a maintainer, GitHub Actions runs an isolated worker-safe job in addition to 
 
 - Coding contract: `docs/ops/FRANKENPHP-CODING.md`
 - Isolated stack base: `specs/104-isolated-e2e-stack/`
+- Product CI sharding / suite gate: `specs/113-e2e-product-sharding/`
 - Cold-start circuit (classic, empty DB): `specs/110-e2e-cold-start-circuit/` — separate Compose project; not worker-isolation
 - PHPStan gate: `specs/094-phpstan-frankenphp-110/`
 - Product E2E catalog: `docs/product/E2E-USE-CASES.md` (out of scope for Kernel isolation)
 - Operator guide: `e2e/README.md`
-- Ship: **v1.26.0** (`docs/CHANGELOG.md` `[1.26.0]`)
+- Ship: **v1.26.0** (`docs/CHANGELOG.md` `[1.26.0]`); suite gating amended under **6.65** / `113`

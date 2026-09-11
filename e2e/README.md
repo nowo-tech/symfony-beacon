@@ -13,6 +13,7 @@ make up              # dogfood stack stays up (:9447)
 make up-e2e          # create app_e2e + start symfony-beacon-e2e (php/messenger*)
 make ready-e2e       # migrate + seed + sample + wire BeaconBundle on E2E
 make test-e2e-isolated
+make test-e2e-smoke  # warm smoke lane only (`e2e/smoke/` on seeded smoke DB)
 # optional: make down-e2e   # stop E2E containers; schema app_e2e is kept
 ```
 
@@ -35,10 +36,11 @@ Disposable stack for **UC-SETUP-07 / UC-SETUP-01 / UC-AUTH-10** (wizard admin). 
 make wipe-e2e-cold    # drop schema + remove cold volumes
 make up-e2e-cold      # start empty stack (migrate happens inside the wizard)
 make test-e2e-cold    # wipe + up + Playwright project `cold` (workers=1)
+make test-e2e-clean   # alias of test-e2e-cold (clean install lane)
 # optional: make down-e2e-cold
 ```
 
-Warm product specs `testIgnore` `e2e/cold/`. Do **not** POST `/setup/api/advance` against seeded `app_e2e` / dogfood.
+Warm product specs `testIgnore` `e2e/cold/`. Do **not** POST `/setup/api/advance` against seeded `app_e2e` / dogfood. Dual lanes: **smoke** (`make test-e2e-smoke`) vs **clean** (`make test-e2e-clean`).
 
 `/health/live` exposes a non-secret `runtime` block (`frankenphp_mode`, `frankenphp_worker`, `reset_kernel`, `app_runtime_mode`, `worker_num`) for asserts.
 

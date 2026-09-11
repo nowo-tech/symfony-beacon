@@ -7,10 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Product E2E CI sharding (Phase 6.65 / `113`):** warm Playwright suite runs as **4 parallel shards** (`--shard=N/4`, ~55m timeout each, `PLAYWRIGHT_WORKERS=1`, own Compose + Mailpit) plus gate job `E2E (Playwright)`. Spec: `specs/113-e2e-product-sharding/`.
+
 ### Changed
 
-- **CI product E2E:** warm Playwright suite runs as **4 parallel shards** (`--shard=N/4`, ~55m timeout each, `PLAYWRIGHT_WORKERS=1` per shard) plus an `E2E (Playwright)` gate job; cold-start and worker-safe jobs unchanged.
-- **Product Playwright catalog:** `e2e/worker/` is ignored by the chromium project (worker probe only via `make test-e2e-worker-safe`).
+- **Worker suite gating:** product `chromium` ignores `e2e/worker/` unless `PLAYWRIGHT_WORKER_SUITE=1` (`make test-e2e-worker-safe` sets it). Cold-start / worker-safe jobs otherwise unchanged.
+- **CI Mailer:** product shards set `PLAYWRIGHT_MAILER_DSN=smtp://mailer:1025`; helper `e2e/support/mailer.ts` (`ensureDeliverableMailer`).
+
+### Fixed
+
+- **View-as-member sticky session (UC-ADM-08):** assert banner by disable form (not success toast); `exitViewAsMember` clears via CSRF POST; `expectAuthenticatedPage` exits before asserts.
+- **BreadcrumbKit ephemeral CRUD (UC-ADM-23):** full-page create/edit helpers + clear FormKit JSON `"null"` textareas (modal `_modal` partials were flaky in CI).
 
 ## [1.28.1] - 2026-09-11
 

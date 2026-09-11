@@ -104,7 +104,7 @@ Extends the isolated stack (does **not** replace product catalog E2E):
 |------|-----------|
 | Defaults | `FRANKENPHP_MODE=worker`, `FRANKENPHP_WORKER_NUM=4`, `FRANKENPHP_RESET_KERNEL=false` in `.env.e2e.dist`; Make `E2E_FRANKENPHP_*`; FrankenPHP keys are isolation keys (dogfood `classic` MUST NOT overwrite) |
 | Product Playwright | `fullyParallel: true`; local 4 / CI 2 workers (`PLAYWRIGHT_WORKERS`) — former non-goal “Parallel Playwright workers” is lifted for product runs |
-| Worker-safe | `make test-e2e-worker-safe` forces **`WORKER_NUM=1`** + Playwright 1 worker + `e2e/worker/`; `ready-e2e-lite` skips sample seed; CI job `e2e-worker-safe` |
+| Worker-safe | `make test-e2e-worker-safe` forces **`WORKER_NUM=1`** + Playwright 1 worker + `PLAYWRIGHT_WORKER_SUITE=1` + `e2e/worker/`; `ready-e2e-lite` skips sample seed; CI job `e2e-worker-safe` |
 | Probe | `/health/live` `runtime` block — see `specs/108-frankenphp-worker-safe-e2e/` |
 
 Cross-ref: `specs/108-frankenphp-worker-safe-e2e/` (shipped **v1.26.0**), `e2e/README.md`, `docs/ops/FRANKENPHP-CODING.md`.
@@ -134,3 +134,17 @@ Documentation capture suite (does **not** replace product catalog E2E):
 | Prefs | Theme + locale demos once public (`/login`) + once private (`/dashboard`); inventory EN + day |
 
 Cross-ref: `specs/111-product-ui-manual/`, `docs/manual/`.
+
+### 2026-09-12 — Product CI sharding & harness (`113` / Phase 6.65)
+
+Warm product E2E on GitHub Actions is **sharded** (does **not** change the isolated Compose project itself):
+
+| Area | Behaviour |
+|------|-----------|
+| CI | Four jobs `E2E (Playwright) N/4` + gate `E2E (Playwright)`; each shard owns Compose + Mailpit; `PLAYWRIGHT_WORKERS=1`; `ARGS=--shard=N/4` |
+| Worker suite | Product `chromium` `testIgnore`s `e2e/worker/` unless `PLAYWRIGHT_WORKER_SUITE=1` (set by `make test-e2e-worker-safe`) |
+| Mailer | CI `PLAYWRIGHT_MAILER_DSN=smtp://mailer:1025`; `e2e/support/mailer.ts` |
+| Session | View-as-member sticky session cleared via CSRF POST helper before authenticated asserts |
+| BreadcrumbKit | Ephemeral E2E writes prefer full-page forms + JSON `"null"` clear |
+
+Cross-ref: `specs/113-e2e-product-sharding/`, `e2e/README.md`.
