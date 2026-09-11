@@ -1365,6 +1365,7 @@ groups:
   intro: Organisez les utilisateurs en groupes, puis associez les groupes aux projets
     pour un accès groupé.
   create: Nouveau groupe
+  create_intro: Nommez le projet et ajoutez une description facultative. Vous en devenez propriétaire et une clé API par défaut est créée.
   search_placeholder: Rechercher par nom, slug ou description…
   empty: Aucun groupe pour l'instant.
   open: Ouvrir
@@ -1406,6 +1407,7 @@ admin_projects:
   title: Projets
   intro: 'Gérez chaque projet sur cette instance : membres, liens de groupe et suppression.'
   create: Nouveau projet
+  create_intro: Nommez le projet et ajoutez une description facultative. Vous en devenez propriétaire et une clé API par défaut est créée.
   empty: Aucun projet pour l'instant.
   open: Gérer
   col:

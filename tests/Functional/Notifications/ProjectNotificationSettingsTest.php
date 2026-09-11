@@ -225,10 +225,13 @@ final class ProjectNotificationSettingsTest extends DatabaseWebTestCase
         [$client, $owner, $project] = $this->bootWithDemoProject('owner-threshold@example.com');
         $this->login($client, $owner);
 
-        $crawler = $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/threshold-rules/new');
+        $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/threshold-rules/new');
+        self::assertResponseRedirects();
+        $crawler = $client->followRedirect();
         self::assertResponseIsSuccessful();
+        self::assertStringContainsString('settings/alerts', $client->getRequest()->getPathInfo());
 
-        $token = $crawler->filter('input[name="project_threshold_rule[_token]"]')->attr('value');
+        $token = $crawler->filter('[data-testid="project-threshold-create-form"] input[name="project_threshold_rule[_token]"]')->attr('value');
         self::assertNotEmpty($token);
 
         $client->request(Request::METHOD_POST, '/projects/'.$project->getUuid().'/threshold-rules/new', [

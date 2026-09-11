@@ -16,6 +16,7 @@ As a project admin, I define a rule such as “more than N errors in M minutes�
 
 1. **Given** I have `project.notifications.manage`, **When** I configure a threshold (count, window, optional env/release scope), **Then** it is stored per project and shown in Settings.
 2. **Given** an invalid threshold (count &lt; 1 or window outside allowed bounds), **When** I save, **Then** validation fails with a clear message.
+3. **Given** Settings → Alerts, **When** I create a rule, **Then** creation is a confirm-dialog modal on that page (`GET …/threshold-rules/new` → `…/settings/alerts?new_threshold=1`); edit MAY remain a full page (`112`).
 
 ### User Story 2 - Fire when the window is exceeded (Priority: P1)
 
@@ -49,6 +50,7 @@ As a project admin, I can see that a threshold fired (last fire time / failure) 
 - **FR-003**: A cooldown MUST prevent alert storms for the same rule.
 - **FR-004**: Optional filters for environment and/or release SHOULD be supported when those dimensions exist.
 - **FR-005**: Member-facing Settings UI for create/edit/enable/disable requires `project.notifications.manage` (HTTP 403 otherwise; see `002` FR-013).
+- **FR-006** (`112`): Creating a threshold rule MUST open a confirm-dialog on Settings → Alerts (`?new_threshold=1`); GET create URL MUST redirect; FormKit chrome MUST use `project_threshold_rule.*` catalogue keys.
 
 ## Success Criteria
 
@@ -70,3 +72,7 @@ As a project admin, I can see that a threshold fired (last fire time / failure) 
 ## Amendment (batch COUNT, 2026-08-11)
 
 - `VolumeThresholdEvaluator` batches `COUNT` queries by `(environment, release, windowMinutes)` so multiple rules sharing the same scope share one `countReceivedSince` call per evaluate pass (notify-worker N+1 reduction). Behaviour and cooldown semantics unchanged.
+
+## Amendment (`112-admin-create-modals`, 2026-09-11)
+
+- Create UX: list/settings modal on Alerts (`?new_threshold=1`); edit remains full page. See `specs/112-admin-create-modals/`.

@@ -118,4 +118,8 @@ As a platform admin, I temporarily view a project as a specific member would, fo
 
 - **FR-007**: Platform admins (`ROLE_ADMIN`) MUST be able to export all projects or one project as `beacon-project-bundle` JSON, and import to upsert by `project.code` (creating missing users disabled). UI on Administration → Projects (index + show). Does not replace suspend/stats/view-as.
 - Audit UserActions for config export/import are recorded (`project.config_exported` / `project.config_imported`).
+
+## Amendment (`112-admin-create-modals`, 2026-09-11)
+
+- **FR-008**: Creating a project from Administration → Projects MUST open a confirm-dialog modal on the directory (`GET /admin/projects/new` → `/admin/projects?new=1`; POST on `admin_projects_new`). Edit remains a full-page form. Product dashboard create (`002` FR-008) is unchanged.
 - Details and panel (non-admin) rules: `089-project-config-export`.

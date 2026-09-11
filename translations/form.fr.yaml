@@ -558,22 +558,34 @@ projects:
     max_uses_help: Laissez Utilisations max vide pour un nombre illimité d’ouvertures jusqu’à expiration.
       La valeur par défaut est 1.
     max_uses_unlimited: Illimité
-thresholds:
-  form:
-    cooldown_minutes: Délai de reprise (minutes)
-    cooldown_minutes_help: Supprime les alertes en double pour cette regle pendant la fenetre de cooldown.
-    enabled: Activee
-    environment: Filtre d''environnement
-    environment_help: Laisser vide pour compter tous les environnements.
-    error_count: Nombre d''erreurs
-    error_count_help: Alerter lorsqu''au moins ce nombre d''evenements error/fatal est recu dans la fenetre
-      glissante.
+project_threshold_rule:
+  label:
     label: Libelle
-    label_help: Nom interne facultatif affiche dans Settings et les payloads.
-    release: Filtre de release
-    release_help: Laisser vide pour compter toutes les releases.
-    window_minutes: Fenetre (minutes)
-    window_minutes_help: Fenetre glissante de retrospection de 1 a 1440 minutes.
+    help: Nom interne facultatif affiche dans Settings et les payloads.
+    placeholder: Burst…
+  enabled:
+    label: Activee
+    help: When off, the rule is kept but not evaluated.
+  error_count:
+    label: Nombre d''erreurs
+    help: Alerter lorsqu''au moins ce nombre d''evenements error/fatal est recu dans la fenetre
+    placeholder: "50"
+  window_minutes:
+    label: Fenetre (minutes)
+    help: Fenetre glissante de retrospection de 1 a 1440 minutes.
+    placeholder: "15"
+  cooldown_minutes:
+    label: Délai de reprise (minutes)
+    help: Supprime les alertes en double pour cette regle pendant la fenetre de cooldown.
+    placeholder: "60"
+  environment:
+    label: Filtre d''environnement
+    help: Laisser vide pour compter tous les environnements.
+    placeholder: prod
+  release_version:
+    label: Filtre de release
+    help: Laisser vide pour compter toutes les releases.
+    placeholder: 1.2.0
 analytics_filter:
   from:
     placeholder: Du
@@ -847,6 +859,15 @@ project_delete:
   confirmation:
     label: Tapez le nom du projet pour confirmer
 
+admin_group:
+  name:
+    label: Name
+    help: Short name shown in Administration and project group links.
+    placeholder: Platform team
+  description:
+    label: Description
+    help: Optional notes for operators (not shown to end users).
+    placeholder: Cross-project access for platform engineers…
 admin_group_member_add:
   email:
     label: E-mail du membre

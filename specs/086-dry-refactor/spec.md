@@ -86,6 +86,7 @@ As an admin on `/admin/permissions` (many per-row edit dialogs) or any surface w
 2. **Given** `open_on_connect: true` (or equivalent), **When** Stimulus connects, **Then** exactly that dialog opens.
 3. **Given** `html[data-theme='dark']`, **When** a confirm or kit Bootstrap modal opens, **Then** the scrim uses black at higher opacity than light theme (not `--color-ink` / `--beacon-ink`).
 4. **Given** `GET /admin/roles/new` or `GET /admin/roles/{uuid}/edit`, **When** followed, **Then** the list/detail page opens with the create/edit modal (`open_on_connect`) instead of a full-page form route.
+5. **Given** `GET /admin/groups/new`, `GET /admin/projects/new`, or `GET …/threshold-rules/new`, **When** followed, **Then** the parent list/settings page opens with the create modal (`?new=1` / `?new_threshold=1`) per `112` (same `open_on_connect` rules).
 
 ### User Story 3 - Make exec targets start the stack (Priority: P2)
 
@@ -151,6 +152,7 @@ As a member on AuthKit login/register/reset, the show/hide control stays **to th
 | Edit member role | same | `header_wrapper` + `content_wrapper`; `submit_disabled: isLastOwner` |
 | Edit group role | same | `header_wrapper` + `content_wrapper` |
 | Mark duplicate / new project / admin project delete | `issue/show`, `dashboard/home`, `admin/projects/show` | already structured (reference) |
+| Admin group / admin project / threshold create (`112`) | `admin/groups/index`, `admin/projects/index`, `project/settings/_thresholds` | `custom_form` + `open_on_connect` |
 
 ## Related
 

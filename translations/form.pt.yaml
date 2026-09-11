@@ -556,22 +556,34 @@ projects:
     max_uses_help: Deixe Utilizações máx. vazio para aberturas ilimitadas até expirar. O valor predefinido
       é 1.
     max_uses_unlimited: Ilimitado
-thresholds:
-  form:
-    cooldown_minutes: Cooldown (minutos)
-    cooldown_minutes_help: Suprime alertas duplicados desta regra durante a janela de cooldown.
-    enabled: Ativada
-    environment: Filtro de ambiente
-    environment_help: Deixe em branco para contar todos os ambientes.
-    error_count: Contagem de erros
-    error_count_help: Alertar quando pelo menos este numero de eventos error/fatal for recebido na janela
-      deslizante.
+project_threshold_rule:
+  label:
     label: Etiqueta
-    label_help: Nome interno opcional mostrado em Settings e nos payloads.
-    release: Filtro de release
-    release_help: Deixe em branco para contar todas as releases.
-    window_minutes: Janela (minutos)
-    window_minutes_help: Janela deslizante retrospetiva de 1 a 1440 minutos.
+    help: Nome interno opcional mostrado em Settings e nos payloads.
+    placeholder: Burst…
+  enabled:
+    label: Ativada
+    help: When off, the rule is kept but not evaluated.
+  error_count:
+    label: Contagem de erros
+    help: Alertar quando pelo menos este numero de eventos error/fatal for recebido na janela
+    placeholder: "50"
+  window_minutes:
+    label: Janela (minutos)
+    help: Janela deslizante retrospetiva de 1 a 1440 minutos.
+    placeholder: "15"
+  cooldown_minutes:
+    label: Cooldown (minutos)
+    help: Suprime alertas duplicados desta regra durante a janela de cooldown.
+    placeholder: "60"
+  environment:
+    label: Filtro de ambiente
+    help: Deixe em branco para contar todos os ambientes.
+    placeholder: prod
+  release_version:
+    label: Filtro de release
+    help: Deixe em branco para contar todas as releases.
+    placeholder: 1.2.0
 analytics_filter:
   from:
     placeholder: De
@@ -845,6 +857,15 @@ project_delete:
   confirmation:
     label: Digite o nome do projeto para confirmar
 
+admin_group:
+  name:
+    label: Name
+    help: Short name shown in Administration and project group links.
+    placeholder: Platform team
+  description:
+    label: Description
+    help: Optional notes for operators (not shown to end users).
+    placeholder: Cross-project access for platform engineers…
 admin_group_member_add:
   email:
     label: E-mail do membro

@@ -10,8 +10,6 @@ Profile, security, display preferences, and privacy tools (UserKit + AuthKit).
 
 ![Profile](images/account-profile.png)
 
-![Profile (continued)](images/account-profile-2.png)
-
 ## Projects and groups
 
 ![Your projects](images/account-projects.png)

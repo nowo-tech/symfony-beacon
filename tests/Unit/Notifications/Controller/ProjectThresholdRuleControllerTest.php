@@ -10,12 +10,12 @@ use App\Notifications\Service\ThresholdRuleWriter;
 use App\Project\Entity\Project;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -29,7 +29,7 @@ final class ProjectThresholdRuleControllerTest extends TestCase
 {
     public function testAssertRuleBelongsToProject(): void
     {
-        $controller = new ProjectThresholdRuleController(new ThresholdRuleWriter($this->createStub(EntityManagerInterface::class)));
+        $controller = $this->controller(new ThresholdRuleWriter($this->createStub(EntityManagerInterface::class)));
         $method = new ReflectionMethod(ProjectThresholdRuleController::class, 'assertRuleBelongsToProject');
 
         $project = new Project()->setName('Acme')->setSlug('acme');
@@ -45,23 +45,19 @@ final class ProjectThresholdRuleControllerTest extends TestCase
         $method->invoke($controller, $other, $rule);
     }
 
-    public function testNewGetRendersForm(): void
+    public function testNewGetRedirectsToAlertsWithOpenFlag(): void
     {
         $project = new Project()->setName('Acme')->setSlug('acme');
         new ReflectionProperty(Project::class, 'uuid')->setValue($project, 'aaaaaaaa-aaaa-7aaa-8aaa-aaaaaaaaaaaa');
 
         $form = $this->createStub(FormInterface::class);
-        $form->method('handleRequest');
-        $form->method('isSubmitted')->willReturn(false);
-        $form->method('createView')->willReturn(new FormView());
-
-        $controller = new ProjectThresholdRuleController(new ThresholdRuleWriter($this->createStub(EntityManagerInterface::class)));
+        $controller = $this->controller(new ThresholdRuleWriter($this->createStub(EntityManagerInterface::class)));
         $seen = [];
         $this->boot($controller, $form, $seen);
 
-        self::assertSame('ok', $controller->new($project, Request::create('/new'))->getContent());
-        self::assertFalse($seen['notifications/threshold_rule_form.html.twig']['is_edit']);
-        self::assertSame($project, $seen['notifications/threshold_rule_form.html.twig']['project']);
+        $response = $controller->new($project, Request::create('/new'));
+        self::assertTrue($response->isRedirection());
+        self::assertSame('/settings/alerts?new_threshold=1', $response->headers->get('Location'));
     }
 
     public function testToggleFlipsEnabledAndRedirects(): void
@@ -81,7 +77,7 @@ final class ProjectThresholdRuleControllerTest extends TestCase
         $form->method('isSubmitted')->willReturn(true);
         $form->method('isValid')->willReturn(true);
 
-        $controller = new ProjectThresholdRuleController(new ThresholdRuleWriter($em));
+        $controller = $this->controller(new ThresholdRuleWriter($em));
         $seen = [];
         $session = $this->boot($controller, $form, $seen, flash: true);
 
@@ -103,12 +99,22 @@ final class ProjectThresholdRuleControllerTest extends TestCase
         $form->method('isSubmitted')->willReturn(false);
         $form->method('isValid')->willReturn(false);
 
-        $controller = new ProjectThresholdRuleController(new ThresholdRuleWriter($this->createStub(EntityManagerInterface::class)));
+        $controller = $this->controller(new ThresholdRuleWriter($this->createStub(EntityManagerInterface::class)));
         $seen = [];
         $this->boot($controller, $form, $seen);
 
         $this->expectException(AccessDeniedException::class);
         $controller->delete($project, $rule, Request::create('/delete', Request::METHOD_POST));
+    }
+
+    private function controller(ThresholdRuleWriter $writer): ProjectThresholdRuleController
+    {
+        $ref = new ReflectionClass(ProjectThresholdRuleController::class);
+        /** @var ProjectThresholdRuleController $controller */
+        $controller = $ref->newInstanceWithoutConstructor();
+        $ref->getProperty('thresholdRuleWriter')->setValue($controller, $writer);
+
+        return $controller;
     }
 
     /**
@@ -121,7 +127,20 @@ final class ProjectThresholdRuleControllerTest extends TestCase
         $formFactory->method('create')->willReturn($form);
 
         $router = $this->createStub(UrlGeneratorInterface::class);
-        $router->method('generate')->willReturn('/settings/alerts');
+        $router->method('generate')->willReturnCallback(
+            static function (string $name, array $params = []): string {
+                if ('project_settings_section' === $name) {
+                    $query = [];
+                    if (!empty($params['new_threshold'])) {
+                        $query['new_threshold'] = $params['new_threshold'];
+                    }
+
+                    return '/settings/alerts'.([] === $query ? '' : '?'.http_build_query($query));
+                }
+
+                return '/settings/alerts';
+            },
+        );
 
         $twig = $this->createStub(Environment::class);
         $twig->method('render')->willReturnCallback(

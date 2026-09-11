@@ -552,22 +552,34 @@ projects:
     max_uses: Max. gebruik
     max_uses_help: Laat Max. gebruik leeg voor onbeperkte openingen tot verval. Standaard is 1 (eenmalig).
     max_uses_unlimited: Onbeperkt
-thresholds:
-  form:
-    cooldown_minutes: Cooldown (minuten)
-    cooldown_minutes_help: Onderdrukt dubbele meldingen voor deze regel tijdens het cooldownvenster.
-    enabled: Ingeschakeld
-    environment: Omgevingsfilter
-    environment_help: Leeg laten om alle omgevingen te tellen.
-    error_count: Aantal fouten
-    error_count_help: Waarschuw wanneer minstens zoveel error/fatal-events binnen het rollende venster
-      worden ontvangen.
+project_threshold_rule:
+  label:
     label: Label
-    label_help: Optionele interne naam die wordt getoond in Settings en payloads.
-    release: Releasefilter
-    release_help: Leeg laten om alle releases te tellen.
-    window_minutes: Venster (minuten)
-    window_minutes_help: Rollend terugkijkvenster van 1 tot 1440 minuten.
+    help: Optionele interne naam die wordt getoond in Settings en payloads.
+    placeholder: Burst…
+  enabled:
+    label: Ingeschakeld
+    help: When off, the rule is kept but not evaluated.
+  error_count:
+    label: Aantal fouten
+    help: Waarschuw wanneer minstens zoveel error/fatal-events binnen het rollende venster
+    placeholder: "50"
+  window_minutes:
+    label: Venster (minuten)
+    help: Rollend terugkijkvenster van 1 tot 1440 minuten.
+    placeholder: "15"
+  cooldown_minutes:
+    label: Cooldown (minuten)
+    help: Onderdrukt dubbele meldingen voor deze regel tijdens het cooldownvenster.
+    placeholder: "60"
+  environment:
+    label: Omgevingsfilter
+    help: Leeg laten om alle omgevingen te tellen.
+    placeholder: prod
+  release_version:
+    label: Releasefilter
+    help: Leeg laten om alle releases te tellen.
+    placeholder: 1.2.0
 analytics_filter:
   from:
     placeholder: Van
@@ -841,6 +853,15 @@ project_delete:
   confirmation:
     label: Typ de projectnaam ter bevestiging
 
+admin_group:
+  name:
+    label: Name
+    help: Short name shown in Administration and project group links.
+    placeholder: Platform team
+  description:
+    label: Description
+    help: Optional notes for operators (not shown to end users).
+    placeholder: Cross-project access for platform engineers…
 admin_group_member_add:
   email:
     label: Lid-e-mail

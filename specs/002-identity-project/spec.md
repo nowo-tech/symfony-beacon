@@ -2,7 +2,7 @@
 
 **Feature Branch**: `002-identity-project`  
 **Created**: 2026-07-19  
-**Status**: Completed (as-built; dashboard create modal, group-link policy, CSRF on API keys; dual public locale routes — 2026-07-21; AuthKit `unlocalized: serve` + SiteBackup setup locale — 2026-07-31; `project.*` permission catalog + i18n; product `project.*` Twig gating + controller 403; `admin.*` catalog removed — 2026-08-10; project `code` + membership `active` + config portability — 2026-08-11 / `089`)  
+**Status**: Completed (as-built; dashboard create modal, group-link policy, CSRF on API keys; dual public locale routes — 2026-07-21; AuthKit `unlocalized: serve` + SiteBackup setup locale — 2026-07-31; `project.*` permission catalog + i18n; product `project.*` Twig gating + controller 403; `admin.*` catalog removed — 2026-08-10; project `code` + membership `active` + config portability — 2026-08-11 / `089`; admin group/project create modals — 2026-09-11 / `112`)  
 
 ## Summary
 
@@ -58,6 +58,8 @@ As a user, I update profile/security/display preferences; as admin, I reach Appe
 5. **Given** `app:seed-platform` has run, **When** I open `/admin/roles`, **Then** five system roles exist (`ROLE_PROJECT_VIEWER`, `ROLE_PROJECT_MEMBER`, `ROLE_PROJECT_ADMIN`, `ROLE_PROJECT_FULL`, `ROLE_PROJECT_OWNER`) whose matrices mirror `ProjectRole` → `ProjectPermission`; legacy operator codes (`ROLE_SUPPORT`, `ROLE_OPS_VIEWER`, `ROLE_PLATFORM`, `ROLE_NAV_EDITOR`, `ROLE_PROJECT_OPS`) are absent.
 6. **Given** `/admin/permissions` with many edit dialogs, **When** the page loads without `?edit=` / `?new=`, **Then** no edit/create dialog auto-opens (`086` FR-003c).
 7. **Given** `/admin/roles`, **When** I create or edit a role, **Then** the form is a confirm-dialog modal on the list/detail page (`GET /admin/roles/new` → `?new=1`; `GET …/edit` → overview `?edit=1`); not a dedicated full-page form (`086` US 2c).
+8. **Given** `/admin/groups` or `/admin/projects`, **When** I create a group or project, **Then** creation is a confirm-dialog modal on the directory (`GET …/new` → `?new=1`; POST stays on the create route); edit remains a full page (`112`).
+9. **Given** `/admin/users`, **When** I create a user, **Then** creation is a confirm-dialog modal (`GET /admin/users/new` → `?new=1`).
 
 ## Requirements *(mandatory)*
 
@@ -69,7 +71,8 @@ As a user, I update profile/security/display preferences; as admin, I reach Appe
 - **FR-006**: Project data is membership-scoped: dashboard lists only accessible projects; controllers enforce `ProjectAccessService` (**active** direct membership **or** linked group **or** share grant). Prefer `requirePermission(ProjectPermission::…)` over raw role rank where a named capability exists.
 - **FR-006b** (`089`): Each `Project` MUST have a unique `code` (slug-like portability key; backfilled from `slug`). Direct `ProjectMembership` MUST support `active` (default true). Project Settings config export/import MUST require `project.settings.manage` and MUST NOT create users; see `089-project-config-export`.
 - **FR-007**: Admins manage **user groups**; projects may link groups with `admin`/`member` role so all group users gain access. Owner role is direct-user only. Linking policy: instance admin or project **owner** may link any group; project **admin** only groups they belong to.
-- **FR-008**: New project UX is dashboard-modal (search row), not Dashboard sidebar menu.
+- **FR-008**: New project UX is dashboard-modal (search row), not Dashboard sidebar menu. Instance-admin create under `/admin/projects` is a separate list-page modal (`112`); it MUST NOT change product `/projects/new` → `/dashboard?new=1`.
+- **FR-008b** (`112`): Admin **group** and **project** create MUST use list-page confirm-dialogs with `?new=1` open-on-connect; GET `…/new` redirects; invalid POST re-opens the modal on the directory.
 - **FR-009**: Disabling a user account MUST invalidate existing sessions (`nowo_user_kit` account_status).
 - **FR-010**: Public auth and setup surfaces MUST support dual bare + `/{_locale}/…` paths with AuthKit/SiteBackup `unlocalized: serve` for `DEFAULT_LOCALE`. Legal bare paths redirect to `/{DEFAULT_LOCALE}/legal/…`. Unauthenticated security entry points resolve to AuthKit login (bare or prefixed per locale mode).
 - **FR-011**: Guest locale switching on public dual-path pages MUST prefer path URLs (`*_unlocalized` for default locale); authenticated dashboard URLs MUST NOT require a `_locale` path segment.

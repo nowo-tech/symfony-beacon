@@ -557,22 +557,34 @@ projects:
     max_uses_help: Lassen Sie Max. Nutzungen leer für unbegrenzte Öffnungen bis zum Ablauf. Standard ist
       1 (einmalig).
     max_uses_unlimited: Unbegrenzt
-thresholds:
-  form:
-    cooldown_minutes: Cooldown (Minuten)
-    cooldown_minutes_help: Unterdruckt doppelte Benachrichtigungen fur diese Regel wahrend des Cooldown-Fensters.
-    enabled: Aktiviert
-    environment: Umgebungsfilter
-    environment_help: Leer lassen, um alle Umgebungen zu zahlen.
-    error_count: Fehleranzahl
-    error_count_help: Benachrichtigen, wenn mindestens so viele Error/Fatal-Events im gleitenden Zeitfenster
-      empfangen werden.
+project_threshold_rule:
+  label:
     label: Bezeichnung
-    label_help: Optionaler interner Name, der in Settings und Payloads angezeigt wird.
-    release: Release-Filter
-    release_help: Leer lassen, um alle Releases zu zahlen.
-    window_minutes: Fenster (Minuten)
-    window_minutes_help: Gleitendes Ruckblicksfenster von 1 bis 1440 Minuten.
+    help: Optionaler interner Name, der in Settings und Payloads angezeigt wird.
+    placeholder: Burst…
+  enabled:
+    label: Aktiviert
+    help: When off, the rule is kept but not evaluated.
+  error_count:
+    label: Fehleranzahl
+    help: Benachrichtigen, wenn mindestens so viele Error/Fatal-Events im gleitenden Zeitfenster
+    placeholder: "50"
+  window_minutes:
+    label: Fenster (Minuten)
+    help: Gleitendes Ruckblicksfenster von 1 bis 1440 Minuten.
+    placeholder: "15"
+  cooldown_minutes:
+    label: Cooldown (Minuten)
+    help: Unterdruckt doppelte Benachrichtigungen fur diese Regel wahrend des Cooldown-Fensters.
+    placeholder: "60"
+  environment:
+    label: Umgebungsfilter
+    help: Leer lassen, um alle Umgebungen zu zahlen.
+    placeholder: prod
+  release_version:
+    label: Release-Filter
+    help: Leer lassen, um alle Releases zu zahlen.
+    placeholder: 1.2.0
 analytics_filter:
   from:
     placeholder: Von
@@ -846,6 +858,15 @@ project_delete:
   confirmation:
     label: Projektnamen zur Bestätigung eingeben
 
+admin_group:
+  name:
+    label: Name
+    help: Short name shown in Administration and project group links.
+    placeholder: Platform team
+  description:
+    label: Description
+    help: Optional notes for operators (not shown to end users).
+    placeholder: Cross-project access for platform engineers…
 admin_group_member_add:
   email:
     label: Mitglieds-E-Mail

@@ -1364,6 +1364,7 @@ groups:
   intro: Organisieren Sie Benutzer in Gruppen und verknüpfen Sie Gruppen dann mit
     Projekten für den Massenzugriff.
   create: Neue Gruppe
+  create_intro: Benennen Sie das Projekt und fügen Sie optional eine Beschreibung hinzu. Sie werden Eigentümer und es wird ein Standard-API-Schlüssel erstellt.
   search_placeholder: Nach Name, Slug oder Beschreibung suchen…
   empty: Noch keine Gruppen.
   open: Offen
@@ -1406,6 +1407,7 @@ admin_projects:
   intro: Verwalten Sie jedes Projekt auf dieser Instanz – Mitglieder, Gruppenverknüpfungen
     und Löschung.
   create: Neues Projekt
+  create_intro: Benennen Sie das Projekt und fügen Sie optional eine Beschreibung hinzu. Sie werden Eigentümer und es wird ein Standard-API-Schlüssel erstellt.
   empty: Noch keine Projekte.
   open: Verwalten
   col:

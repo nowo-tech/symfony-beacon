@@ -1354,6 +1354,7 @@ groups:
   intro: Organizza gli utenti in gruppi, quindi collega i gruppi ai progetti per l'accesso
     in blocco.
   create: Nuovo gruppo
+  create_intro: Assegna un nome al progetto e un’eventuale descrizione. Diventi proprietario e viene creata una chiave API predefinita.
   search_placeholder: Cerca per nome, slug o descrizione…
   empty: Nessun gruppo ancora.
   open: Aprire
@@ -1395,6 +1396,7 @@ admin_projects:
   intro: 'Gestisci ogni progetto su questa istanza: membri, collegamenti ai gruppi
     ed eliminazione.'
   create: Nuovo progetto
+  create_intro: Assegna un nome al progetto e un’eventuale descrizione. Diventi proprietario e viene creata una chiave API predefinita.
   empty: Nessun progetto ancora
   open: Maneggio
   col:

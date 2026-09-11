@@ -16,9 +16,13 @@ Requires **`ROLE_ADMIN`**. Beacon admin CRUD plus nowo-tech kit panels.
 
 ![Groups](images/admin-groups.png)
 
+New groups open as a modal on the groups directory (name + optional description). Edit remains a full page.
+
 ![New group](images/admin-groups-new.png)
 
 ![Projects](images/admin-projects.png)
+
+New projects open as a modal on the admin projects directory (name + optional description). Edit remains a full page.
 
 ![New project (admin)](images/admin-projects-new.png)
 

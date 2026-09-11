@@ -1599,6 +1599,7 @@ groups:
   title: Groups
   intro: Organize users into groups, then link groups to projects for bulk access.
   create: New group
+  create_intro: Name the project and add an optional description. You become the owner and a default API key is created.
   search_placeholder: Search by name, slug, or description…
   empty: No groups yet.
   open: Open
@@ -1639,6 +1640,7 @@ admin_projects:
   title: Projects
   intro: Manage every project on this instance — members, group links, and deletion.
   create: New project
+  create_intro: Name the project and add an optional description. You become the owner and a default API key is created.
   empty: No projects yet.
   open: Manage
   config:

@@ -1,4 +1,4 @@
-<section class="panel mt-6">
+<section class="panel mt-6" data-testid="project-threshold-rules">
     <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
         <div>
             <h2 class="text-lg font-semibold">{{ 'thresholds.title'|trans }}</h2>
@@ -7,7 +7,49 @@
                 <p class="mt-2 text-xs text-[var(--color-alert)]">{{ 'thresholds.ingest_disabled'|trans }}</p>
             {% endif %}
         </div>
-        <a class="btn-primary" href="{{ path('project_threshold_rule_new', {id: project.uuid}) }}">{{ 'thresholds.add'|trans }}</a>
+        {% if thresholdCreateForm %}
+            {% embed 'shared/_confirm_dialog.html.twig' with {
+                custom_form: true,
+                dialog_modifier: 'confirm-dialog--wide',
+                open_on_connect: openThresholdCreate|default(false),
+                aria_labelledby: 'project-threshold-create-title-' ~ project.id,
+            } %}
+                {% block trigger %}
+                    <button
+                        type="button"
+                        class="btn-primary"
+                        data-action="confirm-dialog#open"
+                        data-testid="project-threshold-add"
+                    >{{ 'thresholds.add'|trans }}</button>
+                {% endblock %}
+                {% block form %}
+                    {{ form_start(thresholdCreateForm, {attr: {class: 'confirm-dialog__panel', 'data-testid': 'project-threshold-create-form'}}) }}
+                        <div class="confirm-dialog__header">
+                            <h2 id="project-threshold-create-title-{{ project.id }}" class="confirm-dialog__title">{{ 'thresholds.new_title'|trans }}</h2>
+                            <p class="confirm-dialog__body">{{ 'thresholds.form_help'|trans }}</p>
+                        </div>
+                        <div class="confirm-dialog__content space-y-3">
+                            {{ form_row(thresholdCreateForm.label) }}
+                            {{ form_row(thresholdCreateForm.enabled) }}
+                            <div class="grid gap-3 sm:grid-cols-3">
+                                {{ form_row(thresholdCreateForm.errorCount) }}
+                                {{ form_row(thresholdCreateForm.windowMinutes) }}
+                                {{ form_row(thresholdCreateForm.cooldownMinutes) }}
+                            </div>
+                            <div class="grid gap-3 sm:grid-cols-2">
+                                {{ form_row(thresholdCreateForm.environment) }}
+                                {{ form_row(thresholdCreateForm.releaseVersion) }}
+                            </div>
+                            {% include 'form/_fields.html.twig' with {form: thresholdCreateForm} only %}
+                        </div>
+                        <div class="confirm-dialog__actions">
+                            <button type="button" class="btn-ghost" data-confirm-dialog-close>{{ 'thresholds.cancel'|trans }}</button>
+                            <button type="submit" class="btn-primary">{{ 'thresholds.save'|trans }}</button>
+                        </div>
+                    {{ form_end(thresholdCreateForm, {render_rest: false}) }}
+                {% endblock %}
+            {% endembed %}
+        {% endif %}
     </div>
     {% set thresholdRules = project.thresholdRules %}
     {% if thresholdRules is empty %}

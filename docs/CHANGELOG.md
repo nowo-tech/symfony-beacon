@@ -9,22 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _No unreleased operator-facing changes yet._
 
-## [1.28.0] - 2026-09-10
+## [1.28.0] - 2026-09-11
 
 ### Added
 
 - **Product UI manual (Phase 6.63 / `111`):** English operator guide under [`docs/manual/`](manual/) with fixed **1440×900** Playwright screenshots (warm product inventory + cold setup wizard). Theme/locale preference demos once on public (`/login`) and private (`/dashboard`). Make: `docs-manual-screenshots` / `docs-manual-screenshots-setup`. Spec: `specs/111-product-ui-manual/`.
+- **GitHub wiki Home index:** [`docs/wiki/Home.md`](wiki/Home.md) chapter index linking into `docs/manual/` (canonical tree); `make wiki-push-home`.
+- **Admin / alerts create modals (Phase 6.64 / `112`):** Spec + as-built inventory for confirm-dialog creates. Spec: `specs/112-admin-create-modals/`.
+
+### Changed
+
+- **Create UX:** New group, New project (Administration), and New threshold rule open as confirm-dialog modals on the parent list/settings page (`?new=1` / `?new_threshold=1`). Legacy `…/new` GETs redirect. FormKit catalogues cover `admin_group.*` / `project_threshold_rule.*`. Product dashboard create (`/projects/new` → `/dashboard?new=1`) unchanged.
+- **Manual polish:** Trusted browsers devices shot fixed; create shots recaptured as modals; chapter notes for modal creates.
 
 ### Fixed
 
 - **`make test-e2e-worker-safe`:** force-recreate PHP with `E2E_FRANKENPHP_WORKER_NUM=1` on the same Make invocation that expands `DC_E2E` (process env was overriding `.env.e2e.local` and leaving `worker_num=4`).
-- **PHP-CS-Fixer:** style drift on a handful of PHP sources that failed `php-cs-fixer check` in CI.
+- **PHP-CS-Fixer / Rector / PHPStan:** style and dry-run deltas that failed the Quality gate in CI.
 - **PHPUnit coverage:** close remaining includable gaps (preload command apply paths, WebPush body branches, CSP empty-nonce stamp, CSRF form extension early return, portability UUID create return).
 
 ### Notes for integrators
 
-- Docs / QA / Make only — **no** Doctrine migrations and **no** Composer pin changes.
-- Optional: regenerate manual images with `make docs-manual-screenshots` (warm stack) and `make docs-manual-screenshots-setup` (cold setup).
+- **No** Doctrine migrations and **no** Composer pin changes.
+- Bookmarks to `/admin/groups/new`, `/admin/projects/new`, or `…/threshold-rules/new` still work (redirect to modal open).
+- Optional: regenerate manual images with `make docs-manual-screenshots` (warm) and `make docs-manual-screenshots-setup` (cold setup).
 - See [UPGRADING.md](UPGRADING.md) **Upgrading from 1.27.0 to 1.28.0**.
 
 ## [1.27.0] - 2026-09-10

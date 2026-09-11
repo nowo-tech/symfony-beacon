@@ -362,6 +362,9 @@ final class ProjectSettingsPageBuilderTest extends TestCase
         self::assertArrayHasKey(55, $page['notificationDeleteForms']);
         self::assertArrayHasKey(66, $page['thresholdToggleForms']);
         self::assertArrayHasKey(66, $page['thresholdDeleteForms']);
+        self::assertArrayHasKey('thresholdCreateForm', $page);
+        self::assertNotNull($page['thresholdCreateForm']);
+        self::assertArrayHasKey('openThresholdCreate', $page);
         self::assertArrayHasKey('enabled', $page['memberAlertsInitial']);
         self::assertArrayHasKey('memberAlertsHasOverrides', $page);
         self::assertSame('https://beacon.test/share/new', $page['lastShareUrl']);

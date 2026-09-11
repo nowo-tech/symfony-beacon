@@ -8,7 +8,9 @@ use App\Identity\Entity\User;
 use App\Identity\Entity\UserGroup;
 use App\Identity\Repository\UserGroupMembershipRepository;
 use App\Identity\Repository\UserGroupRepository;
+use App\Notifications\Entity\ProjectThresholdRule;
 use App\Notifications\Enum\MemberAlertEvent;
+use App\Notifications\Form\ProjectThresholdRuleType;
 use App\Notifications\Repository\NotificationDeliveryAttemptRepository;
 use App\Notifications\Service\MemberAlertPreferenceManager;
 use App\Ops\Messenger\MessengerQueueHealth;
@@ -226,6 +228,16 @@ final readonly class ProjectSettingsPageBuilder
             $thresholdDeleteForms[$ruleId] = $this->csrfOnlyFormFactory->create('', 'threshold_delete_'.$ruleId, 'POST')->createView();
         }
 
+        $thresholdCreateForm = null;
+        if ($access->canManageNotifications()) {
+            $thresholdRule = new ProjectThresholdRule();
+            $thresholdRule->setProject($project);
+            $thresholdCreateForm = $this->formFactory->create(ProjectThresholdRuleType::class, $thresholdRule, [
+                'action' => $this->urlGenerator->generate('project_threshold_rule_new', ['id' => $project->getUuid()]),
+                'method' => 'POST',
+            ])->createView();
+        }
+
         $transferOwnershipChoices = $this->membershipFormSupport->transferOwnershipChoices($project, $user);
 
         $memberAlertRows = $this->memberAlertPreferenceManager->projectRowsForUi($user, [$project]);
@@ -402,6 +414,8 @@ final readonly class ProjectSettingsPageBuilder
             'notificationDeleteForms' => $notificationDeleteForms,
             'thresholdToggleForms' => $thresholdToggleForms,
             'thresholdDeleteForms' => $thresholdDeleteForms,
+            'thresholdCreateForm' => $thresholdCreateForm,
+            'openThresholdCreate' => $request->query->getBoolean('new_threshold'),
             'groupAddForm' => $groupAddForm,
             'configImportForm' => $configImportForm,
             'transferOwnershipForm' => $transferOwnershipForm,

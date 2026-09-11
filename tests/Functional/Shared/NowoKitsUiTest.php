@@ -301,10 +301,13 @@ final class NowoKitsUiTest extends DatabaseWebTestCase
         self::assertSelectorExists('#user-create-dialog-title');
 
         $client->request(Request::METHOD_GET, '/projects/'.$project->getUuid().'/threshold-rules/new');
+        self::assertResponseRedirects();
+        $client->followRedirect();
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('.beacon-breadcrumb-wrap');
         self::assertSelectorTextContains('.beacon-breadcrumb-wrap', 'Settings');
-        self::assertSelectorTextContains('.beacon-breadcrumb-wrap', 'New threshold rule');
+        self::assertSelectorExists('[data-testid="project-threshold-create-form"]');
+        self::assertSelectorExists('[data-testid="project-threshold-add"]');
 
         // Menu create/edit forms are kit modal partials (no app shell); seed still registers the routes.
         // admin_users_new remains in the fixture for deep links / legacy crumbs even though GET redirects.

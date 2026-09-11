@@ -4,6 +4,7 @@ import {
   createApiKeyAndParseDsn,
   dismissProductTour,
   ingestHttpBase,
+  openNewThresholdRuleForm,
   waitForPageLoader,
 } from '../support/helpers';
 
@@ -102,10 +103,7 @@ test.describe('Threshold delivery after ingest', () => {
     await expect(page).toHaveURL(new RegExp(`/projects/${uuid}/settings/alerts`), { timeout: 20_000 });
     await expect(page.locator('#project-notification-destinations')).toContainText(destLabel, { timeout: 15_000 });
 
-    await page.goto(`/projects/${uuid}/threshold-rules/new`);
-    await dismissProductTour(page);
-    const ruleForm = page.getByRole('main').locator('form').first();
-    await expect(ruleForm).toBeVisible();
+    const ruleForm = await openNewThresholdRuleForm(page, uuid);
     await ruleForm.locator('input[name="project_threshold_rule[label]"]').fill(ruleLabel);
     await ruleForm.locator('input[name="project_threshold_rule[errorCount]"]').fill('1');
     await ruleForm.locator('input[name="project_threshold_rule[windowMinutes]"]').fill('15');

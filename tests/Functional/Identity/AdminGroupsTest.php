@@ -34,10 +34,14 @@ final class AdminGroupsTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $admin);
-        $crawler = $client->request(Request::METHOD_GET, '/admin/groups/new');
+        $client->request(Request::METHOD_GET, '/admin/groups/new');
+        self::assertResponseRedirects('/admin/groups?new=1');
+        $crawler = $client->followRedirect();
         self::assertResponseIsSuccessful();
+        self::assertSelectorExists('[data-testid="admin-group-create"]');
+        self::assertCount(1, $crawler->filter('[data-confirm-dialog-open-on-connect-value="true"]'));
 
-        $form = $crawler->selectButton('New group')->form([
+        $form = $crawler->filter('form[action$="/admin/groups/new"]')->form([
             'admin_group[name]' => 'Platform',
             'admin_group[description]' => 'Platform team',
         ]);

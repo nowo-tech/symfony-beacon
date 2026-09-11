@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import {
   dismissProductTour,
+  openNewThresholdRuleForm,
   resolveDemoProjectUuid,
   waitForPageLoader,
 } from '../support/helpers';
@@ -130,9 +131,7 @@ test.describe('Notification channel matrix', () => {
   test('threshold rule edit form saves (UC-NOTIF-15)', async ({ page }) => {
     const uuid = await resolveDemoProjectUuid(page);
     const label = `e2e-thr-edit-${Date.now().toString(36)}`;
-    await page.goto(`/projects/${uuid}/threshold-rules/new`);
-    await dismissProductTour(page);
-    const form = page.locator('form').filter({ has: page.locator('input[name="project_threshold_rule[label]"]') });
+    const form = await openNewThresholdRuleForm(page, uuid);
     await form.locator('input[name="project_threshold_rule[label]"]').fill(label);
     await form.locator('input[name="project_threshold_rule[errorCount]"]').fill('3');
     await form.locator('input[name="project_threshold_rule[windowMinutes]"]').fill('10');

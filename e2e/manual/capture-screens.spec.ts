@@ -57,7 +57,7 @@ const accountShots: Shot[] = [
   { name: 'account-groups', path: '/account/groups' },
   { name: 'account-security', path: '/account/security', maxParts: 2 },
   { name: 'account-security-activity', path: '/account/security/activity' },
-  { name: 'account-security-devices', path: '/account/security/devices', maxParts: 2 },
+  { name: 'account-security-devices', path: '/account/security/devices' },
   { name: 'account-security-history', path: '/account/security/history' },
   { name: 'account-display', path: '/account/display', maxParts: 2 },
   { name: 'account-display-panels', path: '/account/display/panels', maxParts: 2 },
@@ -71,9 +71,9 @@ const adminShots: Shot[] = [
   { name: 'admin-users', path: '/admin/users' },
   { name: 'admin-users-new', path: '/admin/users/new', maxParts: 2 },
   { name: 'admin-groups', path: '/admin/groups' },
-  { name: 'admin-groups-new', path: '/admin/groups/new' },
+  { name: 'admin-groups-new', path: '/admin/groups?new=1' },
   { name: 'admin-projects', path: '/admin/projects' },
-  { name: 'admin-projects-new', path: '/admin/projects/new' },
+  { name: 'admin-projects-new', path: '/admin/projects?new=1' },
   { name: 'admin-roles', path: '/admin/roles' },
   { name: 'admin-roles-new', path: '/admin/roles/new' },
   { name: 'admin-permissions', path: '/admin/permissions' },
@@ -282,7 +282,7 @@ test.describe('Product UI manual screenshots', () => {
       { name: 'project-settings-danger', path: `/projects/${projectUuid}/settings/danger` },
       { name: 'project-notifications-new', path: `/projects/${projectUuid}/notifications/new`, maxParts: 2 },
       { name: 'project-notifications-help', path: `/projects/${projectUuid}/notifications/help`, maxParts: 2 },
-      { name: 'project-threshold-rules-new', path: `/projects/${projectUuid}/threshold-rules/new` },
+      { name: 'project-threshold-rules-new', path: `/projects/${projectUuid}/settings/alerts?new_threshold=1` },
     ];
     for (const shot of projectShots) {
       await shoot(page, shot);

@@ -14,6 +14,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Admin create/edit user group (name + optional description).
+ *
+ * Catalogue: {@code translations/form.*.yaml} → {@code admin_group.*}.
  */
 final class AdminGroupType extends FormKitAbstractType
 {
@@ -21,11 +23,9 @@ final class AdminGroupType extends FormKitAbstractType
     {
         $this->withBuilder($builder, function (): void {
             $this->addTextField('name', [
-                'label' => 'groups.name_label',
                 'constraints' => [new NotBlank(), new Length(max: 120)],
             ]);
             $this->addTextareaField('description', [
-                'label' => 'groups.description_label',
                 'required' => false,
                 'constraints' => [new Length(max: 2000)],
             ]);

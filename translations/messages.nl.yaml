@@ -1346,6 +1346,7 @@ groups:
   intro: Organiseer gebruikers in groepen en koppel groepen vervolgens aan projecten
     voor bulktoegang.
   create: Nieuwe groep
+  create_intro: Geef het project een naam en optioneel een beschrijving. Jij wordt eigenaar en er wordt een standaard-API-sleutel aangemaakt.
   search_placeholder: Zoeken op naam, slug of beschrijving…
   empty: Nog geen groepen.
   open: Open
@@ -1386,6 +1387,7 @@ admin_projects:
   title: Projecten
   intro: 'Beheer elk project op dit exemplaar: leden, groepslinks en verwijdering.'
   create: Nieuw project
+  create_intro: Geef het project een naam en optioneel een beschrijving. Jij wordt eigenaar en er wordt een standaard-API-sleutel aangemaakt.
   empty: Nog geen projecten.
   open: Beheren
   col:

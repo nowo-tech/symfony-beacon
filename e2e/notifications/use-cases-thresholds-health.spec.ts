@@ -5,6 +5,7 @@ import {
   ingestHttpBase,
   loadDemoIngestCredentials,
   openFirstIssue,
+  openNewThresholdRuleForm,
   requireSampleOrSkip,
   resolveDemoProjectUuid,
   waitForPageLoader,
@@ -13,10 +14,7 @@ import {
 test.describe('Thresholds, health, quiet hours, issue panels', () => {
   test('creates toggles and deletes a threshold rule (UC-NOTIF-07)', async ({ page }) => {
     const uuid = await resolveDemoProjectUuid(page);
-    await page.goto(`/projects/${uuid}/threshold-rules/new`);
-    await dismissProductTour(page);
-    const form = page.getByRole('main').locator('form.panel, form').first();
-    await expect(form).toBeVisible();
+    const form = await openNewThresholdRuleForm(page, uuid);
     const label = `e2e-threshold-${Date.now().toString(36)}`;
     await form.locator('input[name="project_threshold_rule[label]"]').fill(label);
     await form.locator('input[name="project_threshold_rule[errorCount]"]').fill('5');

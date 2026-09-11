@@ -2,7 +2,7 @@
 
 **Feature Branch**: `036-admin-identity-audit`  
 **Created**: 2026-07-31  
-**Status**: Implemented  
+**Status**: Implemented (group create modal UX — 2026-09-11 / `112`)  
 
 **Input**: Bring Admin → **User** and Admin → **Group** audit UX to parity with Admin → Project audit (`031-admin-project-audit`): filterable `user_action` timelines (action type + date range) on top of existing AuditKit timestamps/blame. Reuse `UserAction` / `UserActionRecorder`; do not invent a parallel audit store.
 
@@ -54,6 +54,7 @@ As an instance admin, I still see AuditKit `createdAt` / `updatedAt` / blame on 
 - **FR-005**: Keep AuditKit timestamp/blame panels; timeline is additive.
 - **FR-006**: English catalogues for filters/empty states; key parity for enabled locales.
 - **FR-007**: Functional tests: group member add appears on group timeline; user role change filterable; non-admin denied.
+- **FR-008** (`112`): Creating a group from Administration → Groups MUST use a confirm-dialog modal on the directory (`GET /admin/groups/new` → `/admin/groups?new=1`); edit remains full page. FormKit chrome uses `admin_group.*`.
 
 ## Success Criteria
 
@@ -72,3 +73,7 @@ As an instance admin, I still see AuditKit `createdAt` / `updatedAt` / blame on 
 - Immutable WORM / compliance-grade storage.
 - End-user (non-admin) account security activity (see `037` polish).
 - Replacing AuditKit traits on User/UserGroup.
+
+## Amendment (`112-admin-create-modals`, 2026-09-11)
+
+- Admin group **create** is a list-page modal (`?new=1`); does not change timeline/filter requirements above. See `specs/112-admin-create-modals/`.

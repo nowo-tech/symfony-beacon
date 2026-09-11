@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Notifications\Controller;
 
+use App\Identity\Entity\User;
 use App\Notifications\Entity\ProjectThresholdRule;
 use App\Notifications\Form\ProjectThresholdRuleType;
 use App\Notifications\Service\ThresholdRuleWriter;
 use App\Project\Entity\Project;
 use App\Project\Enum\ProjectSettingsSection;
 use App\Project\Security\ProjectPermission;
+use App\Project\Service\ProjectAccessService;
+use App\Project\Service\ProjectSettingsPageBuilder;
 use Nowo\FormKitBundle\Form\Type\CsrfOnlyType;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,6 +31,8 @@ final class ProjectThresholdRuleController extends AbstractController
 {
     public function __construct(
         private readonly ThresholdRuleWriter $thresholdRuleWriter,
+        private readonly ProjectSettingsPageBuilder $settingsPageBuilder,
+        private readonly ProjectAccessService $projectAccess,
     ) {
     }
 
@@ -38,25 +43,41 @@ final class ProjectThresholdRuleController extends AbstractController
         Project $project,
         Request $request,
     ): Response {
+        if ($request->isMethod('GET')) {
+            return $this->redirectToRoute('project_settings_section', [
+                'id' => $project->getUuid(),
+                'section' => ProjectSettingsSection::Alerts->value,
+                'new_threshold' => 1,
+            ]);
+        }
+
         $rule = new ProjectThresholdRule();
         $rule->setProject($project);
 
-        $form = $this->createForm(ProjectThresholdRuleType::class, $rule);
+        $form = $this->createForm(ProjectThresholdRuleType::class, $rule, [
+            'action' => $this->generateUrl('project_threshold_rule_new', ['id' => $project->getUuid()]),
+            'method' => 'POST',
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->thresholdRuleWriter->create($project, $rule);
             $this->addFlash('success', 'thresholds.flash.created');
 
-            return $this->redirectToRoute('project_settings_section', ['id' => $project->getUuid(), 'section' => ProjectSettingsSection::Alerts->value]);
+            return $this->redirectToRoute('project_settings_section', [
+                'id' => $project->getUuid(),
+                'section' => ProjectSettingsSection::Alerts->value,
+            ]);
         }
 
-        return $this->render('notifications/threshold_rule_form.html.twig', [
-            'project' => $project,
-            'form' => $form,
-            'rule' => $rule,
-            'is_edit' => false,
-        ]);
+        /** @var User $user */
+        $user = $this->getUser();
+        $access = $this->projectAccess->requireSettingsSurface($project, $user);
+        $vars = $this->settingsPageBuilder->build($project, $user, $access, $request, ProjectSettingsSection::Alerts);
+        $vars['thresholdCreateForm'] = $form->createView();
+        $vars['openThresholdCreate'] = true;
+
+        return $this->render('project/settings.html.twig', $vars);
     }
 
     #[Route('/projects/{projectId}/threshold-rules/{id}/edit', name: 'project_threshold_rule_edit', requirements: ['projectId' => Requirement::UUID, 'id' => Requirement::UUID], methods: ['GET', 'POST'])]

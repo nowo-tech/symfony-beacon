@@ -547,21 +547,34 @@ projects:
     max_uses: Max uses
     max_uses_help: Leave Max uses empty for unlimited opens until expiry. Default is 1 (single use).
     max_uses_unlimited: Unlimited
-thresholds:
-  form:
-    cooldown_minutes: Cooldown (minutes)
-    cooldown_minutes_help: Suppress duplicate alerts for this rule during the cooldown window.
-    enabled: Enabled
-    environment: Environment filter
-    environment_help: Leave blank to count all environments.
-    error_count: Error count
-    error_count_help: Alert when at least this many error/fatal events are received in the rolling window.
+project_threshold_rule:
+  label:
     label: Label
-    label_help: Optional internal name shown in Settings and payloads.
-    release: Release filter
-    release_help: Leave blank to count all releases.
-    window_minutes: Window (minutes)
-    window_minutes_help: Rolling lookback window from 1 to 1440 minutes.
+    help: Optional internal name shown in Settings and payloads.
+    placeholder: Burst on prod…
+  enabled:
+    label: Enabled
+    help: When off, the rule is kept but not evaluated.
+  error_count:
+    label: Error count
+    help: Alert when at least this many error/fatal events are received in the rolling window.
+    placeholder: "50"
+  window_minutes:
+    label: Window (minutes)
+    help: Rolling lookback window from 1 to 1440 minutes.
+    placeholder: "15"
+  cooldown_minutes:
+    label: Cooldown (minutes)
+    help: Suppress duplicate alerts for this rule during the cooldown window.
+    placeholder: "60"
+  environment:
+    label: Environment filter
+    help: Leave blank to count all environments.
+    placeholder: prod
+  release_version:
+    label: Release filter
+    help: Leave blank to count all releases.
+    placeholder: 1.2.0
 analytics_filter:
   from:
     placeholder: From
@@ -835,6 +848,15 @@ project_delete:
   confirmation:
     label: Type the project name to confirm
 
+admin_group:
+  name:
+    label: Name
+    help: Short name shown in Administration and project group links.
+    placeholder: Platform team
+  description:
+    label: Description
+    help: Optional notes for operators (not shown to end users).
+    placeholder: Cross-project access for platform engineers…
 admin_group_member_add:
   email:
     label: Member email

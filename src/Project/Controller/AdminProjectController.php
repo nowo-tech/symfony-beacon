@@ -26,6 +26,7 @@ use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
 use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -58,51 +59,21 @@ final class AdminProjectController extends AbstractController
     #[Route('/admin/projects', name: 'admin_projects', methods: ['GET'])]
     public function index(Request $request): Response
     {
-        $query = $request->query->getString('q');
-        $total = $this->projectRepository->countAllOrdered('' !== $query ? $query : null);
-        $pagination = PagePagination::fromRequest($request, $total);
-        $projects = $this->projectRepository->findAllOrdered(
-            '' !== $query ? $query : null,
-            $pagination['per_page'],
-            $pagination['offset'],
-        );
-        $projectIds = [];
-        foreach ($projects as $project) {
-            $id = $project->getId();
-            if (null !== $id) {
-                $projectIds[] = $id;
-            }
-        }
-
-        return $this->render('admin/projects/index.html.twig', [
-            'projects' => $projects,
-            'q' => $query,
-            'pagination' => $pagination,
-            'searchForm' => $this->getFilterFormFactory->create(AdminSearchType::class, [
-                'q' => $query,
-            ], [
-                'action' => $this->generateUrl('admin_projects'),
-            ])->createView(),
-            'opsStats' => $this->opsStats->forProjects($projects),
-            'access_counts' => $this->projectRepository->countAccessByProjectIds($projectIds),
-            'importForm' => $this->createForm(AdminProjectImportType::class, null, [
-                'action' => $this->generateUrl('admin_projects_import'),
-                'method' => 'POST',
-                'csrf_token_id' => 'admin_projects_import',
-            ])->createView(),
-        ]);
+        return $this->renderIndex($request);
     }
 
-    /** Create a project (admin becomes owner; default API key). */
+    /**
+     * Create a project (admin becomes owner; default API key).
+     * GET opens the create modal on the directory; POST processes the form.
+     */
     #[Route('/admin/projects/new', name: 'admin_projects_new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
-        $form = $this->createForm(ProjectType::class, [
-            'name' => '',
-            'description' => '',
-        ], [
-            'csrf_token_id' => 'admin_project_new',
-        ]);
+        if (!$request->isMethod(Request::METHOD_POST)) {
+            return $this->redirectToRoute('admin_projects', ['new' => '1']);
+        }
+
+        $form = $this->buildCreateForm();
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -120,11 +91,7 @@ final class AdminProjectController extends AbstractController
             return $this->redirectToRoute('admin_projects_show', ['id' => $project->getUuid()]);
         }
 
-        return $this->render('admin/projects/form.html.twig', [
-            'form' => $form,
-            'project' => null,
-            'is_edit' => false,
-        ]);
+        return $this->renderIndex($request, $form, openCreate: true);
     }
 
     /** Project detail: members, linked groups, open in product UI, delete. */
@@ -332,6 +299,68 @@ final class AdminProjectController extends AbstractController
         $this->addFlash('success', 'flash.project.deleted');
 
         return $this->redirectToRoute('admin_projects');
+    }
+
+    /**
+     * Render the projects directory (optional create modal open / invalid create form).
+     *
+     * @param FormInterface<mixed>|null $invalidCreateForm Submitted create form with errors
+     */
+    private function renderIndex(
+        Request $request,
+        ?FormInterface $invalidCreateForm = null,
+        bool $openCreate = false,
+    ): Response {
+        $query = $request->query->getString('q');
+        $total = $this->projectRepository->countAllOrdered('' !== $query ? $query : null);
+        $pagination = PagePagination::fromRequest($request, $total);
+        $projects = $this->projectRepository->findAllOrdered(
+            '' !== $query ? $query : null,
+            $pagination['per_page'],
+            $pagination['offset'],
+        );
+        $projectIds = [];
+        foreach ($projects as $project) {
+            $id = $project->getId();
+            if (null !== $id) {
+                $projectIds[] = $id;
+            }
+        }
+
+        $createForm = ($invalidCreateForm ?? $this->buildCreateForm())->createView();
+
+        return $this->render('admin/projects/index.html.twig', [
+            'projects' => $projects,
+            'q' => $query,
+            'pagination' => $pagination,
+            'searchForm' => $this->getFilterFormFactory->create(AdminSearchType::class, [
+                'q' => $query,
+            ], [
+                'action' => $this->generateUrl('admin_projects'),
+            ])->createView(),
+            'opsStats' => $this->opsStats->forProjects($projects),
+            'access_counts' => $this->projectRepository->countAccessByProjectIds($projectIds),
+            'importForm' => $this->createForm(AdminProjectImportType::class, null, [
+                'action' => $this->generateUrl('admin_projects_import'),
+                'method' => 'POST',
+                'csrf_token_id' => 'admin_projects_import',
+            ])->createView(),
+            'createForm' => $createForm,
+            'open_create' => $openCreate || $request->query->getBoolean('new'),
+        ]);
+    }
+
+    /** @return FormInterface<mixed> */
+    private function buildCreateForm(): FormInterface
+    {
+        return $this->createForm(ProjectType::class, [
+            'name' => '',
+            'description' => '',
+        ], [
+            'action' => $this->generateUrl('admin_projects_new'),
+            'method' => 'POST',
+            'csrf_token_id' => 'admin_project_new',
+        ]);
     }
 
     private function createProject(string $name, string $description, User $owner): Project

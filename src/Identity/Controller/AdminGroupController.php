@@ -31,6 +31,7 @@ use Nowo\FormKitBundle\Form\CsrfOnlyFormFactory;
 use Nowo\FormKitBundle\Form\GetFilterFormFactory;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -65,43 +66,22 @@ final class AdminGroupController extends AbstractController
     #[Route('/admin/groups', name: 'admin_groups', methods: ['GET'])]
     public function index(Request $request): Response
     {
-        $query = $request->query->getString('q');
-        $total = $this->groupRepository->countAllOrdered('' !== $query ? $query : null);
-        $pagination = PagePagination::fromRequest($request, $total);
-        $groups = $this->groupRepository->findAllOrdered(
-            '' !== $query ? $query : null,
-            $pagination['per_page'],
-            $pagination['offset'],
-        );
-        $groupIds = [];
-        foreach ($groups as $group) {
-            $id = $group->getId();
-            if (null !== $id) {
-                $groupIds[] = $id;
-            }
-        }
-
-        return $this->render('admin/groups/index.html.twig', [
-            'groups' => $groups,
-            'q' => $query,
-            'pagination' => $pagination,
-            'searchForm' => $this->getFilterFormFactory->create(AdminSearchType::class, [
-                'q' => $query,
-            ], [
-                'action' => $this->generateUrl('admin_groups'),
-            ])->createView(),
-            'member_counts' => $this->groupMembershipRepository->countByGroupIds($groupIds),
-        ]);
+        return $this->renderIndex($request);
     }
 
-    /** Create a group (name, optional description; slug derived from name). */
+    /**
+     * Create a group (name, optional description; slug derived from name).
+     * GET opens the create modal on the directory; POST processes the form.
+     */
     #[Route('/admin/groups/new', name: 'admin_groups_new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
+        if (!$request->isMethod(Request::METHOD_POST)) {
+            return $this->redirectToRoute('admin_groups', ['new' => '1']);
+        }
+
         $group = new UserGroup();
-        $form = $this->createForm(AdminGroupType::class, $group, [
-            'csrf_token_id' => 'admin_group_new',
-        ]);
+        $form = $this->buildCreateForm($group);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -121,11 +101,7 @@ final class AdminGroupController extends AbstractController
             return $this->redirectToRoute('admin_groups_show', ['id' => $group->getUuid()]);
         }
 
-        return $this->render('admin/groups/form.html.twig', [
-            'form' => $form,
-            'group' => null,
-            'is_edit' => false,
-        ]);
+        return $this->renderIndex($request, $form, openCreate: true);
     }
 
     /** Group detail: members, linked projects, and filterable audit timeline. */
@@ -422,6 +398,59 @@ final class AdminGroupController extends AbstractController
         }
 
         return $this->redirectToRoute('admin_groups_show', ['id' => $group->getUuid()]);
+    }
+
+    /**
+     * Render the groups directory (optional create modal open / invalid create form).
+     *
+     * @param FormInterface<mixed>|null $invalidCreateForm Submitted create form with errors
+     */
+    private function renderIndex(
+        Request $request,
+        ?FormInterface $invalidCreateForm = null,
+        bool $openCreate = false,
+    ): Response {
+        $query = $request->query->getString('q');
+        $total = $this->groupRepository->countAllOrdered('' !== $query ? $query : null);
+        $pagination = PagePagination::fromRequest($request, $total);
+        $groups = $this->groupRepository->findAllOrdered(
+            '' !== $query ? $query : null,
+            $pagination['per_page'],
+            $pagination['offset'],
+        );
+        $groupIds = [];
+        foreach ($groups as $group) {
+            $id = $group->getId();
+            if (null !== $id) {
+                $groupIds[] = $id;
+            }
+        }
+
+        $createForm = ($invalidCreateForm ?? $this->buildCreateForm())->createView();
+
+        return $this->render('admin/groups/index.html.twig', [
+            'groups' => $groups,
+            'q' => $query,
+            'pagination' => $pagination,
+            'searchForm' => $this->getFilterFormFactory->create(AdminSearchType::class, [
+                'q' => $query,
+            ], [
+                'action' => $this->generateUrl('admin_groups'),
+            ])->createView(),
+            'member_counts' => $this->groupMembershipRepository->countByGroupIds($groupIds),
+            'createForm' => $createForm,
+            'open_create' => $openCreate || $request->query->getBoolean('new'),
+        ]);
+    }
+
+    /** @return FormInterface<mixed> */
+    private function buildCreateForm(?UserGroup $group = null): FormInterface
+    {
+        return $this->createForm(AdminGroupType::class, $group ?? new UserGroup(), [
+            'action' => $this->generateUrl('admin_groups_new'),
+            'method' => 'POST',
+            'csrf_token_id' => 'admin_group_new',
+        ]);
     }
 
     /** ASCII slug for the group name (fallback random token if empty). */

@@ -52,6 +52,6 @@ Copy-for-AI: [AI-EXPORT.md](../product/AI-EXPORT.md).
 
 ![Notifications help](images/project-notifications-help.png)
 
-![New threshold rule](images/project-threshold-rules-new.png)
+![New threshold rule (modal on Settings → Alerts)](images/project-threshold-rules-new.png)
 
 See [NOTIFICATIONS.md](../product/NOTIFICATIONS.md).

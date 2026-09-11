@@ -11,7 +11,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Create/edit a project error-volume threshold rule (FormKit).
+ * Create/edit a project error-volume threshold rule (FormKit {@code beacon}).
+ *
+ * Catalogue: {@code translations/form.*.yaml} → {@code project_threshold_rule.*}.
  */
 final class ProjectThresholdRuleType extends FormKitAbstractType
 {
@@ -20,38 +22,26 @@ final class ProjectThresholdRuleType extends FormKitAbstractType
     {
         $this->withBuilder($builder, function (): void {
             $this->addTextField('label', [
-                'label' => 'thresholds.form.label',
                 'required' => false,
-                'help' => 'thresholds.form.label_help',
             ]);
             $this->addCheckboxField('enabled', [
-                'label' => 'thresholds.form.enabled',
                 'required' => false,
+                'placeholder' => false,
             ]);
             $this->addIntegerField('errorCount', [
-                'label' => 'thresholds.form.error_count',
-                'help' => 'thresholds.form.error_count_help',
                 'attr' => ['min' => 1, 'max' => 1000000],
             ]);
             $this->addIntegerField('windowMinutes', [
-                'label' => 'thresholds.form.window_minutes',
-                'help' => 'thresholds.form.window_minutes_help',
                 'attr' => ['min' => 1, 'max' => 1440],
             ]);
             $this->addIntegerField('cooldownMinutes', [
-                'label' => 'thresholds.form.cooldown_minutes',
-                'help' => 'thresholds.form.cooldown_minutes_help',
                 'attr' => ['min' => 1, 'max' => 10080],
             ]);
             $this->addTextField('environment', [
-                'label' => 'thresholds.form.environment',
                 'required' => false,
-                'help' => 'thresholds.form.environment_help',
             ]);
             $this->addTextField('releaseVersion', [
-                'label' => 'thresholds.form.release',
                 'required' => false,
-                'help' => 'thresholds.form.release_help',
             ]);
         });
     }

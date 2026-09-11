@@ -69,10 +69,14 @@ final class AdminProjectsTest extends DatabaseWebTestCase
         $em->flush();
 
         $this->login($client, $admin);
-        $crawler = $client->request(Request::METHOD_GET, '/admin/projects/new');
+        $client->request(Request::METHOD_GET, '/admin/projects/new');
+        self::assertResponseRedirects('/admin/projects?new=1');
+        $crawler = $client->followRedirect();
         self::assertResponseIsSuccessful();
+        self::assertSelectorExists('[data-testid="admin-project-create"]');
+        self::assertCount(1, $crawler->filter('[data-confirm-dialog-open-on-connect-value="true"]'));
 
-        $form = $crawler->selectButton('New project')->form([
+        $form = $crawler->filter('form[action$="/admin/projects/new"]')->form([
             'project[name]' => 'Billing API',
             'project[description]' => 'From admin',
         ]);

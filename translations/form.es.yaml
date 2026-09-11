@@ -557,22 +557,34 @@ projects:
     max_uses_help: Deja Usos máximos vacío para aperturas ilimitadas hasta la caducidad. El valor por
       defecto es 1 (un solo uso).
     max_uses_unlimited: Ilimitado
-thresholds:
-  form:
-    cooldown_minutes: Cooldown (minutos)
-    cooldown_minutes_help: Suprime alertas duplicadas de esta regla durante la ventana de cooldown.
-    enabled: Activada
-    environment: Filtro de entorno
-    environment_help: Déjalo vacío para contar todos los entornos.
-    error_count: Conteo de errores
-    error_count_help: Alerta cuando se reciben al menos este número de eventos error/fatal dentro de la
-      ventana móvil.
+project_threshold_rule:
+  label:
     label: Etiqueta
-    label_help: Nombre interno opcional mostrado en Ajustes y en los payloads.
-    release: Filtro de release
-    release_help: Déjalo vacío para contar todas las releases.
-    window_minutes: Ventana (minutos)
-    window_minutes_help: Ventana de observación móvil de 1 a 1440 minutos.
+    help: Nombre interno opcional mostrado en Ajustes y en los payloads.
+    placeholder: Pico en prod…
+  enabled:
+    label: Activada
+    help: Si está desactivada, la regla se conserva pero no se evalúa.
+  error_count:
+    label: Conteo de errores
+    help: Alerta cuando se reciben al menos este número de eventos error/fatal dentro de la ventana móvil.
+    placeholder: "50"
+  window_minutes:
+    label: Ventana (minutos)
+    help: Ventana de observación móvil de 1 a 1440 minutos.
+    placeholder: "15"
+  cooldown_minutes:
+    label: Cooldown (minutos)
+    help: Suprime alertas duplicadas de esta regla durante la ventana de cooldown.
+    placeholder: "60"
+  environment:
+    label: Filtro de entorno
+    help: Déjalo vacío para contar todos los entornos.
+    placeholder: prod
+  release_version:
+    label: Filtro de release
+    help: Déjalo vacío para contar todas las releases.
+    placeholder: 1.2.0
 analytics_filter:
   from:
     placeholder: Desde
@@ -846,6 +858,15 @@ project_delete:
   confirmation:
     label: Escribe el nombre del proyecto para confirmar
 
+admin_group:
+  name:
+    label: Nombre
+    help: Nombre corto mostrado en Administración y en los enlaces de grupo del proyecto.
+    placeholder: Equipo de plataforma
+  description:
+    label: Descripción
+    help: Notas opcionales para operadores (no se muestran a usuarios finales).
+    placeholder: Acceso multi-proyecto para ingenieros de plataforma…
 admin_group_member_add:
   email:
     label: Email del miembro

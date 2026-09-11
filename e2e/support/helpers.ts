@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -269,6 +269,18 @@ export async function expectAuthenticatedPage(page: Page, path: string): Promise
   await dismissProductTour(page);
   await expect(page, `Expected auth for ${path}`).not.toHaveURL(/\/login(\?|$|\/)/);
   await expect(page.locator('body')).toBeVisible();
+}
+
+/**
+ * Open the New threshold rule confirm-dialog on Settings → Alerts
+ * (GET /threshold-rules/new redirects here with ?new_threshold=1).
+ */
+export async function openNewThresholdRuleForm(page: Page, projectUuid: string): Promise<Locator> {
+  await gotoStable(page, `/projects/${projectUuid}/settings/alerts?new_threshold=1`);
+  await dismissProductTour(page);
+  const form = page.locator('[data-testid="project-threshold-create-form"]');
+  await expect(form).toBeVisible({ timeout: 15_000 });
+  return form;
 }
 
 export async function expectGuestPage(page: Page, path: string): Promise<void> {

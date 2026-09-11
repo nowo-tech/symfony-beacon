@@ -108,25 +108,28 @@ See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
 
 ## Upgrading from 1.27.0 to 1.28.0
 
-Product UI manual (`docs/manual/`), worker-safe Make env fix, PHP-CS-Fixer + PHPUnit coverage hardening. **No migrations. No Composer pin changes.**
+Product UI manual (`docs/manual/` + wiki Home index), admin/alerts **create** modals (`112`), worker-safe Make env fix, Quality/coverage CI hardening. **No migrations. No Composer pin changes.**
 
 1. Pull / checkout `v1.28.0`.
 
 2. No `composer install` required solely for this release (pins unchanged).
 
-3. Optional — browse the English product UI manual: [manual/README.md](manual/README.md). Regenerators (warm + cold setup):
+3. Bookmarks to `/admin/groups/new`, `/admin/projects/new`, or `…/threshold-rules/new` still work — they redirect to the parent page with the modal open (`?new=1` / `?new_threshold=1`). Edit flows remain full-page. Product create (`/projects/new` → dashboard modal) is unchanged.
+
+4. Optional — browse the English product UI manual: [manual/README.md](manual/README.md). Wiki index: [GitHub wiki](https://github.com/nowo-tech/symfony-beacon/wiki). Regenerators:
    ```bash
    make docs-manual-screenshots
    make docs-manual-screenshots-setup
+   make wiki-push-home
    ```
 
-4. Optional — re-verify FrankenPHP worker-safe E2E (now correctly forces `WORKER_NUM=1` on recreate):
+5. Optional — re-verify FrankenPHP worker-safe E2E (forces `WORKER_NUM=1` on recreate):
    ```bash
    make up-e2e && make ready-e2e-lite
    make test-e2e-worker-safe
    ```
 
-See [CHANGELOG.md](CHANGELOG.md) `[1.28.0]` and `specs/111-product-ui-manual/`.
+See [CHANGELOG.md](CHANGELOG.md) `[1.28.0]`, `specs/111-product-ui-manual/`, and `specs/112-admin-create-modals/`.
 
 ## Upgrading from 1.26.0 to 1.27.0
 

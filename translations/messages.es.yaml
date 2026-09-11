@@ -1560,6 +1560,7 @@ groups:
   title: Grupos
   intro: Organiza usuarios en grupos y vincúlalos a proyectos para acceso masivo.
   create: Nuevo grupo
+  create_intro: Pon nombre al proyecto y una descripción opcional. Pasarás a ser el propietario y se creará una clave API por defecto.
   search_placeholder: Buscar por nombre, slug o descripción…
   empty: Aún no hay grupos.
   open: Abrir
@@ -1602,6 +1603,7 @@ admin_projects:
   intro: Gestiona todos los proyectos de esta instancia — miembros, grupos vinculados
     y eliminación.
   create: Nuevo proyecto
+  create_intro: Pon nombre al proyecto y una descripción opcional. Pasarás a ser el propietario y se creará una clave API por defecto.
   empty: Aún no hay proyectos.
   open: Gestionar
   config:

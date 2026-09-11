@@ -71,10 +71,20 @@ As an operator, I see the cold-install wizard flow (gate → wizard → admin �
 - `make docs-manual-screenshots` and `make docs-manual-screenshots-setup` are documented and runnable locally.
 - Warm product E2E does not execute the manual capture specs.
 
+## Amendment (`112-admin-create-modals`, 2026-09-11)
+
+- Create shots that used full-page `…/new` MUST capture the modal open query instead:
+  - `admin-groups-new` → `/admin/groups?new=1`
+  - `admin-projects-new` → `/admin/projects?new=1`
+  - `project-threshold-rules-new` → `/projects/{uuid}/settings/alerts?new_threshold=1`
+- Chapters MAY note that create opens as a modal on the parent page (edit may stay full page).
+- Wiki Home remains an index into `docs/manual/` (not a second copy of screenshots).
+
 ## Cross-refs
 
 - Warm E2E: `specs/104-isolated-e2e-stack/`
 - Cold setup circuit: `specs/110-e2e-cold-start-circuit/`, `specs/056-setup-wizard/`
 - Appearance / theme: `specs/082-appearance-theme-presets/`
+- Create-modal inventory: `specs/112-admin-create-modals/`
 - Manual tree: `docs/manual/`
 - Quickstart: `specs/111-product-ui-manual/quickstart.md`
