@@ -70,11 +70,19 @@ test.describe('Administration — use cases', () => {
       await expect(page).not.toHaveURL(/\/login/);
     }
 
-    const disable = page.locator('form[action*="/admin/view-as-member/disable"] button[type="submit"]').first();
-    if (await disable.isVisible().catch(() => false)) {
-      await disable.click();
-      await dismissProductTour(page);
-      await expect(page).not.toHaveURL(/\/login/);
+    try {
+      await expect(page.locator('form[action*="/admin/view-as-member/disable"]')).toBeVisible({ timeout: 10_000 });
+    } finally {
+      // Shared PHP session cookie must not leave view-as-member on for later shard tests.
+      const disable = page.locator('form[action*="/admin/view-as-member/disable"] button[type="submit"]').first();
+      if (await disable.isVisible().catch(() => false)) {
+        await disable.click();
+        await dismissProductTour(page);
+        await expect(page).not.toHaveURL(/\/login/);
+      }
+      await expect(page.locator('form[action*="/admin/view-as-member/disable"]')).toHaveCount(0, {
+        timeout: 15_000,
+      });
     }
   });
 

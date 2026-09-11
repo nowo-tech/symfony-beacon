@@ -214,6 +214,22 @@ export async function dismissProductTour(page: Page): Promise<void> {
 }
 
 /**
+ * Exit admin “view-as-member” if a prior test left `_beacon_view_as_member` in the shared PHP session.
+ * That mode blanks FormKit fields and denies project settings (403).
+ */
+export async function exitViewAsMember(page: Page): Promise<void> {
+  const exit = page.locator('form[action*="/admin/view-as-member/disable"] button[type="submit"]').first();
+  if ((await exit.count()) === 0 || !(await exit.isVisible().catch(() => false))) {
+    return;
+  }
+  await exit.click({ force: true });
+  await waitForPageLoader(page);
+  await expect(page.locator('form[action*="/admin/view-as-member/disable"]')).toHaveCount(0, {
+    timeout: 15_000,
+  });
+}
+
+/**
  * Restore demo admin phone + phoneVerifiedAt after profile E2E clears verification.
  * Non-prod GET; 204 when the admin session can repair the QR approver.
  */
@@ -267,11 +283,21 @@ export async function resolveDemoProjectUuid(page: Page): Promise<string> {
 export async function expectAuthenticatedPage(page: Page, path: string): Promise<void> {
   await gotoStable(page, path);
   await dismissProductTour(page);
+  if (await page.locator('form[action*="/admin/view-as-member/disable"]').count()) {
+    await exitViewAsMember(page);
+    await gotoStable(page, path);
+    await dismissProductTour(page);
+  }
   if (/\/login(\?|$|\/)/i.test(page.url()) || page.url() === '' || page.url() === 'about:blank') {
     // Session can drop mid-suite under load; re-auth once then retry the path.
     await loginAsDemo(page);
     await gotoStable(page, path);
     await dismissProductTour(page);
+    if (await page.locator('form[action*="/admin/view-as-member/disable"]').count()) {
+      await exitViewAsMember(page);
+      await gotoStable(page, path);
+      await dismissProductTour(page);
+    }
   }
   await expect(page, `Expected auth for ${path} (url=${page.url()})`).not.toHaveURL(/\/login(\?|$|\/)/);
   await expect(page.locator('body')).toBeVisible();
@@ -649,11 +675,7 @@ export async function createEphemeralBreadcrumbCollection(
   if ((await nameField.count()) > 0) {
     await nameField.first().fill(name);
   }
-  await form.evaluate((el) => {
-    if (el instanceof HTMLFormElement) {
-      el.requestSubmit();
-    }
-  });
+  await form.locator('button[type="submit"]').first().click({ force: true });
   await waitForPageLoader(page);
 
   let collectionId = page.url().match(/collections\/(\d+)/)?.[1] ?? '';

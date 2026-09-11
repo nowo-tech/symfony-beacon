@@ -6,6 +6,7 @@ import {
   dismissCookieConsent,
   dismissProductTour,
   expectAuthenticatedPage,
+  exitViewAsMember,
   openAdminCreateForm,
   resolveDemoProjectUuid,
   waitForPageLoader,
@@ -43,8 +44,10 @@ test.describe('Final gaps — full role, admin members, bulk import', () => {
     await createEnabledUser(page, email, password, `Full ${suffix}`);
     const uuid = await resolveDemoProjectUuid(page);
 
+    await exitViewAsMember(page);
     await page.goto(`/projects/${uuid}/settings/access`);
     await dismissProductTour(page);
+    await exitViewAsMember(page);
     const membersPanel = page
       .locator('section.panel')
       .filter({ has: page.locator('h2', { hasText: /Members|Miembros/i }) })

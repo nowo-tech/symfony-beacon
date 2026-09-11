@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { dismissProductTour, expectAuthenticatedPage, gotoStable, waitForPageLoader } from '../support/helpers';
+import { dismissProductTour, expectAuthenticatedPage, exitViewAsMember, gotoStable, waitForPageLoader } from '../support/helpers';
 
 /**
  * Mutation coverage for Administration → Appearance (UC-ADM-15 / UC-ADM-31)
