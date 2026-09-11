@@ -1,8 +1,15 @@
 # Symfony Beacon — product UI manual
 
-Operator guide for the self-hosted Beacon web UI. Screenshots are English, day-theme captures at a fixed viewport (development overlays removed).
+Operator guide for the self-hosted Beacon web UI. Each chapter walks through the screens in product order: what the page is for, what you can do there, then a day-theme English screenshot at a fixed viewport (development overlays removed).
 
 **Wiki index:** [symfony-beacon/wiki](https://github.com/nowo-tech/symfony-beacon/wiki) (chapter table linking here). Canonical wiki Home source: [`docs/wiki/Home.md`](../wiki/Home.md) — push with `make wiki-push-home`.
+
+## How to read this manual
+
+1. Start with [First-time setup](00-setup.md) only if you are installing a cold instance.
+2. Otherwise begin at [Getting started](01-getting-started.md) (sign-in).
+3. Use later chapters as a screen catalog: open the matching section when you need that part of the UI.
+4. Companion shots named `*-2.png` continue the **same** viewport (scroll position), not a different layout. The prose under each image explains what that continuation shows.
 
 ## Conventions
 

@@ -1,6 +1,6 @@
 # Symfony Beacon — product UI manual
 
-Operator guide for the self-hosted Beacon web UI.
+Operator guide for the self-hosted Beacon web UI. Each chapter explains what a screen is for, what it contributes to day-to-day operation, then shows the screenshot.
 
 **Source of truth:** [`docs/manual/`](https://github.com/nowo-tech/symfony-beacon/tree/main/docs/manual) in this repository (versioned with `main`, regenerated via Playwright). This wiki **Home** is an index only — chapter content and screenshots live in the tree.
 
@@ -25,6 +25,7 @@ Full index and conventions: [docs/manual/README.md](https://github.com/nowo-tech
 |------|--------|
 | Viewport | **1440×900** fixed (tall screens use `*-2.png` companions) |
 | Theme / language | **Day** + **English** for the inventory; preference demos once public + private — see chapter 07 |
+| Prose | Each screen: purpose → what it contributes → screenshot (no bare image stacks) |
 
 ## Regenerating screenshots
 

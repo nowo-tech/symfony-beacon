@@ -108,7 +108,7 @@ See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
 
 ## Upgrading from 1.27.0 to 1.28.0
 
-Product UI manual (`docs/manual/` + wiki Home index), admin/alerts **create** modals (`112`), worker-safe Make env fix, Quality/coverage CI hardening. **No migrations. No Composer pin changes.**
+Product UI manual (`docs/manual/` screen catalog + wiki Home index), admin/alerts **create** modals (`112`), worker-safe Make env fix, Quality/coverage CI hardening. **No migrations. No Composer pin changes.**
 
 1. Pull / checkout `v1.28.0`.
 
@@ -116,7 +116,7 @@ Product UI manual (`docs/manual/` + wiki Home index), admin/alerts **create** mo
 
 3. Bookmarks to `/admin/groups/new`, `/admin/projects/new`, or `…/threshold-rules/new` still work — they redirect to the parent page with the modal open (`?new=1` / `?new_threshold=1`). Edit flows remain full-page. Product create (`/projects/new` → dashboard modal) is unchanged.
 
-4. Optional — browse the English product UI manual: [manual/README.md](manual/README.md). Wiki index: [GitHub wiki](https://github.com/nowo-tech/symfony-beacon/wiki). Regenerators:
+4. Optional — browse the English product UI manual (purpose → contribution → screenshot per screen): [manual/README.md](manual/README.md). Wiki index: [GitHub wiki](https://github.com/nowo-tech/symfony-beacon/wiki). Regenerators:
    ```bash
    make docs-manual-screenshots
    make docs-manual-screenshots-setup

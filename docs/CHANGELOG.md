@@ -21,6 +21,7 @@ _No unreleased operator-facing changes yet._
 
 - **Create UX:** New group, New project (Administration), and New threshold rule open as confirm-dialog modals on the parent list/settings page (`?new=1` / `?new_threshold=1`). Legacy `…/new` GETs redirect. FormKit catalogues cover `admin_group.*` / `project_threshold_rule.*`. Product dashboard create (`/projects/new` → `/dashboard?new=1`) unchanged.
 - **Manual polish:** Trusted browsers devices shot fixed; create shots recaptured as modals; chapter notes for modal creates.
+- **Manual screen catalog:** Chapters `00`–`07` + README rewritten so each screen states purpose and operator contribution before its screenshot (no bare image stacks); all `*-2` companions referenced; wiki Home conventions aligned. Spec `111` FR-009…FR-012 / M8.
 
 ### Fixed
 

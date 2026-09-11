@@ -23,3 +23,10 @@
 ## Phase 4: Specs / roadmap
 
 - [x] T012 Add `specs/111-product-ui-manual/` + amend `104` / `110` + ROADMAP 6.63
+
+## Phase 5: Operator prose polish (2026-09-11)
+
+- [x] T013 Rewrite `docs/manual/` README + chapters `00`–`07` with purpose / contribution prose before each screenshot (no bare image stacks)
+- [x] T014 Reference all companion PNGs (`*-2`) from chapters; verify zero orphan images under `docs/manual/images/`
+- [x] T015 Align `docs/wiki/Home.md` conventions with the prose catalog rule
+- [x] T016 Amend `specs/111-product-ui-manual/` (FR-009…FR-012, M8) + ROADMAP 6.63 note

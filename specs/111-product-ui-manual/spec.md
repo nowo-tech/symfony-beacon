@@ -2,10 +2,10 @@
 
 **Feature Branch**: `docs/product-ui-manual`  
 **Created**: 2026-09-10  
-**Status**: Implemented (PR #53 / Phase 6.63)  
+**Status**: Implemented (PR #53 / Phase 6.63); prose catalog amendment 2026-09-11  
 **Roadmap**: Phase 6.63  
 
-**Input**: Operators and contributors need an English, production-looking **product UI manual** with screenshots of setup, auth, dashboard, account, projects, admin, and legal surfaces. Captures MUST hide development chrome (Symfony WDT / Twig Inspector / Vite overlay), use a **fixed 1440×900** viewport (no stretched full-page images that break aside chrome), demonstrate **day/night** and **language** switching once on a public route and once on a private route, then keep the inventory in **English + day**. Setup wizard shots MUST use the disposable cold stack (`110`), never warm `app_e2e` / dogfood.
+**Input**: Operators and contributors need an English, production-looking **product UI manual** with screenshots of setup, auth, dashboard, account, projects, admin, and legal surfaces. Each chapter MUST read as an operator screen catalog: for every page, state what it is and what it contributes, then show the capture. Captures MUST hide development chrome (Symfony WDT / Twig Inspector / Vite overlay), use a **fixed 1440×900** viewport (no stretched full-page images that break aside chrome), demonstrate **day/night** and **language** switching once on a public route and once on a private route, then keep the inventory in **English + day**. Setup wizard shots MUST use the disposable cold stack (`110`), never warm `app_e2e` / dogfood.
 
 ## Summary
 
@@ -18,6 +18,7 @@
 | M5 | Make | `docs-manual-screenshots` (warm isolated); `docs-manual-screenshots-setup` (cold) |
 | M6 | Theme/locale | Prefs demos: `prefs-public-*` / `prefs-private-*` (theme day/night + open locale menu); inventory stays EN + day |
 | M7 | Playwright | `PLAYWRIGHT_MANUAL=1` project; product `chromium` `testIgnore`s `e2e/manual/` |
+| M8 | Prose | Each screen documented as purpose → what it contributes → screenshot; no bare consecutive image stacks; every committed PNG referenced from a chapter |
 
 ## Non-goals
 
@@ -31,9 +32,9 @@
 
 ### User Story 1 - Read the manual on GitHub (P1)
 
-As an operator, I open `docs/manual/README.md` on GitHub and see inline screenshots that look like production (no WDT), with consistent framing.
+As an operator, I open `docs/manual/README.md` on GitHub and see inline screenshots that look like production (no WDT), with consistent framing. Each chapter explains what a screen is for and what it contributes **before** showing the image (including `*-2` companions).
 
-**Independent Test**: View PR / main tree; images render; sample PNGs are 1440×900.
+**Independent Test**: View PR / main tree; images render; sample PNGs are 1440×900; no chapter dumps consecutive images without intervening prose.
 
 ### User Story 2 - Regenerate product screenshots (P1)
 
@@ -63,6 +64,10 @@ As an operator, I see the cold-install wizard flow (gate → wizard → admin �
 - **FR-006**: Product Playwright `chromium` MUST ignore `e2e/manual/`; manual mode MUST NOT run as part of `test-e2e-isolated` by default.
 - **FR-007**: Docs index (`docs/README.md`) and root README MUST link the manual.
 - **FR-008**: Tall content MAY emit same-size scroll companions (`{name}-2.png`, optional `-3`); companions MUST keep 1440×900.
+- **FR-009**: Each documented screen MUST include short English prose stating (a) what the page/section is and (b) what it contributes to operators, placed **before** its screenshot(s). Chapters MUST NOT stack multiple inventory images with only alt captions and no explanatory body text between them.
+- **FR-010**: Every PNG under `docs/manual/images/` that is committed for the inventory MUST be referenced from at least one chapter (including `*-2` companions when present).
+- **FR-011**: `docs/manual/README.md` MUST explain how to read the manual and that `*-2.png` companions continue the same viewport (scroll), not a different layout.
+- **FR-012**: Wiki Home (`docs/wiki/Home.md`) MUST remain an index into `docs/manual/` (not a second copy of screenshots) and MAY summarize the prose convention.
 
 ## Success Criteria
 
@@ -70,6 +75,7 @@ As an operator, I see the cold-install wizard flow (gate → wizard → admin �
 - All committed documentation PNGs are 1440×900.
 - `make docs-manual-screenshots` and `make docs-manual-screenshots-setup` are documented and runnable locally.
 - Warm product E2E does not execute the manual capture specs.
+- Chapters read as an operator screen catalog (purpose + contribution per screen); inventory PNG reference set is complete (no orphan PNGs).
 
 ## Amendment (`112-admin-create-modals`, 2026-09-11)
 
@@ -79,6 +85,12 @@ As an operator, I see the cold-install wizard flow (gate → wizard → admin �
   - `project-threshold-rules-new` → `/projects/{uuid}/settings/alerts?new_threshold=1`
 - Chapters MAY note that create opens as a modal on the parent page (edit may stay full page).
 - Wiki Home remains an index into `docs/manual/` (not a second copy of screenshots).
+
+## Amendment (operator prose polish, 2026-09-11)
+
+- Rewrite chapters `00`–`07` + README so each screen has purpose / contribution prose before images (closes bare image stacks).
+- Reference previously unlinked companions (`projects-new-2`, `project-settings-access-2`, `project-settings-alerts-2`, `project-notifications-help-2`, `admin-users-new-2`, `admin-user-activity-2`, …).
+- Align `docs/wiki/Home.md` conventions with the prose rule; capture tooling unchanged.
 
 ## Cross-refs
 
