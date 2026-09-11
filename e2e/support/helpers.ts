@@ -283,6 +283,18 @@ export async function openNewThresholdRuleForm(page: Page, projectUuid: string):
   return form;
 }
 
+/**
+ * Open Administration create modal for groups or projects
+ * (GET …/new redirects to the directory with ?new=1).
+ */
+export async function openAdminCreateForm(page: Page, kind: 'groups' | 'projects'): Promise<Locator> {
+  await gotoStable(page, `/admin/${kind}?new=1`);
+  await dismissProductTour(page);
+  const form = page.locator(`form[action$="/admin/${kind}/new"]`);
+  await expect(form).toBeVisible({ timeout: 15_000 });
+  return form;
+}
+
 export async function expectGuestPage(page: Page, path: string): Promise<void> {
   const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
   await dismissCookieConsent(page);

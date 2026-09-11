@@ -447,6 +447,7 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v1.26.0** | FrankenPHP worker-safe E2E (`108` / 6.60): `/health/live` runtime; isolated worker defaults (`WORKER_NUM=4`); Playwright multi-worker; `test-e2e-worker-safe` + CI |
 | **v1.27.0** | Cold-start E2E (`110` / 6.62): disposable `app_e2e_cold` / `:9461`; wipe → `/setup` API → wizard admin login; CI `e2e-cold`; setup time-limit hardening |
 | **v1.28.0** | Product UI manual (`111` / 6.63) + wiki Home (screen-catalog prose); admin/alerts create modals (`112` / 6.64); worker-safe Make `WORKER_NUM=1` recreate fix; CS + coverage hardening |
+| **v1.28.1** | E2E helpers for create modals (`openAdminCreateForm` / kit-chrome dialog preference) |
 | **Unreleased** | — |
 | **Next** | Later Phase 6+ (SSO/SAML, WebAuthn, QR SMS OTP, Hotwire Native `008`, …) when specified |
 
@@ -459,4 +460,4 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 1. Pull items from **Later** when prioritized.
 2. Mark rows **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-09-11 (v1.28.0: Phase 6.63 / `111` product UI manual prose catalog + wiki Home; Phase 6.64 / `112` admin create modals).
+Last updated: 2026-09-11 (v1.28.1 E2E create-modal helpers; v1.28.0 Phase 6.63 / `111` + 6.64 / `112`).

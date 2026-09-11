@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _No unreleased operator-facing changes yet._
 
+## [1.28.1] - 2026-09-11
+
+### Fixed
+
+- **E2E after create modals (`112`):** Playwright helpers and admin specs locate create forms in confirm-dialogs (`openAdminCreateForm`, kit-chrome prefers open dialog submit) instead of requiring a full-page form under `main`.
+
+### Notes for integrators
+
+- Test / DX only — **no** migrations and **no** Composer pin changes. Operators on `v1.28.0` need not upgrade for product behaviour.
+- See [UPGRADING.md](UPGRADING.md) **Upgrading from 1.28.0 to 1.28.1**.
+
 ## [1.28.0] - 2026-09-11
 
 ### Added
@@ -1690,7 +1701,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.28.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.28.1...HEAD
+[1.28.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.28.0...v1.28.1
 [1.28.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.27.0...v1.28.0
 [1.27.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.26.0...v1.27.0
 [1.26.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.25.0...v1.26.0

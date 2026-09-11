@@ -4,6 +4,7 @@ import {
   dismissCookieConsent,
   dismissProductTour,
   expectAuthenticatedPage,
+  openAdminCreateForm,
   waitForPageLoader,
 } from '../support/helpers';
 
@@ -13,9 +14,7 @@ test.describe('Admin remaining mutations', () => {
     const suffix = Date.now().toString(36);
     const name = `E2E Admin Proj ${suffix}`;
 
-    await expectAuthenticatedPage(page, '/admin/projects/new');
-    const form = page.getByRole('main').locator('form').filter({ has: page.locator('input[name="project[name]"]') });
-    await expect(form).toBeVisible({ timeout: 15_000 });
+    const form = await openAdminCreateForm(page, 'projects');
     await form.locator('input[name="project[name]"]').fill(name);
     const desc = form.locator('textarea[name="project[description]"]');
     if ((await desc.count()) > 0) {
@@ -147,9 +146,7 @@ test.describe('Admin remaining mutations', () => {
   test('group edit form saves; delete ephemeral group (UC-ADM-36)', async ({ page }) => {
     const suffix = Date.now().toString(36);
     const name = `e2e-group-${suffix}`;
-    await expectAuthenticatedPage(page, '/admin/groups/new');
-    const create = page.getByRole('main').locator('form').filter({ has: page.locator('input[name*="[name]"]') }).first();
-    await expect(create).toBeVisible({ timeout: 15_000 });
+    const create = await openAdminCreateForm(page, 'groups');
     await create.locator('input[name*="[name]"]').first().fill(name);
     await create.locator('button[type="submit"]').first().click();
     await waitForPageLoader(page);

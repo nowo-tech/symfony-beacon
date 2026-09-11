@@ -6,6 +6,7 @@ import {
   dismissCookieConsent,
   dismissProductTour,
   expectAuthenticatedPage,
+  openAdminCreateForm,
   resolveDemoProjectUuid,
   waitForPageLoader,
 } from '../support/helpers';
@@ -115,9 +116,8 @@ test.describe('Final gaps — full role, admin members, bulk import', () => {
     await createEnabledUser(page, email, password, `AdmMem ${suffix}`);
 
     // Prefer ephemeral admin project so we do not churn demo memberships.
-    await expectAuthenticatedPage(page, '/admin/projects/new');
     const name = `E2E Adm Members ${suffix}`;
-    const form = page.getByRole('main').locator('form').filter({ has: page.locator('input[name="project[name]"]') });
+    const form = await openAdminCreateForm(page, 'projects');
     await form.locator('input[name="project[name]"]').fill(name);
     await form.locator('button[type="submit"]').first().click();
     await waitForPageLoader(page);

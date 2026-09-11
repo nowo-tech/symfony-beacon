@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.28.0)](#unreleased-main-after-1280)
+- [Unreleased (main after 1.28.1)](#unreleased-main-after-1281)
+- [Upgrading from 1.28.0 to 1.28.1](#upgrading-from-1280-to-1281)
 - [Upgrading from 1.27.0 to 1.28.0](#upgrading-from-1270-to-1280)
 - [Upgrading from 1.26.0 to 1.27.0](#upgrading-from-1260-to-1270)
 - [Upgrading from 1.25.0 to 1.26.0](#upgrading-from-1250-to-1260)
@@ -100,11 +101,19 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.28.0)
+## Unreleased (main after 1.28.1)
 
 _No unreleased operator-facing steps yet._
 
 See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
+
+## Upgrading from 1.28.0 to 1.28.1
+
+Playwright E2E fixes for admin create modals (`112`). **No migrations. No Composer pin changes. No operator UI change.**
+
+1. Pull / checkout `v1.28.1` (optional for production — test suite only).
+
+See [CHANGELOG.md](CHANGELOG.md) `[1.28.1]`.
 
 ## Upgrading from 1.27.0 to 1.28.0
 

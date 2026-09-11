@@ -132,8 +132,17 @@ export async function assertPageHasKitChrome(page: Page): Promise<void> {
   const table = main.locator('table').first();
   const panel = main.locator('.panel, .kit-admin, [data-testid]').first();
   const dialog = page.locator('dialog.confirm-dialog, [data-controller="confirm-dialog"]');
-  const empty = main.locator('.empty, [data-tour*="empty"], .panel');
+  const empty = main.locator('.empty, [data-testid*="empty"], .panel');
+  const openDialog = page.locator('dialog[open], dialog.confirm-dialog[open]').first();
+  const openDialogForm =
+    (await openDialog.count()) > 0 && (await openDialog.isVisible().catch(() => false))
+      ? openDialog.locator('form').filter({ has: page.locator('button[type="submit"], input[type="submit"]') }).first()
+      : null;
 
+  const hasOpenDialogForm =
+    null !== openDialogForm
+    && (await openDialogForm.count()) > 0
+    && (await openDialogForm.isVisible().catch(() => false));
   const hasForm = (await form.count()) > 0 && (await form.isVisible().catch(() => false));
   const hasTable = (await table.count()) > 0 && (await table.isVisible().catch(() => false));
   const hasPanel = (await panel.count()) > 0 && (await panel.isVisible().catch(() => false));
@@ -141,14 +150,19 @@ export async function assertPageHasKitChrome(page: Page): Promise<void> {
   const hasEmptyChrome = (await empty.count()) > 0;
 
   expect(
-    hasForm || hasTable || hasPanel || hasDialog || hasEmptyChrome,
+    hasForm || hasTable || hasPanel || hasDialog || hasEmptyChrome || hasOpenDialogForm,
     'page should expose kit chrome (form/table/panel/dialog) or an empty panel state',
   ).toBeTruthy();
 
-  if (hasForm) {
-    // Prefer the largest visible form in main (skip tiny locale switchers).
-    const mainForm = main.locator('form').filter({ has: page.locator('button[type="submit"], input[type="submit"], input:not([type="hidden"])') }).first();
-    if ((await mainForm.count()) > 0) {
+  // Prefer an open create/edit confirm-dialog form (?new=1 / threshold modal) over list filters in main.
+  if (hasOpenDialogForm && openDialogForm) {
+    await assertStandardForm(page, openDialogForm);
+  } else if (hasForm) {
+    const mainForm = main
+      .locator('form')
+      .filter({ has: page.locator('button[type="submit"], input[type="submit"]') })
+      .first();
+    if ((await mainForm.count()) > 0 && (await mainForm.isVisible().catch(() => false))) {
       await assertStandardForm(page, mainForm);
     }
   }

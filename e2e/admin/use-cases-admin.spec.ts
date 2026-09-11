@@ -80,6 +80,6 @@ test.describe('Administration — use cases', () => {
 
   test('admin projects new form loads (UC-ADM-06)', async ({ page }) => {
     await expectAuthenticatedPage(page, '/admin/projects/new');
-    await expect(page.getByRole('main').locator('form').first()).toBeVisible();
+    await expect(page.locator('form[action$="/admin/projects/new"]')).toBeVisible({ timeout: 15_000 });
   });
 });
