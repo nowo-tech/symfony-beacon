@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import {
+  clearBreadcrumbKitJsonFields,
   createEphemeralBreadcrumbCollection,
   dismissProductTour,
   expectAuthenticatedPage,
@@ -81,18 +82,12 @@ test.describe('Kit admin CRUD depth', () => {
     const suffix = Date.now().toString(36);
     const { code, collectionId, name } = await createEphemeralBreadcrumbCollection(page, suffix);
 
-    await page.goto(`/breadcrumb-kit-admin/collections?q=${encodeURIComponent(code)}`);
-    await dismissProductTour(page);
-    const row = page.locator('tr').filter({ hasText: code }).first();
-    await expect(row).toBeVisible({ timeout: 15_000 });
-    await row.locator('button.btn-bk-collection-form').first().click({ force: true });
-    const editModal = page.locator('#modal-bk-collection-form');
-    await expect(editModal).toBeVisible({ timeout: 15_000 });
-    const editForm = editModal.locator('form').filter({ has: page.locator('input[name*="[code]"]') }).first();
+    await expectAuthenticatedPage(page, `/breadcrumb-kit-admin/collections/${collectionId}/edit`);
+    const editForm = page.locator('form').filter({ has: page.locator('input[name*="[code]"]') }).first();
     await expect(editForm).toBeVisible({ timeout: 15_000 });
-    const editName = editForm.locator('input[name*="[name]"]').first();
-    await editName.fill(`${name} edited`);
-    await editForm.locator('button[type="submit"]').first().click({ force: true });
+    await clearBreadcrumbKitJsonFields(editForm);
+    await editForm.locator('input[name*="[name]"]').first().fill(`${name} edited`);
+    await editForm.locator('button[type="submit"]').first().click();
     await waitForPageLoader(page);
     await expect(page.getByRole('main')).toContainText(/actualizada|updated|colección|collection/i, { timeout: 15_000 });
 

@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import {
+  clearBreadcrumbKitJsonFields,
   createEphemeralBreadcrumbCollection,
   dismissProductTour,
   expectAuthenticatedPage,
@@ -129,7 +130,7 @@ test.describe('Kit admin behavioral depth', () => {
     const form = await openNewBreadcrumbItemForm(page, collectionId);
     await form.locator('input[name="breadcrumb_item[routeName]"], input[name*="[routeName]"]').first().fill(routeName);
     await form.locator('input[name="breadcrumb_item[label]"], input[name*="[label]"]').first().fill(itemLabel);
-    await form.locator('button[type="submit"]').first().click({ force: true });
+    await form.locator('button[type="submit"]').first().click();
     await waitForPageLoader(page);
     // BreadcrumbKit redirectToRefererOr may bounce to /items/new after create — assert via filtered list.
     await page.goto(
@@ -144,16 +145,15 @@ test.describe('Kit admin behavioral depth', () => {
     const bkUrl = await row.locator('button.btn-bk-item-form').first().getAttribute('data-bk-url');
     const itemId = bkUrl?.match(/items\/(\d+)\/edit/)?.[1];
     expect(itemId, 'breadcrumb item id').toBeTruthy();
-    await row.locator('button.btn-bk-item-form').first().click({ force: true });
-    const editModal = page.locator('#modal-bk-item-form');
-    await expect(editModal).toBeVisible({ timeout: 15_000 });
-    const editForm = editModal.locator('form').filter({
+    await expectAuthenticatedPage(page, `/breadcrumb-kit-admin/collections/${collectionId}/items/${itemId}/edit`);
+    const editForm = page.locator('form').filter({
       has: page.locator('input[name="breadcrumb_item[label]"], input[name*="[label]"]'),
     }).first();
     await expect(editForm).toBeVisible({ timeout: 15_000 });
+    await clearBreadcrumbKitJsonFields(editForm);
     const editedLabel = `${itemLabel} edited`;
     await editForm.locator('input[name="breadcrumb_item[label]"], input[name*="[label]"]').first().fill(editedLabel);
-    await editForm.locator('button[type="submit"]').first().click({ force: true });
+    await editForm.locator('button[type="submit"]').first().click();
     await waitForPageLoader(page);
     await expect(page.getByRole('main')).toContainText(/actualiz|updated|editad|item/i, { timeout: 15_000 });
 

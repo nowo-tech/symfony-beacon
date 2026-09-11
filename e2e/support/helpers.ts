@@ -216,23 +216,15 @@ export async function dismissProductTour(page: Page): Promise<void> {
 /**
  * Exit admin “view-as-member” if a prior test left `_beacon_view_as_member` in the shared PHP session.
  * That mode blanks FormKit fields and denies project settings (403).
+ * Caller must be on a page that renders the banner (e.g. /dashboard), not a 403 shell.
  */
 export async function exitViewAsMember(page: Page): Promise<void> {
-  const exitLocator = () =>
-    page
-      .locator('form[action*="/admin/view-as-member/disable"] button[type="submit"]')
-      .or(page.getByRole('button', { name: /Exit view-as-member|Salir de ver.?como.?miembro/i }))
-      .first();
-
-  let exit = exitLocator();
+  const exit = page
+    .locator('form[action*="/admin/view-as-member/disable"] button[type="submit"]')
+    .or(page.getByRole('button', { name: /Exit view-as-member|Salir de ver.?como.?miembro/i }))
+    .first();
   if ((await exit.count()) === 0 || !(await exit.isVisible().catch(() => false))) {
-    // Enable redirects to project settings (often 403 under view-as-member) — no banner there.
-    await page.goto('/dashboard');
-    await dismissProductTour(page);
-    exit = exitLocator();
-    if ((await exit.count()) === 0 || !(await exit.isVisible().catch(() => false))) {
-      return;
-    }
+    return;
   }
   await exit.click({ force: true });
   await waitForPageLoader(page);
@@ -294,6 +286,15 @@ export async function expectAuthenticatedPage(page: Page, path: string): Promise
   await dismissProductTour(page);
   if (await page.locator('form[action*="/admin/view-as-member/disable"]').count()) {
     await exitViewAsMember(page);
+    await gotoStable(page, path);
+    await dismissProductTour(page);
+  } else if (page.url().includes('/projects/') && page.url().includes('/settings')) {
+    // Enable redirects here under view-as-member (often 403, no banner). Probe dashboard once.
+    await page.goto('/dashboard');
+    await dismissProductTour(page);
+    if (await page.locator('form[action*="/admin/view-as-member/disable"]').count()) {
+      await exitViewAsMember(page);
+    }
     await gotoStable(page, path);
     await dismissProductTour(page);
   }
@@ -658,6 +659,23 @@ export async function completeSlideToConfirm(form: import('@playwright/test').Lo
   }
 }
 
+/** Clear FormKit JSON textareas that ship the literal string "null" (breaks kit JsonObjectTransformer). */
+export async function clearBreadcrumbKitJsonFields(form: Locator): Promise<void> {
+  const areas = form.locator('textarea');
+  const n = await areas.count();
+  for (let i = 0; i < n; i++) {
+    const area = areas.nth(i);
+    const name = (await area.getAttribute('name')) ?? '';
+    if (!/(Json|Params|Attributes|Keys|translations|responsive)/i.test(name)) {
+      continue;
+    }
+    const v = (await area.inputValue()).trim();
+    if (v === '' || v === 'null' || v === '[]' || v === '{}') {
+      await area.fill('');
+    }
+  }
+}
+
 /** Open BreadcrumbKit “new collection” modal (primary UX; full-page /new is layout-fragile). */
 export async function openNewBreadcrumbCollectionForm(page: Page): Promise<Locator> {
   await expectAuthenticatedPage(page, '/breadcrumb-kit-admin/collections');
@@ -693,10 +711,7 @@ export async function createEphemeralBreadcrumbCollection(
   if ((await nameField.count()) > 0) {
     await nameField.first().fill(name);
   }
-  const jsonField = form.locator('textarea[name*="[responsiveConfigJson]"]');
-  if ((await jsonField.count()) > 0) {
-    await jsonField.first().fill('');
-  }
+  await clearBreadcrumbKitJsonFields(form);
   // Kit redirectToRefererOr sends us back to /new (Referer), not /collections/{id}/edit.
   await form.locator('button[type="submit"]').first().click();
   await waitForPageLoader(page);
@@ -710,20 +725,18 @@ export async function createEphemeralBreadcrumbCollection(
   return { code, collectionId, name };
 }
 
-/** Open BreadcrumbKit “new item” modal for a collection. */
+/**
+ * Open BreadcrumbKit “new item” full-page form (modal `_modal` + FormKit "null" JSON flakes CI).
+ */
 export async function openNewBreadcrumbItemForm(page: Page, collectionId: string): Promise<Locator> {
-  await expectAuthenticatedPage(page, `/breadcrumb-kit-admin/collections/${collectionId}/items`);
-  const open = page.locator('button.btn-primary.btn-bk-item-form, button.btn-bk-item-form.btn-primary').first();
-  await expect(open).toBeVisible({ timeout: 15_000 });
-  await open.click({ force: true });
-  const modal = page.locator('#modal-bk-item-form');
-  await expect(modal).toBeVisible({ timeout: 15_000 });
-  const form = modal
+  await expectAuthenticatedPage(page, `/breadcrumb-kit-admin/collections/${collectionId}/items/new`);
+  const form = page
     .locator('form')
     .filter({ has: page.locator('input[name="breadcrumb_item[routeName]"], input[name*="[routeName]"]') })
     .first();
   await expect(form.locator('input[name="breadcrumb_item[routeName]"], input[name*="[routeName]"]').first()).toBeVisible({
     timeout: 15_000,
   });
+  await clearBreadcrumbKitJsonFields(form);
   return form;
 }

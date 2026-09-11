@@ -69,21 +69,24 @@ test.describe('Administration — use cases', () => {
     }
     await enable.click();
     await waitForPageLoader(page);
-    // Enable form redirects to project settings; under view-as-member that is often 403 without banner.
+    // Enable redirects to project settings (often 403); banner lives on authenticated shells.
     await page.goto('/dashboard');
     await dismissProductTour(page);
     await expect(page).not.toHaveURL(/\/login/);
-    await expect(
-      page.getByRole('status').filter({ hasText: /viewing projects as a member|viendo proyectos como miembro|ver proyectos como miembro/i }),
-    ).toBeVisible({ timeout: 15_000 });
 
-    // Always clear session flag — later tests share the PHP session id from storageState.
-    await exitViewAsMember(page);
+    // Banner form — not the success toast (also role=status with similar copy).
+    const banner = page.locator('[role="status"]').filter({
+      has: page.locator('form[action*="/admin/view-as-member/disable"]'),
+    });
+    try {
+      await expect(banner).toBeVisible({ timeout: 15_000 });
+    } finally {
+      // Shared PHP session must not leave view-as-member on for later shard tests.
+      await exitViewAsMember(page);
+    }
     await page.goto('/dashboard');
     await dismissProductTour(page);
-    await expect(
-      page.getByRole('status').filter({ hasText: /viewing projects as a member|viendo proyectos como miembro|ver proyectos como miembro/i }),
-    ).toHaveCount(0, { timeout: 15_000 });
+    await expect(banner).toHaveCount(0, { timeout: 15_000 });
   });
 
   test('admin projects new form loads (UC-ADM-06)', async ({ page }) => {

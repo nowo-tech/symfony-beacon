@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { dismissProductTour, expectAuthenticatedPage, exitViewAsMember, gotoStable, waitForPageLoader } from '../support/helpers';
+import { dismissProductTour, expectAuthenticatedPage, gotoStable, waitForPageLoader } from '../support/helpers';
 
 /**
  * Mutation coverage for Administration → Appearance (UC-ADM-15 / UC-ADM-31)
@@ -120,7 +120,6 @@ test.describe('Appearance mutations', () => {
 test.describe('Account display theme preference', () => {
   test('preferred theme preference saves and chrome toggle still works (UC-ACC-07)', async ({ page }) => {
     await expectAuthenticatedPage(page, '/account/display');
-    await exitViewAsMember(page);
     const form = page
       .getByRole('main')
       .locator('form')
