@@ -52,9 +52,7 @@ test.describe('Project settings — use cases', () => {
 
   test('threshold create form exposes metric fields (UC-NOTIF-06)', async ({ page }) => {
     const uuid = await resolveDemoProjectUuid(page);
-    await expectAuthenticatedPage(page, `/projects/${uuid}/threshold-rules/new`);
-    const form = page.getByRole('main').locator('form.panel, form').first();
-    await expect(form).toBeVisible();
-    await expect(form.locator('input, select').first()).toBeVisible();
+    const form = await openNewThresholdRuleForm(page, uuid);
+    await expect(form.locator('input:not([type="hidden"]), select').first()).toBeVisible();
   });
 });
