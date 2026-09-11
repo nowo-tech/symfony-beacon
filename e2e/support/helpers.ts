@@ -219,15 +219,24 @@ export async function dismissProductTour(page: Page): Promise<void> {
  * Caller must be on a page that renders the banner (e.g. /dashboard), not a 403 shell.
  */
 export async function exitViewAsMember(page: Page): Promise<void> {
-  const exit = page
-    .locator('form[action*="/admin/view-as-member/disable"] button[type="submit"]')
-    .or(page.getByRole('button', { name: /Exit view-as-member|Salir de ver.?como.?miembro/i }))
-    .first();
-  if ((await exit.count()) === 0 || !(await exit.isVisible().catch(() => false))) {
+  const form = page.locator('form[action*="/admin/view-as-member/disable"]').first();
+  if ((await form.count()) === 0 || !(await form.isVisible().catch(() => false))) {
     return;
   }
-  await exit.click({ force: true });
-  await waitForPageLoader(page);
+  // Prefer request POST with the rendered CSRF fields — button clicks flake under overlays.
+  const action = (await form.getAttribute('action')) || '/admin/view-as-member/disable';
+  const fields: Record<string, string> = {};
+  for (const input of await form.locator('input').all()) {
+    const name = await input.getAttribute('name');
+    if (!name) {
+      continue;
+    }
+    fields[name] = await input.inputValue();
+  }
+  const response = await page.request.post(action, { form: fields, maxRedirects: 0, failOnStatusCode: false });
+  expect([302, 303, 200].includes(response.status()), `view-as-member disable status=${response.status()}`).toBeTruthy();
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await dismissProductTour(page);
 }
 
 /**
@@ -286,15 +295,6 @@ export async function expectAuthenticatedPage(page: Page, path: string): Promise
   await dismissProductTour(page);
   if (await page.locator('form[action*="/admin/view-as-member/disable"]').count()) {
     await exitViewAsMember(page);
-    await gotoStable(page, path);
-    await dismissProductTour(page);
-  } else if (page.url().includes('/projects/') && page.url().includes('/settings')) {
-    // Enable redirects here under view-as-member (often 403, no banner). Probe dashboard once.
-    await page.goto('/dashboard');
-    await dismissProductTour(page);
-    if (await page.locator('form[action*="/admin/view-as-member/disable"]').count()) {
-      await exitViewAsMember(page);
-    }
     await gotoStable(page, path);
     await dismissProductTour(page);
   }
