@@ -93,8 +93,13 @@ make test-e2e-isolated ARGS='e2e/smoke/public.spec.ts'
 make test-e2e ARGS='e2e/flows/mutations.spec.ts'
 make test-e2e ARGS='e2e/hooks'
 make test-e2e ARGS='e2e/**/use-cases-*.spec.ts'
+make test-e2e ARGS='--shard=1/4'   # same as GitHub Actions product E2E matrix
 PLAYWRIGHT_BASE_URL=https://localhost:9447 make test-e2e
 ```
+
+### GitHub Actions (product E2E)
+
+CI runs the warm product suite as **four parallel jobs** (`E2E (Playwright) 1/4` … `4/4`), each with its own Compose + Mailpit stack and `playwright test --shard=N/4`. A gate job named **`E2E (Playwright)`** requires all shards. Cold-start and FrankenPHP worker-safe stay separate jobs. Artifact names on failure: `playwright-report-N-of-4`.
 
 When `CI=1` or `PLAYWRIGHT_REQUIRE_SAMPLE=1`, tests that need sample/demo data **fail** instead of skipping (see `requireSampleOrSkip` in `support/helpers.ts`).
 

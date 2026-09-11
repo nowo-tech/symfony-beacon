@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-_No unreleased operator-facing changes yet._
+### Changed
+
+- **CI product E2E:** warm Playwright suite runs as **4 parallel shards** (`--shard=N/4`, ~55m timeout each) plus an `E2E (Playwright)` gate job; cold-start and worker-safe jobs unchanged.
 
 ## [1.28.1] - 2026-09-11
 

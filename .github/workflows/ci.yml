@@ -254,10 +254,18 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+  # Product catalog is large (~450 tests, ~70m monolith). Split with Playwright --shard
+  # across parallel runners (each brings its own Compose + Mailpit) so wall-clock stays
+  # under ~45m and mutation/Mailpit flakes are isolated per shard.
   e2e:
-    name: E2E (Playwright)
+    name: E2E (Playwright) ${{ matrix.shard }}/${{ matrix.shards }}
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 55
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+        shards: [4]
     env:
       CI: "1"
       PLAYWRIGHT_REQUIRE_SAMPLE: "1"
@@ -351,14 +359,14 @@ jobs:
           make ready
           make seed-sample
 
-      - name: Playwright E2E
-        run: make test-e2e
+      - name: Playwright E2E (shard ${{ matrix.shard }}/${{ matrix.shards }})
+        run: make test-e2e ARGS="--shard=${{ matrix.shard }}/${{ matrix.shards }}"
 
       - name: Upload Playwright artifacts
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.shard }}-of-${{ matrix.shards }}
           path: |
             playwright-report
             test-results
@@ -370,6 +378,22 @@ jobs:
         run: |
           docker compose --profile hmr --profile mail down -v || true
           make down-infra || true
+
+  # Stable check name for branch protection / badges (matrix jobs are "E2E (Playwright) N/4").
+  e2e-product:
+    name: E2E (Playwright)
+    needs: e2e
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require all product E2E shards
+        run: |
+          result='${{ needs.e2e.result }}'
+          echo "Matrix job result: ${result}"
+          if [ "${result}" != "success" ]; then
+            echo "::error::One or more E2E (Playwright) shards failed (${result})."
+            exit 1
+          fi
 
   e2e-worker-safe:
     name: E2E FrankenPHP worker-safe

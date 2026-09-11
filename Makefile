@@ -121,6 +121,7 @@ help:
 	@echo "  make test-unit-js    Vitest unit tests for assets/"
 	@echo "  make test-unit-js-coverage  Vitest + V8 coverage → var/coverage-js/"
 	@echo "  make test-e2e        Playwright E2E against dogfood stack (make up + seed[+sample]; mutates MYSQL_DATABASE)"
+	@echo "                       Filter/shard: ARGS='e2e/smoke' or ARGS='--shard=1/4' (CI uses 4 shards)"
 	@echo "  make test-e2e-isolated  Playwright against isolated stack (app_e2e / :$(E2E_HTTPS_PORT); needs make ready-e2e)"
 	@echo "  make test-e2e-worker-safe  FrankenPHP worker Kernel isolation (WORKER_NUM=1, RESET=false; e2e/worker)"
 	@echo "  make test-e2e-worker-safe-classic  Same probe under FRANKENPHP_MODE=classic (contrast)"

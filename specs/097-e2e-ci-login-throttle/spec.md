@@ -124,6 +124,17 @@ Original ship retained Playwright **`workers: 1`** for shared-DB stability. As o
 - Kernel-isolation suite: `make test-e2e-worker-safe` (forces `WORKER_NUM=1`); CI job `e2e-worker-safe`.
 - Product CI job `e2e` remains `make test-e2e` on dogfood (may stay classic).
 
+## Amendment (Product E2E CI shards, 2026-09-11)
+
+Warm product CI no longer runs the full catalog in one ~70–90m job:
+
+- Matrix job `e2e`: four parallel runners, `make test-e2e ARGS='--shard=N/4'`, ~55m timeout each, `fail-fast: false`
+- Gate job `e2e-product` named **E2E (Playwright)** requires all shards
+- Cold (`e2e-cold`) and worker-safe (`e2e-worker-safe`) unchanged
+- Local parity: `make test-e2e ARGS='--shard=1/4'`
+
+Cross-ref: `.github/workflows/ci.yml`, `e2e/README.md`.
+
 Assumptions above about “full suite remains single-worker” are superseded for product runs. Cross-ref: `specs/108-frankenphp-worker-safe-e2e/` (shipped **v1.26.0**), `specs/104-isolated-e2e-stack/`.
 
 ## Amendment (Cold-start E2E circuit, 2026-09-10 / `110`)

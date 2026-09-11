@@ -103,7 +103,9 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Unreleased (main after 1.28.1)
 
-_No unreleased operator-facing steps yet._
+### CI
+
+- Product Playwright on GitHub Actions is sharded (`--shard=N/4`, four parallel Compose stacks). No operator runtime steps. Local: `make test-e2e ARGS='--shard=1/4'`.
 
 See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
 
