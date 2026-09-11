@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { dismissProductTour, expectAuthenticatedPage, resolveDemoProjectUuid } from '../support/helpers';
+import { dismissProductTour, expectAuthenticatedPage, openNewThresholdRuleForm, resolveDemoProjectUuid } from '../support/helpers';
 
 test.describe('Project settings — use cases', () => {
   test('settings section tabs load individually (UC-PROJ-04)', async ({ page }) => {
