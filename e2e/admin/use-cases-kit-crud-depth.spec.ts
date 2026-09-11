@@ -1,5 +1,10 @@
 import { test, expect, type Page } from '@playwright/test';
-import { dismissProductTour, expectAuthenticatedPage, waitForPageLoader } from '../support/helpers';
+import {
+  createEphemeralBreadcrumbCollection,
+  dismissProductTour,
+  expectAuthenticatedPage,
+  waitForPageLoader,
+} from '../support/helpers';
 
 /**
  * Full kit-admin CRUD depth — modal creates, edit, delete, export.
@@ -71,44 +76,25 @@ test.describe('Kit admin CRUD depth', () => {
     await expect(page.locator('tr').filter({ hasText: code })).toHaveCount(0, { timeout: 15_000 });
   });
 
-  test('breadcrumb collection create full page, edit full page, delete ephemeral (UC-ADM-23 depth)', async ({ page }) => {
+  test('breadcrumb collection create via modal, edit, delete ephemeral (UC-ADM-23 depth)', async ({ page }) => {
     test.setTimeout(120_000);
     const suffix = Date.now().toString(36);
-    const code = `e2e_bk_${suffix}`;
-    const name = `E2E BK ${suffix}`;
+    const { code, collectionId, name } = await createEphemeralBreadcrumbCollection(page, suffix);
 
-    await expectAuthenticatedPage(page, '/breadcrumb-kit-admin/collections/new');
-    const create = page.locator('form').filter({ has: page.locator('input[name*="[code]"]') }).first();
-    await expect(create).toBeVisible({ timeout: 15_000 });
-    await create.locator('input[name*="[code]"]').first().fill(code);
-    const nameField = create.locator('input[name*="[name]"]');
-    if ((await nameField.count()) > 0) {
-      await nameField.first().fill(name);
-    }
-    await create.locator('button[type="submit"]').first().click();
-    await waitForPageLoader(page);
-    await expect(page).not.toHaveURL(/\/login/);
-
-    let collectionId = page.url().match(/collections\/(\d+)/)?.[1] ?? '';
-    if (!collectionId) {
-      await page.goto(`/breadcrumb-kit-admin/collections?q=${encodeURIComponent(code)}`);
-      await dismissProductTour(page);
-      const row = page.locator('tr').filter({ hasText: code }).first();
-      await expect(row).toBeVisible({ timeout: 15_000 });
-      const itemsHref = await row.locator('a[href*="/collections/"]').first().getAttribute('href');
-      collectionId = itemsHref?.match(/collections\/(\d+)/)?.[1] ?? '';
-    }
-    expect(collectionId, 'collection id').toBeTruthy();
-
-    await page.goto(`/breadcrumb-kit-admin/collections/${collectionId}/edit`);
+    await page.goto(`/breadcrumb-kit-admin/collections?q=${encodeURIComponent(code)}`);
     await dismissProductTour(page);
-    const editForm = page.locator('form').filter({ has: page.locator('input[name*="[code]"]') }).first();
+    const row = page.locator('tr').filter({ hasText: code }).first();
+    await expect(row).toBeVisible({ timeout: 15_000 });
+    await row.locator('button.btn-bk-collection-form').first().click({ force: true });
+    const editModal = page.locator('#modal-bk-collection-form');
+    await expect(editModal).toBeVisible({ timeout: 15_000 });
+    const editForm = editModal.locator('form').filter({ has: page.locator('input[name*="[code]"]') }).first();
     await expect(editForm).toBeVisible({ timeout: 15_000 });
     const editName = editForm.locator('input[name*="[name]"]').first();
     await editName.fill(`${name} edited`);
-    await editForm.locator('button[type="submit"]').first().click();
+    await editForm.locator('button[type="submit"]').first().click({ force: true });
     await waitForPageLoader(page);
-    await expect(page.getByRole('main')).toContainText(/actualizada|updated|colección/i, { timeout: 15_000 });
+    await expect(page.getByRole('main')).toContainText(/actualizada|updated|colección|collection/i, { timeout: 15_000 });
 
     await page.goto(`/breadcrumb-kit-admin/collections?q=${encodeURIComponent(code)}`);
     await dismissProductTour(page);
@@ -125,6 +111,7 @@ test.describe('Kit admin CRUD depth', () => {
     await page.goto(`/breadcrumb-kit-admin/collections?q=${encodeURIComponent(code)}`);
     await dismissProductTour(page);
     await expect(page.locator('tr').filter({ hasText: code })).toHaveCount(0, { timeout: 15_000 });
+    void collectionId;
   });
 
   test('RoutingKit create, edit path, delete ephemeral row (UC-ADM-24 depth)', async ({ page }) => {

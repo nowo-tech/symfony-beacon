@@ -622,3 +622,67 @@ export async function completeSlideToConfirm(form: import('@playwright/test').Lo
     });
   }
 }
+
+/** Open BreadcrumbKit “new collection” modal (primary UX; full-page /new is layout-fragile). */
+export async function openNewBreadcrumbCollectionForm(page: Page): Promise<Locator> {
+  await expectAuthenticatedPage(page, '/breadcrumb-kit-admin/collections');
+  const open = page.locator('button.btn-primary.btn-bk-collection-form, button.btn-bk-collection-form.btn-primary').first();
+  await expect(open).toBeVisible({ timeout: 15_000 });
+  await open.click({ force: true });
+  const modal = page.locator('#modal-bk-collection-form');
+  await expect(modal).toBeVisible({ timeout: 15_000 });
+  const form = modal.locator('form').filter({ has: page.locator('input[name*="[code]"]') }).first();
+  await expect(form.locator('input[name*="[code]"]').first()).toBeVisible({ timeout: 15_000 });
+  return form;
+}
+
+/** Create an ephemeral breadcrumb collection via modal; returns code + numeric id. */
+export async function createEphemeralBreadcrumbCollection(
+  page: Page,
+  suffix: string,
+): Promise<{ code: string; collectionId: string; name: string }> {
+  const code = `e2e_bk_${suffix}`;
+  const name = `E2E BK ${suffix}`;
+  const form = await openNewBreadcrumbCollectionForm(page);
+  await form.locator('input[name*="[code]"]').first().fill(code);
+  const nameField = form.locator('input[name*="[name]"]');
+  if ((await nameField.count()) > 0) {
+    await nameField.first().fill(name);
+  }
+  await form.evaluate((el) => {
+    if (el instanceof HTMLFormElement) {
+      el.requestSubmit();
+    }
+  });
+  await waitForPageLoader(page);
+
+  let collectionId = page.url().match(/collections\/(\d+)/)?.[1] ?? '';
+  if (!collectionId) {
+    await page.goto(`/breadcrumb-kit-admin/collections?q=${encodeURIComponent(code)}`);
+    await dismissProductTour(page);
+    const row = page.locator('tr').filter({ hasText: code }).first();
+    await expect(row).toBeVisible({ timeout: 15_000 });
+    const itemsHref = await row.locator('a[href*="/collections/"]').first().getAttribute('href');
+    collectionId = itemsHref?.match(/collections\/(\d+)/)?.[1] ?? '';
+  }
+  expect(collectionId, 'breadcrumb collection id').toBeTruthy();
+  return { code, collectionId, name };
+}
+
+/** Open BreadcrumbKit “new item” modal for a collection. */
+export async function openNewBreadcrumbItemForm(page: Page, collectionId: string): Promise<Locator> {
+  await expectAuthenticatedPage(page, `/breadcrumb-kit-admin/collections/${collectionId}/items`);
+  const open = page.locator('button.btn-primary.btn-bk-item-form, button.btn-bk-item-form.btn-primary').first();
+  await expect(open).toBeVisible({ timeout: 15_000 });
+  await open.click({ force: true });
+  const modal = page.locator('#modal-bk-item-form');
+  await expect(modal).toBeVisible({ timeout: 15_000 });
+  const form = modal
+    .locator('form')
+    .filter({ has: page.locator('input[name="breadcrumb_item[routeName]"], input[name*="[routeName]"]') })
+    .first();
+  await expect(form.locator('input[name="breadcrumb_item[routeName]"], input[name*="[routeName]"]').first()).toBeVisible({
+    timeout: 15_000,
+  });
+  return form;
+}

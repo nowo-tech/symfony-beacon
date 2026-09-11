@@ -1,5 +1,10 @@
 import { test, expect, type Page } from '@playwright/test';
-import { dismissProductTour, expectAuthenticatedPage, waitForPageLoader } from '../support/helpers';
+import {
+  createEphemeralBreadcrumbCollection,
+  dismissProductTour,
+  expectAuthenticatedPage,
+  waitForPageLoader,
+} from '../support/helpers';
 
 async function createEphemeralMenu(page: Page, suffix: string): Promise<{ code: string; menuId: string }> {
   const code = `e2e_mv_${suffix}`;
@@ -138,27 +143,7 @@ test.describe('Kit reorder & export depth', () => {
   test('breadcrumb collection export JSON is downloadable (UC-ADM-23-D2)', async ({ page, request }) => {
     test.setTimeout(90_000);
     const suffix = Date.now().toString(36);
-    const code = `e2e_bkx_${suffix}`;
-    await expectAuthenticatedPage(page, '/breadcrumb-kit-admin/collections/new');
-    const create = page.locator('form').filter({ has: page.locator('input[name*="[code]"]') }).first();
-    await create.locator('input[name*="[code]"]').first().fill(code);
-    const nameField = create.locator('input[name*="[name]"]');
-    if ((await nameField.count()) > 0) {
-      await nameField.first().fill(`E2E BKX ${suffix}`);
-    }
-    await create.locator('button[type="submit"]').first().click();
-    await waitForPageLoader(page);
-
-    let collectionId = page.url().match(/collections\/(\d+)/)?.[1] ?? '';
-    if (!collectionId) {
-      await page.goto(`/breadcrumb-kit-admin/collections?q=${encodeURIComponent(code)}`);
-      await dismissProductTour(page);
-      const rowByQ = page.locator('tr').filter({ hasText: code }).first();
-      await expect(rowByQ).toBeVisible({ timeout: 15_000 });
-      const href = await rowByQ.locator('a[href*="/collections/"]').first().getAttribute('href');
-      collectionId = href?.match(/collections\/(\d+)/)?.[1] ?? '';
-    }
-    expect(collectionId).toBeTruthy();
+    const { code, collectionId } = await createEphemeralBreadcrumbCollection(page, suffix);
 
     const cookies = await page.context().cookies();
     const cookieHeader = cookies.map((c) => `${c.name}=${c.value}`).join('; ');

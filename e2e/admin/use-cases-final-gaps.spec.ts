@@ -45,8 +45,13 @@ test.describe('Final gaps — full role, admin members, bulk import', () => {
 
     await page.goto(`/projects/${uuid}/settings/access`);
     await dismissProductTour(page);
-    const members = page.locator('section.panel').filter({ hasText: /member|miembro/i }).first();
-    await members.locator('button[data-action="confirm-dialog#open"]').first().click();
+    const membersPanel = page
+      .locator('section.panel')
+      .filter({ has: page.locator('h2', { hasText: /Members|Miembros/i }) })
+      .first();
+    const addBtn = membersPanel.locator('button[data-action="confirm-dialog#open"]').first();
+    await expect(addBtn).toBeVisible({ timeout: 15_000 });
+    await addBtn.click();
     const addForm = page.locator('form').filter({ has: page.locator('#member-email, input[name="project_member_add[email]"]') });
     await expect(addForm).toBeVisible({ timeout: 10_000 });
     await addForm.locator('#member-email, input[name="project_member_add[email]"]').fill(email);

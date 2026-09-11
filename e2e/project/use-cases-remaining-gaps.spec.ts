@@ -94,10 +94,16 @@ test.describe('Project / dashboard remaining gaps', () => {
 
     const row = page.locator('li').filter({ hasText: label }).first();
     await expect(row).toBeVisible();
-    const revokeBtn = row.locator('form[action*="/revoke"] button[type="submit"]').first();
-    page.once('dialog', (d) => d.accept().catch(() => undefined));
-    await revokeBtn.click({ force: true });
+    const revokeForm = row.locator('form[action*="/revoke"]').first();
+    const revokeBtn = revokeForm.locator('button[type="submit"]').first();
+    await Promise.all([
+      page.waitForEvent('dialog').then((d) => d.accept()),
+      revokeBtn.click(),
+    ]);
     await waitForPageLoader(page);
+    await expect(page.locator('li[data-testid="api-key-inactive"]').filter({ hasText: label })).toBeVisible({
+      timeout: 15_000,
+    });
     // Revoke UI can finish before the auth gate sees the inactive flag — poll briefly.
     await expect
       .poll(

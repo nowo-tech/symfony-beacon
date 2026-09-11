@@ -12,6 +12,7 @@ import {
   resolveDemoProjectUuid,
   waitForPageLoader,
 } from '../support/helpers';
+import { ensureDeliverableMailer } from '../support/mailer';
 
 /**
  * Atomic use cases added after the catalog umbrella pass (AUTH-25/26, ACC-24/25,
@@ -37,37 +38,40 @@ test.describe('Atomic use-case gaps', () => {
     }
   });
 
-  test('password reset code page loads (UC-AUTH-26)', async ({ browser }) => {
+  test('password reset code page loads (UC-AUTH-26)', async ({ page, browser }) => {
+    // MailerGatedAuthKitRouteSubscriber redirects reset routes to login until DSN is deliverable.
+    await ensureDeliverableMailer(page);
+
     const ctx = await browser.newContext({
       ignoreHTTPSErrors: true,
       storageState: { cookies: [], origins: [] },
     });
-    const page = await ctx.newPage();
+    const guest = await ctx.newPage();
     try {
       // Prefer unlocalized path; locale redirect can be slow under load.
-      await gotoStable(page, '/reset-password/complete');
-      await dismissCookieConsent(page);
+      await gotoStable(guest, '/reset-password/complete');
+      await dismissCookieConsent(guest);
       // One bounce to login under load is common — retry once before falling back.
-      if (/\/login/i.test(page.url())) {
-        await gotoStable(page, '/reset-password/complete');
-        await dismissCookieConsent(page);
+      if (/\/login/i.test(guest.url())) {
+        await gotoStable(guest, '/reset-password/complete');
+        await dismissCookieConsent(guest);
       }
-      if (/\/login/i.test(page.url())) {
+      if (/\/login/i.test(guest.url())) {
         // AuthKit may require a pending reset; the request form still proves guest reset chrome.
-        await gotoStable(page, '/reset-password');
-        await dismissCookieConsent(page);
-        await expect(page).toHaveURL(/\/(?:[a-z]{2}\/)?reset-password(?!\/reset)/);
+        await gotoStable(guest, '/reset-password');
+        await dismissCookieConsent(guest);
+        await expect(guest).toHaveURL(/\/(?:[a-z]{2}\/)?reset-password(?!\/reset)/);
         await expect(
-          page.locator('form').filter({ has: page.locator('input:not([type="hidden"])') }).first(),
+          guest.locator('form').filter({ has: guest.locator('input:not([type="hidden"])') }).first(),
         ).toBeVisible({ timeout: 15_000 });
         return;
       }
-      await expect(page).toHaveURL(/\/(?:[a-z]{2}\/)?reset-password\/complete/);
-      const panel = page.locator('.nowo-auth-kit__panel, main, [role="main"]').first();
-      await expect(panel.locator('form').filter({ has: page.locator('input:not([type="hidden"])') }).first()).toBeVisible({
+      await expect(guest).toHaveURL(/\/(?:[a-z]{2}\/)?reset-password\/complete/);
+      const panel = guest.locator('.nowo-auth-kit__panel, main, [role="main"]').first();
+      await expect(panel.locator('form').filter({ has: guest.locator('input:not([type="hidden"])') }).first()).toBeVisible({
         timeout: 15_000,
       });
-      await expect(page.getByRole('heading', { name: /code|código|kod/i })).toBeVisible();
+      await expect(guest.getByRole('heading', { name: /code|código|kod/i })).toBeVisible();
     } finally {
       await ctx.close();
     }

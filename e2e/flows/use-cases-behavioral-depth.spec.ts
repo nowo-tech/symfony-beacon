@@ -9,6 +9,7 @@ import {
   resolveDemoProjectUuid,
   waitForPageLoader,
 } from '../support/helpers';
+import { ensureDeliverableMailer } from '../support/mailer';
 import {
   mailpitDeleteAll,
   mailpitIsReachable,
@@ -27,21 +28,6 @@ import {
  * trusted devices, forged auth tokens, admin validation / toggle edges.
  * Complements chrome smoke and shallow “Covered” catalog rows with real outcomes.
  */
-
-async function ensureDeliverableMailer(page: Page): Promise<void> {
-  await gotoStable(page, '/admin/mailer');
-  await waitForPageLoader(page);
-  const form = page.locator('form').filter({ has: page.locator('input[name*="[plainMailerDsn]"]') });
-  await expect(form).toBeVisible({ timeout: 15_000 });
-  // Shared server Mailpit is `mailpit`; app-local profile uses `mailer` (often unresolved here).
-  await form.locator('input[name*="[plainMailerDsn]"]').fill('smtp://mailpit:1025');
-  const from = form.locator('input[name*="[mailerFrom]"], input[name*="[from]"]');
-  if ((await from.count()) > 0 && (await from.first().inputValue()) === '') {
-    await from.first().fill('beacon@symfony-beacon.local');
-  }
-  await form.locator('button[type="submit"]').first().click();
-  await waitForPageLoader(page);
-}
 
 async function createSharePath(page: Page, projectUuid: string, opts?: { maxUses?: string; issueUuid?: string }): Promise<string> {
   await page.goto(`/projects/${projectUuid}/settings/access`);

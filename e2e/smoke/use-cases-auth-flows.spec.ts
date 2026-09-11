@@ -8,26 +8,13 @@ import {
   loginAsDemo,
   waitForPageLoader,
 } from '../support/helpers';
+import { ensureDeliverableMailer } from '../support/mailer';
 
 /**
  * Magic + reset are gated until an encrypted deliverable Mailer DSN is saved
  * (`MailerGatedAuthKitRouteSubscriber`). QR login is `mode: enabled` (approve/deny in
  * `use-cases-auth-qr-dual.spec.ts`; demo admin has seeded `phoneVerifiedAt`).
  */
-async function ensureDeliverableMailer(page: import('@playwright/test').Page): Promise<void> {
-  await gotoStable(page, '/admin/mailer');
-  await waitForPageLoader(page);
-  const form = page.locator('form').filter({ has: page.locator('input[name*="[plainMailerDsn]"]') });
-  await expect(form).toBeVisible({ timeout: 15_000 });
-  await form.locator('input[name*="[plainMailerDsn]"]').fill('smtp://mailer:1025');
-  const from = form.locator('input[name*="[mailerFrom]"], input[name*="[from]"]');
-  if ((await from.count()) > 0 && (await from.first().inputValue()) === '') {
-    await from.first().fill('beacon@symfony-beacon.local');
-  }
-  await form.locator('button[type="submit"]').first().click();
-  await waitForPageLoader(page);
-  await expect(page).not.toHaveURL(/\/login/);
-}
 
 test.describe('Auth flows — magic, reset, QR', () => {
   test('submits magic-login request without 5xx (UC-AUTH-17)', async ({ page, browser }) => {

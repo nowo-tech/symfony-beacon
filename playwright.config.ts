@@ -11,6 +11,8 @@ import { defineConfig, devices } from '@playwright/test';
 const cold = process.env.PLAYWRIGHT_COLD === '1';
 const manual = process.env.PLAYWRIGHT_MANUAL === '1';
 const isolated = process.env.PLAYWRIGHT_ISOLATED === '1';
+/** FrankenPHP worker probe (`make test-e2e-worker-safe`) — do not ignore e2e/worker. */
+const workerSuite = process.env.PLAYWRIGHT_WORKER_SUITE === '1';
 const baseURL =
   process.env.PLAYWRIGHT_BASE_URL ??
   (cold ? 'https://localhost:9461' : isolated ? 'https://localhost:9460' : 'https://localhost:9447');
@@ -100,8 +102,10 @@ export default defineConfig({
                   storageState: authFile,
                 },
                 dependencies: ['setup'],
-                // cold/manual: dedicated Make targets; worker/: FrankenPHP isolation (classic dogfood ≠ worker probe).
-                testIgnore: [/auth\.setup\.ts/, /cold\//, /manual\//, /worker\//],
+                // cold/manual: dedicated Make targets; worker/: only when PLAYWRIGHT_WORKER_SUITE=1.
+                testIgnore: workerSuite
+                  ? [/auth\.setup\.ts/, /cold\//, /manual\//]
+                  : [/auth\.setup\.ts/, /cold\//, /manual\//, /worker\//],
               },
             ],
 });

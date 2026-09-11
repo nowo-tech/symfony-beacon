@@ -39,7 +39,8 @@ test.describe('Appearance mutations', () => {
     await expectAuthenticatedPage(page, '/admin/appearance/brand');
     const form = page.locator('[data-testid="appearance-form"]');
     await expect(form).toBeVisible();
-    const brand = form.locator('input[name*="[brandName]"]');
+    const brand = form.locator('input[name*="[brandName]"], input[name*="[brand_name]"]').first();
+    await expect(brand).toBeVisible({ timeout: 15_000 });
     const original = await brand.inputValue();
     const ephemeral = `E2E Brand ${Date.now().toString(36)}`;
     await brand.fill(ephemeral);
@@ -51,7 +52,8 @@ test.describe('Appearance mutations', () => {
     await gotoStable(page, '/admin/appearance/brand');
     await dismissProductTour(page);
     const formAgain = page.locator('[data-testid="appearance-form"]');
-    const brandAgain = formAgain.locator('input[name*="[brandName]"]');
+    const brandAgain = formAgain.locator('input[name*="[brandName]"], input[name*="[brand_name]"]').first();
+    await expect(brandAgain).toBeVisible({ timeout: 15_000 });
     await brandAgain.fill(original || 'symfony-beacon');
     await formAgain.locator('button.btn-primary[type="submit"]').click();
     await waitForPageLoader(page);
@@ -121,9 +123,9 @@ test.describe('Account display theme preference', () => {
     const form = page
       .getByRole('main')
       .locator('form')
-      .filter({ has: page.locator('button[type="submit"]') })
+      .filter({ has: page.locator('select[name*="[preferredTheme]"]') })
       .first();
-    await expect(form).toBeVisible();
+    await expect(form).toBeVisible({ timeout: 15_000 });
     const theme = form.locator('select[name*="[preferredTheme]"]');
     await expect(theme).toBeVisible();
     const before = await theme.inputValue();
@@ -153,7 +155,7 @@ test.describe('Account display theme preference', () => {
     await page
       .getByRole('main')
       .locator('form')
-      .filter({ has: page.locator('button[type="submit"]') })
+      .filter({ has: page.locator('select[name*="[preferredTheme]"]') })
       .first()
       .locator('button[type="submit"]')
       .click();

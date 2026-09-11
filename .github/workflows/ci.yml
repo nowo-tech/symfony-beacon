@@ -273,6 +273,8 @@ jobs:
       PLAYWRIGHT_WORKERS: "1"
       PLAYWRIGHT_BASE_URL: https://localhost:9447
       PLAYWRIGHT_MAILPIT_URL: http://127.0.0.1:18026
+      # Compose profile `mail` → service hostname `mailer` (not shared `mailpit`).
+      PLAYWRIGHT_MAILER_DSN: smtp://mailer:1025
       COMPOSER_ALLOW_SUPERUSER: "1"
 
     steps:

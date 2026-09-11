@@ -6,6 +6,7 @@ import {
   gotoStable,
   waitForPageLoader,
 } from '../support/helpers';
+import { ensureDeliverableMailer } from '../support/mailer';
 import {
   mailpitDeleteAll,
   mailpitIsReachable,
@@ -15,22 +16,8 @@ import {
 
 /**
  * UC-AUTH-18 / UC-AUTH-20 — complete magic-login and password-reset via Mailpit.
- * Prerequisites: `make mailpit` + deliverable Admin → Mailer DSN `smtp://mailer:1025`.
+ * Prerequisites: `make mailpit` + deliverable Admin → Mailer DSN (see PLAYWRIGHT_MAILER_DSN).
  */
-async function ensureDeliverableMailer(page: import('@playwright/test').Page): Promise<void> {
-  await gotoStable(page, '/admin/mailer');
-  await waitForPageLoader(page);
-  const form = page.locator('form').filter({ has: page.locator('input[name*="[plainMailerDsn]"]') });
-  await expect(form).toBeVisible({ timeout: 15_000 });
-  await form.locator('input[name*="[plainMailerDsn]"]').fill('smtp://mailer:1025');
-  const from = form.locator('input[name*="[mailerFrom]"], input[name*="[from]"]');
-  if ((await from.count()) > 0 && (await from.first().inputValue()) === '') {
-    await from.first().fill('beacon@symfony-beacon.local');
-  }
-  await form.locator('button[type="submit"]').first().click();
-  await waitForPageLoader(page);
-  await expect(page).not.toHaveURL(/\/login/);
-}
 
 async function createEnabledUser(
   page: import('@playwright/test').Page,

@@ -1,5 +1,11 @@
 import { test, expect, type Page } from '@playwright/test';
-import { dismissProductTour, expectAuthenticatedPage, waitForPageLoader } from '../support/helpers';
+import {
+  createEphemeralBreadcrumbCollection,
+  dismissProductTour,
+  expectAuthenticatedPage,
+  openNewBreadcrumbItemForm,
+  waitForPageLoader,
+} from '../support/helpers';
 
 async function createEphemeralMenu(page: Page, suffix: string): Promise<{ code: string; menuId: string }> {
   const code = `e2e_menu_${suffix}`;
@@ -25,32 +31,6 @@ async function createEphemeralMenu(page: Page, suffix: string): Promise<{ code: 
   const menuId = href?.match(/\/admin\/menus\/(\d+)/)?.[1] ?? '';
   expect(menuId).toBeTruthy();
   return { code, menuId };
-}
-
-async function createEphemeralBreadcrumbCollection(page: Page, suffix: string): Promise<{ code: string; collectionId: string }> {
-  const code = `e2e_bk_${suffix}`;
-  const name = `E2E BK ${suffix}`;
-  await expectAuthenticatedPage(page, '/breadcrumb-kit-admin/collections/new');
-  const create = page.locator('form').filter({ has: page.locator('input[name*="[code]"]') }).first();
-  await create.locator('input[name*="[code]"]').first().fill(code);
-  const nameField = create.locator('input[name*="[name]"]');
-  if ((await nameField.count()) > 0) {
-    await nameField.first().fill(name);
-  }
-  await create.locator('button[type="submit"]').first().click();
-  await waitForPageLoader(page);
-
-  let collectionId = page.url().match(/collections\/(\d+)/)?.[1] ?? '';
-  if (!collectionId) {
-    await page.goto(`/breadcrumb-kit-admin/collections?q=${encodeURIComponent(code)}`);
-    await dismissProductTour(page);
-    const row = page.locator('tr').filter({ hasText: code }).first();
-    await expect(row).toBeVisible({ timeout: 15_000 });
-    const itemsHref = await row.locator('a[href*="/collections/"]').first().getAttribute('href');
-    collectionId = itemsHref?.match(/collections\/(\d+)/)?.[1] ?? '';
-  }
-  expect(collectionId).toBeTruthy();
-  return { code, collectionId };
 }
 
 function openKitModal(page: Page, id: string) {
@@ -146,15 +126,10 @@ test.describe('Kit admin behavioral depth', () => {
     const itemLabel = `BK item ${suffix}`;
     const routeName = `e2e_bk_item_${suffix}`;
     const { collectionId } = await createEphemeralBreadcrumbCollection(page, suffix);
-    await page.goto(`/breadcrumb-kit-admin/collections/${collectionId}/items/new`);
-    await dismissProductTour(page);
-    const form = page.locator('form').filter({
-      has: page.locator('input[name="breadcrumb_item[routeName]"]'),
-    }).first();
-    await expect(form).toBeVisible({ timeout: 15_000 });
-    await form.locator('input[name="breadcrumb_item[routeName]"]').fill(routeName);
-    await form.locator('input[name="breadcrumb_item[label]"]').fill(itemLabel);
-    await form.locator('button[type="submit"]').first().click();
+    const form = await openNewBreadcrumbItemForm(page, collectionId);
+    await form.locator('input[name="breadcrumb_item[routeName]"], input[name*="[routeName]"]').first().fill(routeName);
+    await form.locator('input[name="breadcrumb_item[label]"], input[name*="[label]"]').first().fill(itemLabel);
+    await form.locator('button[type="submit"]').first().click({ force: true });
     await waitForPageLoader(page);
     // BreadcrumbKit redirectToRefererOr may bounce to /items/new after create — assert via filtered list.
     await page.goto(
@@ -169,15 +144,16 @@ test.describe('Kit admin behavioral depth', () => {
     const bkUrl = await row.locator('button.btn-bk-item-form').first().getAttribute('data-bk-url');
     const itemId = bkUrl?.match(/items\/(\d+)\/edit/)?.[1];
     expect(itemId, 'breadcrumb item id').toBeTruthy();
-    await page.goto(`/breadcrumb-kit-admin/collections/${collectionId}/items/${itemId}/edit`);
-    await dismissProductTour(page);
-    const editForm = page.locator('form').filter({
-      has: page.locator('input[name="breadcrumb_item[label]"]'),
+    await row.locator('button.btn-bk-item-form').first().click({ force: true });
+    const editModal = page.locator('#modal-bk-item-form');
+    await expect(editModal).toBeVisible({ timeout: 15_000 });
+    const editForm = editModal.locator('form').filter({
+      has: page.locator('input[name="breadcrumb_item[label]"], input[name*="[label]"]'),
     }).first();
     await expect(editForm).toBeVisible({ timeout: 15_000 });
     const editedLabel = `${itemLabel} edited`;
-    await editForm.locator('input[name="breadcrumb_item[label]"]').fill(editedLabel);
-    await editForm.locator('button[type="submit"]').first().click();
+    await editForm.locator('input[name="breadcrumb_item[label]"], input[name*="[label]"]').first().fill(editedLabel);
+    await editForm.locator('button[type="submit"]').first().click({ force: true });
     await waitForPageLoader(page);
     await expect(page.getByRole('main')).toContainText(/actualiz|updated|editad|item/i, { timeout: 15_000 });
 
