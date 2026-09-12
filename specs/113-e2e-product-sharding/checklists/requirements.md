@@ -20,10 +20,10 @@
 
 ## Feature Readiness
 
-- [x] As-built on `main` (commits through `5b2ab9a`)
+- [x] As-built on `main` (shipped **v1.28.2**)
 - [x] Tasks marked complete
-- [x] ROADMAP / CHANGELOG updated under Phase 6.65 / Unreleased
+- [x] ROADMAP / CHANGELOG updated under Phase 6.65 / `[1.28.2]`
 
 ## Notes
 
-Retroactive spec for work already merged to stabilize sharded product E2E CI.
+Retroactive spec for work merged to stabilize sharded product E2E CI; cut as **v1.28.2**.

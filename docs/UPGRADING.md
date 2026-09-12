@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.28.1)](#unreleased-main-after-1281)
+- [Unreleased (main after 1.28.2)](#unreleased-main-after-1282)
+- [Upgrading from 1.28.1 to 1.28.2](#upgrading-from-1281-to-1282)
 - [Upgrading from 1.28.0 to 1.28.1](#upgrading-from-1280-to-1281)
 - [Upgrading from 1.27.0 to 1.28.0](#upgrading-from-1270-to-1280)
 - [Upgrading from 1.26.0 to 1.27.0](#upgrading-from-1260-to-1270)
@@ -101,13 +102,24 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.28.1)
+## Unreleased (main after 1.28.2)
 
-### CI
-
-- Product Playwright on GitHub Actions is sharded (`--shard=N/4`, four parallel Compose stacks). No operator runtime steps. Local: `make test-e2e ARGS='--shard=1/4'`.
+_No unreleased operator-facing steps yet._
 
 See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
+
+## Upgrading from 1.28.1 to 1.28.2
+
+Product E2E CI sharding and harness stabilization (`113` / Phase 6.65). **No migrations. No Composer pin changes. No operator UI change.**
+
+1. Pull / checkout `v1.28.2` (optional for production — CI / Playwright only).
+
+2. Maintainers / local E2E:
+   - Product CI runs four shards; locally: `make test-e2e ARGS='--shard=1/4'`.
+   - Worker-safe suite needs `PLAYWRIGHT_WORKER_SUITE=1` (set by `make test-e2e-worker-safe`).
+   - Optional CI mailer: `PLAYWRIGHT_MAILER_DSN=smtp://mailer:1025` when Compose profile `mail` is up.
+
+See [CHANGELOG.md](CHANGELOG.md) `[1.28.2]` and `specs/113-e2e-product-sharding/`.
 
 ## Upgrading from 1.28.0 to 1.28.1
 

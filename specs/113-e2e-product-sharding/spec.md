@@ -2,7 +2,7 @@
 
 **Feature Branch**: `113-e2e-product-sharding` (shipped on `main`)  
 **Created**: 2026-09-11  
-**Status**: Shipped (Unreleased / Phase 6.65)  
+**Status**: Shipped (v1.28.2 / Phase 6.65)  
 **Roadmap**: Phase 6.65  
 
 **Input**: The warm product Playwright catalog (~450 tests) exceeded practical CI wall-clock as a single job (~70m) and shared-session flakes (view-as-member, Mailpit/AuthKit mailer, BreadcrumbKit modal JSON, worker-suite bleed) made the gate unreliable. Maintainers need a sharded GitHub Actions matrix plus harness/helpers that keep each shard green without changing product behaviour.
@@ -90,7 +90,7 @@ As a CI job with Compose profile `mail`, Playwright configures a deliverable SMT
 - **FR-004**: CI MUST set a deliverable `PLAYWRIGHT_MAILER_DSN` when the mail profile is up.
 - **FR-005**: Shared-session helpers MUST clear view-as-member before authenticated page asserts; UC-ADM-08 MUST always attempt exit in `finally`.
 - **FR-006**: BreadcrumbKit ephemeral write helpers MUST prefer full-page forms and clear FormKit JSON `"null"` textareas.
-- **FR-007**: Docs (`e2e/README.md`, ROADMAP 6.65, CHANGELOG Unreleased) MUST describe sharding and harness rules.
+- **FR-007**: Docs (`e2e/README.md`, ROADMAP 6.65, CHANGELOG `[1.28.2]`) MUST describe sharding and harness rules.
 
 ## Success Criteria
 

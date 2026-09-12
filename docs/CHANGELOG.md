@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+_No unreleased operator-facing changes yet._
+
+## [1.28.2] - 2026-09-12
+
 ### Added
 
 - **Product E2E CI sharding (Phase 6.65 / `113`):** warm Playwright suite runs as **4 parallel shards** (`--shard=N/4`, ~55m timeout each, `PLAYWRIGHT_WORKERS=1`, own Compose + Mailpit) plus gate job `E2E (Playwright)`. Spec: `specs/113-e2e-product-sharding/`.
@@ -20,6 +24,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **View-as-member sticky session (UC-ADM-08):** assert banner by disable form (not success toast); `exitViewAsMember` clears via CSRF POST; `expectAuthenticatedPage` exits before asserts.
 - **BreadcrumbKit ephemeral CRUD (UC-ADM-23):** full-page create/edit helpers + clear FormKit JSON `"null"` textareas (modal `_modal` partials were flaky in CI).
+
+### Notes for integrators
+
+- Test / DX / CI only — **no** migrations and **no** Composer pin changes. Operators on `v1.28.1` need not upgrade for product behaviour.
+- Local shard: `make test-e2e ARGS='--shard=1/4'`. See [e2e/README.md](../e2e/README.md) and [UPGRADING.md](UPGRADING.md) **Upgrading from 1.28.1 to 1.28.2**.
 
 ## [1.28.1] - 2026-09-11
 
@@ -1713,7 +1722,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.28.1...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.28.2...HEAD
+[1.28.2]: https://github.com/nowo-tech/symfony-beacon/compare/v1.28.1...v1.28.2
 [1.28.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.28.0...v1.28.1
 [1.28.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.27.0...v1.28.0
 [1.27.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.26.0...v1.27.0
