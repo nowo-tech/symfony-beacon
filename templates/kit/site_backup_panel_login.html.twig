@@ -27,7 +27,7 @@
       <div class="auth-form__row" style="display: grid; gap: 0.4rem; margin-bottom: 1rem;">
         {{ form_label(loginForm.password, 'Password') }}
         {{ form_widget(loginForm.password, {
-          attr: { autofocus: true, autocomplete: 'current-password', class: 'auth-form__control' },
+          attr: {autofocus: true, autocomplete: 'current-password', class: 'auth-form__control'},
         }) }}
         {{ form_errors(loginForm.password) }}
       </div>
