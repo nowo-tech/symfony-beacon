@@ -128,6 +128,21 @@ final class ContentSecurityPolicySubscriberTest extends TestCase
         self::assertStringContainsString('<script type="application/json">{"a":1}</script>', $content);
     }
 
+    public function testStampsNonceOnInlineStylesWithoutNonce(): void
+    {
+        $html = '<html><head><style>body{margin:0}</style><style nonce="already">.x{}</style></head><body></body></html>';
+        $response = $this->dispatch('/', $html, kernelDebug: false);
+        $content = (string) $response->getContent();
+        $nonce = (string) preg_replace(
+            "/.*style-src-elem 'self' 'nonce-([^']+)'.*/s",
+            '$1',
+            (string) $response->headers->get('Content-Security-Policy'),
+        );
+
+        self::assertStringContainsString('<style nonce="'.$nonce.'">body{margin:0}</style>', $content);
+        self::assertStringContainsString('<style nonce="already">.x{}</style>', $content);
+    }
+
     public function testDoesNotOverrideExistingCsp(): void
     {
         $response = new Response('<html></html>', Response::HTTP_OK, [

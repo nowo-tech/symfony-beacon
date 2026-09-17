@@ -111,6 +111,7 @@ final readonly class ContentSecurityPolicySubscriber
 
         $nonce = (string) $request->attributes->get(self::REQUEST_ATTR_NONCE, '');
         $this->stampInlineScriptNonces($response, $nonce);
+        $this->stampInlineStyleNonces($response, $nonce);
         $response->headers->set('Content-Security-Policy', $this->buildCsp($path, $request));
     }
 
@@ -206,6 +207,46 @@ final readonly class ContentSecurityPolicySubscriber
             $response->setContent($updated);
         }
     }
+
+    /**
+     * Host templates (e.g. maintenance 503) ship bare {@code <style>} blocks.
+     * A nonce in style-src-elem disables unsafe-inline in browsers — stamp the
+     * request nonce onto inline styles that do not already declare one.
+     */
+    private function stampInlineStyleNonces(Response $response, string $nonce): void
+    {
+        if ('' === $nonce) {
+            return;
+        }
+
+        $content = $response->getContent();
+
+        if (!\is_string($content) || !str_contains($content, '<style')) {
+            return;
+        }
+
+        $escapedNonce = htmlspecialchars($nonce, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+        $updated = preg_replace_callback(
+            '/<style(\s[^>]*)?>/i',
+            static function (array $matches) use ($escapedNonce): string {
+                $attrs = $matches[1] ?? '';
+
+                if (preg_match('/\bnonce\s*=/i', $attrs) === 1) {
+                    return $matches[0];
+                }
+
+                return '<style nonce="' . $escapedNonce . '"' . $attrs . '>';
+            },
+            $content,
+        );
+
+        if (\is_string($updated) && $updated !== $content) {
+            $response->setContent($updated);
+        }
+    }
+
+
 
     private function originOf(string $url): ?string
     {
