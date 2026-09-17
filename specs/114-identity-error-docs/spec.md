@@ -1,8 +1,8 @@
 # Feature Specification: Visual identity book + error manual docs
 
-**Feature Branch**: `114-identity-error-docs` (working tree / Unreleased)  
+**Feature Branch**: `114-identity-error-docs` (shipped on `main` / v1.29.0)  
 **Created**: 2026-09-17  
-**Status**: Implemented in tree (Unreleased / Phase 6.66) — awaiting PR/tag  
+**Status**: Done (v1.29.0 / Phase 6.66)  
 **Roadmap**: Phase 6.66  
 
 **Input**: Contributors need an English **visual identity** book (mark, moss tokens, type, mascot, applied screens) separate from the operator UI catalog. Operators need a **manual chapter for branded HTTP errors** with 1440×900 captures. Runtime mascot / error illustrations MUST be real transparent PNGs. Supporting polish: CSP nonces on inline `<style>`, warm HTML/Twig markup smoke, opt-in Mailpit Make lane, a branded SiteBackup panel-login Twig override, and **manual capture hygiene** so inventory PNGs stay English, free of E2E/XSS seed noise, free of absurd maintenance countdowns, with English legal footers and clean admin Groups rows.
@@ -103,7 +103,7 @@ As a signed-in user with preferred locale `en`, legal footer link labels MUST be
 - PHPUnit rejects non-transparent runtime error/mascot PNGs.
 - Markup smoke + CSP style nonce green on warm E2E.
 - `make test-e2e-mailpit` documented in `e2e/README.md` / Makefile help.
-- ROADMAP Phase 6.66 / CHANGELOG Unreleased describe this feature.
+- ROADMAP Phase 6.66 / CHANGELOG `[1.29.0]` describe this feature.
 - Recaptured inventory passes L&F hygiene: EN setup gate, clean dashboard card, EN legal footer, clean admin-groups row, maintenance preview without absurd ETA.
 
 ## Assumptions

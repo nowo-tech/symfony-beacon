@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+_No unreleased operator-facing changes yet._
+
+## [1.29.0] - 2026-09-17
+
 ### Added
 
 - **Visual identity manual (Phase 6.66 / `114`):** English brand book at [`docs/identity/README.md`](identity/README.md) (mark, moss tokens, type, mascot, applied 1440×900 screens). Linked from docs index, product UI manual, wiki Home, and root README. OTHER: REQ-DOCS-APP-005. Spec: `specs/114-identity-error-docs/`.
@@ -32,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Optional: browse the identity book and Errors chapter; regenerate screenshots with `make docs-manual-screenshots` / `make docs-manual-screenshots-setup`.
 - Optional: `make test-e2e-mailpit` when exercising auth mail delivery locally.
 - Product fix: signed-in users with preferred locale `en` see English legal footer labels even on pages that embed Twig controller fragments (e.g. dashboard New project modal).
+- See [UPGRADING.md](UPGRADING.md) **Upgrading from 1.28.2 to 1.29.0**.
 
 ## [1.28.2] - 2026-09-12
 
@@ -1746,7 +1751,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.28.2...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.29.0...HEAD
+[1.29.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.28.2...v1.29.0
 [1.28.2]: https://github.com/nowo-tech/symfony-beacon/compare/v1.28.1...v1.28.2
 [1.28.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.28.0...v1.28.1
 [1.28.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.27.0...v1.28.0

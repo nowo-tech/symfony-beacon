@@ -20,4 +20,4 @@
 - [x] ROADMAP Phase 6.66
 - [x] Amend `063` FR-002 and `111` chapter list (+ FR-015/016/017 hygiene)
 - [x] `.specify/feature.json` → `114-identity-error-docs`
-- [x] Status: Implemented in tree (Unreleased)
+- [x] Status: Done (v1.29.0)

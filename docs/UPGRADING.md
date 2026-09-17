@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.28.2)](#unreleased-main-after-1282)
+- [Unreleased (main after 1.29.0)](#unreleased-main-after-1290)
+- [Upgrading from 1.28.2 to 1.29.0](#upgrading-from-1282-to-1290)
 - [Upgrading from 1.28.1 to 1.28.2](#upgrading-from-1281-to-1282)
 - [Upgrading from 1.28.0 to 1.28.1](#upgrading-from-1280-to-1281)
 - [Upgrading from 1.27.0 to 1.28.0](#upgrading-from-1270-to-1280)
@@ -102,11 +103,17 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.28.2)
+## Unreleased (main after 1.29.0)
+
+_No unreleased operator-facing steps yet._
+
+See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
+
+## Upgrading from 1.28.2 to 1.29.0
 
 Visual identity book + error manual docs (`114` / Phase 6.66), CSP style nonces, capture hygiene, and authenticated legal footer locale fix. **No migrations. No Composer pin changes.**
 
-1. Pull / checkout `main` (or the forthcoming patch that cuts Unreleased).
+1. Pull / checkout `v1.29.0`.
 
 2. Optional — identity book and Errors chapter:
    - [identity/README.md](identity/README.md)
@@ -125,7 +132,7 @@ Visual identity book + error manual docs (`114` / Phase 6.66), CSP style nonces,
 
 5. No action required for the legal footer fix beyond deploying the build — signed-in preferred locale and footer labels stay aligned after Twig fragment sub-requests.
 
-See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]` and `specs/114-identity-error-docs/`.
+See [CHANGELOG.md](CHANGELOG.md) `[1.29.0]` and `specs/114-identity-error-docs/`.
 
 ## Upgrading from 1.28.1 to 1.28.2
 
