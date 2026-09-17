@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 420" role="img" aria-label="Beacon moss palette, light and dark">
+  <rect width="920" height="420" fill="#f3f6f4"/>
+  <text x="32" y="40" font-family="Montserrat, Segoe UI, sans-serif" font-size="18" font-weight="600" fill="#0f1c18">Day  :root / [data-theme="light"]</text>
+  <g font-family="IBM Plex Mono, ui-monospace, monospace" font-size="11" fill="#0f1c18">
+    <rect x="32" y="56" width="96" height="72" rx="8" fill="#1f6f54"/><text x="32" y="146">moss #1f6f54</text>
+    <rect x="144" y="56" width="96" height="72" rx="8" fill="#134736"/><text x="144" y="146">deep #134736</text>
+    <rect x="256" y="56" width="96" height="72" rx="8" fill="#4aad7f"/><text x="256" y="146">mark #4aad7f</text>
+    <rect x="368" y="56" width="96" height="72" rx="8" fill="#f3f6f4" stroke="#d8e2dc"/><text x="368" y="146">paper #f3f6f4</text>
+    <rect x="480" y="56" width="96" height="72" rx="8" fill="#ffffff" stroke="#d8e2dc"/><text x="480" y="146">surface #fff</text>
+    <rect x="592" y="56" width="96" height="72" rx="8" fill="#0f1c18"/><text x="592" y="146" fill="#0f1c18">ink #0f1c18</text>
+    <rect x="704" y="56" width="96" height="72" rx="8" fill="#b42318"/><text x="704" y="146">alert #b42318</text>
+    <rect x="816" y="56" width="72" height="72" rx="8" fill="#b54708"/><text x="816" y="146">warn</text>
+  </g>
+  <rect x="32" y="176" width="856" height="212" rx="12" fill="#0c1210"/>
+  <text x="52" y="208" font-family="Montserrat, Segoe UI, sans-serif" font-size="18" font-weight="600" fill="#e6eee9">Night  [data-theme="dark"]</text>
+  <g font-family="IBM Plex Mono, ui-monospace, monospace" font-size="11" fill="#e6eee9">
+    <rect x="52" y="224" width="96" height="72" rx="8" fill="#4aad7f"/><text x="52" y="314">moss #4aad7f</text>
+    <rect x="164" y="224" width="96" height="72" rx="8" fill="#6bc49a"/><text x="164" y="314">deep #6bc49a</text>
+    <rect x="276" y="224" width="96" height="72" rx="8" fill="#4aad7f"/><text x="276" y="314">mark #4aad7f</text>
+    <rect x="388" y="224" width="96" height="72" rx="8" fill="#0c1210" stroke="#2a3832"/><text x="388" y="314">paper #0c1210</text>
+    <rect x="500" y="224" width="96" height="72" rx="8" fill="#151c19" stroke="#2a3832"/><text x="500" y="314">surface #151c19</text>
+    <rect x="612" y="224" width="96" height="72" rx="8" fill="#e6eee9"/><text x="612" y="314" fill="#e6eee9">ink #e6eee9</text>
+    <rect x="724" y="224" width="72" height="72" rx="8" fill="#f97066"/><text x="724" y="314">alert</text>
+    <rect x="812" y="224" width="56" height="72" rx="8" fill="#fdb022"/><text x="812" y="314">warn</text>
+  </g>
+  <text x="52" y="360" font-family="Montserrat, Segoe UI, sans-serif" font-size="12" fill="#8aa396">Tokens: --beacon-* in assets/styles/tailwind.css · SiteAppearance DEFAULT_* · PWA theme_color #1f6f54 / theme_color_dark #4aad7f</text>
+</svg>

@@ -7,6 +7,7 @@ English operator and developer manuals for **symfony-beacon**.
 | Doc | Topic |
 |-----|--------|
 | [manual/README.md](manual/README.md) | **Product UI manual** (screenshots, day/night, setup) |
+| [identity/README.md](identity/README.md) | **Visual identity** (mark, colour, type, mascot, applied screens) |
 | [GitHub wiki Home](https://github.com/nowo-tech/symfony-beacon/wiki) | Wiki index → same chapters (source: [`wiki/Home.md`](wiki/Home.md); `make wiki-push-home`) |
 | [INSTALL.md](INSTALL.md) | First install, seed layers, SiteBackup setup |
 | [PRODUCTION.md](PRODUCTION.md) | Prod image, secrets, health, Messenger |
