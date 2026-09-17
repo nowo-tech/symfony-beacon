@@ -10,12 +10,12 @@
 3. **Cold crawl** (`e2e/manual/capture-setup.spec.ts`): gate + wizard + admin + done via setup API helpers from `110`.
 4. **Playwright config**: mutually exclusive projects — `manual` (warm), `manual-setup` (cold+manual), ignore `manual/` in product `chromium`.
 5. **Make**: Docker Playwright image with `--shm-size` / memory cap; group runs locally if WSL OOM.
-6. **Docs**: English chapters under `docs/manual/`; chapter 07 owns theme/locale; other chapters stay day EN.
+6. **Docs**: English chapters under `docs/manual/`; chapter 07 owns theme/locale; chapter **08** owns branded HTTP errors / maintenance preview (`114`); other chapters stay day EN. Visual identity book is `docs/identity/` (companion link only).
 7. **Prose catalog**: Each screen section uses purpose → contribution → screenshot; README explains `*-2` companions; wiki Home stays an index. Capture paths unchanged when only prose is refreshed.
 
 ## Dependencies
 
-- Specs `104` (warm stack), `110` (cold stack), `056` (setup product), `082` (theme presets), `112` (create-modal inventory URLs).
+- Specs `104` (warm stack), `110` (cold stack), `056` (setup product), `082` (theme presets), `112` (create-modal inventory URLs), `063` / `114` (errors chapter + identity companion).
 
 ## Risks
 

@@ -35,7 +35,7 @@ As a visitor, **When** the app returns **400**, **401**, **408**, **429**, or **
 ## Requirements
 
 - **FR-001**: Twig overrides under `templates/bundles/TwigBundle/Exception/` (`error.html.twig`, `error{code}.html.twig` for supported codes) MUST extend a light `templates/error/layout.html.twig` (theme toggle + Vite app CSS; no cookie-consent render / no dashboard shell).
-- **FR-002**: Illustrations MUST live at `public/illustrations/error-{code}.png` for supported codes: **400, 401, 403, 404, 408, 429, 500, 502, 503**. Mascot source art remains `public/brand/mascot.png`; mark PNG at `public/brand/beacon-mark.png` (vector mark remains `beacon-mark.svg`).
+- **FR-002**: Illustrations MUST live at `public/illustrations/error-{code}.png` for supported codes: **400, 401, 403, 404, 408, 429, 500, 502, 503**. Mascot source art remains `public/brand/mascot.png`; mark PNG at `public/brand/beacon-mark.png` (vector mark remains `beacon-mark.svg`). Mascot and error illustrations MUST be real PNG with a **transparent canvas** (RGBA / IHDR color type 6 — not JPEG renamed `.png`, not an opaque box).
 - **FR-003**: `messages.*` keys under `error.{code}.*` (at least `title`, `lead`, `hint`, `image_alt`) MUST have parity across enabled locales (EN source of truth). Copy MUST inform calmly (no blame, no urgency panic) and MAY include a light humorous `hint` line.
 - **FR-004**: Framework `_errors` import (`prefix: /_error`) MUST be `when@dev` only. Security `access_control` MAY allow `^/_error` (and maintenance preview) as `PUBLIC_ACCESS` so previews are anonymous in dev.
 - **FR-005**: Setup/restore gates MUST exclude `/_error` so catalog-empty redirects do not steal previews.
@@ -48,3 +48,15 @@ As a visitor, **When** the app returns **400**, **401**, **408**, **429**, or **
 - Replacing Symfony profiler exception pages while `APP_DEBUG=1` on non-preview URLs.
 - Translating illustration text baked into PNGs (numbers / “UNDER MAINTENANCE” are visual only; UI strings are Twig/i18n).
 - Maintenance enable/disable UX and admin panel (see `092-maintenance-mode`).
+- Operator manual screenshots of error pages (see `111` FR-013 / `114`); documentation PNGs under `docs/manual/images/error-*.png` are page captures and are not required to be transparent.
+
+## Amendment (transparent runtime art + docs, 2026-09-17 / `114`)
+
+- FR-002 transparent-canvas rule is enforced by PHPUnit IHDR / color-type assertions on `public/brand/mascot.png` and `public/illustrations/error-*.png`.
+- Product UI manual chapter `08-errors.md` documents the operator-facing pages; visual identity book lives at `docs/identity/` (REQ-DOCS-APP-005).
+
+## Cross-refs
+
+- Maintenance: `specs/092-maintenance-mode/`
+- Product UI manual: `specs/111-product-ui-manual/`
+- Identity + error docs package: `specs/114-identity-error-docs/`

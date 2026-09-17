@@ -28,5 +28,19 @@
 
 - [x] T013 Rewrite `docs/manual/` README + chapters `00`–`07` with purpose / contribution prose before each screenshot (no bare image stacks)
 - [x] T014 Reference all companion PNGs (`*-2`) from chapters; verify zero orphan images under `docs/manual/images/`
-- [x] T015 Align `docs/wiki/Home.md` conventions with the prose catalog rule
-- [x] T016 Amend `specs/111-product-ui-manual/` (FR-009…FR-012, M8) + ROADMAP 6.63 note
+
+## Phase 6: Errors chapter + identity companion (`114`, 2026-09-17)
+
+- [x] T015 Add `docs/manual/08-errors.md` + warm capture paths for `error-*` / `error-maintenance`
+- [x] T016 Index chapter 08 + link `docs/identity/` from manual README and wiki Home
+- [x] T017 Amend this spec (FR-013 / FR-014) and point follow-through at `specs/114-identity-error-docs/`
+
+## Phase 7: Manual capture hygiene (`114`, 2026-09-17)
+
+- [x] T018 Amend FR-015 / FR-016 (dashboard filter, MM schedule clear, cold setup EN)
+- [x] T019 Recapture hygiene PNGs via warm + cold Make targets (see `114` T024–T027)
+
+## Phase 8: Footer locale + admin Groups (`114`, 2026-09-17)
+
+- [x] T020 Amend FR-017 (admin Groups demo row + EN legal footer)
+- [x] T021 Recapture `dashboard` / prefs / `admin-groups` (see `114` T029–T032)
