@@ -442,6 +442,84 @@ export const MANUAL_DEV_CHROME_HIDE_CSS = `
 `;
 
 /**
+ * Dashboard home for docs: show only the demo project (hide E2E / XSS seed rows).
+ * Prefer query navigation; fall back to submitting the search form.
+ */
+export async function filterManualDashboardProjects(page: Page): Promise<void> {
+  const target = '/dashboard?q=' + encodeURIComponent('Symfony Beacon');
+  await gotoStable(page, target);
+  await prepareProductionScreenshot(page);
+  const search = page.locator('form[role="search"]').first();
+  if (await search.isVisible().catch(() => false)) {
+    const q = search.locator('input[name*="[q]"], input[name="q"]').first();
+    if (await q.isVisible().catch(() => false)) {
+      const current = (await q.inputValue().catch(() => '')) ?? '';
+      if (!/symfony\s*beacon/i.test(current)) {
+        await q.fill('Symfony Beacon');
+        await search.locator('button[type="submit"]').click();
+        await waitForPageLoader(page);
+        await prepareProductionScreenshot(page);
+      }
+    }
+  }
+  await expect(page.getByRole('main')).toContainText(/Symfony Beacon|Beacon/i, {
+    timeout: 15_000,
+  });
+  // Seed noise must not dominate the first viewport.
+  await expect(page.getByRole('main')).not.toContainText(/onerror\s*=/i);
+}
+
+/**
+ * Clear leftover MM schedule (E2E often leaves 2099 dates → absurd countdown on preview).
+ */
+export async function clearMaintenanceScheduleForManual(page: Page): Promise<void> {
+  await gotoStable(page, '/admin/maintenance/');
+  await prepareProductionScreenshot(page);
+  const clear = page
+    .locator(
+      'button[form="maintenance-clear-schedule-form"], #maintenance-clear-schedule-form button[type="submit"]',
+    )
+    .first();
+  if (await clear.isVisible().catch(() => false)) {
+    await clear.click({ force: true });
+    await waitForPageLoader(page);
+  }
+}
+
+/** Demo group name for admin identity docs shots (hides Playwright E2E rows). */
+export const MANUAL_ADMIN_GROUP_NAME = 'Beacon operators';
+
+/**
+ * Admin Groups directory for docs: ensure a human demo group exists, then filter to it
+ * so E2E seed rows do not dominate the table.
+ */
+export async function filterManualAdminGroups(page: Page): Promise<void> {
+  await gotoStable(page, '/admin/groups');
+  await prepareProductionScreenshot(page);
+
+  const hasDemo = await page.getByRole('main').getByText(MANUAL_ADMIN_GROUP_NAME, { exact: false }).count();
+  if (hasDemo === 0) {
+    await gotoStable(page, '/admin/groups?new=1');
+    await prepareProductionScreenshot(page);
+    const nameInput = page.locator('input[name*="[name]"]').first();
+    await expect(nameInput).toBeVisible({ timeout: 10_000 });
+    await nameInput.fill(MANUAL_ADMIN_GROUP_NAME);
+    const desc = page.locator('textarea[name*="[description]"]').first();
+    if (await desc.isVisible().catch(() => false)) {
+      await desc.fill('Default operators group for documentation screenshots.');
+    }
+    await page.locator('[data-testid="admin-group-create-submit"]').click({ force: true });
+    await waitForPageLoader(page);
+  }
+
+  const target = '/admin/groups?q=' + encodeURIComponent('Beacon');
+  await gotoStable(page, target);
+  await prepareProductionScreenshot(page);
+  await expect(page.getByRole('main')).toContainText(/Beacon operators/i, { timeout: 15_000 });
+  await expect(page.getByRole('main')).not.toContainText(/\bE2E\b/i);
+}
+
+/**
  * Force English UI for documentation shots (manual is English; demo users may prefer es).
  */
 export async function ensureEnglishUi(page: Page): Promise<void> {
@@ -467,23 +545,32 @@ export async function ensureEnglishUi(page: Page): Promise<void> {
   const enOption = page
     .locator(
       [
+        'a.locale-switcher__option[hreflang="en"]',
         'form[action*="/account/locale/en"] button.locale-switcher__option',
         'form[action*="/locale/en"] button.locale-switcher__option',
-        'a.locale-switcher__option[hreflang="en"]',
         'button.locale-switcher__option[hreflang="en"]',
         'button.locale-switcher__option[lang="en"]',
       ].join(', '),
     )
     .first();
 
-  if (!(await enOption.isVisible().catch(() => false))) {
+  if (!(await enOption.count())) {
     return;
   }
 
-  await Promise.all([
-    page.waitForLoadState('domcontentloaded').catch(() => undefined),
-    enOption.click({ force: true }),
-  ]);
+  // Path-locale links may sit inside closed <details>; force after open.
+  const href = await enOption.getAttribute('href').catch(() => null);
+  if (href) {
+    await Promise.all([
+      page.waitForLoadState('domcontentloaded').catch(() => undefined),
+      page.goto(href, { waitUntil: 'domcontentloaded' }).catch(() => enOption.click({ force: true })),
+    ]);
+  } else {
+    await Promise.all([
+      page.waitForLoadState('domcontentloaded').catch(() => undefined),
+      enOption.click({ force: true }),
+    ]);
+  }
   await waitForPageLoader(page);
 }
 

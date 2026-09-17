@@ -113,7 +113,7 @@ Specs are grouped by product domain (Playwright still uses `testDir: ./e2e`):
 |--------|----------|
 | `setup/` | `auth.setup.ts` (writes `e2e/.auth/admin.json`) |
 | `support/` | Shared helpers |
-| `smoke/` | Public/auth chrome, cookies, navigation, misc |
+| `smoke/` | Public/auth chrome, cookies, navigation, markup standardization, misc |
 | `account/` | Profile, display prefs, member alerts |
 | `admin/` | Hub, users, kits, settings, appearance mutations, analytics admin |
 | `project/` | Dashboard, project settings, share, members |
@@ -151,13 +151,21 @@ Local stability: Playwright `retries: 1` (non-CI) and `gotoStable()` (retries `E
 
 Digest flush (`UC-NOTIF-17`): `make test-e2e` runs `app:notifications:flush-digests --force` and writes `var/e2e/flush-digests.last` for `notifications/use-cases-digest-flush.spec.ts`.
 
-Mailpit-backed auth completion (`UC-AUTH-18` / `UC-AUTH-20`):
+### HTML / Twig markup (UC-UI-13)
+
+`e2e/support/html-markup.ts` asserts document shell, CSP nonces on inline `<style>`/`<script>` (raw response HTML), and non-bare error text. Warm smoke: `e2e/smoke/html-twig-standardization.spec.ts`.
+
+### Mailpit delivery lane (UC-AUTH-18 / UC-AUTH-20)
+
+Opt-in — not part of `make test-e2e-smoke`. Brings up Compose profile `mail` on the isolated E2E stack, forces `PLAYWRIGHT_WORKERS=1`, and runs Mailpit-backed auth specs:
 
 ```bash
-make mailpit
-make test-e2e ARGS='e2e/smoke/use-cases-auth-mailpit.spec.ts'
-# Optional: PLAYWRIGHT_REQUIRE_MAILPIT=1 to fail instead of skip when Mailpit is down
+make up-e2e && make ready-e2e
+make test-e2e-mailpit
+# Optional filter: make test-e2e-mailpit ARGS='e2e/smoke/use-cases-auth-mailpit.spec.ts'
 ```
+
+Dogfood shortcut (mutates dev DB): `make mailpit` then `PLAYWRIGHT_MAILPIT=1 make test-e2e ARGS='e2e/smoke/use-cases-auth-mailpit.spec.ts'`.
 
 Push HTTP (`UC-ACC-23`) needs `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` in `.env` (see `.env.dist`); recreate `php` after setting keys.
 
