@@ -15,6 +15,7 @@ nowo_site_backup:
     templates:
         # Friendlier token gate (SVG + calm copy); wizard/done stay in the package.
         setup_token: 'kit/site_backup_setup_token.html.twig'
+        panel_login: 'kit/site_backup_panel_login.html.twig'
     backup:
         include_paths:
             - config

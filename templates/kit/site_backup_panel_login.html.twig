@@ -1,0 +1,38 @@
+{% extends nowo_site_backup_panel_layout_template %}
+
+{% block title %}Site Backup — Beacon{% endblock %}
+
+{% block nowo_site_backup_panel_content %}
+{# Panel shell already provides the card chrome — keep content flat. #}
+<div class="auth-card" style="padding: 0; box-shadow: none; background: transparent; border: 0;">
+  <p class="eyebrow" style="margin: 0 0 0.35rem; font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-primary, #0f766e);">
+    Ops
+  </p>
+  <h1 class="auth-card__title" style="margin-top: 0;">Site Backup panel</h1>
+  <p style="margin: 0 0 1.25rem; color: var(--color-muted, #475569); font-size: 0.95rem;">
+    Separate ops password — not the application admin session.
+  </p>
+
+  {% if misconfigured|default(false) %}
+    <p class="auth-alert auth-alert--error" role="alert">
+      Password protection is enabled but <code>security.password_hash</code> is not set.
+      Configure a hash with <code>nowo:site-backup:hash-password</code> before using the panel.
+    </p>
+  {% elseif not protectionEnabled %}
+    <p class="auth-alert" role="status">
+      Password protection is disabled. Anyone who can reach this URL can open the panel — enable a hash in production.
+    </p>
+  {% else %}
+    {{ form_start(loginForm, {attr: {class: 'auth-form'}}) }}
+      <div class="auth-form__row" style="display: grid; gap: 0.4rem; margin-bottom: 1rem;">
+        {{ form_label(loginForm.password, 'Password') }}
+        {{ form_widget(loginForm.password, {
+          attr: { autofocus: true, autocomplete: 'current-password', class: 'auth-form__control' },
+        }) }}
+        {{ form_errors(loginForm.password) }}
+      </div>
+      <button type="submit" class="btn btn--primary btn--block">Sign in</button>
+    {{ form_end(loginForm) }}
+  {% endif %}
+</div>
+{% endblock %}
