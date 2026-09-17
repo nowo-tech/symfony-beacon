@@ -21,9 +21,9 @@ final class HttpErrorPagesTest extends DatabaseWebTestCase
     {
         foreach ([400, 401, 403, 404, 408, 429, 500, 502, 503] as $code) {
             yield (string) $code => [
-                sprintf('@Twig/Exception/error%d.html.twig', $code),
+                \sprintf('@Twig/Exception/error%d.html.twig', $code),
                 $code,
-                sprintf('illustrations/error-%d.png', $code),
+                \sprintf('illustrations/error-%d.png', $code),
             ];
         }
     }
@@ -61,7 +61,7 @@ final class HttpErrorPagesTest extends DatabaseWebTestCase
         $bytes = file_get_contents($path);
         self::assertNotFalse($bytes);
         self::assertStringStartsWith("\x89PNG\r\n\x1a\n", $bytes, $path.' must be a PNG (JPEG/JFIF payloads named .png fail REQ-ERROR-001 item 9)');
-        self::assertSame(6, ord($bytes[25]), $path.' must be PNG color type 6 (RGBA)');
+        self::assertSame(6, \ord($bytes[25]), $path.' must be PNG color type 6 (RGBA)');
         self::assertTrue(
             self::pngFirstRowHasFullyTransparentPixel($bytes),
             $path.' must have a transparent canvas (alpha=0 on the first scanline)',
@@ -71,39 +71,39 @@ final class HttpErrorPagesTest extends DatabaseWebTestCase
     private static function pngFirstRowHasFullyTransparentPixel(string $png): bool
     {
         $width = unpack('N', substr($png, 16, 4));
-        if (!is_array($width) || !isset($width[1]) || $width[1] < 1) {
+        if (!\is_array($width) || !isset($width[1]) || $width[1] < 1) {
             return false;
         }
         $idat = '';
         $offset = 8;
-        $length = strlen($png);
+        $length = \strlen($png);
         while ($offset + 8 <= $length) {
             $chunkLenParts = unpack('N', substr($png, $offset, 4));
-            if (!is_array($chunkLenParts) || !isset($chunkLenParts[1])) {
+            if (!\is_array($chunkLenParts) || !isset($chunkLenParts[1])) {
                 return false;
             }
             $chunkLen = $chunkLenParts[1];
             $type = substr($png, $offset + 4, 4);
-            $idat .= $type === 'IDAT' ? substr($png, $offset + 8, $chunkLen) : '';
-            if ($type === 'IEND') {
+            $idat .= 'IDAT' === $type ? substr($png, $offset + 8, $chunkLen) : '';
+            if ('IEND' === $type) {
                 break;
             }
             $offset += 12 + $chunkLen;
         }
         $raw = zlib_decode($idat);
-        if (!is_string($raw) || $raw === '') {
+        if (!\is_string($raw) || '' === $raw) {
             return false;
         }
         $bpp = 4;
         $stride = $width[1] * $bpp;
-        if (strlen($raw) < 1 + $stride) {
+        if (\strlen($raw) < 1 + $stride) {
             return false;
         }
         $row = substr($raw, 1, $stride);
-        $filter = ord($raw[0]);
+        $filter = \ord($raw[0]);
         $out = [];
         for ($i = 0; $i < $stride; ++$i) {
-            $x = ord($row[$i]);
+            $x = \ord($row[$i]);
             $left = $i >= $bpp ? $out[$i - $bpp] : 0;
             $out[$i] = match ($filter) {
                 0, 2 => $x,
@@ -114,7 +114,7 @@ final class HttpErrorPagesTest extends DatabaseWebTestCase
             };
         }
         for ($i = 3; $i < $stride; $i += $bpp) {
-            if ($out[$i] === 0) {
+            if (0 === $out[$i]) {
                 return true;
             }
         }

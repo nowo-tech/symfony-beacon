@@ -225,18 +225,18 @@ final readonly class ContentSecurityPolicySubscriber
             return;
         }
 
-        $escapedNonce = htmlspecialchars($nonce, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $escapedNonce = htmlspecialchars($nonce, \ENT_QUOTES | \ENT_SUBSTITUTE, 'UTF-8');
 
         $updated = preg_replace_callback(
             '/<style(\s[^>]*)?>/i',
             static function (array $matches) use ($escapedNonce): string {
                 $attrs = $matches[1] ?? '';
 
-                if (preg_match('/\bnonce\s*=/i', $attrs) === 1) {
+                if (1 === preg_match('/\bnonce\s*=/i', $attrs)) {
                     return $matches[0];
                 }
 
-                return '<style nonce="' . $escapedNonce . '"' . $attrs . '>';
+                return '<style nonce="'.$escapedNonce.'"'.$attrs.'>';
             },
             $content,
         );
@@ -245,8 +245,6 @@ final readonly class ContentSecurityPolicySubscriber
             $response->setContent($updated);
         }
     }
-
-
 
     private function originOf(string $url): ?string
     {

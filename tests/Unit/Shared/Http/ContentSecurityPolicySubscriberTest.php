@@ -196,6 +196,17 @@ final class ContentSecurityPolicySubscriberTest extends TestCase
         self::assertSame('<script>window.x=1</script>', $response->getContent());
     }
 
+    public function testStampInlineStyleNoncesReturnsEarlyForEmptyNonce(): void
+    {
+        $method = new ReflectionMethod(ContentSecurityPolicySubscriber::class, 'stampInlineStyleNonces');
+        $subscriber = new ContentSecurityPolicySubscriber(kernelDebug: false);
+        $response = new Response('<style>body{margin:0}</style>');
+
+        $method->invoke($subscriber, $response, '');
+
+        self::assertSame('<style>body{margin:0}</style>', $response->getContent());
+    }
+
     /**
      * @param list<string> $connectSrcExtra
      * @param list<string> $scriptSrcExtra

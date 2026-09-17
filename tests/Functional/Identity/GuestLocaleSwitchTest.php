@@ -41,13 +41,18 @@ final class GuestLocaleSwitchTest extends DatabaseWebTestCase
         self::assertSelectorExists('a[href="/es/legal/privacy"]');
     }
 
-    public function testGuestLocaleHelperRequiresPostAndLocalizesRedirect(): void
+    public function testGuestLocaleHelperRejectsGet(): void
     {
         $client = self::createClient();
-
         $client->request(Request::METHOD_GET, '/locale/es', ['redirect' => '/legal/privacy']);
         self::assertResponseStatusCodeSame(405);
+    }
 
+    public function testGuestLocaleHelperRequiresPostAndLocalizesRedirect(): void
+    {
+        // Use a fresh client: a prior GET 405 on the same BrowserKit session
+        // poisons CSRF storage and the POST falls through to the login entry point.
+        $client = self::createClient();
         $token = $this->guestLocaleCsrfToken($client);
         $client->request(Request::METHOD_POST, '/locale/es', [
             '_token' => $token,
