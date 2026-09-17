@@ -4,6 +4,8 @@ Operator guide for the self-hosted Beacon web UI. Each chapter walks through the
 
 **Wiki index:** [symfony-beacon/wiki](https://github.com/nowo-tech/symfony-beacon/wiki) (chapter table linking here). Canonical wiki Home source: [`docs/wiki/Home.md`](../wiki/Home.md) — push with `make wiki-push-home`.
 
+**Visual identity:** [`docs/identity/README.md`](../identity/README.md) — mark, moss tokens, mascot, and how they land on these screens. Not a second operator catalog.
+
 ## How to read this manual
 
 1. Start with [First-time setup](00-setup.md) only if you are installing a cold instance.
@@ -31,6 +33,7 @@ Operator guide for the self-hosted Beacon web UI. Each chapter walks through the
 | [05 — Administration](05-admin-and-ops.md) | Users, ops, kits, backup |
 | [06 — Legal and privacy](06-legal-and-privacy.md) | Legal pages and cookies |
 | [07 — Theme and language](07-appearance.md) | How to switch day/night and locale |
+| [08 — Branded HTTP errors](08-errors.md) | Public error pages, mascot, and maintenance preview |
 
 ## Regenerating screenshots
 

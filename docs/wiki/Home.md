@@ -16,8 +16,11 @@ Operator guide for the self-hosted Beacon web UI. Each chapter explains what a s
 | [05 — Administration](https://github.com/nowo-tech/symfony-beacon/blob/main/docs/manual/05-admin-and-ops.md) | Users, ops, kits, backup |
 | [06 — Legal and privacy](https://github.com/nowo-tech/symfony-beacon/blob/main/docs/manual/06-legal-and-privacy.md) | Legal pages and cookies |
 | [07 — Theme and language](https://github.com/nowo-tech/symfony-beacon/blob/main/docs/manual/07-appearance.md) | Day/night and locale |
+| [08 — Branded HTTP errors](https://github.com/nowo-tech/symfony-beacon/blob/main/docs/manual/08-errors.md) | Public error pages, mascot, and maintenance preview |
 
 Full index and conventions: [docs/manual/README.md](https://github.com/nowo-tech/symfony-beacon/blob/main/docs/manual/README.md).
+
+**Related — visual identity:** [`docs/identity/README.md`](https://github.com/nowo-tech/symfony-beacon/blob/main/docs/identity/README.md) (mark, colour, type, mascot, applied screens). This wiki stays an index into `docs/manual/`; the identity book is not a screenshot dump.
 
 ## Conventions (short)
 
@@ -25,6 +28,7 @@ Full index and conventions: [docs/manual/README.md](https://github.com/nowo-tech
 |------|--------|
 | Viewport | **1440×900** fixed (tall screens use `*-2.png` companions) |
 | Theme / language | **Day** + **English** for the inventory; preference demos once public + private — see chapter 07 |
+| Error previews | `/_error/{code}` in `APP_ENV=dev`; maintenance preview at `/_maintenance_preview` |
 | Prose | Each screen: purpose → what it contributes → screenshot (no bare image stacks) |
 
 ## Regenerating screenshots
