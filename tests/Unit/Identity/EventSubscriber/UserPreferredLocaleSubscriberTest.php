@@ -8,6 +8,7 @@ use App\Identity\Entity\User;
 use App\Identity\EventSubscriber\UserPreferredLocaleSubscriber;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -33,8 +34,7 @@ final class UserPreferredLocaleSubscriberTest extends TestCase
         $request = Request::create('/dashboard');
         $event = $this->mainEvent($request);
 
-        new UserPreferredLocaleSubscriber(new TokenStorage(), $translator, 'en')
-            ->onKernelRequest($event);
+        $this->subscriber(new TokenStorage(), $translator, 'en')->onKernelRequest($event);
 
         self::assertSame('en', $translator->locale);
         self::assertNull($event->getResponse());
@@ -48,8 +48,7 @@ final class UserPreferredLocaleSubscriberTest extends TestCase
         $request->attributes->set('_route', 'nowo_auth_kit_login');
         $event = $this->mainEvent($request);
 
-        new UserPreferredLocaleSubscriber($this->tokens($user), $translator, 'en')
-            ->onKernelRequest($event);
+        $this->subscriber($this->tokens($user), $translator, 'en')->onKernelRequest($event);
 
         self::assertSame('en', $translator->locale);
     }
@@ -61,8 +60,7 @@ final class UserPreferredLocaleSubscriberTest extends TestCase
         $request = Request::create('/projects', Request::METHOD_GET, ['_locale' => 'es', 'page' => '2']);
         $event = $this->mainEvent($request);
 
-        new UserPreferredLocaleSubscriber($this->tokens($user), $translator, 'en')
-            ->onKernelRequest($event);
+        $this->subscriber($this->tokens($user), $translator, 'en')->onKernelRequest($event);
 
         $response = $event->getResponse();
         self::assertTrue($response->isRedirection());
@@ -78,8 +76,7 @@ final class UserPreferredLocaleSubscriberTest extends TestCase
         $request->setSession($session);
         $event = $this->mainEvent($request);
 
-        new UserPreferredLocaleSubscriber($this->tokens($user), $translator, 'en')
-            ->onKernelRequest($event);
+        $this->subscriber($this->tokens($user), $translator, 'en')->onKernelRequest($event);
 
         self::assertSame('fr', $request->getLocale());
         self::assertSame('fr', $session->get('_locale'));
@@ -94,8 +91,7 @@ final class UserPreferredLocaleSubscriberTest extends TestCase
         $request = Request::create('/projects');
         $event = $this->mainEvent($request);
 
-        new UserPreferredLocaleSubscriber($this->tokens($user), $translator, 'de')
-            ->onKernelRequest($event);
+        $this->subscriber($this->tokens($user), $translator, 'de')->onKernelRequest($event);
 
         self::assertSame('de', $request->getLocale());
         self::assertSame('de', $translator->locale);
@@ -109,12 +105,44 @@ final class UserPreferredLocaleSubscriberTest extends TestCase
         $request = Request::create('/projects');
         $event = $this->mainEvent($request);
 
-        new UserPreferredLocaleSubscriber($this->tokens($user), $translator, '   ')
-            ->onKernelRequest($event);
+        $this->subscriber($this->tokens($user), $translator, '   ')->onKernelRequest($event);
 
         self::assertSame('en', $request->getLocale());
         self::assertSame('en', $translator->locale);
         self::assertNull($event->getResponse());
+    }
+
+    public function testSubRequestCopiesLocaleFromMainRequest(): void
+    {
+        $translator = new RecordingTranslator();
+        $translator->locale = 'es';
+
+        $main = Request::create('/dashboard');
+        $main->setLocale('en');
+        $stack = new RequestStack();
+        $stack->push($main);
+
+        $sub = Request::create('/_fragment');
+        $sub->setLocale('es');
+        $event = new RequestEvent(
+            $this->createStub(KernelInterface::class),
+            $sub,
+            HttpKernelInterface::SUB_REQUEST,
+        );
+
+        new UserPreferredLocaleSubscriber(new TokenStorage(), $translator, $stack, 'es')
+            ->onKernelRequest($event);
+
+        self::assertSame('en', $sub->getLocale());
+        self::assertSame('en', $translator->locale);
+    }
+
+    private function subscriber(
+        TokenStorage $tokens,
+        RecordingTranslator $translator,
+        string $defaultLocale,
+    ): UserPreferredLocaleSubscriber {
+        return new UserPreferredLocaleSubscriber($tokens, $translator, new RequestStack(), $defaultLocale);
     }
 
     private function userWithLocale(string $locale): User

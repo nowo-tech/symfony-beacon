@@ -8,6 +8,8 @@ use App\Identity\Entity\User;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -20,12 +22,18 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * Must run after the firewall (user available) and re-sync LocaleAware services
  * (Translator), because LocaleAwareListener already ran earlier with the default locale.
+ *
+ * Sub-requests ({@code render(controller(...))}} fragments) share the Translator service.
+ * LocaleAwareListener sets them from the fragment `_locale` (often DEFAULT_LOCALE) and
+ * would leave the rest of the main response (e.g. legal footer) translated wrongly —
+ * copy the main request locale onto sub-requests instead.
  */
 final readonly class UserPreferredLocaleSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private TokenStorageInterface $tokenStorage,
         private TranslatorInterface $translator,
+        private RequestStack $requestStack,
         #[Autowire('%default_locale%')]
         private string $defaultLocale,
     ) {
@@ -42,6 +50,8 @@ final readonly class UserPreferredLocaleSubscriber implements EventSubscriberInt
     public function onKernelRequest(RequestEvent $event): void
     {
         if (!$event->isMainRequest()) {
+            $this->syncSubRequestLocaleFromMain($event);
+
             return;
         }
 
@@ -75,15 +85,38 @@ final readonly class UserPreferredLocaleSubscriber implements EventSubscriberInt
             return;
         }
 
-        $request->setLocale($preferred);
+        $this->applyLocale($request, $preferred);
+    }
+
+    /**
+     * Keep the shared Translator aligned with the main request after fragment sub-requests.
+     */
+    private function syncSubRequestLocaleFromMain(RequestEvent $event): void
+    {
+        $main = $this->requestStack->getMainRequest();
+        if (null === $main) {
+            return;
+        }
+
+        $locale = $main->getLocale();
+        if ('' === $locale) {
+            return;
+        }
+
+        $this->applyLocale($event->getRequest(), $locale);
+    }
+
+    private function applyLocale(Request $request, string $locale): void
+    {
+        $request->setLocale($locale);
         if ($request->hasSession()) {
-            $request->getSession()->set('_locale', $preferred);
+            $request->getSession()->set('_locale', $locale);
         }
 
         // LocaleAwareListener (priority 15) already configured the translator from the
         // previous request locale / default — push the account preference now.
         if ($this->translator instanceof LocaleAwareInterface) {
-            $this->translator->setLocale($preferred);
+            $this->translator->setLocale($locale);
         }
     }
 }

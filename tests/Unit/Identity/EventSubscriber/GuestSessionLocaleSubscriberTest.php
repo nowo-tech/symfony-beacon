@@ -16,8 +16,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Contracts\Translation\LocaleAwareInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class GuestSessionLocaleSubscriberTest extends TestCase
 {
@@ -137,31 +135,5 @@ final class GuestSessionLocaleSubscriberTest extends TestCase
             $request,
             HttpKernelInterface::MAIN_REQUEST,
         );
-    }
-}
-
-/**
- * @internal
- */
-final class RecordingTranslator implements TranslatorInterface, LocaleAwareInterface
-{
-    public string $locale = 'en';
-
-    /**
-     * @param array<string, mixed> $parameters
-     */
-    public function trans(string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
-    {
-        return $id;
-    }
-
-    public function getLocale(): string
-    {
-        return $this->locale;
-    }
-
-    public function setLocale(string $locale): void
-    {
-        $this->locale = $locale;
     }
 }
