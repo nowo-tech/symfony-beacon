@@ -7,7 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-_No unreleased operator-facing changes yet._
+### Added
+
+- **Visual identity manual (Phase 6.66 / `114`):** English brand book at [`docs/identity/README.md`](identity/README.md) (mark, moss tokens, type, mascot, applied 1440×900 screens). Linked from docs index, product UI manual, wiki Home, and root README. OTHER: REQ-DOCS-APP-005. Spec: `specs/114-identity-error-docs/`.
+- **Product UI manual — Errors chapter:** [`docs/manual/08-errors.md`](manual/08-errors.md) + 1440×900 captures (`error-*.png`, `error-maintenance.png`); warm capture suite includes `/_error/{code}` and `/_maintenance_preview`. Amends `111` FR-013 / FR-014.
+- **Error / mascot art format:** runtime `public/brand/mascot.png` and `public/illustrations/error-*.png` asserted as PNG RGBA with a transparent canvas (REQ-ERROR-001 item 9 / `063` FR-002). `docs/manual/images/error-*.png` remain page screenshots.
+- **HTML/Twig standardization smoke:** `e2e/smoke/html-twig-standardization.spec.ts` + `e2e/support/html-markup.ts` (UC-UI-13).
+- **Opt-in Mailpit E2E lane:** `make test-e2e-mailpit` (Compose `mail` profile, `PLAYWRIGHT_MAILPIT=1`, serial workers) for auth delivery specs without burdening default smoke.
+- **SiteBackup panel login Twig:** host override `kit/site_backup_panel_login.html.twig` wired as `panel_login`.
+
+### Changed
+
+- **CSP style nonces:** `ContentSecurityPolicySubscriber` stamps the request nonce onto bare inline `<style>` (parity with scripts) so maintenance / error chrome stays CSP-safe.
+- **Legal / audit notes:** REQ-CC-010 counsel-pending table in [`docs/product/LEGAL-AND-COOKIES.md`](product/LEGAL-AND-COOKIES.md); ENGINEERING-AUDIT records identity ✅ and counsel ⚠️.
+- **Manual capture hygiene (`114`):** dashboard/prefs filter to demo project (`Symfony Beacon`); clear leftover maintenance schedules before `error-maintenance` shot; cold setup captures force English (`lockSetupEnglish` / path locale); admin Groups filter to `Beacon operators` (purge `%e2e%` groups before `docs-manual-screenshots`). Amends `111` FR-015 / FR-016 / FR-017.
+
+### Fixed
+
+- **Authenticated legal footer locale:** fragment sub-requests (`render(controller(…))`) no longer leave the shared Translator on `DEFAULT_LOCALE` after the main body — `UserPreferredLocaleSubscriber` syncs sub-requests from the main locale, and `_legal_footer` passes the request locale into `|trans` explicitly.
+
+### Notes for integrators
+
+- **No migrations. No Composer pin changes.**
+- Optional: browse the identity book and Errors chapter; regenerate screenshots with `make docs-manual-screenshots` / `make docs-manual-screenshots-setup`.
+- Optional: `make test-e2e-mailpit` when exercising auth mail delivery locally.
+- Product fix: signed-in users with preferred locale `en` see English legal footer labels even on pages that embed Twig controller fragments (e.g. dashboard New project modal).
 
 ## [1.28.2] - 2026-09-12
 

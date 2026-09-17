@@ -104,9 +104,28 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Unreleased (main after 1.28.2)
 
-_No unreleased operator-facing steps yet._
+Visual identity book + error manual docs (`114` / Phase 6.66), CSP style nonces, capture hygiene, and authenticated legal footer locale fix. **No migrations. No Composer pin changes.**
 
-See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
+1. Pull / checkout `main` (or the forthcoming patch that cuts Unreleased).
+
+2. Optional — identity book and Errors chapter:
+   - [identity/README.md](identity/README.md)
+   - [manual/08-errors.md](manual/08-errors.md)
+   ```bash
+   make docs-manual-screenshots
+   make docs-manual-screenshots-setup
+   ```
+
+3. Optional — Mailpit auth delivery lane (not part of default smoke):
+   ```bash
+   make test-e2e-mailpit
+   ```
+
+4. SiteBackup operators who brand the backup panel login: confirm `panel_login` points at `kit/site_backup_panel_login.html.twig` (Flex recipe / `nowo_site_backup.yaml`).
+
+5. No action required for the legal footer fix beyond deploying the build — signed-in preferred locale and footer labels stay aligned after Twig fragment sub-requests.
+
+See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]` and `specs/114-identity-error-docs/`.
 
 ## Upgrading from 1.28.1 to 1.28.2
 

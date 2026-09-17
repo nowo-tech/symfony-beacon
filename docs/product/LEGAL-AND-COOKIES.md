@@ -15,6 +15,17 @@ All of these are **public** (`PUBLIC_ACCESS`). Copy is English by default and tr
 
 > **Operator duty:** replace placeholders (legal name, address, contact email, registry IDs, retention schedule) before exposing the instance to the public or shipping store apps. The templates are starting points, not legal advice.
 
+## Current-law review (REQ-CC-010)
+
+| Field | Beacon |
+| ----- | ------ |
+| **Jurisdictions in scope** | EU/EEA (RGPD) + Spain (LSSI-CE / LOPDGDD) — matrix default unless a deployment docs a narrower market |
+| **Last legal review** | **Counsel pending — not production** (engineering record **2026-09-17**) |
+| **Published copy** | Operator-placeholder structure (`legal.placeholder.*` + kit-shaped notice/privacy/terms/cookies). Routes and CookieConsent chrome are in place ([REQ-CC-001](../../OTHER_FULL_SPECS_DETAILS.md#REQ-CC-001)…009). |
+| **Production gate** | Do **not** process real personal data on a public instance until counsel replaces placeholders with operator identity, processors, retention, and LSSI identification. This file is **not** legal advice. |
+
+Re-record the date in this table (and `docs/ops/ENGINEERING-AUDIT.md`) whenever AuthKit, analytics, mail, Beacon DSN, payments, or processors change.
+
 ## Cookie consent bundle
 
 Configuration: `config/packages/nowo_cookie_consent.yaml`

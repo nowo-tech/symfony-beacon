@@ -149,7 +149,7 @@ Guest language: path switcher or `GET|POST /locale/{locale}` (session). Signed-i
 
 ## HTTP error pages
 
-Branded Twig overrides live under `templates/bundles/TwigBundle/Exception/` (`error404`, `error403`, `error500`) with art in `public/illustrations/` and the mascot in `public/brand/mascot.png`.
+Branded Twig overrides live under `templates/bundles/TwigBundle/Exception/` (`error404`, `error403`, `error500`) with art in `public/illustrations/` and the mascot in `public/brand/mascot.png`. Those files are PNG with a transparent canvas. Visual identity (mark, tokens, how those pages should look): [identity/README.md](identity/README.md).
 
 Preview routes are registered **only when `APP_ENV=dev`** (not `test` / `prod`):
 
