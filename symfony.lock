@@ -72,6 +72,9 @@
     "nowo-tech/breadcrumb-kit-bundle": {
         "version": "v2.0.2"
     },
+    "nowo-tech/ckeditor5-editor-bundle": {
+        "version": "v1.4.6"
+    },
     "nowo-tech/cookie-consent-bundle": {
         "version": "v1.3.3"
     },
@@ -101,6 +104,9 @@
     },
     "nowo-tech/otp-input-bundle": {
         "version": "v1.4.4"
+    },
+    "nowo-tech/outbound-url-guard-bundle": {
+        "version": "dev-main"
     },
     "nowo-tech/password-policy-bundle": {
         "version": "v1.2.3"

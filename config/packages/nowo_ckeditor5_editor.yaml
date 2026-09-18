@@ -1,0 +1,12 @@
+nowo_ckeditor5_editor:
+    default_profile: legal
+    # Strict on every env: legal pages must not keep scripts, handlers, or iframes.
+    html_sanitizer: strict
+    profiles:
+        legal:
+            preset: standard
+            toolbar: true
+            min_height: 420px
+            form_theme: form_div_layout.html.twig
+            debug: false
+            theme: light

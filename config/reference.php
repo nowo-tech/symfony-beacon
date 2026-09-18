@@ -2842,6 +2842,25 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     uppercase?: bool|Param, // Default: true
  *     form_theme?: scalar|Param|null, // Default: "form_div_layout.html.twig"
  * }
+ * @psalm-type NowoCkeditor5EditorConfig = array{
+ *     default_profile?: scalar|Param|null, // Profile name used when the form field omits the "config" option (form option key remains "config" for BC). // Default: "default"
+ *     html_sanitizer?: scalar|Param|null, // Optional service id implementing Ckeditor5HtmlSanitizerInterface, or a built-in: "allowlist" (YouTube/Vimeo iframes kept as src only) or "strict" (same sanitizer, every iframe dropped). Null (default) disables server-side sanitization (BC). // Default: null
+ *     profiles?: array<string, array{ // Default: []
+ *         toolbar?: bool|Param, // When true, CKEditor shows its toolbar (preset still controls which buttons are available). // Default: true
+ *         min_height?: scalar|Param|null, // Default CSS min-height for the editable region wrapper (e.g. 240px, 12rem). // Default: "240px"
+ *         form_theme?: scalar|Param|null, // Base Symfony form layout (must match twig.form_themes in your app). // Default: "form_div_layout.html.twig"
+ *         debug?: bool|Param, // When true, the browser console receives detailed logs from the bundle script. // Default: false
+ *         preset?: scalar|Param|null, // Editor feature preset: standard, simple, minimal, emoji, typography, variables (plugins + toolbar). Use upload_url with preset standard for server-side image uploads. // Default: "standard"
+ *         theme?: scalar|Param|null, // Chrome palette for the demo/widget wrapper: light, dark, or auto (EditorTheme). // Default: "light"
+ *         upload_url?: scalar|Param|null, // POST endpoint URL for image uploads (CKEditor SimpleUploadAdapter). Empty disables uploads. // Default: null
+ *     }>,
+ *     ...<string, mixed>
+ * }
+ * @psalm-type NowoOutboundUrlGuardConfig = array{
+ *     allow_private?: bool|Param, // When true, loopback, RFC1918, and blocked hostnames are allowed. Cloud metadata stays blocked. // Default: false
+ *     resolve_dns?: bool|Param, // When true, hostnames are resolved and the first public address is returned as an HttpClient resolve pin. Set false for Docker service names. // Default: true
+ *     dns_timeout?: float|Param, // Socket timeout in seconds for DNS lookups. Must stay below the host PHP max_execution_time. // Default: 2.0
+ * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -2885,6 +2904,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     nowo_maintenance_mode?: NowoMaintenanceModeConfig,
  *     nowo_phone_input?: NowoPhoneInputConfig,
  *     nowo_otp_input?: NowoOtpInputConfig,
+ *     nowo_ckeditor5_editor?: NowoCkeditor5EditorConfig,
+ *     nowo_outbound_url_guard?: NowoOutboundUrlGuardConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -2931,6 +2952,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_maintenance_mode?: NowoMaintenanceModeConfig,
  *         nowo_phone_input?: NowoPhoneInputConfig,
  *         nowo_otp_input?: NowoOtpInputConfig,
+ *         nowo_ckeditor5_editor?: NowoCkeditor5EditorConfig,
+ *         nowo_outbound_url_guard?: NowoOutboundUrlGuardConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -2975,6 +2998,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_maintenance_mode?: NowoMaintenanceModeConfig,
  *         nowo_phone_input?: NowoPhoneInputConfig,
  *         nowo_otp_input?: NowoOtpInputConfig,
+ *         nowo_ckeditor5_editor?: NowoCkeditor5EditorConfig,
+ *         nowo_outbound_url_guard?: NowoOutboundUrlGuardConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -3022,6 +3047,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         nowo_maintenance_mode?: NowoMaintenanceModeConfig,
  *         nowo_phone_input?: NowoPhoneInputConfig,
  *         nowo_otp_input?: NowoOtpInputConfig,
+ *         nowo_ckeditor5_editor?: NowoCkeditor5EditorConfig,
+ *         nowo_outbound_url_guard?: NowoOutboundUrlGuardConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,

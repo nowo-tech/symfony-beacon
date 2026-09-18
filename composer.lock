@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "51bdd9b13b44ab070a74ec69f5edbf24",
+    "content-hash": "8460bb672e4d42e2a92763c7317e89e7",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -2330,6 +2330,90 @@
             "time": "2026-08-24T16:03:00+00:00"
         },
         {
+            "name": "nowo-tech/ckeditor5-editor-bundle",
+            "version": "v1.4.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nowo-tech/CKEditor5EditorBundle.git",
+                "reference": "f23981638ba90c13bef24c00473dd16c4c0025a6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nowo-tech/CKEditor5EditorBundle/zipball/f23981638ba90c13bef24c00473dd16c4c0025a6",
+                "reference": "f23981638ba90c13bef24c00473dd16c4c0025a6",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2 <8.6",
+                "symfony/asset": "^6.4 || ^7.0 || ^8.0",
+                "symfony/config": "^6.4 || ^7.0 || ^8.0",
+                "symfony/dependency-injection": "^6.4 || ^7.0 || ^8.0",
+                "symfony/form": "^6.4 || ^7.0 || ^8.0",
+                "symfony/framework-bundle": "^6.4 || ^7.0 || ^8.0",
+                "symfony/http-foundation": "^6.4 || ^7.0 || ^8.0",
+                "symfony/http-kernel": "^6.4 || ^7.0 || ^8.0",
+                "symfony/routing": "^6.4 || ^7.0 || ^8.0",
+                "symfony/security-csrf": "^6.4 || ^7.0 || ^8.0",
+                "symfony/twig-bundle": "^6.4 || ^7.0 || ^8.0",
+                "twig/extra-bundle": "^3.12",
+                "twig/string-extra": "^3.12"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "nowo-tech/phpstan-frankenphp": "^1.0",
+                "phpstan/extension-installer": "^1.0",
+                "phpstan/phpstan": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpstan/phpstan-symfony": "^2.0",
+                "phpunit/phpunit": "^11.0",
+                "rector/rector": "^2.0",
+                "symfony/yaml": "^6.4 || ^7.0 || ^8.0",
+                "vincentlanglet/twig-cs-fixer": "^4.0"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Nowo\\Ckeditor5EditorBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Héctor Franco Aceituno",
+                    "email": "hectorfranco@nowo.tech",
+                    "homepage": "https://github.com/HecFranco",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Nowo.tech",
+                    "homepage": "https://nowo.tech"
+                }
+            ],
+            "description": "Symfony form type for rich text using CKEditor 5 (GPL OSS build via Vite). FOS-style YAML profiles, Docker makefile workflow.",
+            "homepage": "https://github.com/nowo-tech/Ckeditor5EditorBundle",
+            "keywords": [
+                "CKEditor",
+                "ckeditor5",
+                "editor",
+                "form",
+                "rich-text",
+                "symfony",
+                "symfony-bundle",
+                "vite",
+                "wysiwyg"
+            ],
+            "support": {
+                "changelog": "https://github.com/nowo-tech/Ckeditor5EditorBundle/blob/main/docs/CHANGELOG.md",
+                "docs": "https://github.com/nowo-tech/Ckeditor5EditorBundle/tree/main/docs",
+                "issues": "https://github.com/nowo-tech/Ckeditor5EditorBundle/issues",
+                "source": "https://github.com/nowo-tech/Ckeditor5EditorBundle"
+            },
+            "time": "2026-09-18T17:28:03+00:00"
+        },
+        {
             "name": "nowo-tech/cookie-consent-bundle",
             "version": "v1.9.7",
             "source": {
@@ -3272,6 +3356,95 @@
                 }
             ],
             "time": "2026-09-03T22:11:18+00:00"
+        },
+        {
+            "name": "nowo-tech/outbound-url-guard-bundle",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nowo-tech/OutboundUrlGuard.git",
+                "reference": "8ebe256d6f7c9089dfdab54238bbc14b38ca4f73"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nowo-tech/OutboundUrlGuard/zipball/8ebe256d6f7c9089dfdab54238bbc14b38ca4f73",
+                "reference": "8ebe256d6f7c9089dfdab54238bbc14b38ca4f73",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2 <8.6",
+                "symfony/config": "^7.4 || ^8.0",
+                "symfony/dependency-injection": "^7.4 || ^8.0",
+                "symfony/http-kernel": "^7.4 || ^8.0",
+                "symfony/process": "^7.4 || ^8.0",
+                "symfony/yaml": "^7.4 || ^8.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.64",
+                "nowo-tech/phpstan-frankenphp": "^1.0",
+                "phpstan/extension-installer": "^1.4",
+                "phpstan/phpstan": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpstan/phpstan-symfony": "^2.0",
+                "phpunit/phpunit": "^11.0",
+                "rector/rector": "^2.0",
+                "symfony/phpunit-bridge": "^7.4 || ^8.0"
+            },
+            "suggest": {
+                "symfony/flex": "For automatic recipe installation",
+                "symfony/http-client": "To open the pinned URL after the guard accepts it"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Nowo\\OutboundUrlGuardBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Héctor Franco Aceituno",
+                    "email": "hectorfranco@nowo.tech",
+                    "homepage": "https://github.com/HecFranco",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Nowo.tech",
+                    "homepage": "https://nowo.tech"
+                }
+            ],
+            "description": "Symfony bundle that blocks SSRF on outbound http(s) URLs: private networks, cloud metadata, and optional DNS pinning.",
+            "homepage": "https://github.com/nowo-tech/OutboundUrlGuard",
+            "keywords": [
+                "http-client",
+                "outbound",
+                "ssrf",
+                "symfony",
+                "symfony-bundle",
+                "url",
+                "webhook"
+            ],
+            "support": {
+                "changelog": "https://github.com/nowo-tech/OutboundUrlGuard/blob/main/docs/CHANGELOG.md",
+                "docs": "https://github.com/nowo-tech/OutboundUrlGuard/tree/main/docs",
+                "issues": "https://github.com/nowo-tech/OutboundUrlGuard/issues",
+                "source": "https://github.com/nowo-tech/OutboundUrlGuard"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/HecFranco",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-09-18T18:36:27+00:00"
         },
         {
             "name": "nowo-tech/password-policy-bundle",

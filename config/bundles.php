@@ -44,4 +44,6 @@ return [
     Nowo\MaintenanceModeBundle\NowoMaintenanceModeBundle::class => ['all' => true],
     Nowo\PhoneInputBundle\NowoPhoneInputBundle::class => ['all' => true],
     Nowo\OtpInputBundle\NowoOtpInputBundle::class => ['all' => true],
+    Nowo\Ckeditor5EditorBundle\NowoCkeditor5EditorBundle::class => ['all' => true],
+    Nowo\OutboundUrlGuardBundle\NowoOutboundUrlGuardBundle::class => ['all' => true],
 ];
