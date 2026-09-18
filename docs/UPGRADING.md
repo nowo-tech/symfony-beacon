@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.29.0)](#unreleased-main-after-1290)
+- [Unreleased (main after 1.29.1)](#unreleased-main-after-1291)
+- [Upgrading from 1.29.0 to 1.29.1](#upgrading-from-1290-to-1291)
 - [Upgrading from 1.28.2 to 1.29.0](#upgrading-from-1282-to-1290)
 - [Upgrading from 1.28.1 to 1.28.2](#upgrading-from-1281-to-1282)
 - [Upgrading from 1.28.0 to 1.28.1](#upgrading-from-1280-to-1281)
@@ -103,11 +104,19 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.29.0)
+## Unreleased (main after 1.29.1)
 
 _No unreleased operator-facing steps yet._
 
 See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
+
+## Upgrading from 1.29.0 to 1.29.1
+
+CI Quality (Rector) + Coverage (`COVERAGE_MIN=100`) after the 1.29.0 locale/error helpers, plus Twig-CS / guest-locale CSRF / CSP empty-nonce coverage. **No migrations. No Composer pin changes. No operator UI change.**
+
+1. Pull / checkout `v1.29.1` (optional for production — CI / PHPUnit only).
+
+See [CHANGELOG.md](CHANGELOG.md) `[1.29.1]`.
 
 ## Upgrading from 1.28.2 to 1.29.0
 

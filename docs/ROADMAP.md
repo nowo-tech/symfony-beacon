@@ -452,6 +452,7 @@ See `docs/ARCHITECTURE.md` non-goals and constitution.
 | **v1.28.1** | E2E helpers for create modals (`openAdminCreateForm` / kit-chrome dialog preference) |
 | **v1.28.2** | Product E2E CI sharding & harness stabilization (`113` / 6.65): 4 shards + gate; worker-suite env gate; Mailer DSN; view-as-member CSRF exit; BreadcrumbKit full-page writes |
 | **v1.29.0** | Visual identity book + error manual docs (`114` / 6.66): `docs/identity/`; `08-errors.md`; transparent runtime art; CSP style nonces; html-twig smoke; `make test-e2e-mailpit`; manual capture hygiene (incl. EN legal footer + admin Groups) |
+| **v1.29.1** | CI Quality/Coverage restore after 1.29.0: Rector PNG helpers, locale subscriber Clover 100%, guest locale CSRF, Twig-CS `panel_login`, CSP empty-nonce coverage |
 | **Unreleased** | — |
 | **Next** | Later Phase 6+ (SSO/SAML, WebAuthn, QR SMS OTP, Hotwire Native `008`, …) when specified |
 
@@ -464,4 +465,4 @@ Versions are indicative; cut releases when exit criteria for a phase (or a coher
 1. Pull items from **Later** when prioritized.
 2. Mark rows **Done** and bump the indicative release when shipping.
 
-Last updated: 2026-09-17 (v1.29.0 Phase 6.66 / `114` identity + error manual docs + capture hygiene + footer/admin Groups polish; v1.28.2 Phase 6.65 / `113` product E2E sharding + harness; v1.28.1 create-modal helpers; v1.28.0 Phase 6.63 / `111` + 6.64 / `112`).
+Last updated: 2026-09-18 (v1.29.1 CI Quality/Coverage restore; v1.29.0 Phase 6.66 / `114` identity + error manual docs + capture hygiene + footer/admin Groups polish; v1.28.2 Phase 6.65 / `113` product E2E sharding + harness).

@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _No unreleased operator-facing changes yet._
 
+## [1.29.1] - 2026-09-18
+
+### Fixed
+
+- **CI Quality / Coverage after 1.29.0 (REQ-QA-001 / QA-002 / QA-005):** Rector dry-run on `HttpErrorPagesTest` PNG helpers (instance methods); PHPUnit covers `UserPreferredLocaleSubscriber` sub-request early-returns so Clover returns to **100%**.
+- **Guest locale CSRF:** split GET 405 from the POST redirect so BrowserKit does not poison the session token (`GuestLocaleSwitchTest`).
+- **Twig-CS:** hash spacing on SiteBackup `panel_login`.
+- **CSP style stamp:** empty-nonce early return covered on `stampInlineStyleNonces`.
+
+### Notes for integrators
+
+- Test / DX / CI only — **no** migrations and **no** Composer pin changes. Operators on `v1.29.0` need not upgrade for product behaviour.
+- See [UPGRADING.md](UPGRADING.md) **Upgrading from 1.29.0 to 1.29.1**.
+
 ## [1.29.0] - 2026-09-17
 
 ### Added
@@ -1751,7 +1765,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.29.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.29.1...HEAD
+[1.29.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.29.0...v1.29.1
 [1.29.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.28.2...v1.29.0
 [1.28.2]: https://github.com/nowo-tech/symfony-beacon/compare/v1.28.1...v1.28.2
 [1.28.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.28.0...v1.28.1
