@@ -5,7 +5,7 @@
 {% block legal_body %}
 <article class="legal-doc prose-legal">
     <h1>{{ 'legal.cookies.title'|trans }}</h1>
-    <p class="legal-doc__meta">{{ 'legal.last_updated'|trans({'%date%': '2026-07-29'}) }}</p>
+    <p class="legal-doc__meta">{{ 'legal.last_updated'|trans({'%date%': '2026-09-18'}) }}</p>
 
     <p>{{ 'legal.cookies.intro'|trans({'%brand%': site_appearance.brandName}) }}</p>
 
@@ -61,6 +61,12 @@
                     <td>{{ 'legal.cookies.cat_required'|trans }}</td>
                     <td>{{ 'legal.cookies.duration_consent'|trans }}</td>
                     <td>{{ 'legal.cookies.purpose_category'|trans }}</td>
+                </tr>
+                <tr>
+                    <td><code>di_obs</code></td>
+                    <td>{{ 'legal.cookies.cat_required'|trans }}</td>
+                    <td>{{ 'legal.cookies.duration_device'|trans }}</td>
+                    <td>{{ 'legal.cookies.purpose_device'|trans }}</td>
                 </tr>
             </tbody>
         </table>

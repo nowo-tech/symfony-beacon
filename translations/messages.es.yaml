@@ -1963,98 +1963,93 @@ legal:
     label: Legal
   last_updated: 'Última actualización: %date%'
   manage_cookies: Configuración de cookies
-  placeholder:
-    legal_name: 'Nombre legal: [Nombre legal del operador — sustituir]'
-    address: 'Dirección: [Domicilio social — sustituir]'
-    contact_email: 'Contacto: [privacy@ejemplo.com — sustituir]'
-    registration: 'Registro mercantil / NIF: [si aplica — sustituir]'
+  identity:
+    name_line: 'Denominación: [Nombre legal del operador — sustituir]'
+    tax_line: 'NIF/CIF: [Identificación fiscal del operador — sustituir]'
+    address_line: 'Domicilio: [Domicilio social — sustituir]'
+    registry_line: 'Registro mercantil: [si aplica — sustituir]'
+    contact_line: 'Contacto: [privacy@example.com — sustituir]'
   notice:
     title: Aviso legal
-    intro: Este aviso legal aplica a la instancia autoalojada de %brand% que estás
-      visitando. Sustituye los marcadores siguientes por los datos reales del operador
-      antes del uso público.
-    operator_heading: Operador
-    operator_body: El operador de esta instancia es responsable del servicio y de
-      los contenidos que publique aquí.
+    intro: 'Este aviso identifica al operador de esta instancia de %brand%. Sustituye los marcadores por los datos reales del operador antes del uso público. Es un punto de partida para la identificación LSSI-CE art. 10 y el RGPD, no un dictamen jurídico.'
+    publisher_heading: Prestador y responsable
+    publisher_body: 'Quien ejecuta esta instancia es el prestador del servicio de la sociedad de la información y el responsable del tratamiento de este despliegue. Completa la identificación siguiente antes de tratar datos de otras personas.'
+    lssi_heading: Identificación del servicio de la sociedad de la información
+    lssi_body: 'En cumplimiento del artículo 10 de la Ley 34/2002 (LSSI-CE), el operador de esta instancia debe publicar su denominación, identificadores fiscales o registrales si aplican, domicilio postal y un correo o teléfono de contacto.'
+    self_host_heading: Despliegues autoalojados
+    self_host_body: 'Estas páginas se entregan como plantillas editables. Quien despliega este software es el prestador y el responsable de ese despliegue y debe sustituir cada marcador por su propia identificación. El texto por defecto no debe nombrar a una empresa de terceros.'
     hosting_heading: Alojamiento
-    hosting_body: Este software puede alojarlo el operador o un proveedor de infraestructura
-      elegido por el operador. Completa los detalles de hosting según tu despliegue.
+    hosting_body: 'Esta instancia se aloja en infraestructura elegida por el operador. Documenta el alojador y dónde se guardan los datos antes del uso público. Los encargados solo tratan datos siguiendo instrucciones del operador.'
+    ip_heading: Propiedad intelectual
+    ip_body: 'La marca, la mascota y la interfaz de esta instancia pertenecen al operador o a sus licenciantes. El código fuente se ofrece bajo licencia MIT en el repositorio; esa licencia no concede derechos sobre la marca del operador.'
     liability_heading: Responsabilidad
-    liability_body: El software se ofrece tal cual. El operador sigue siendo responsable
-      del uso lícito, del cumplimiento en protección de datos y de la exactitud de
-      los textos legales específicos de esta instancia.
+    liability_body: 'El operador mantiene el servicio con la diligencia que exige el estado de la técnica. El texto por defecto no limita la responsabilidad que el derecho de consumo español o de la UE no permite excluir. Revisa esta cláusula con asesoramiento legal antes de producción.'
+    law_heading: Ley aplicable
+    law_body: 'Sustituye esta cláusula por la ley aplicable y el fuero que corresponda al operador. Hasta entonces es un marcador. Las personas consumidoras pueden demandar en los juzgados de su domicilio cuando la ley lo prevea.'
   privacy:
     title: Política de privacidad
-    intro: Esta política describe cómo pueden tratarse datos personales al usar esta
-      instancia de %brand%. El operador debe adaptarla a su organización y jurisdicción.
+    intro: 'Esta política explica cómo pueden tratarse datos personales en esta instancia de %brand% ofrecida a personas en la UE/EEE, incluida España (RGPD y LOPDGDD). El operador debe sustituir los marcadores por sus datos de responsable antes de producción.'
     controller_heading: Responsable del tratamiento
-    controller_body: El operador de esta instancia Beacon es el responsable del tratamiento
-      de las cuentas y la telemetría almacenadas en su despliegue. Completa nombre
-      legal y contacto en la página de Aviso legal.
+    controller_body: 'El operador de esta instancia es el responsable del tratamiento. Esta plantilla no incluye un delegado de protección de datos por defecto; las solicitudes de privacidad van al contacto del Aviso legal.'
+    controller_self_host: Quien autoaloje este software es el responsable de ese despliegue. Las aplicaciones cliente que envían telemetría son responsables distintos de los datos de sus usuarios finales incluidos en esos eventos; Beacon guarda esa telemetría para el titular del proyecto.
     data_heading: Datos que tratamos
-    data_body: 'Según cómo configure y use la instancia el operador, el tratamiento
-      puede incluir:'
-    data_account: Datos de cuenta (correo, nombre visible, hash de contraseña, roles,
-      preferencias)
-    data_telemetry: Telemetría de errores y rendimiento enviada vía DSN / Envelope
-    data_logs: Registros operativos y, opcionalmente, logs de consentimiento de cookies
-    data_cookies: Cookies y tecnologías similares descritas en la página de Cookies
+    data_body: 'En esta instancia el operador puede tratar:'
+    data_account: Datos de cuenta — correo, nombre visible, hash de contraseña, roles, idioma preferido y teléfono si lo añades.
+    data_telemetry: Telemetría de proyecto que tú o tu aplicación enviáis por un DSN (errores y rendimiento, que pueden incluir direcciones IP, URL e identificadores que incluya tu aplicación).
+    data_security: Datos de seguridad — intentos de acceso, observaciones de inteligencia de dispositivo (cookie di_obs) y navegadores de confianza. El identificador de dispositivo no es una contraseña.
+    data_logs: Registros operativos, incluidos los de auditoría HTTP y los de consentimiento de cookies.
+    data_cookies: Cookies y almacenamiento similar descritos en la página de Cookies.
     purpose_heading: Finalidades
-    purpose_body: Los datos se tratan para autenticar usuarios, operar el seguimiento
-      de errores de los proyectos configurados, asegurar el servicio y (si está activo)
-      recordar preferencias de cookies.
+    purpose_body: Tratamos estos datos para crear y proteger cuentas, ofrecer el seguimiento de errores y rendimiento de los proyectos que configures, enviar las notificaciones que definas, mantener el servicio y registrar las elecciones de cookies.
+    basis_heading: Bases jurídicas
+    basis_contract: Contrato (RGPD art. 6.1.b) — cuenta, autenticación y el servicio de seguimiento que solicitas.
+    basis_legitimate: Interés legítimo (art. 6.1.f) — seguridad del servicio, prevención de abusos, inteligencia de dispositivo y registros de diagnóstico. Puedes oponerte cuando la ley te lo reconozca.
+    basis_consent: Consentimiento (art. 6.1.a y ePrivacy) — categorías opcionales de cookies (preferencias, analítica). Puedes retirarlo en cualquier momento en Configuración de cookies. Las cookies necesarias no se basan en el consentimiento.
+    basis_legal: Obligación legal (art. 6.1.c) — atender a autoridades competentes cuando la ley lo exija.
+    recipients_heading: Destinatarios
+    recipients_body: 'Los datos se almacenan en la infraestructura que elija el operador y en el correo que configure. El despliegue por defecto no vende datos personales. Los administradores de un proyecto pueden añadir destinos de notificación (por ejemplo Slack o correo); esos destinos solo reciben el contenido de alerta que ese administrador configuró. Los encargados actúan con instrucciones por escrito.'
+    transfers_heading: Transferencias internacionales
+    transfers_body: 'El operador debe documentar si el tratamiento permanece en la UE/EEE. Esta plantilla asume alojamiento en el EEE hasta que se sustituya. Si un administrador configura un webhook o un buzón fuera del EEE, ese administrador provoca la transferencia y debe contar antes con un mecanismo del capítulo V del RGPD (por ejemplo cláusulas contractuales tipo).'
     retention_heading: Conservación
-    retention_body: Los plazos de conservación los define el operador (ciclo de vida
-      de cuentas, retención de proyectos, logs). Sustituye este párrafo por el calendario
-      de tu organización.
+    retention_account: Las cuentas se conservan mientras existan y se suprimen o anonimizan cuando usas la eliminación de cuenta o un administrador borra al usuario.
+    retention_telemetry: La telemetría se conserva durante el plazo configurado en cada proyecto. Si no hay plazo, los eventos permanecen hasta que un administrador los borre o borre el proyecto.
+    retention_cookies: La cookie de sesión dura hasta 1 día; Recordarme hasta 30 días; las cookies de consentimiento alrededor de 1 año; di_obs 1 hora.
+    retention_logs: Los registros HTTP y de consentimiento siguen la purga configurada en Administración. Los registros de seguridad se conservan solo el tiempo necesario para investigar abusos.
     rights_heading: Tus derechos
-    rights_body: Según la normativa aplicable (por ejemplo el RGPD), puedes tener
-      derechos de acceso, rectificación, supresión, limitación, portabilidad y oposición.
-      Contacta con el operador usando los datos del Aviso legal.
+    rights_body: 'Puedes solicitar acceso, rectificación, supresión, limitación, portabilidad y oposición, y retirar el consentimiento de las cookies opcionales sin afectar al tratamiento anterior. Contacta con el operador usando los datos del Aviso legal. El operador debería responder en el plazo de un mes, ampliable en dos meses más si la solicitud es compleja, y puede pedirte que acredites tu identidad antes de comunicar datos.'
+    authority_heading: Autoridad de control
+    authority_body: Puedes reclamar ante la Agencia Española de Protección de Datos (AEPD), C/ Jorge Juan 6, 28001 Madrid, España, https://www.aepd.es, o ante la autoridad de tu país de residencia en la UE/EEE.
+    automated_heading: Decisiones automatizadas
+    automated_body: No adoptamos decisiones basadas únicamente en el tratamiento automatizado que produzcan efectos jurídicos o significativamente similares (RGPD art. 22). La inteligencia de dispositivo apoya la seguridad de la cuenta; no concede ni deniega un contrato por sí sola y no es una credencial.
     cookies_heading: Cookies
-    cookies_body: Usamos cookies necesarias para el acceso y el almacenamiento del
-      consentimiento. Las categorías opcionales (preferencias, analítica) solo se
-      activan si las permites en el banner de cookies.
+    cookies_body: Las cookies estrictamente necesarias permiten el acceso, la seguridad y el registro del consentimiento. Las categorías opcionales solo se activan si las permites.
   terms:
     title: Términos de uso
-    intro: Estos términos regulan el uso de esta instancia de %brand%. El operador
-      debe sustituir esta plantilla por términos acordes a su oferta (herramienta
-      interna, SaaS, etc.).
+    intro: 'Estos términos son una plantilla para el uso de esta instancia de %brand%. Sustitúyelos por términos acordes a la oferta del operador antes de producción. Si solo usas el código con licencia MIT en tus servidores, los términos de ese despliegue son los tuyos.'
     service_heading: Servicio
-    service_body: Beacon ofrece seguimiento autoalojado de errores y rendimiento para
-      proyectos configurados por usuarios autorizados.
+    service_body: El servicio es seguimiento de errores y rendimiento para proyectos creados por usuarios autorizados, incluida la ingesta, el flujo de issues, las notificaciones y la administración.
     accounts_heading: Cuentas
-    accounts_body: Debes mantener la confidencialidad de tus credenciales y usar el
-      servicio solo para proyectos y datos que estés autorizado a tratar.
+    accounts_body: Debes facilitar datos de cuenta exactos, guardar la confidencialidad de las credenciales y usar el servicio solo para proyectos y datos personales que estés autorizado a tratar. Respondes de la actividad realizada con tu cuenta.
     accept_heading: Uso aceptable
-    accept_body: No abuses de la API de ingest, no intentes accesos no autorizados
-      ni subas contenido ilícito. El operador puede suspender cuentas que incumplan
-      estos términos.
+    accept_body: No abuses de la API de ingesta, no busques accesos no autorizados, no subas contenido ilícito ni uses el servicio para dañar a terceros. Podemos suspender el acceso que incumpla estos términos o la ley.
+    ip_heading: Propiedad intelectual
+    ip_body: 'El código fuente se licencia bajo MIT según el repositorio. Estos términos no ceden la marca Beacon ni las marcas del operador. Conservas los derechos sobre la telemetría que envías; concedes al operador la licencia necesaria para almacenarla y mostrarla a fin de prestar el servicio.'
     limitation_heading: Limitación de responsabilidad
-    limitation_body: En la medida permitida por la ley, el operador y los autores
-      del software no responden de daños indirectos derivados del uso del servicio.
-      Revisa esta cláusula con asesoramiento legal.
+    limitation_body: 'En la medida en que lo permita la normativa aplicable, el operador no responde de daños indirectos o consecuenciales derivados del uso del servicio. No se afecta la responsabilidad que no pueda excluirse legalmente, incluida la por dolo, negligencia grave o derechos irrenunciables de las personas consumidoras. Revisa esta cláusula con asesoramiento legal antes de producción.'
+    law_heading: Ley aplicable y fuero
+    law_body: 'Sustituye esta cláusula por la ley aplicable y el fuero que corresponda al operador. Las personas consumidoras pueden demandar en los juzgados de su domicilio cuando la ley lo prevea.'
     changes_heading: Cambios
-    changes_body: El operador puede actualizar estos términos. El uso continuado tras
-      el aviso puede implicar la aceptación de los términos actualizados cuando la
-      ley lo permita.
+    changes_body: Podemos actualizar estos términos publicando el texto nuevo en esta página con una fecha nueva. Si un cambio reduce tus derechos, avisaremos también a los administradores con sesión iniciada antes de que surta efecto cuando la ley exija preaviso. El uso continuado después de la fecha de efecto es aceptación cuando la ley admite esa forma de aceptación.
   cookies:
-    title: Aviso de cookies
-    intro: Esta página describe las cookies y tecnologías similares utilizadas por
-      esta instancia de %brand%. Las cookies estrictamente necesarias sustentan la
-      autenticación, la seguridad y el registro del consentimiento. Las categorías
-      opcionales se utilizan únicamente con su consentimiento previo. Use Configuración
-      de cookies para revisar o modificar su selección en cualquier momento.
+    title: Política de cookies
+    intro: Esta página enumera las cookies y tecnologías similares de esta instancia de %brand%. Las cookies estrictamente necesarias permiten la autenticación, la seguridad y el registro del consentimiento. Las categorías opcionales solo se usan con tu consentimiento previo. Usa Configuración de cookies para revisar o cambiar tu elección en cualquier momento.
     categories_heading: Categorías
     cat_required: Estrictamente necesarias
-    cat_required_help: Imprescindibles para la autenticación, la seguridad y el registro
-      de su decisión de consentimiento. Estas cookies no pueden desactivarse.
+    cat_required_help: Imprescindibles para la autenticación, la seguridad y registrar tu decisión de consentimiento. No se pueden desactivar desde el banner.
     cat_preferences: Preferencias
-    cat_preferences_help: Cookies opcionales que almacenan elecciones de presentación
-      o de funciones no esenciales cuando el operador las habilita y usted las acepta.
+    cat_preferences_help: Cookies opcionales que guardan elecciones de presentación no esenciales, solo si aceptas esta categoría.
     cat_analytics: Analítica
-    cat_analytics_help: Cookies de medición opcionales, utilizadas solo si el operador
-      activa herramientas de analítica y usted otorga su consentimiento previo.
+    cat_analytics_help: 'Cookies opcionales de medición, solo si esta instancia activa herramientas de analítica y aceptas esta categoría. La compilación por defecto no instala una cookie de analítica de terceros.'
     inventory_heading: Inventario de cookies
     col_name: Nombre
     col_category: Categoría
@@ -2062,26 +2057,16 @@ legal:
     col_purpose: Finalidad
     duration_session: Hasta 1 día
     duration_remember: Hasta 30 días
-    duration_consent: Aproximadamente 1 año
-    purpose_session: Mantiene la sesión HTTP autenticada necesaria para acceder a
-      las áreas protegidas del servicio.
-    purpose_remember: Permite la autenticación persistente cuando se selecciona «Recordarme»
-      al iniciar sesión (token seguro; duración limitada).
-    purpose_csrf: Cookie CSRF de doble envío de corta duración que Symfony establece
-      al enviar formularios protegidos (patrón csrf-token_<token>; prefijo __Host-
-      en HTTPS).
-    purpose_consent: Cookie_Consent y Cookie_Consent_Key registran que se tomó una
-      decisión de consentimiento y vinculan una clave anónima al registro de auditoría
-      en el servidor.
-    purpose_category: Cookie_Category_analytics y Cookie_Category_preferences almacenan
-      si cada categoría opcional fue aceptada o rechazada (mecanismo de consentimiento,
-      no rastreadores).
+    duration_consent: Alrededor de 1 año
+    duration_device: 1 hora
+    purpose_session: Mantiene la sesión HTTP autenticada necesaria para acceder a las zonas protegidas del servicio.
+    purpose_remember: Permite la autenticación persistente cuando se marca Recordarme al iniciar sesión.
+    purpose_csrf: Cookie CSRF de doble envío, de vida corta, que Symfony establece al enviar formularios protegidos (patrón csrf-token_*; prefijo __Host- en HTTPS).
+    purpose_consent: Cookie_Consent y Cookie_Consent_Key registran que hubo una decisión de consentimiento y vinculan una clave anónima al registro de consentimiento del servidor.
+    purpose_category: Cookie_Category_analytics y Cookie_Category_preferences guardan si cada categoría opcional fue aceptada o rechazada (mecanismo de consentimiento, no rastreadores).
+    purpose_device: Puntero HttpOnly (di_obs) para reconocer un navegador que vuelve, por seguridad de la cuenta. No es una credencial de acceso ni un identificador publicitario.
     storage_heading: Almacenamiento local
-    storage_body: La preferencia de tema (claro/oscuro) y algunas opciones de interfaz
-      pueden guardarse en el localStorage del navegador y no constituyen cookies HTTP.
-      Según la orientación habitual sobre ePrivacy, puede tratarse como estrictamente
-      necesaria para una interfaz coherente; el operador debe confirmar las normas
-      aplicables en su jurisdicción.
+    storage_body: El tema (claro/oscuro) y algunas opciones de diseño pueden guardarse en localStorage del navegador. No son cookies HTTP. Son estrictamente necesarias para mantener la interfaz que elegiste en este dispositivo.
 notifications:
   title: Notificaciones
   intro: Envía alertas a Slack, Discord, Teams, Telegram, email o un endpoint HTTP genérico cuando aparezcan

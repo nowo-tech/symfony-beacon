@@ -1646,450 +1646,113 @@ tour:
           erneut aus, wenn Sie eine neue Umgebung einrichten.
 legal:
   nav:
-    label: Legal
-  last_updated: 'Letzte Aktualisierung: %date%'
+    label: Rechtliches
+  last_updated: 'Zuletzt aktualisiert: %date%'
   manage_cookies: Cookie-Einstellungen
-  placeholder:
-    legal_name: 'Offizieller Name: [Offizieller Name des Betreibers – ersetzen]'
-    address: 'Adresse: [Registrierte Adresse – ersetzen]'
-    contact_email: 'Kontakt: [privacy@example.com – ersetzen]'
-    registration: 'Handelsregister/Steuernummer: [falls zutreffend – ersetzen]'
+  identity:
+    name_line: 'Firma: [Rechtlicher Name des Betreibers — ersetzen]'
+    tax_line: 'Steuer-ID: [Steuer-ID des Betreibers — ersetzen]'
+    address_line: 'Anschrift: [Sitz / Anschrift — ersetzen]'
+    registry_line: 'Handelsregister: [falls zutreffend — ersetzen]'
+    contact_line: 'Kontakt: [privacy@example.com — ersetzen]'
   notice:
-    title: Rechtlicher Hinweis
-    intro: Dieser rechtliche Hinweis gilt für die selbstgehostete %brand%-Instanz,
-      die Sie besuchen. Ersetzen Sie die Platzhalter unten durch die tatsächlichen
-      Angaben des Betreibers, bevor Sie sie öffentlich verwenden.
-    operator_heading: Operator
-    operator_body: Für den Dienst und die hier veröffentlichten Inhalte ist der Betreiber
-      dieser Instanz verantwortlich.
+    title: Impressum
+    intro: 'Dieser Hinweis benennt den Betreiber dieser %brand%-Instanz. Ersetzen Sie die Platzhalter vor der öffentlichen Nutzung durch echte Angaben. Ausgangspunkt für LSSI-CE Art. 10 und die DSGVO — keine Rechtsberatung.'
+    publisher_heading: Anbieter und Verantwortlicher
+    publisher_body: 'Die Organisation, die diese Instanz betreibt, ist Anbieterin des Teledienstes und Verantwortliche dieser Installation. Tragen Sie die Kennzeichnung unten ein, bevor Sie personenbezogene Daten Dritter verarbeiten.'
+    lssi_heading: Kennzeichnung des Teledienstes
+    lssi_body: 'Nach Artikel 10 des spanischen Gesetzes 34/2002 (LSSI-CE) muss der Betreiber dieser Instanz Firma, Steuer- oder Registerkennzeichen soweit zutreffend, Anschrift sowie E-Mail oder Telefon veröffentlichen.'
+    self_host_heading: Selbst gehostete Installationen
+    self_host_body: 'Diese Seiten sind editierbare Vorlagen. Wer diese Software einsetzt, ist Anbieter und Verantwortlicher dieser Installation und muss jeden Platzhalter durch die eigene Kennzeichnung ersetzen. Der Standardtext darf kein Drittunternehmen nennen.'
     hosting_heading: Hosting
-    hosting_body: Diese Software kann vom Betreiber oder einem vom Betreiber ausgewählten
-      externen Infrastrukturanbieter gehostet werden. Die Hosting-Details sollten
-      vom Betreiber ausgefüllt werden.
+    hosting_body: 'Diese Instanz wird auf Infrastruktur gehostet, die der Betreiber wählt. Dokumentieren Sie Host und Speicherort vor der öffentlichen Nutzung. Auftragsverarbeiter handeln nur auf Weisung des Betreibers.'
+    ip_heading: Geistiges Eigentum
+    ip_body: 'Marke, Maskottchen und Oberfläche dieser Instanz gehören dem Betreiber oder seinen Lizenzgebern. Der Quellcode steht im Repository unter der MIT-Lizenz; diese Lizenz überträgt keine Markenrechte des Betreibers.'
     liability_heading: Haftung
-    liability_body: Die Software wird im Ist-Zustand bereitgestellt. Der Betreiber
-      bleibt für die rechtmäßige Nutzung, die Einhaltung des Datenschutzes und die
-      Richtigkeit der betreiberspezifischen Rechtstexte in diesem Fall verantwortlich.
+    liability_body: 'Der Betreiber betreibt den Dienst mit der nach dem Stand der Technik gebotenen Sorgfalt. Der Standardtext schränkt keine Haftung ein, die spanisches oder EU-Verbraucherrecht nicht ausschließen lässt. Vor Produktion rechtlich prüfen lassen.'
+    law_heading: Anwendbares Recht
+    law_body: 'Ersetzen Sie diese Klausel durch das für den Betreiber geltende Recht und den Gerichtsstand. Bis dahin ist sie ein Platzhalter. Verbraucher können am Gericht ihres Wohnsitzes klagen, soweit das Recht es vorsieht.'
   privacy:
-    title: Datenschutzrichtlinie
-    intro: Diese Datenschutzerklärung beschreibt, wie personenbezogene Daten verarbeitet
-      werden können, wenn Sie diese %brand%-Instanz nutzen. Betreiber müssen diesen
-      Text an ihre Organisation und Rechtsprechung anpassen.
-    controller_heading: Datenverantwortlicher
-    controller_body: Der Betreiber dieser Beacon-Instanz ist der Datenverantwortliche
-      für die in seiner Bereitstellung gespeicherten Konten und Telemetriedaten. Geben
-      Sie auf der Seite „Rechtliche Hinweise“ den Firmennamen und die Kontaktdaten
-      ein.
-    data_heading: Daten, die wir verarbeiten
-    data_body: 'Abhängig davon, wie der Betreiber die Instanz konfiguriert und nutzt,
-      kann die Verarbeitung Folgendes umfassen:'
-    data_account: Kontodaten (E-Mail, Anzeigename, Passwort-Hash, Rollen, Präferenzen)
-    data_telemetry: Anwendungsfehler- und Leistungstelemetrie, gesendet über Projekt-DSN/Envelope-Ingest
-    data_logs: Betriebsprotokolle und optionale Cookie-Zustimmungsprotokolle
-    data_cookies: Auf der Seite „Cookies“ beschriebene Cookies und ähnliche Technologien
+    title: Datenschutzerklärung
+    intro: 'Diese Erklärung beschreibt, wie personenbezogene Daten auf dieser %brand%-Instanz verarbeitet werden können, wenn sie Personen in der EU/im EWR einschließlich Spanien angeboten wird (DSGVO und LOPDGDD). Der Betreiber muss Platzhalter vor der Produktion durch eigene Verantwortlichen-Daten ersetzen.'
+    controller_heading: Verantwortlicher
+    controller_body: 'Der Betreiber dieser Instanz ist Verantwortlicher. Diese Vorlage enthält keinen Datenschutzbeauftragten; Anfragen gehen an den Kontakt im Impressum.'
+    controller_self_host: Wer die Software selbst hostet, ist Verantwortlicher dieser Installation. Kundenanwendungen, die Telemetrie senden, bleiben eigene Verantwortliche für Endnutzerdaten in diesen Ereignissen; Beacon speichert die Telemetrie für den Projektinhaber.
+    data_heading: Verarbeitete Daten
+    data_body: 'Auf dieser Instanz kann der Betreiber verarbeiten:'
+    data_account: Kontodaten — E-Mail, Anzeigename, Passwort-Hash, Rollen, bevorzugte Sprache und Telefonnummer, falls angegeben.
+    data_telemetry: Projekttelemetrie, die Sie oder Ihre Anwendung über eine DSN senden (Fehler- und Leistungsereignisse, gegebenenfalls mit IP-Adressen, URLs und Kennungen Ihrer Anwendung).
+    data_security: Sicherheitsdaten — Anmeldeversuche, Gerätebeobachtungen (Cookie di_obs) und vertrauenswürdige Browser. Die Gerätekennung ist kein Passwort.
+    data_logs: Betriebsprotokolle, einschließlich HTTP-Audit und Cookie-Einwilligungsprotokolle.
+    data_cookies: Cookies und ähnliche Speicher, beschrieben auf der Cookie-Seite.
     purpose_heading: Zwecke
-    purpose_body: Die Daten werden verarbeitet, um Benutzer zu authentifizieren, die
-      Fehlerverfolgung für konfigurierte Projekte durchzuführen, den Dienst zu sichern
-      und (sofern aktiviert) sich Cookie-Einstellungen zu merken.
-    retention_heading: Zurückbehaltung
-    retention_body: Aufbewahrungsfristen werden vom Betreiber definiert (Kontolebenszyklus,
-      Projektdatenaufbewahrung, Protokollaufbewahrung). Ersetzen Sie diesen Absatz
-      durch den Aufbewahrungsplan Ihrer Organisation.
+    purpose_body: Wir verarbeiten diese Daten, um Konten anzulegen und zu schützen, Fehler- und Leistungsverfolgung für Ihre Projekte bereitzustellen, von Ihnen eingerichtete Benachrichtigungen zuzustellen, den Dienst zuverlässig zu halten und Cookie-Entscheidungen zu speichern.
+    basis_heading: Rechtsgrundlagen
+    basis_contract: Vertrag (DSGVO Art. 6 Abs. 1 lit. b) — Konto, Authentifizierung und der angeforderte Tracking-Dienst.
+    basis_legitimate: Berechtigte Interessen (Art. 6 Abs. 1 lit. f) — Sicherheit, Missbrauchsvermeidung, Geräteintelligenz und Diagnoseprotokolle. Sie können widersprechen, soweit das Recht es vorsieht.
+    basis_consent: Einwilligung (Art. 6 Abs. 1 lit. a und ePrivacy) — optionale Cookie-Kategorien (Präferenzen, Analyse). Widerruf jederzeit über Cookie-Einstellungen. Notwendige Cookies stützen sich nicht auf Einwilligung.
+    basis_legal: Rechtliche Pflicht (Art. 6 Abs. 1 lit. c) — Antworten an zuständige Behörden, wenn das Gesetz es verlangt.
+    recipients_heading: Empfänger
+    recipients_body: 'Daten liegen auf der vom Betreiber gewählten Infrastruktur und beim konfigurierten Mailer. Die Standardinstallation verkauft keine personenbezogenen Daten. Projektadministratoren können Benachrichtigungsziele hinzufügen; diese erhalten nur den konfigurierten Alarmtext. Auftragsverarbeiter handeln auf schriftliche Weisung.'
+    transfers_heading: Drittlandübermittlung
+    transfers_body: 'Der Betreiber muss dokumentieren, ob die Verarbeitung in der EU/im EWR bleibt. Die Vorlage nimmt EWR-Hosting an, bis sie ersetzt wird. Richtet ein Administrator einen Webhook oder ein Postfach außerhalb des EWR ein, verursacht er die Übermittlung und braucht zuvor einen Mechanismus nach DSGVO Kapitel V.'
+    retention_heading: Speicherdauer
+    retention_account: Konten bleiben bestehen, solange das Konto existiert, und werden gelöscht oder anonymisiert, wenn Sie das Konto löschen oder ein Administrator den Nutzer entfernt.
+    retention_telemetry: Telemetrie bleibt für die am Projekt eingestellte Frist. Ohne Frist bleiben Ereignisse, bis ein Administrator sie oder das Projekt löscht.
+    retention_cookies: Sitzungscookie bis zu 1 Tag; Angemeldet bleiben bis zu 30 Tage; Einwilligungs-Cookies etwa 1 Jahr; di_obs 1 Stunde.
+    retention_logs: HTTP- und Einwilligungsprotokolle folgen dem in der Administration gesetzten Löschplan. Sicherheitsprotokolle nur so lange, wie zur Untersuchung von Missbrauch nötig.
     rights_heading: Ihre Rechte
-    rights_body: Je nach geltendem Recht (z. B. DSGVO) haben Sie möglicherweise Rechte
-      auf Zugang, Berichtigung, Löschung, Einschränkung, Übertragbarkeit und Widerspruch.
-      Kontaktieren Sie den Betreiber über die Kontaktdaten auf der Seite „Rechtliche
-      Hinweise“.
-    cookies_heading: Kekse
-    cookies_body: Für die Anmeldung und Einwilligungsspeicherung verwenden wir notwendige
-      Cookies. Optionale Kategorien (Einstellungen, Analysen) werden erst aktiviert,
-      nachdem Sie sie im Cookie-Banner zulassen.
+    rights_body: 'Sie können Auskunft, Berichtigung, Löschung, Einschränkung, Übertragbarkeit und Widerspruch verlangen und die Einwilligung für optionale Cookies widerrufen. Kontaktieren Sie den Betreiber über das Impressum. Antwort in der Regel innerhalb eines Monats, verlängerbar um zwei Monate bei komplexen Anfragen; vor der Offenlegung kann die Identität geprüft werden.'
+    authority_heading: Aufsichtsbehörde
+    authority_body: Beschwerde bei der Agencia Española de Protección de Datos (AEPD), C/ Jorge Juan 6, 28001 Madrid, Spanien, https://www.aepd.es, oder bei der Behörde Ihres Wohnsitzstaats in der EU/im EWR.
+    automated_heading: Automatisierte Entscheidungen
+    automated_body: Wir treffen keine ausschließlich automatisierten Entscheidungen mit rechtlicher oder ähnlich erheblicher Wirkung (DSGVO Art. 22). Geräteintelligenz dient der Kontosicherheit; sie gewährt oder verweigert keinen Vertrag allein und ist keine Anmeldedaten.
+    cookies_heading: Cookies
+    cookies_body: Unbedingt erforderliche Cookies ermöglichen Anmeldung, Sicherheit und das Speichern der Einwilligung. Optionale Kategorien laufen nur nach Ihrer Zustimmung.
   terms:
     title: Nutzungsbedingungen
-    intro: Diese Bedingungen regeln die Nutzung dieser %brand%-Instanz. Betreiber
-      sollten diese Vorlage durch Bedingungen ersetzen, die zu ihrem Angebot passen
-      (internes Tool, Kunden-SaaS usw.).
-    service_heading: Service
-    service_body: Beacon bietet selbstgehostete Fehler- und Leistungsverfolgung für
-      Projekte, die von autorisierten Benutzern konfiguriert wurden.
+    intro: 'Diese Bedingungen sind eine Vorlage für die Nutzung dieser %brand%-Instanz. Ersetzen Sie sie vor der Produktion durch Bedingungen, die zum Angebot des Betreibers passen. Nutzen Sie nur den MIT-lizenzierten Quellcode auf eigenen Servern, gelten die Bedingungen Ihrer Installation.'
+    service_heading: Dienst
+    service_body: Der Dienst ist Fehler- und Leistungsverfolgung für Projekte berechtigter Nutzer, einschließlich Ingest, Issue-Workflow, Benachrichtigungen und Administration.
     accounts_heading: Konten
-    accounts_body: Sie müssen Ihre Zugangsdaten vertraulich behandeln und den Dienst
-      nur für Projekte und Daten nutzen, zu deren Verarbeitung Sie berechtigt sind.
-    accept_heading: Akzeptable Verwendung
-    accept_body: Missbrauchen Sie die Aufnahme-API nicht, versuchen Sie nicht, unbefugt
-      darauf zuzugreifen und laden Sie keine rechtswidrigen Inhalte hoch. Der Betreiber
-      kann Konten sperren, die gegen diese Bedingungen verstoßen.
+    accounts_body: Sie müssen zutreffende Kontodaten angeben, Zugangsdaten vertraulich halten und den Dienst nur für Projekte und personenbezogene Daten nutzen, die Sie verarbeiten dürfen. Sie haften für Aktivitäten unter Ihrem Konto.
+    accept_heading: Zulässige Nutzung
+    accept_body: Missbrauchen Sie die Ingest-API nicht, suchen Sie keinen unbefugten Zugang, laden Sie keine rechtswidrigen Inhalte hoch und schaden Sie anderen nicht. Wir können den Zugang sperren, der diese Bedingungen oder das Gesetz verletzt.
+    ip_heading: Geistiges Eigentum
+    ip_body: 'Der Quellcode ist wie im Repository unter MIT lizenziert. Diese Bedingungen übertragen nicht die Marke Beacon oder Kennzeichen des Betreibers. Sie behalten Rechte an der gesendeten Telemetrie und räumen dem Betreiber die Lizenz ein, sie zu speichern und anzuzeigen, um den Dienst zu erbringen.'
     limitation_heading: Haftungsbeschränkung
-    limitation_body: Soweit gesetzlich zulässig, haften der Betreiber und die Software-Autoren
-      nicht für indirekte Schäden, die aus der Nutzung des Dienstes entstehen. Betreiber
-      sollten diese Klausel von einem Anwalt überprüfen lassen.
+    limitation_body: 'Soweit geltendes Recht es zulässt, haftet der Betreiber nicht für mittelbare oder Folgeschäden aus der Nutzung. Haftung, die gesetzlich nicht ausgeschlossen werden kann, bleibt unberührt. Vor Produktion rechtlich prüfen lassen.'
+    law_heading: Recht und Gerichtsstand
+    law_body: 'Ersetzen Sie diese Klausel durch das für den Betreiber geltende Recht und den Gerichtsstand. Verbraucher können am Gericht ihres Wohnsitzes klagen, soweit das Recht es vorsieht.'
     changes_heading: Änderungen
-    changes_body: Der Betreiber kann diese Bedingungen aktualisieren. Die fortgesetzte
-      Nutzung nach der Benachrichtigung stellt die Annahme der aktualisierten Bedingungen
-      dar, sofern dies gesetzlich zulässig ist.
+    changes_body: Wir können diese Bedingungen aktualisieren, indem wir den neuen Text mit neuem Datum auf dieser Seite veröffentlichen. Verringert eine Änderung Ihre Rechte, benachrichtigen wir angemeldete Administratoren vorher, soweit das Gesetz eine Ankündigung verlangt. Weitere Nutzung nach dem Wirksamkeitsdatum ist Annahme, soweit das Recht diese Form zulässt.
   cookies:
     title: Cookie-Hinweis
-    intro: Auf dieser Seite werden die Cookies und ähnlichen Technologien beschrieben,
-      die von dieser %brand%-Instanz verwendet werden. Unbedingt erforderliche Cookies
-      unterstützen Authentifizierung, Sicherheit und die Speicherung Ihrer Einwilligung.
-      Optionale Kategorien werden nur mit Ihrer vorherigen Einwilligung eingesetzt.
-      Über die Cookie-Einstellungen können Sie Ihre Auswahl jederzeit einsehen oder
-      ändern.
+    intro: Diese Seite listet Cookies und ähnliche Techniken dieser %brand%-Instanz. Unbedingt erforderliche Cookies dienen Authentifizierung, Sicherheit und dem Speichern der Einwilligung. Optionale Kategorien nur mit vorheriger Einwilligung. Über Cookie-Einstellungen können Sie die Auswahl jederzeit ändern.
     categories_heading: Kategorien
     cat_required: Unbedingt erforderlich
-    cat_required_help: Unerlässlich für Authentifizierung, Sicherheit und Speicherung
-      Ihrer Einwilligungsentscheidung. Diese Cookies können nicht deaktiviert werden.
+    cat_required_help: Erforderlich für Authentifizierung, Sicherheit und das Speichern Ihrer Einwilligung. Im Banner nicht abschaltbar.
     cat_preferences: Präferenzen
-    cat_preferences_help: Optionale Cookies, die nicht wesentliche Darstellungs- oder
-      Funktionseinstellungen speichern, sofern der Betreiber sie aktiviert und Sie
-      zustimmen.
+    cat_preferences_help: Optionale Cookies für nicht wesentliche Darstellungswahlen, nur wenn Sie diese Kategorie akzeptieren.
     cat_analytics: Analyse
-    cat_analytics_help: Optionale Mess-Cookies, die nur eingesetzt werden, wenn der
-      Betreiber Analysetools aktiviert und Sie zuvor einwilligen.
+    cat_analytics_help: 'Optionale Mess-Cookies, nur wenn diese Instanz Analysewerkzeuge aktiviert und Sie die Kategorie akzeptieren. Der Standard setzt kein Analyse-Cookie Dritter.'
     inventory_heading: Cookie-Inventar
     col_name: Name
     col_category: Kategorie
     col_duration: Dauer
     col_purpose: Zweck
-    duration_session: Sitzung
-    duration_remember: Bis zu 7 Tage
+    duration_session: Bis zu 1 Tag
+    duration_remember: Bis zu 30 Tage
     duration_consent: Etwa 1 Jahr
-    purpose_session: Erhält die authentifizierte HTTP-Sitzung aufrecht, die für den
-      Zugriff auf geschützte Bereiche des Dienstes erforderlich ist.
-    purpose_remember: Ermöglicht dauerhafte Authentifizierung, wenn bei der Anmeldung
-      „Angemeldet bleiben“ gewählt wird (sicheres Token; begrenzte Laufzeit).
-    purpose_csrf: Kurzlebiger Double-Submit-CSRF-Cookie, den Symfony beim Absenden
-      geschützter Formulare setzt (Muster csrf-token_<token>; __Host- Präfix bei HTTPS).
-    purpose_consent: Cookie_Consent und Cookie_Consent_Key speichern, dass eine Einwilligungsentscheidung
-      getroffen wurde, und verknüpfen einen anonymen Schlüssel mit dem serverseitigen
-      Audit-Protokoll.
-    purpose_category: Cookie_Category_analytics und Cookie_Category_preferences speichern,
-      ob jede optionale Kategorie akzeptiert oder abgelehnt wurde (Einwilligungsmechanik,
-      keine Tracker).
+    duration_device: 1 Stunde
+    purpose_session: Hält die authentifizierte HTTP-Sitzung, die für geschützte Bereiche nötig ist.
+    purpose_remember: Ermöglicht dauerhafte Anmeldung, wenn beim Login „Angemeldet bleiben“ gewählt wird.
+    purpose_csrf: Kurzlebiges Double-Submit-CSRF-Cookie von Symfony bei geschützten Formularen (Muster csrf-token_*; Präfix __Host- bei HTTPS).
+    purpose_consent: Cookie_Consent und Cookie_Consent_Key speichern, dass eine Einwilligung vorliegt, und verknüpfen einen anonymen Schlüssel mit dem serverseitigen Einwilligungsprotokoll.
+    purpose_category: Cookie_Category_analytics und Cookie_Category_preferences speichern, ob jede optionale Kategorie akzeptiert oder abgelehnt wurde (Einwilligungsmechanik, keine Tracker).
+    purpose_device: HttpOnly-Zeiger (di_obs), um einen wiederkehrenden Browser für die Kontosicherheit zu erkennen. Kein Anmeldedatum und keine Werbe-ID.
     storage_heading: Lokaler Speicher
-    storage_body: Die Theme-Präferenz (hell/dunkel) und einige UI-Layout-Einstellungen
-      können im localStorage des Browsers gespeichert werden und sind keine HTTP-Cookies.
-      Nach typischer ePrivacy-Orientierung kann dies als unbedingt erforderlich für
-      eine kohärente Benutzeroberfläche gelten; Betreiber sollten die geltenden Regeln
-      in ihrer Rechtsordnung prüfen.
-releases:
-  title: Release-Zustand
-  intro: Wahlen Sie eine Release aus, um zu sehen, wie viele Issues dort erstmals aufgetreten sind, zwei
-    Releases zu vergleichen oder direkt zum vorhandenen Issue-List-Vergleich zu springen.
-  empty: Fur dieses Projekt sind noch keine Release-Daten verfugbar.
-  focus:
-    submit: Release-Zustand aktualisieren
-  new_in_release:
-    title: Neu in %release%
-    count: '%count% Issues wurden in dieser Release erstmals gesehen.'
-    open_issue_list: Gefilterte Issue-Liste offnen
-    empty: In dieser Release wurden keine Issues erstmals gesehen.
-  compare:
-    help: Vergleichen Sie die ausgewahlte Release optional mit einer anderen Release anhand der aktuellen
-      Issue-Menge.
-    summary_title: Vergleich %a% vs %b%
-    only_a: Nur in %release%
-    only_b: Nur in %release%
-    both: In beiden Releases
-    empty: Keine Issues in dieser Menge
-  catalog:
-    title: Releases
-  environment_compare:
-    title: Umgebungsvergleich
-    environment_a: Umgebung A
-    environment_b: Umgebung B
-    open_issue_list: Vergleich in der Issue-Liste offnen
-    help: Dies verwendet den vorhandenen `014`-Issue-List-Vergleich wieder. Wenn eine Release ausgewahlt
-      ist, behalt der Link diesen Release-Filter bei.
-mailer_settings:
-  title: Mailer
-  intro: Speichern Sie das Symfony Mailer DSN verschlusselt in der Datenbank (nicht
-    in .env). Die Magic-Link-Anmeldung bleibt verborgen, bis hier ein DSN ungleich
-    null gespeichert ist; E-Mail-Benachrichtigungsziele verwenden ebenfalls diesen
-    Transport.
-  status:
-    database: Ausgehende E-Mails verwenden das in den Instanzeinstellungen gespeicherte
-      DSN. Die Magic-Link-Anmeldung ist verfugbar, wenn dieses DSN kein Null-Transport
-      ist.
-    env_fallback: Es gibt noch kein Datenbank-DSN - ausgehende E-Mails fallen auf
-      MAILER_DSN aus der Umgebung zuruck (normalerweise null://null). Die Magic-Link-Anmeldung
-      bleibt deaktiviert, bis Sie hier ein verschlusseltes DSN speichern.
-  current_dsn: 'Aktuelles DSN:'
-  from_preview: 'Absenderadresse: %from%'
-  submit: Mailer-Einstellungen speichern
-  magic_ready: Magic-Link-E-Mail-Anmeldedaten sind bereit
-  magic_blocked: Magic-Link-E-Mail ist nicht verfugbar (speichern Sie ein zustellbares
-    verschlusseltes DSN)
-  sample:
-    title: Beispiel-E-Mail senden
-    intro: Sendet eine Testnachricht uber das verschlusselte Mailer DSN (derselbe
-      Transport wie fur die Magic-Link-Anmeldung).
-    to_label: Empfanger
-    submit: Beispiel senden
-    unavailable: Speichern Sie zuerst ein gultiges verschlusseltes Mailer DSN (nicht
-      null://), dann konnen Sie ein Beispiel senden.
-    email_subject: Beacon-Mailer-Beispiel (Magic-Login-Anmeldedaten)
-    email_body: 'Dies ist eine Beispielnachricht aus Administration -> Mailer.
-
-
-      Wenn Sie diese Nachricht erhalten haben, kann das verschlusselte Mailer DSN
-      Magic-Login-E-Mails zustellen.
-
-      Absenderadresse: %from%
-
-      '
-settings:
-  instance_config:
-    title: Instanzkonfiguration
-    intro: Exportieren oder importieren Sie freigegebene nicht-geheime Einstellungen
-      (Erscheinungsbild und Instanz-Flags). Mailer-DSN, Mercure-Geheimnisse und OAuth-Geheimnisse
-      sind nie enthalten.
-    export_title: Export
-    export_help: Laden Sie eine versionierte JSON-Datei herunter, die für Backup-Übungen
-      geeignet ist. Geheimnisse bleiben auf dieser Instanz.
-    export: JSON herunterladen
-    import_title: Import
-    import_help: Stellen Sie Erscheinungsbild und freigegebene Flags aus einem früheren
-      Export wieder her. Geheime Werte werden abgelehnt und bleiben unverändert.
-    import: JSON importieren
-    file: Konfigurationsdatei
-    imported: Instanzkonfiguration importiert.
-    import_failed: Import fehlgeschlagen. Prüfen Sie die Schemaversion und ob die
-      Datei keine geheimen Schlüssel enthält.
-    missing_file: Wählen Sie eine JSON-Datei zum Importieren.
-    invalid_csrf: Ungültiges Sicherheitstoken.
-    file_too_large: Instanz-JSON ist zu groß (max. 2 MiB).
-mercure_settings:
-  title: Mercure
-  intro: Optionale Live-Benachrichtigungen fur angemeldete Mitglieder, wenn ein neues
-    Issue erstellt wird. Standardmassig deaktiviert - nur aktivieren, wenn ein Mercure-Hub
-    verfugbar ist. Web Push bleibt eine separate Aktivierung unter Konto -> Anzeige.
-  manual_hint: 'Betriebshandbuch (Hub, JWT-Geheimnis, Compose, Fehlerbehebung): docs/ops/MERCURE.md
-    im Repository.'
-  status:
-    active: Live-Mercure-Benachrichtigungen sind fur Mitglieder aktiviert.
-    inactive: Mercure ist deaktiviert
-    inactive_help: Mitglieder offnen kein EventSource, bis Sie Mercure hier aktivieren
-      und eine erreichbare Hub-URL + ein JWT-Geheimnis angeben (unten gespeichert
-      oder uber die Umgebung).
-    url_database: Die Hub-Publish-URL ist in den Instanzeinstellungen gespeichert.
-    url_env: Die Hub-Publish-URL fallt auf MERCURE_URL aus der Umgebung zuruck.
-    url_missing: Es ist keine Hub-Publish-URL konfiguriert (unten setzen oder MERCURE_URL).
-    secret_database: Das JWT-Geheimnis ist verschlusselt in den Instanzeinstellungen
-      gespeichert.
-    secret_env: Das JWT-Geheimnis fallt auf MERCURE_JWT_SECRET aus der Umgebung zuruck.
-    secret_missing: Es ist kein JWT-Geheimnis konfiguriert (unten setzen oder MERCURE_JWT_SECRET).
-  public_url_preview: 'Browser-Hub-URL: %url%'
-  push_note: Hintergrund-PWA-Push wird pro Benutzer unter Konto -> Anzeige konfiguriert
-    (benotigt VAPID_*-Schlussel). Es hangt nicht von Mercure ab.
-  submit: Mercure-Einstellungen speichern
-  guide:
-    title: Mercure Schritt für Schritt konfigurieren
-    intro: Live-Toasts für neue Issues nutzen einen Mercure-Hub (Server-Sent Events). Mercure ist optional und unabhängig von Web Push (Konto → Anzeige).
-    open: So konfigurieren
-    close: Schließen
-    docs_hint: 'Vollständige Referenz zu Topics, Datenschutz und Produktion — docs/ops/MERCURE.md.'
-    env:
-      step1_example: |
-        MERCURE_URL=http://mercure/.well-known/mercure
-        MERCURE_PUBLIC_URL=${DEFAULT_URI}/.well-known/mercure
-        MERCURE_JWT_SECRET="!ChangeThisMercureHubJWTSecretKey!"
-      step2_example: openssl rand -base64 48
-      title: 2. Umgebungsvariablen
-      lead: 'Hub lieber in .env konfigurieren und Formularfelder leer lassen, damit die Administration nur die Funktion ein-/ausschaltet.'
-      step1: Diese Variablen in .env kopieren oder bestätigen (aus .env.dist).
-      step2: Platzhalter-JWT-Geheimnis durch einen starken Wert ersetzen (mindestens 32 Zeichen).
-      step2_note: Dieselbe Zeichenkette muss PHP (MERCURE_JWT_SECRET) und der Hub verwenden (compose.yaml mappt sie auf MERCURE_PUBLISHER_JWT_KEY und MERCURE_SUBSCRIBER_JWT_KEY).
-      step3: 'Wissen, wofür jede Variable steht.'
-      table_var: Variable
-      table_meaning: Bedeutung
-      row_url: Interne Publish-URL aus PHP (Compose-Beispiel links).
-      row_public: 'Browser-EventSource-URL. Bevorzugen Sie ${DEFAULT_URI}/.well-known/mercure, damit der Browser same-origin über Caddy bleibt.'
-      row_jwt: Gemeinsames HMAC-Geheimnis für Publisher- und Subscriber-JWTs.
-    external:
-      example: |
-        MERCURE_URL=https://mercure.example.com/.well-known/mercure
-        MERCURE_PUBLIC_URL=https://mercure.example.com/.well-known/mercure
-        MERCURE_JWT_SECRET="your-shared-secret-at-least-32-chars"
-      title: 6. Externer Hub (optional)
-      lead: Sie können Beacon auf jeden Mercure-kompatiblen Hub statt des Compose-Dienstes zeigen.
-      step1: 'MERCURE_URL (oder Publish URL) auf einen Endpunkt setzen, den der PHP-Container erreichen kann.'
-      step2: 'MERCURE_PUBLIC_URL (oder Public URL) auf eine HTTPS-URL setzen, die Browser öffnen können.'
-      step3: Dasselbe JWT-Geheimnis für Hub-Publisher/Subscriber-Schlüssel und in Beacon verwenden.
-      step4: Bei Cross-Origin-Hub CORS (cors_origins) für Ihren Beacon-Origin konfigurieren.
-    start:
-      step1_example: |
-        docker compose up -d mercure php
-        # or a full stack:
-        make up
-      step2_example: 'docker compose exec mercure curl -fsS http://127.0.0.1/healthz'
-      step3_example: |
-        handle /.well-known/mercure* {
-            reverse_proxy mercure:80
-        }
-      title: 3. Hub starten
-      step1: Mercure mit dem App-Stack starten oder neu erstellen.
-      step2: Health-Endpoint des Hubs prüfen (im Compose-Netzwerk).
-      step3: 'Bestätigen, dass Caddy den Hub proxied (bereits in .docker/frankenphp/Caddyfile).'
-    troubleshoot:
-      recreate: |
-        # After changing hub env vars
-        docker compose up -d --force-recreate mercure
-      title: 7. Fehlerbehebung
-      inactive: 'Status inaktiv — Schalter aus, oder URL/Geheimnis fehlen (DB und Env leer).'
-      unauthorized: EventSource 401 — Subscriber-JWT-Geheimnis ≠ Hub MERCURE_SUBSCRIBER_JWT_KEY.
-      cors: CORS-Fehler — Public URL ist cross-origin und Hub cors_origins schließt Beacon aus.
-      publish: 'Publish-Fehler in Logs — PHP erreicht MERCURE_URL nicht, oder JWT ≠ Hub-Schlüssel.'
-      ciphertext: Browser fordert Unsinnspfad wie /MUIFA…== — Overrides konnten nicht entschlüsselt werden; Publish/Public/JWT hier leeren und Env-Werte nutzen.
-      push: 'Toasts nur bei offenem Tab sind erwartet; für Hintergrund Web Push (VAPID_*) nutzen.'
-    verify:
-      curl_example: |
-        # From the host (replace with your DEFAULT_URI)
-        curl -sI "${DEFAULT_URI}/.well-known/mercure"
-      title: 5. Im Browser prüfen
-      step1: DevTools → Network öffnen und nach mercure oder EventSource filtern.
-      step2: Verbindung zu /.well-known/mercure (oder Ihrer Public URL) mit Autorisierungs-JWT bestätigen.
-      step3: 'Neues Issue in einem Projekt erzeugen, dem Sie angehören, und SSE-Event / Toast beobachten.'
-      step4: 'GET /account/realtime/config sollte hubUrl + token nur enthalten, wenn Mercure aktiv und konfiguriert ist.'
-    overview:
-      title: 1. Was Sie brauchen
-      body: 'Beacon veröffentlicht private Updates; angemeldete Mitglieder abonnieren, solange ein Tab offen ist. Diese Teile müssen übereinstimmen.'
-      item_hub: Ein Mercure-Hub (Compose-Dienst mercure oder ein kompatibler Hub).
-      item_jwt: Ein gemeinsames JWT-HMAC-Geheimnis (≥ 32 Zeichen) für PHP und den Hub.
-      item_proxy: Same-Origin-Browserzugriff über Caddy unter /.well-known/mercure (Compose-Standard).
-      item_admin: Der Hauptschalter auf diesem Bildschirm plus optionale URL-/Geheimnis-Overrides.
-    admin:
-      title: 4. Live-Alerts hier aktivieren
-      step1: „Mercure-Live-Alerts aktivieren“ einschalten.
-      step2: 'Publish URL, Public URL und JWT leer lassen, um MERCURE_* aus der Umgebung zu nutzen.'
-      step3: 'Oder Felder ausfüllen, um die Umgebung zu überschreiben (Werte werden in der DB verschlüsselt).'
-      step4: Speichern. Das Statuspanel oben sollte Live-Alerts als aktiv anzeigen.
-      step5: 'Als Projektmitglied anmelden, Tab offen lassen, neues Issue erzeugen und auf den In-App-Toast achten.'
-      current_url: 'Aktuell aufgelöste Browser-Hub-URL: %url%'
-setup:
-  eyebrow: Erster Start
-  title: Instanz-Setup
-  intro: Installieren Sie Navigationskataloge und optionale Demo-Daten. Dieselben
-    Schritte wie in den CLI-Seed-Schichten.
-  intro_required: Navigationskataloge fehlen. Installieren Sie Menus, Breadcrumbs
-    und das Cookie-Consent-Profil, bevor Sie fortfahren.
-  intro_bootstrap: Plattformkataloge sind bereit. Registrieren Sie den ersten Administrator,
-    laden Sie optional Beispieltelemetrie und markieren Sie das Setup dann als abgeschlossen.
-  already_done: Das Setup ist als abgeschlossen markiert.
-  back_dashboard: Zuruck zum Dashboard
-  login_setup_link: Erststart-Setup
-  progress_of: Schritt %current% von %total%
-  log:
-    tabs_label: Setup-Fortschritt
-    tab: Protokoll
-    completed: Abgeschlossen
-  admin:
-    email: E-Mail
-    password: Passwort
-  token:
-    title: Öffnen Sie den Setup-Assistenten
-    lead: Setup ist absichtlich gesperrt. Fügen Sie den Wert von SITE_SETUP_TOKEN ein, um fortzufahren.
-    field_label: Setup-Token
-    field_placeholder: SITE_SETUP_TOKEN
-    submit: Weiter
-    howto: So erhalten Sie den Token
-    step_env: Kopieren Sie SITE_SETUP_TOKEN aus Ihrer .env.local (bei leerem Wert zufällig erzeugen).
-    step_url: Sie können auch %path% öffnen und … durch den Token ersetzen.
-    step_header: In Skripten senden Sie den Header X-Setup-Token mit demselben Wert.
-  reason:
-    heading: Setup ist erforderlich
-    db_connection: Die Datenbank ist mit der aktuellen DATABASE_URL nicht erreichbar
-      (fehlt, falsch oder der DB-Dienst ist ausgefallen).
-    db_connection_hint: Konfigurieren Sie im Datenbankschritt eine funktionierende
-      DATABASE_URL, bevor Sie fortfahren. Uberspringen ist deaktiviert, bis die Verbindung
-      funktioniert.
-    db_connection_form: Die Datenbankverbindung ist fehlgeschlagen. Geben Sie eine
-      gultige DATABASE_URL ein (wird in .env.local geschrieben). Sie konnen diesen
-      Schritt nicht uberspringen, bis die Datenbank antwortet.
-    db_schema_empty: Die Datenbank verbindet sich, hat aber noch keine Tabellen -
-      Migrationen / Import erstellen das Schema.
-    db_schema_hint: Fahren Sie mit dem Assistenten fort, um Migrationen auszufuhren
-      (oder einen vollstandigen Dump zu importieren). Sie mussen DATABASE_URL nicht
-      andern, wenn die Verbindung bereits funktioniert.
-    marker_required: Ein Marker setup.required ist vorhanden (Kaltstart oder nach
-      Wiederherstellung).
-    marker_done_missing: setup.done fehlt, wahrend require_done_marker aktiviert ist.
-    incomplete: 'Assistent in Bearbeitung: %detail%'
-  database:
-    intro: Optional - leer lassen und uberspringen, wenn DATABASE_URL aus der Umgebung
-      bereits funktioniert.
-  bootstrap_login_hint: Mochten Sie lieber Ihren eigenen Administrator erstellen?
-  bootstrap_login_link: Anmelden
-  bootstrap_register_link: Ersten Administrator registrieren
-  banner:
-    title: Instanz-Setup abschliessen
-    body: Installieren Sie Menus/Breadcrumbs und optionale Demo-Beispiele fur diese
-      Beacon-Instanz.
-    cta: Setup offnen
-  step_platform:
-    title: Erforderlich - Plattformkataloge
-    body: Installieren Sie Dashboard-Menus, Breadcrumbs und das Cookie-Consent-Profil/-Inventar.
-      Dieser Schritt ist obligatorisch, bevor der Rest der App funktioniert.
-    item_menus: Menus (Dashboard, Einstellungen, Administration)
-    item_breadcrumbs: Breadcrumb-Sammlung (Standard)
-    item_cookies: Cookie-Consent-Profil
-    cta: Menus, Breadcrumbs und Cookies installieren
-    cta_again: Platform Seed erneut ausfuhren
-    done: Plattformkataloge sind installiert.
-  step_options:
-    title: Optionale nachste Schritte
-    body: Erstellen Sie das erste Administratorkonto und/oder laden Sie einen vollstandigen
-      Beispiel-Datensatz. Sie konnen beides uberspringen.
-    locked: Schliessen Sie zuerst die erforderliche Plattforminstallation ab.
-    register_title: Ersten Benutzer erstellen
-    register_body: Registrieren Sie Ihren eigenen Administrator uber AuthKit (nur
-      Registrierung fur den ersten Benutzer).
-    register_cta: Ersten Administrator registrieren
-    register_done: Mindestens ein Benutzer existiert bereits.
-    sample_title: Vollstandige Beispieldaten laden
-    sample_body: Erstellen Sie bei Bedarf das Demo-Projekt und laden Sie den grosseren
-      Beispiel-Telemetriedatensatz (Load-Profil).
-    sample_cta: Vollstandige Beispieldaten installieren
-    sample_note: Dies kann eine Minute dauern. Sehr grosse Datensatze bleiben nur
-      per CLI verfugbar (`app:seed-sample --size=huge --force`).
-    sample_requires_register: Registrieren Sie den ersten Administrator, bevor Sie
-      Beispieltelemetrie laden (das Demo-Projekt gehort Ihrem Konto).
-  step_demo:
-    title: Demo-Projekt
-    body: Erstellen Sie den lokalen Demo-Administrator (falls fehlend) und das Demo-Projekt
-      mit einem API-Schlussel.
-    cta: Demo-Projekt erstellen
-    exists: Demo-Projekt ist bereits vorhanden.
-  step_sample:
-    title: Beispieltelemetrie
-    body: Laden Sie synthetische Issues fur QA. Erfordert das Demo-Projekt. Sehr grosse
-      Grossen bleiben nur per CLI verfugbar.
-    dev: Beispiel laden (dev)
-    load: Beispiel laden (load)
-    need_demo: Erstellen Sie zuerst das Demo-Projekt.
-  step_done:
-    title: Fertig
-    body: Diesen Assistenten schliessen. Sie konnen Setup jederzeit uber Administration
-      erneut offnen.
-    cta: Setup als abgeschlossen markieren
-  cli_hint: 'CLI-Aquivalent: make bootstrap && make seed && make seed-sample - siehe
-    docs/INSTALL.md'
-  flash:
-    platform_ok: Navigationskataloge und Cookie-Consent wurden aktualisiert.
-    platform_required: Installieren Sie zuerst Menus, Breadcrumbs und Cookie-Consent.
-    demo_ok: Demo-Benutzer / Projekt bereit.
-    demo_exists: Demo-Benutzer und Demo-Projekt existieren bereits.
-    sample_ok: Beispieltelemetrie wurde geladen. Live-Mercure-Benachrichtigungen wurden
-      bei Bedarf mit den Umgebungsstandardwerten aktiviert.
-    sample_requires_user: Melden Sie sich an oder registrieren Sie den ersten Administrator,
-      bevor Sie Beispieldaten laden.
-    sample_demo_user: Lokaler Demo-Administrator admin@symfony-beacon.local / admin123
-      wurde erstellt, um das Demo-Projekt zu besitzen.
-    complete: Setup als abgeschlossen markiert.
-    bootstrap_ready: Setup abgeschlossen. Melden Sie sich an oder registrieren Sie
-      den ersten Administrator, um fortzufahren.
-    unknown_action: Unbekannte Setup-Aktion.
-    failed: Setup-Aktion fehlgeschlagen.
+    storage_body: Thema (hell/dunkel) und einige Layout-Wahlen können im localStorage des Browsers liegen. Das sind keine HTTP-Cookies. Sie sind unbedingt erforderlich, um die auf diesem Gerät gewählte Oberfläche zu halten.
 notifications:
   title: Benachrichtigungen
   intro: Senden Sie Benachrichtigungen an Slack, Discord, Teams, Telegram, E-Mail oder einen generischen

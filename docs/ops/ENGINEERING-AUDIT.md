@@ -1,9 +1,9 @@
 # Engineering audit (REQ-REV)
 
 **App:** Symfony Beacon (`symfony-beacon`)  
-**Pass date:** 2026-08-15 (first pass) · **Remediation High:** 2026-08-15 · **QA-002:** 2026-08-16 · **Platform 100% close:** 2026-08-17 · **Kit-over-shim pass 40:** 2026-08-29 (**v1.24.4**) · **AUTH-005 docs:** 2026-08-29 (**v1.24.5**) · **OTHER column re-audit:** 2026-09-17 (error manual shots EN; CC-010 counsel pending)  
+**Pass date:** 2026-08-15 (first pass) · **Remediation High:** 2026-08-15 · **QA-002:** 2026-08-16 · **Platform 100% close:** 2026-08-17 · **Kit-over-shim pass 40:** 2026-08-29 (**v1.24.4**) · **AUTH-005 docs:** 2026-08-29 (**v1.24.5**) · **OTHER column re-audit:** 2026-09-17 (error manual shots EN) · **CC-011:** 2026-09-18 (generic legal seed)  
 **Scope:** REQ-REV-002…007 (+ BP-004 evidence)  
-**Verdict:** **✅ Pass** — Critical/High empty; Low backlog only (profiler CI budgets; residual kit chrome forks). **OTHER residual:** REQ-CC-010 ⚠️ — legal copy still placeholders ([`docs/product/LEGAL-AND-COOKIES.md`](../product/LEGAL-AND-COOKIES.md)). **REQ-DOCS-APP-005** ✅ — [`docs/identity/README.md`](../identity/README.md).
+**Verdict:** **✅ Pass** — Critical/High empty; Low backlog only (profiler CI budgets; residual kit chrome forks). **REQ-CC-011 ✅** / **REQ-CC-010 ⚠️** — generic editable legal placeholders (no nowo.tech identity); operator must fill facts before production ([`docs/product/LEGAL-AND-COOKIES.md`](../product/LEGAL-AND-COOKIES.md)). **REQ-DOCS-APP-005** ✅ — [`docs/identity/README.md`](../identity/README.md).
 
 This document is the REV-007 evidence artifact. Prior Spec Kit hardening (`087`, `095`, `096`) feeds this gate. Re-run at least once per minor release train.
 

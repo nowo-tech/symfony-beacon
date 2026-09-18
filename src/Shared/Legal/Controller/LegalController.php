@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
- * Public legal / privacy pages (operator-editable placeholders).
+ * Public legal pages (operator-editable placeholders: notice, privacy, terms, cookies).
  *
  * Canonical URLs include /{_locale}/legal/…; bare /legal/… redirects to DEFAULT_LOCALE.
  */

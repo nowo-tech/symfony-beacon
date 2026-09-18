@@ -367,7 +367,7 @@ project:
   settings:
     title: Settings
     nav: Settings
-    intro: Manage governance, access, alerts, portability, and destructive actions for this project.
+    intro: 'This policy explains how personal data may be processed on this %brand% instance when offered to people in the EU/EEA, including Spain (GDPR and LOPDGDD). The operator must replace placeholders with their own controller details before production.'
     tabs_label: Settings sections
     tab:
       general: General
@@ -384,7 +384,7 @@ project:
     ingest_disabled_banner: Envelope ingest is suspended for this project. Existing data remains readable.
   health:
     title: Health
-    intro: Instance Messenger queue depth and recent notification delivery status for this project’s destinations.
+    intro: 'These terms are a template for use of this %brand% instance. Replace them with terms that match the operator’s offering before production. If you only use the MIT-licensed source on your own servers, your deployment’s terms are yours.'
     messenger_pending: Messenger async pending
     messenger_unavailable: Queue depth unavailable
     instance_wide: instance-wide
@@ -1992,97 +1992,93 @@ legal:
     label: Legal
   last_updated: 'Last updated: %date%'
   manage_cookies: Cookie settings
-  placeholder:
-    legal_name: 'Legal name: [Operator legal name — replace]'
-    address: 'Address: [Registered address — replace]'
-    contact_email: 'Contact: [privacy@example.com — replace]'
-    registration: 'Company registry / tax ID: [if applicable — replace]'
+  identity:
+    name_line: 'Legal name: [Operator legal name — replace]'
+    tax_line: 'Tax ID: [Operator tax ID — replace]'
+    address_line: 'Address: [Registered address — replace]'
+    registry_line: 'Company registry: [if applicable — replace]'
+    contact_line: 'Contact: [privacy@example.com — replace]'
   notice:
     title: Legal notice
-    intro: This legal notice applies to the self-hosted %brand% instance you are visiting.
-      Replace the placeholders below with the operator’s real details before public
-      use.
-    operator_heading: Operator
-    operator_body: The operator of this instance is responsible for the service and
-      for the content they publish here.
+    intro: 'This notice identifies the operator of this %brand% instance. Replace the placeholders with the operator’s real details before public use. It is a starting point for Spanish information-society identification (LSSI-CE art. 10) and the EU GDPR — not legal advice.'
+    publisher_heading: Publisher and controller
+    publisher_body: 'The organisation that runs this instance is the information-society provider and the data controller of this deployment. Fill in the identification below before processing other people’s personal data.'
+    lssi_heading: Information-society identification
+    lssi_body: 'In compliance with article 10 of Ley 34/2002 (LSSI-CE), the operator of this instance must publish its legal name, tax or registry identifiers where applicable, postal address, and a contact email or telephone.'
+    self_host_heading: Self-hosted deployments
+    self_host_body: 'These pages ship as editable templates. Whoever deploys this software is the provider and controller of that deployment and must replace every placeholder with their own identification. The default copy must not name a third-party company.'
     hosting_heading: Hosting
-    hosting_body: This software may be hosted by the operator or a third-party infrastructure
-      provider chosen by the operator. Hosting details should be completed by the
-      operator.
+    hosting_body: 'This instance is hosted on infrastructure chosen by the operator. Document the host and where data is stored before public use. Processors may handle data only on the operator’s instructions.'
+    ip_heading: Intellectual property
+    ip_body: 'The brand, mascot, and interface of this instance belong to the operator or their licensors. The application source is offered under the MIT licence in the repository; that licence does not grant rights in the operator’s brand.'
     liability_heading: Liability
-    liability_body: The software is provided as-is. The operator remains responsible
-      for lawful use, data protection compliance, and the accuracy of operator-specific
-      legal text on this instance.
+    liability_body: 'The operator maintains the service with the care required by the state of the art. The default text does not limit liability that Spanish or EU consumer law does not allow to be limited. Counsel should review this clause before production.'
+    law_heading: Governing law
+    law_body: 'Replace this clause with the governing law and venue advised for the operator. Until then treat it as a placeholder. Consumers may sue in the courts of their domicile where the law so provides.'
   privacy:
     title: Privacy policy
-    intro: This privacy policy describes how personal data may be processed when you
-      use this %brand% instance. Operators must adapt this text to their organisation
-      and jurisdiction.
+    intro: 'This policy explains how personal data may be processed on this %brand% instance when offered to people in the EU/EEA, including Spain (GDPR and LOPDGDD). The operator must replace placeholders with their own controller details before production.'
     controller_heading: Data controller
-    controller_body: The operator of this Beacon instance is the data controller for
-      accounts and telemetry stored on their deployment. Fill in legal name and contact
-      details in the Legal notice page.
+    controller_body: 'The operator of this instance is the data controller. There is no default data-protection officer in this template; privacy requests go to the contact on the Legal notice page.'
+    controller_self_host: A third party that self-hosts this software is the controller of that deployment. Customer applications that send telemetry are separate controllers of the end-user data inside those events; Beacon stores that telemetry for the project owner.
     data_heading: Data we process
-    data_body: 'Depending on how the operator configures and uses the instance, processing
-      may include:'
-    data_account: Account data (email, display name, password hash, roles, preferences)
-    data_telemetry: Application error and performance telemetry sent via project DSN
-      / Envelope ingest
-    data_logs: Operational logs and optional cookie consent logs
-    data_cookies: Cookies and similar technologies described on the Cookies page
+    data_body: 'On this instance the operator may process:'
+    data_account: Account data — email, display name, password hash, roles, preferred locale, and phone number if you add one.
+    data_telemetry: Project telemetry you or your application send through a DSN (error and performance events, which may include IP addresses, URLs, and identifiers your application includes).
+    data_security: Security data — login attempts, device-intelligence observations (cookie di_obs), and trusted-browser records. Device ID is not a password.
+    data_logs: Operational logs, including HTTP audit logs and cookie-consent logs.
+    data_cookies: Cookies and similar storage described on the Cookies page.
     purpose_heading: Purposes
-    purpose_body: Data is processed to authenticate users, operate error tracking
-      for configured projects, secure the service, and (where enabled) remember cookie
-      preferences.
+    purpose_body: We process this data to create and secure accounts, provide error and performance tracking for projects you configure, deliver notifications you set up, keep the service reliable, and record cookie choices.
+    basis_heading: Legal bases
+    basis_contract: Contract (GDPR art. 6(1)(b)) — account, authentication, and the error-tracking service you request.
+    basis_legitimate: Legitimate interests (art. 6(1)(f)) — securing the service, preventing abuse, device intelligence, and diagnostic logs. You may object where the law gives you that right.
+    basis_consent: Consent (art. 6(1)(a) and ePrivacy) — optional cookie categories (preferences, analytics). You can withdraw consent at any time with Cookie settings. Necessary cookies do not rely on consent.
+    basis_legal: Legal obligation (art. 6(1)(c)) — answering competent authorities when the law requires it.
+    recipients_heading: Recipients
+    recipients_body: 'Data is stored on infrastructure the operator chooses and on the mailer the operator configures. The default deployment does not sell personal data. Project administrators may add notification destinations (for example Slack or email); those destinations receive only the alert content that administrator configured. Processors act on written instructions.'
+    transfers_heading: International transfers
+    transfers_body: 'The operator must document whether processing stays in the EU/EEA. The default template assumes EEA hosting until replaced. If an administrator configures a webhook or mailbox outside the EEA, that administrator causes the transfer and must have a GDPR chapter V mechanism (such as standard contractual clauses) before doing so.'
     retention_heading: Retention
-    retention_body: Retention periods are defined by the operator (account lifecycle,
-      project data retention, log retention). Replace this paragraph with your organisation’s
-      retention schedule.
+    retention_account: Accounts are kept while the account exists and deleted or anonymised when you use account deletion or an administrator removes the user.
+    retention_telemetry: Telemetry is kept for the retention period configured on each project. If no period is set, events stay until an administrator deletes them or the project.
+    retention_cookies: The session cookie lasts up to 1 day; Remember me up to 30 days; consent cookies about 1 year; di_obs 1 hour.
+    retention_logs: HTTP and consent logs follow the purge schedule set in Administration. Security logs are kept only as long as needed to investigate abuse.
     rights_heading: Your rights
-    rights_body: Depending on applicable law (for example GDPR), you may have rights
-      of access, rectification, erasure, restriction, portability, and objection.
-      Contact the operator using the details on the Legal notice page.
+    rights_body: 'You may request access, rectification, erasure, restriction, portability, and objection, and you may withdraw consent for optional cookies without affecting earlier processing. Contact the operator using the details on the Legal notice page. The operator should answer within one month, which can be extended by two further months for complex requests, and may need to confirm your identity before disclosing data.'
+    authority_heading: Supervisory authority
+    authority_body: You may lodge a complaint with the Agencia Española de Protección de Datos (AEPD), C/ Jorge Juan 6, 28001 Madrid, Spain, https://www.aepd.es, or with the authority of your EU/EEA country of residence.
+    automated_heading: Automated decisions
+    automated_body: We do not make decisions based solely on automated processing that produce legal or similarly significant effects (GDPR art. 22). Device intelligence supports account security; it does not grant or deny a contract by itself, and it is not a credential.
     cookies_heading: Cookies
-    cookies_body: We use necessary cookies for sign-in and consent storage. Optional
-      categories (preferences, analytics) are only activated after you allow them
-      in the cookie banner.
+    cookies_body: Strictly necessary cookies support sign-in, security, and consent recording. Optional categories run only after you allow them.
   terms:
     title: Terms of use
-    intro: These terms govern use of this %brand% instance. Operators should replace
-      this template with terms that match their offering (internal tool, customer
-      SaaS, etc.).
+    intro: 'These terms are a template for use of this %brand% instance. Replace them with terms that match the operator’s offering before production. If you only use the MIT-licensed source on your own servers, your deployment’s terms are yours.'
     service_heading: Service
-    service_body: Beacon provides self-hosted error and performance tracking for projects
-      configured by authorised users.
+    service_body: The service is self-hosted-style error and performance tracking for projects created by authorised users, including ingest, issue workflow, notifications, and administration.
     accounts_heading: Accounts
-    accounts_body: You must keep credentials confidential and use the service only
-      for projects and data you are authorised to process.
+    accounts_body: You must provide accurate account data, keep credentials confidential, and use the service only for projects and personal data you are allowed to process. You are responsible for activity under your account.
     accept_heading: Acceptable use
-    accept_body: Do not abuse the ingest API, attempt unauthorised access, or upload
-      unlawful content. The operator may suspend accounts that violate these terms.
+    accept_body: Do not abuse the ingest API, probe for unauthorised access, upload unlawful content, or use the service to harm others. We may suspend access that breaks these terms or the law.
+    ip_heading: Intellectual property
+    ip_body: 'The software source is licensed under MIT as stated in the repository. These terms do not assign the Beacon brand or the operator’s marks. You keep rights in the telemetry you send; you grant the operator the licence needed to store and display it to provide the service.'
     limitation_heading: Limitation of liability
-    limitation_body: To the extent permitted by law, the operator and software authors
-      are not liable for indirect damages arising from use of the service. Operators
-      should have counsel review this clause.
+    limitation_body: 'To the extent applicable law allows, the operator is not liable for indirect or consequential loss arising from use of the service. Liability that cannot legally be excluded — including for intent, gross negligence, or non-waivable consumer rights — is unaffected. Counsel should review this clause before production.'
+    law_heading: Governing law and venue
+    law_body: 'Replace this clause with the governing law and venue advised for the operator. Consumers may sue in the courts of their domicile where the law so provides.'
     changes_heading: Changes
-    changes_body: The operator may update these terms. Continued use after notice
-      constitutes acceptance of the updated terms where permitted by law.
+    changes_body: We may update these terms by publishing the new text on this page with a new date. If a change reduces your rights, we will also notify signed-in administrators before it takes effect where the law requires notice. Continued use after the effective date is acceptance where the law allows that form of acceptance.
   cookies:
     title: Cookie notice
-    intro: This page describes the cookies and similar technologies used by this %brand%
-      instance. Strictly necessary cookies support authentication, security, and consent
-      recording. Optional categories are used only with your prior consent. Use Cookie
-      settings to review or change your selection at any time.
+    intro: This page lists the cookies and similar technologies used by this %brand% instance. Strictly necessary cookies support authentication, security, and consent recording. Optional categories are used only with your prior consent. Use Cookie settings to review or change your selection at any time.
     categories_heading: Categories
     cat_required: Strictly necessary
-    cat_required_help: Essential for authentication, security, and recording your
-      consent decision. These cookies cannot be disabled.
+    cat_required_help: Essential for authentication, security, and recording your consent decision. These cookies cannot be switched off from the banner.
     cat_preferences: Preferences
-    cat_preferences_help: Optional cookies that store non-essential presentation or
-      feature choices when enabled by the operator and accepted by you.
+    cat_preferences_help: Optional cookies that store non-essential presentation choices, used only if you accept this category.
     cat_analytics: Analytics
-    cat_analytics_help: Optional measurement cookies used only if the operator enables
-      analytics tooling and you give prior consent.
+    cat_analytics_help: 'Optional measurement cookies, used only if this instance enables analytics tooling and you accept this category. The default build does not set a third-party analytics cookie.'
     inventory_heading: Cookie inventory
     col_name: Name
     col_category: Category
@@ -2090,23 +2086,16 @@ legal:
     col_purpose: Purpose
     duration_session: Up to 1 day
     duration_remember: Up to 30 days
-    duration_consent: Approximately 1 year
-    purpose_session: Maintains the authenticated HTTP session required to access protected
-      areas of the service.
-    purpose_remember: Enables persistent authentication when “Remember me” is selected
-      at sign-in (secure token; limited lifetime).
-    purpose_csrf: Short-lived double-submit CSRF cookie set by Symfony when submitting
-      protected forms (name pattern csrf-token_<token>; __Host- prefix on HTTPS).
-    purpose_consent: Cookie_Consent and Cookie_Consent_Key record that a consent decision
-      was made and link an anonymous key to the server-side consent audit log.
-    purpose_category: Cookie_Category_analytics and Cookie_Category_preferences store
-      whether each optional category was accepted or refused (consent machinery, not
-      trackers).
+    duration_consent: About 1 year
+    duration_device: 1 hour
+    purpose_session: Maintains the authenticated HTTP session required to access protected areas of the service.
+    purpose_remember: Enables persistent authentication when Remember me is selected at sign-in.
+    purpose_csrf: Short-lived double-submit CSRF cookie set by Symfony when submitting protected forms (name pattern csrf-token_*; __Host- prefix on HTTPS).
+    purpose_consent: Cookie_Consent and Cookie_Consent_Key record that a consent decision was made and link an anonymous key to the server-side consent log.
+    purpose_category: Cookie_Category_analytics and Cookie_Category_preferences store whether each optional category was accepted or refused (consent machinery, not trackers).
+    purpose_device: HttpOnly pointer (di_obs) used to recognise a returning browser for account security. It is not a login credential and it is not an advertising identifier.
     storage_heading: Local storage
-    storage_body: Theme preference (light/dark) and some UI layout choices may be
-      stored in the browser’s localStorage and are not HTTP cookies. Under typical
-      ePrivacy guidance this may be treated as strictly necessary for a coherent user
-      interface; operators should confirm the applicable rules in their jurisdiction.
+    storage_body: Theme (light/dark) and some layout choices may be stored in the browser’s localStorage. They are not HTTP cookies. They are strictly necessary to keep the interface you chose on this device.
 notifications:
   title: Notifications
   intro: Send alerts to Slack, Discord, Teams, Telegram, email, or a generic HTTP endpoint when new issues,

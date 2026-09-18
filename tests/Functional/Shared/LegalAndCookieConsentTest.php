@@ -70,4 +70,29 @@ final class LegalAndCookieConsentTest extends WebTestCase
         self::assertStringNotContainsString('nowo-cookie-consent__preferences-bubble', $content);
         self::assertStringContainsString('nowo-consent-modal', $content);
     }
+
+    public function testLegalPagesStayGenericAndDoNotNameNowoTech(): void
+    {
+        $client = self::createClient();
+
+        foreach (['/en/legal/notice', '/en/legal/privacy', '/es/legal/notice'] as $path) {
+            $client->request(Request::METHOD_GET, $path);
+            self::assertResponseIsSuccessful($path);
+            $content = $client->getResponse()->getContent() ?: '';
+            self::assertStringContainsString('privacy@example.com', $content, $path);
+            self::assertStringNotContainsString('B01772607', $content, $path);
+            self::assertStringNotContainsString('hola@nowo.tech', $content, $path);
+            self::assertStringNotContainsString('nowo.tech', $content, $path);
+            self::assertStringNotContainsString('Nowo Insurance', $content, $path);
+        }
+
+        $client->request(Request::METHOD_GET, '/en/legal/notice');
+        $notice = $client->getResponse()->getContent() ?: '';
+        self::assertStringContainsString('[Operator legal name', $notice);
+
+        $client->request(Request::METHOD_GET, '/en/legal/cookies');
+        $cookies = $client->getResponse()->getContent() ?: '';
+        self::assertStringContainsString('di_obs', $cookies);
+        self::assertStringContainsString('1 hour', $cookies);
+    }
 }

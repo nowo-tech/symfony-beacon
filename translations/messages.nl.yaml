@@ -1625,442 +1625,113 @@ tour:
           uit bij het onboarden van een nieuwe omgeving.
 legal:
   nav:
-    label: Legaal
+    label: Juridisch
   last_updated: 'Laatst bijgewerkt: %date%'
   manage_cookies: Cookie-instellingen
-  placeholder:
-    legal_name: 'Wettelijke naam: [wettelijke naam exploitant — vervangen]'
-    address: 'Adres: [Geregistreerd adres — vervangen]'
-    contact_email: 'Contact: [privacy@example.com — vervangen]'
-    registration: 'Bedrijfsregister/belastingnummer: [indien van toepassing — vervangen]'
+  identity:
+    name_line: 'Naam: [Wettelijke naam van de exploitant — vervangen]'
+    tax_line: 'Fiscaal nummer: [fiscaal nummer van de exploitant — vervangen]'
+    address_line: 'Adres: [statutaire zetel — vervangen]'
+    registry_line: 'Handelsregister: [indien van toepassing — vervangen]'
+    contact_line: 'Contact: [privacy@example.com — vervangen]'
   notice:
-    title: Juridische mededeling
-    intro: Deze juridische kennisgeving is van toepassing op de zelfgehoste %brand%-instantie
-      die u bezoekt. Vervang de onderstaande tijdelijke aanduidingen door de echte
-      gegevens van de operator vóór openbaar gebruik.
-    operator_heading: Exploitant
-    operator_body: De exploitant van deze instantie is verantwoordelijk voor de dienst
-      en voor de inhoud die zij hier publiceren.
-    hosting_heading: Hosten
-    hosting_body: Deze software kan worden gehost door de exploitant of door een door
-      de exploitant gekozen externe infrastructuuraanbieder. De hostinggegevens moeten
-      door de operator worden ingevuld.
-    liability_heading: Betrouwbaarheid
-    liability_body: De software wordt geleverd zoals hij is. De exploitant blijft
-      verantwoordelijk voor rechtmatig gebruik, naleving van de gegevensbescherming
-      en de juistheid van exploitantspecifieke juridische teksten in dit geval.
+    title: Juridische kennisgeving
+    intro: 'Deze tekst identificeert de exploitant van deze %brand%-instantie. Vervang de plaatsaanduidingen vóór openbaar gebruik door echte gegevens. Uitgangspunt voor LSSI-CE art. 10 en de AVG — geen juridisch advies.'
+    publisher_heading: Aanbieder en verwerkingsverantwoordelijke
+    publisher_body: 'De organisatie die deze instantie draait is aanbieder van de informatiemaatschappijdienst en verwerkingsverantwoordelijke van deze installatie. Vul de identificatie hieronder in voordat u persoonsgegevens van anderen verwerkt.'
+    lssi_heading: Identificatie van de dienst
+    lssi_body: 'Op grond van artikel 10 van de Spaanse wet 34/2002 (LSSI-CE) moet de exploitant wettelijke naam, fiscale of registergegevens waar van toepassing, postadres en een e-mail of telefoon publiceren.'
+    self_host_heading: Zelf gehoste installaties
+    self_host_body: 'Deze pagina’s zijn bewerkbare sjablonen. Wie deze software inzet is aanbieder en verantwoordelijke van die installatie en moet elke plaatsaanduiding vervangen door de eigen identificatie. De standaardtekst mag geen derde vennootschap noemen.'
+    hosting_heading: Hosting
+    hosting_body: 'Deze instantie wordt gehost op infrastructuur die de exploitant kiest. Documenteer host en opslaglocatie vóór openbaar gebruik. Verwerkers handelen alleen in opdracht van de exploitant.'
+    ip_heading: Intellectuele eigendom
+    ip_body: 'Merk, mascotte en interface van deze instantie behoren toe aan de exploitant of haar licentiegevers. De broncode staat onder de MIT-licentie in de repository; die licentie draagt het merk van de exploitant niet over.'
+    liability_heading: Aansprakelijkheid
+    liability_body: 'De exploitant onderhoudt de dienst met de zorg die de stand van de techniek vereist. De standaardtekst beperkt geen aansprakelijkheid die Spaans of EU-consumentenrecht niet toestaat uit te sluiten. Laat deze clausule vóór productie toetsen.'
+    law_heading: Toepasselijk recht
+    law_body: 'Vervang deze clausule door het toepasselijke recht en de forumkeuze van de exploitant. Tot dan is het een plaatsaanduiding. Consumenten kunnen dagvaarden bij de rechter van hun woonplaats waar de wet dat toestaat.'
   privacy:
-    title: Privacybeleid
-    intro: Dit privacybeleid beschrijft hoe persoonlijke gegevens kunnen worden verwerkt
-      wanneer u deze %brand%-instantie gebruikt. Exploitanten moeten deze tekst aanpassen
-      aan hun organisatie en jurisdictie.
-    controller_heading: Gegevensbeheerder
-    controller_body: De operator van dit Beacon-exemplaar is de gegevensbeheerder
-      voor accounts en telemetrie die in hun implementatie zijn opgeslagen. Vul de
-      wettelijke naam en contactgegevens in op de pagina Juridische kennisgeving.
+    title: Privacyverklaring
+    intro: 'Deze verklaring legt uit hoe persoonsgegevens op deze %brand%-instantie kunnen worden verwerkt wanneer die wordt aangeboden aan mensen in de EU/EER, inclusief Spanje (AVG en LOPDGDD). De exploitant moet plaatsaanduidingen vóór productie vervangen door de eigen verantwoordelijke.'
+    controller_heading: Verwerkingsverantwoordelijke
+    controller_body: 'De exploitant van deze instantie is verwerkingsverantwoordelijke. Dit sjabloon heeft geen functionaris voor gegevensbescherming; privacyverzoeken gaan naar het contact op de juridische kennisgeving.'
+    controller_self_host: Een derde die deze software zelf host, is de verwerkingsverantwoordelijke van die installatie. Klantapplicaties die telemetrie sturen blijven verantwoordelijk voor eindgebruikersgegevens in die events; Beacon bewaart die telemetrie voor de projecteigenaar.
     data_heading: Gegevens die wij verwerken
-    data_body: 'Afhankelijk van hoe de operator het exemplaar configureert en gebruikt,
-      kan de verwerking het volgende omvatten:'
-    data_account: Accountgegevens (e-mail, weergavenaam, wachtwoord-hash, rollen,
-      voorkeuren)
-    data_telemetry: Applicatiefout- en prestatietelemetrie verzonden via project-DSN/envelop-opname
-    data_logs: Operationele logboeken en optionele logboeken voor toestemming voor
-      cookies
-    data_cookies: Cookies en soortgelijke technologieën beschreven op de Cookies-pagina
+    data_body: 'Op deze instantie kan de exploitant verwerken:'
+    data_account: Accountgegevens — e-mail, weergavenaam, wachtwoordhash, rollen, voorkeurstaal en telefoonnummer als u dat toevoegt.
+    data_telemetry: Projecttelemetrie die u of uw applicatie via een DSN stuurt (fout- en prestatiegebeurtenissen, die IP-adressen, URL’s en identificatoren van uw applicatie kunnen bevatten).
+    data_security: Beveiligingsgegevens — inlogpogingen, apparaattobservaties (cookie di_obs) en vertrouwde browsers. Het apparaat-ID is geen wachtwoord.
+    data_logs: Operationele logs, inclusief HTTP-audit en cookie-toestemmingslogs.
+    data_cookies: Cookies en vergelijkbare opslag, beschreven op de cookiepagina.
     purpose_heading: Doeleinden
-    purpose_body: Gegevens worden verwerkt om gebruikers te authenticeren, fouten
-      bij te houden voor geconfigureerde projecten, de service te beveiligen en (indien
-      ingeschakeld) cookievoorkeuren te onthouden.
-    retention_heading: Behoud
-    retention_body: Bewaartermijnen worden gedefinieerd door de exploitant (accountlevenscyclus,
-      bewaren van projectgegevens, bewaren van logbestanden). Vervang deze paragraaf
-      door het bewaarschema van uw organisatie.
-    rights_heading: Jouw rechten
-    rights_body: Afhankelijk van de toepasselijke wetgeving (bijvoorbeeld AVG) heeft
-      u mogelijk recht op toegang, rectificatie, verwijdering, beperking, overdraagbaarheid
-      en bezwaar. Neem contact op met de exploitant via de gegevens op de pagina Juridische
-      kennisgeving.
-    cookies_heading: Koekjes
-    cookies_body: We gebruiken noodzakelijke cookies voor aanmelding en opslag van
-      toestemming. Optionele categorieën (voorkeuren, analyses) worden pas geactiveerd
-      nadat u deze in de cookiebanner heeft toegestaan.
+    purpose_body: Wij verwerken deze gegevens om accounts aan te maken en te beveiligen, fout- en prestatietracking te leveren voor projecten die u instelt, meldingen te bezorgen die u configureert, de dienst betrouwbaar te houden en cookiekeuzes vast te leggen.
+    basis_heading: Rechtsgronden
+    basis_contract: Overeenkomst (AVG art. 6 lid 1 onder b) — account, authenticatie en de trackingdienst die u vraagt.
+    basis_legitimate: Gerechtvaardigd belang (art. 6 lid 1 onder f) — beveiliging, misbruikpreventie, apparaatinformatie en diagnostische logs. U kunt bezwaar maken waar het recht dat geeft.
+    basis_consent: Toestemming (art. 6 lid 1 onder a en ePrivacy) — optionele cookiecategorieën (voorkeuren, analyse). Intrekken kan op elk moment via Cookie-instellingen. Noodzakelijke cookies steunen niet op toestemming.
+    basis_legal: Wettelijke plicht (art. 6 lid 1 onder c) — bevoegde autoriteiten antwoorden wanneer de wet dat vereist.
+    recipients_heading: Ontvangers
+    recipients_body: 'Gegevens staan op infrastructuur die de exploitant kiest en bij de geconfigureerde mailer. De standaardinstallatie verkoopt geen persoonsgegevens. Projectbeheerders kunnen meldingsbestemmingen toevoegen; die ontvangen alleen de geconfigureerde waarschuwing. Verwerkers handelen op schriftelijke instructie.'
+    transfers_heading: Internationale doorgifte
+    transfers_body: 'De exploitant moet documenteren of de verwerking in de EU/EER blijft. Dit sjabloon gaat uit van EER-hosting tot het wordt vervangen. Configureert een beheerder een webhook of mailbox buiten de EER, dan veroorzaakt hij de doorgifte en heeft hij vooraf een mechanisme uit AVG hoofdstuk V nodig.'
+    retention_heading: Bewaartermijn
+    retention_account: Accounts blijven bestaan zolang het account bestaat en worden gewist of geanonimiseerd wanneer u het account verwijdert of een beheerder de gebruiker verwijdert.
+    retention_telemetry: Telemetrie wordt bewaard voor de termijn die op elk project is ingesteld. Zonder termijn blijven gebeurtenissen tot een beheerder ze of het project wist.
+    retention_cookies: Het sessiecookie duurt tot 1 dag; Onthoud mij tot 30 dagen; toestemmingscookies ongeveer 1 jaar; di_obs 1 uur.
+    retention_logs: HTTP- en toestemmingslogs volgen het opschoonschema in Beheer. Beveiligingslogs worden alleen bewaard zolang nodig om misbruik te onderzoeken.
+    rights_heading: Uw rechten
+    rights_body: 'U kunt inzage, rectificatie, wissing, beperking, overdraagbaarheid en bezwaar vragen en toestemming voor optionele cookies intrekken. Contacteer de exploitant via de juridische kennisgeving. Antwoord in beginsel binnen een maand, verlengbaar met twee maanden bij complexe verzoeken; identiteit kan worden gecontroleerd.'
+    authority_heading: Toezichthoudende autoriteit
+    authority_body: U kunt een klacht indienen bij de Agencia Española de Protección de Datos (AEPD), C/ Jorge Juan 6, 28001 Madrid, Spanje, https://www.aepd.es, of bij de autoriteit van uw woonland in de EU/EER.
+    automated_heading: Geautomatiseerde besluiten
+    automated_body: Wij nemen geen uitsluitend geautomatiseerde besluiten met rechtsgevolgen of vergelijkbare aanzienlijke gevolgen (AVG art. 22). Apparaatinformatie ondersteunt accountbeveiliging; zij kent of weigert geen overeenkomst op zichzelf en is geen inloggegeven.
+    cookies_heading: Cookies
+    cookies_body: Strikt noodzakelijke cookies ondersteunen aanmelden, beveiliging en het vastleggen van toestemming. Optionele categorieën draaien alleen nadat u ze toestaat.
   terms:
     title: Gebruiksvoorwaarden
-    intro: Deze voorwaarden zijn van toepassing op het gebruik van deze %brand%-instantie.
-      Operators moeten dit sjabloon vervangen door termen die passen bij hun aanbod
-      (interne tool, SaaS voor klanten, enz.).
+    intro: 'Deze voorwaarden zijn een sjabloon voor gebruik van deze %brand%-instantie. Vervang ze vóór productie door voorwaarden die bij het aanbod van de exploitant passen. Gebruikt u alleen de MIT-gelicentieerde broncode op eigen servers, dan gelden de voorwaarden van die installatie.'
     service_heading: Dienst
-    service_body: Beacon biedt zelfgehoste fout- en prestatietracking voor projecten
-      die zijn geconfigureerd door geautoriseerde gebruikers.
-    accounts_heading: Rekeningen
-    accounts_body: U moet de inloggegevens vertrouwelijk houden en de service alleen
-      gebruiken voor projecten en gegevens die u mag verwerken.
-    accept_heading: Acceptabel gebruik
-    accept_body: Maak geen misbruik van de ingest-API, probeer geen ongeoorloofde
-      toegang te verkrijgen of upload geen onwettige inhoud. De exploitant kan accounts
-      opschorten die deze voorwaarden schenden.
+    service_body: De dienst is fout- en prestatietracking voor projecten van geautoriseerde gebruikers, inclusief ingest, issue-workflow, meldingen en beheer.
+    accounts_heading: Accounts
+    accounts_body: U moet juiste accountgegevens geven, inloggegevens vertrouwelijk houden en de dienst alleen gebruiken voor projecten en persoonsgegevens die u mag verwerken. U bent verantwoordelijk voor activiteit onder uw account.
+    accept_heading: Aanvaardbaar gebruik
+    accept_body: Misbruik de ingest-API niet, zoek geen ongeautoriseerde toegang, upload geen onrechtmatige inhoud en gebruik de dienst niet om anderen te schaden. Wij kunnen toegang schorsen die deze voorwaarden of de wet schendt.
+    ip_heading: Intellectuele eigendom
+    ip_body: 'De broncode is gelicentieerd onder MIT zoals in de repository. Deze voorwaarden dragen het merk Beacon of merken van de exploitant niet over. U behoudt rechten op de verzonden telemetrie en verleent de exploitant de licentie die nodig is om die op te slaan en te tonen om de dienst te leveren.'
     limitation_heading: Beperking van aansprakelijkheid
-    limitation_body: Voor zover wettelijk toegestaan ​​zijn de exploitant en de softwareauteurs
-      niet aansprakelijk voor indirecte schade die voortvloeit uit het gebruik van
-      de dienst. Exploitanten moeten deze clausule door een raadsman laten beoordelen.
-    changes_heading: Veranderingen
-    changes_body: De exploitant kan deze voorwaarden bijwerken. Voortgezet gebruik
-      na kennisgeving houdt aanvaarding in van de bijgewerkte voorwaarden, voor zover
-      toegestaan ​​door de wet.
+    limitation_body: 'Voor zover toepasselijk recht dat toelaat, is de exploitant niet aansprakelijk voor indirecte of gevolgschade door gebruik van de dienst. Aansprakelijkheid die wettelijk niet kan worden uitgesloten blijft gelden. Laat deze clausule vóór productie toetsen.'
+    law_heading: Recht en forum
+    law_body: 'Vervang deze clausule door het toepasselijke recht en de forumkeuze van de exploitant. Consumenten kunnen dagvaarden bij de rechter van hun woonplaats waar de wet dat toestaat.'
+    changes_heading: Wijzigingen
+    changes_body: Wij kunnen deze voorwaarden bijwerken door de nieuwe tekst met een nieuwe datum op deze pagina te publiceren. Vermindert een wijziging uw rechten, dan waarschuwen wij ook ingelogde beheerders vooraf wanneer de wet kennisgeving vereist. Voortgezet gebruik na de ingangsdatum is aanvaarding waar het recht die vorm toestaat.
   cookies:
-    title: Cookiemelding
-    intro: Deze pagina beschrijft de cookies en vergelijkbare technologieën die door
-      deze %brand%-instantie worden gebruikt. Strikt noodzakelijke cookies ondersteunen
-      authenticatie, beveiliging en vastlegging van toestemming. Optionele categorieën
-      worden alleen gebruikt met uw voorafgaande toestemming. Gebruik Cookie-instellingen
-      om uw selectie te allen tijde te bekijken of te wijzigen.
+    title: Cookieverklaring
+    intro: Deze pagina somt de cookies en vergelijkbare technieken van deze %brand%-instantie op. Strikt noodzakelijke cookies ondersteunen authenticatie, beveiliging en het vastleggen van toestemming. Optionele categorieën alleen met uw voorafgaande toestemming. Gebruik Cookie-instellingen om uw keuze op elk moment te wijzigen.
     categories_heading: Categorieën
     cat_required: Strikt noodzakelijk
-    cat_required_help: Essentieel voor authenticatie, beveiliging en vastlegging van
-      uw toestemmingsbeslissing. Deze cookies kunnen niet worden uitgeschakeld.
+    cat_required_help: Nodig voor authenticatie, beveiliging en het vastleggen van uw toestemming. Niet uit te zetten via de banner.
     cat_preferences: Voorkeuren
-    cat_preferences_help: Optionele cookies die niet-essentiële presentatie- of functiekeuzes
-      opslaan wanneer de beheerder ze inschakelt en u toestemt.
+    cat_preferences_help: Optionele cookies die niet-essentiële weergavekeuzes bewaren, alleen als u deze categorie aanvaardt.
     cat_analytics: Analyse
-    cat_analytics_help: Optionele meetcookies, alleen gebruikt als de beheerder analysetools
-      inschakelt en u voorafgaande toestemming geeft.
+    cat_analytics_help: 'Optionele meetcookies, alleen als deze instantie analysetools inschakelt en u de categorie accepteert. De standaard zet geen analytische cookie van derden.'
     inventory_heading: Cookie-inventaris
     col_name: Naam
     col_category: Categorie
     col_duration: Duur
     col_purpose: Doel
-    duration_session: Sessie
-    duration_remember: Tot 7 dagen
+    duration_session: Tot 1 dag
+    duration_remember: Tot 30 dagen
     duration_consent: Ongeveer 1 jaar
-    purpose_session: Handhaaft de geauthenticeerde HTTP-sessie die nodig is om beveiligde
-      delen van de dienst te gebruiken.
-    purpose_remember: Maakt persistente authenticatie mogelijk wanneer bij het inloggen
-      “Onthoud mij” wordt geselecteerd (veilig token; beperkte geldigheid).
-    purpose_csrf: Kortdurende double-submit CSRF-cookie die Symfony zet bij het verzenden
-      van beveiligde formulieren (patroon csrf-token_<token>; __Host- prefix op HTTPS).
-    purpose_consent: Cookie_Consent en Cookie_Consent_Key registreren dat een toestemmingskeuze
-      is gemaakt en koppelen een anonieme sleutel aan het server-side auditlogboek.
-    purpose_category: Cookie_Category_analytics en Cookie_Category_preferences slaan
-      op of elke optionele categorie is geaccepteerd of geweigerd (toestemmingsmechanisme,
-      geen trackers).
+    duration_device: 1 uur
+    purpose_session: Houdt de geauthenticeerde HTTP-sessie in stand die nodig is voor beveiligde delen.
+    purpose_remember: Maakt blijvende authenticatie mogelijk wanneer Onthoud mij bij het aanmelden is gekozen.
+    purpose_csrf: Kortlevende double-submit-CSRF-cookie die Symfony zet bij beveiligde formulieren (patroon csrf-token_*; prefix __Host- op HTTPS).
+    purpose_consent: Cookie_Consent en Cookie_Consent_Key leggen vast dat een toestemmingsbeslissing is genomen en koppelen een anonieme sleutel aan het toestemmingslog op de server.
+    purpose_category: Cookie_Category_analytics en Cookie_Category_preferences bewaren of elke optionele categorie is aanvaard of geweigerd (toestemmingsmechanisme, geen trackers).
+    purpose_device: HttpOnly-pointer (di_obs) om een terugkerende browser te herkennen voor accountbeveiliging. Geen inloggegeven en geen advertentie-identificatie.
     storage_heading: Lokale opslag
-    storage_body: Themavoorkeur (licht/donker) en sommige UI-lay-outkeuzes kunnen
-      worden opgeslagen in de localStorage van de browser en zijn geen HTTP-cookies.
-      Volgens typische ePrivacy-richtlijnen kan dit als strikt noodzakelijk voor een
-      coherente gebruikersinterface worden behandeld; beheerders moeten de toepasselijke
-      regels in hun rechtsgebied bevestigen.
-releases:
-  title: Release-gezondheid
-  intro: Kies een release om te zien hoeveel issues daar voor het eerst zijn gezien, twee releases te
-    vergelijken of direct naar de bestaande compare van de issuelijst te gaan.
-  empty: Er zijn nog geen releasegegevens beschikbaar voor dit project.
-  focus:
-    submit: Release-gezondheid bijwerken
-  new_in_release:
-    title: Nieuw in %release%
-    count: '%count% issues zijn voor het eerst in deze release gezien.'
-    open_issue_list: Gefilterde issuelijst openen
-    empty: Er zijn geen issues voor het eerst in deze release gezien.
-  compare:
-    help: Vergelijk de geselecteerde release optioneel met een andere release met behulp van de huidige
-      set issues.
-    summary_title: Vergelijk %a% vs %b%
-    only_a: Alleen in %release%
-    only_b: Alleen in %release%
-    both: In beide releases
-    empty: Geen issues in deze set
-  catalog:
-    title: Releases
-  environment_compare:
-    title: Omgevingsvergelijking
-    environment_a: Omgeving A
-    environment_b: Omgeving B
-    open_issue_list: Vergelijking openen in de issuelijst
-    help: Dit hergebruikt de bestaande `014` compare van de issuelijst. Wanneer een release is geselecteerd,
-      behoudt de link dat releasefilter.
-mailer_settings:
-  title: Mailer
-  intro: Sla de Symfony Mailer-DSN versleuteld op in de database (niet in .env). Inloggen
-    met magic link blijft verborgen totdat hier een niet-nul-DSN is opgeslagen; e-mailnotificatiedoelen
-    gebruiken ook dit transport.
-  status:
-    database: Uitgaande e-mail gebruikt de DSN die in de instantie-instellingen is
-      opgeslagen. Inloggen met magic link is beschikbaar wanneer deze DSN geen null-transport
-      is.
-    env_fallback: Nog geen database-DSN - uitgaande e-mail valt terug op MAILER_DSN
-      uit de omgeving (meestal null://null). Inloggen met magic link blijft uitgeschakeld
-      totdat je hier een versleutelde DSN opslaat.
-  current_dsn: 'Huidige DSN:'
-  from_preview: 'From-adres: %from%'
-  submit: Mailer-instellingen opslaan
-  magic_ready: E-mailreferenties voor magic link zijn gereed
-  magic_blocked: Magic-link-e-mail is niet beschikbaar (sla een afleverbare versleutelde
-    DSN op)
-  sample:
-    title: Voorbeeldmail verzenden
-    intro: Verstuurt een testbericht met de versleutelde Mailer-DSN (hetzelfde transport
-      als voor inloggen met magic link).
-    to_label: Ontvanger
-    submit: Voorbeeld verzenden
-    unavailable: Sla eerst een geldige versleutelde Mailer-DSN op (niet null://),
-      daarna kun je een voorbeeld verzenden.
-    email_subject: Beacon Mailer-voorbeeld (magic-loginreferenties)
-    email_body: 'Dit is een voorbeeldbericht uit Beheer -> Mailer.
-
-
-      Als je dit hebt ontvangen, kan de versleutelde Mailer-DSN magic-loginmails afleveren.
-
-      From-adres: %from%
-
-      '
-settings:
-  instance_config:
-    title: Instantieconfiguratie
-    intro: Exporteer of importeer toegestane niet-geheime instellingen (weergave en
-      instantieflags). Mailer-DSN, Mercure-geheimen en OAuth-geheimen worden nooit
-      opgenomen.
-    export_title: Exporteren
-    export_help: Download een geversioniseerd JSON-bestand dat veilig is voor back-upoefeningen.
-      Geheimen blijven op deze instantie.
-    export: JSON downloaden
-    import_title: Importeren
-    import_help: Herstel weergave en toegestane flags vanuit een eerdere export. Geheime
-      waarden worden geweigerd en blijven ongewijzigd.
-    import: JSON importeren
-    file: Configuratiebestand
-    imported: Instantieconfiguratie geïmporteerd.
-    import_failed: Import mislukt. Controleer de schemaversie en of het bestand geen
-      geheime sleutels bevat.
-    missing_file: Kies een JSON-bestand om te importeren.
-    invalid_csrf: Ongeldig beveiligingstoken.
-    file_too_large: Instantieconfig-JSON is te groot (max. 2 MiB).
-mercure_settings:
-  title: Mercure
-  intro: Optionele livemeldingen voor aangemelde leden wanneer een nieuwe issue wordt
-    aangemaakt. Standaard uitgeschakeld - alleen inschakelen wanneer een Mercure-hub
-    beschikbaar is. Web Push blijft een aparte opt-in onder Account -> Weergave.
-  manual_hint: 'Operatorhandleiding (hub, JWT-secret, Compose, probleemoplossing):
-    docs/ops/MERCURE.md in de repository.'
-  status:
-    active: Live Mercure-meldingen zijn ingeschakeld voor leden.
-    inactive: Mercure staat uit
-    inactive_help: Leden openen geen EventSource totdat je Mercure hier inschakelt
-      en een bereikbare hub-URL + JWT-secret opgeeft (hieronder opgeslagen of via
-      de omgeving).
-    url_database: De hub publish-URL is opgeslagen in de instantie-instellingen.
-    url_env: De hub publish-URL valt terug op MERCURE_URL uit de omgeving.
-    url_missing: Geen hub publish-URL geconfigureerd (stel hieronder in of gebruik
-      MERCURE_URL).
-    secret_database: Het JWT-secret is versleuteld opgeslagen in de instantie-instellingen.
-    secret_env: Het JWT-secret valt terug op MERCURE_JWT_SECRET uit de omgeving.
-    secret_missing: Geen JWT-secret geconfigureerd (stel hieronder in of gebruik MERCURE_JWT_SECRET).
-  public_url_preview: 'Browser-hub-URL: %url%'
-  push_note: PWA-push op de achtergrond wordt per gebruiker ingesteld onder Account
-    -> Weergave (vereist VAPID_*-sleutels). Het hangt niet af van Mercure.
-  submit: Mercure-instellingen opslaan
-  guide:
-    title: Mercure stap voor stap configureren
-    intro: Live-toasts voor nieuwe issues gebruiken een Mercure-hub (Server-Sent Events). Mercure is optioneel en onafhankelijk van Web Push (Account → Weergave).
-    open: Hoe te configureren
-    close: Sluiten
-    docs_hint: 'Volledige referentie met topics, privacy en productie — docs/ops/MERCURE.md.'
-    env:
-      step1_example: |
-        MERCURE_URL=http://mercure/.well-known/mercure
-        MERCURE_PUBLIC_URL=${DEFAULT_URI}/.well-known/mercure
-        MERCURE_JWT_SECRET="!ChangeThisMercureHubJWTSecretKey!"
-      step2_example: openssl rand -base64 48
-      title: 2. Omgevingsvariabelen
-      lead: Configureer de hub liever in .env en laat de formuliervelden leeg zodat Beheer alleen de functie aan/uit zet.
-      step1: Kopieer of bevestig deze variabelen in .env (uit .env.dist).
-      step2: Vervang de placeholder-JWT-geheim door een sterke waarde (minimaal 32 tekens).
-      step2_note: Dezelfde string moet door PHP (MERCURE_JWT_SECRET) en de hub worden gebruikt (compose.yaml mapt die naar MERCURE_PUBLISHER_JWT_KEY en MERCURE_SUBSCRIBER_JWT_KEY).
-      step3: Weten wat elke variabele doet.
-      table_var: Variabele
-      table_meaning: Betekenis
-      row_url: Interne publish-URL vanuit PHP (Compose-voorbeeld links).
-      row_public: 'Browser-EventSource-URL. Gebruik bij voorkeur ${DEFAULT_URI}/.well-known/mercure zodat de browser same-origin via Caddy blijft.'
-      row_jwt: Gedeeld HMAC-geheim voor publisher- en subscriber-JWTs.
-    external:
-      example: |
-        MERCURE_URL=https://mercure.example.com/.well-known/mercure
-        MERCURE_PUBLIC_URL=https://mercure.example.com/.well-known/mercure
-        MERCURE_JWT_SECRET="your-shared-secret-at-least-32-chars"
-      title: 6. Externe hub (optioneel)
-      lead: Je kunt Beacon naar elke Mercure-compatibele hub laten wijzen in plaats van de Compose-service.
-      step1: Zet MERCURE_URL (of Publish URL) op een endpoint dat de PHP-container kan bereiken.
-      step2: Zet MERCURE_PUBLIC_URL (of Public URL) op een HTTPS-URL die browsers kunnen openen.
-      step3: Gebruik hetzelfde JWT-geheim op de hub publisher/subscriber-sleutels en in Beacon.
-      step4: 'Als de hub cross-origin is, configureer hub-CORS (cors_origins) voor je Beacon-origin.'
-    start:
-      step1_example: |
-        docker compose up -d mercure php
-        # or a full stack:
-        make up
-      step2_example: 'docker compose exec mercure curl -fsS http://127.0.0.1/healthz'
-      step3_example: |
-        handle /.well-known/mercure* {
-            reverse_proxy mercure:80
-        }
-      title: 3. Hub starten
-      step1: Start of herschep Mercure met de app-stack.
-      step2: Bevestig het health-endpoint van de hub (binnen het Compose-netwerk).
-      step3: Bevestig dat Caddy de hub proxyt (al in .docker/frankenphp/Caddyfile).
-    troubleshoot:
-      recreate: |
-        # After changing hub env vars
-        docker compose up -d --force-recreate mercure
-      title: 7. Probleemoplossing
-      inactive: 'Status inactief — schakelaar uit, of URL/geheim ontbreekt (DB en env leeg).'
-      unauthorized: EventSource 401 — subscriber-JWT-geheim ≠ hub MERCURE_SUBSCRIBER_JWT_KEY.
-      cors: CORS-fouten — public URL is cross-origin en hub cors_origins sluit Beacon uit.
-      publish: 'Publish-fouten in logs — PHP kan MERCURE_URL niet bereiken, of JWT ≠ hub-sleutels.'
-      ciphertext: Browser vraagt een onzinpad zoals /MUIFA…== — decryptie van overrides mislukt; maak Publish/Public/JWT hier leeg en gebruik env-waarden.
-      push: 'Toasts alleen met open tab is verwacht; gebruik Web Push (VAPID_*) voor achtergrond.'
-    verify:
-      curl_example: |
-        # From the host (replace with your DEFAULT_URI)
-        curl -sI "${DEFAULT_URI}/.well-known/mercure"
-      title: 5. Verifiëren in de browser
-      step1: Open DevTools → Network en filter op mercure of EventSource.
-      step2: Bevestig een verbinding met /.well-known/mercure (of je public URL) met een authorisatie-JWT.
-      step3: Trigger een nieuw issue op een project waar je bij hoort en let op het SSE-event / toast.
-      step4: GET /account/realtime/config moet hubUrl + token alleen bevatten wanneer Mercure is ingeschakeld en geconfigureerd.
-    overview:
-      title: 1. Wat je nodig hebt
-      body: Beacon publiceert privé-updates; ingelogde leden abonneren zolang een tab open is. Deze onderdelen moeten overeenkomen.
-      item_hub: 'Een Mercure-hub (Compose-service mercure, of elke Mercure-compatibele hub).'
-      item_jwt: Eén gedeeld JWT-HMAC-geheim (≥ 32 tekens) voor PHP en de hub.
-      item_proxy: Same-origin-browsertoegang via Caddy op /.well-known/mercure (Compose-standaard).
-      item_admin: 'De hoofdschakelaar op dit scherm, plus optionele URL-/geheim-overrides.'
-    admin:
-      title: 4. Live-waarschuwingen hier inschakelen
-      step1: Zet “Mercure-livewaarschuwingen inschakelen” aan.
-      step2: 'Laat Publish URL, Public URL en JWT leeg om MERCURE_* uit de omgeving te gebruiken.'
-      step3: Of vul die velden in om de env te overschrijven (waarden versleuteld in de database).
-      step4: Opslaan. Het statuspaneel hierboven moet live-waarschuwingen als actief tonen.
-      step5: 'Meld je aan als projectlid, houd een tab open, maak een nieuw issue en let op de in-app-toast.'
-      current_url: 'Nu opgeloste browser-hub-URL: %url%'
-setup:
-  eyebrow: Eerste keer
-  title: Instantie-setup
-  intro: Installeer navigatiecatalogi en optionele demogegevens. Dezelfde stappen
-    als in de CLI-seedlagen.
-  intro_required: Navigatiecatalogi ontbreken. Installeer menu's, breadcrumbs en het
-    cookie-consentprofiel voordat je doorgaat.
-  intro_bootstrap: Platformcatalogi zijn gereed. Registreer de eerste beheerder, laad
-    optioneel voorbeeldtelemetrie en markeer de setup daarna als voltooid.
-  already_done: De setup is gemarkeerd als voltooid.
-  back_dashboard: Terug naar dashboard
-  login_setup_link: Eerste setup
-  progress_of: Stap %current% van %total%
-  log:
-    tabs_label: Setup-voortgang
-    tab: Log
-    completed: Voltooid
-  admin:
-    email: E-mail
-    password: Wachtwoord
-  token:
-    title: Open de setup-assistent
-    lead: Setup is expres vergrendeld. Plak de waarde van SITE_SETUP_TOKEN om door te gaan.
-    field_label: Setup-token
-    field_placeholder: SITE_SETUP_TOKEN
-    submit: Doorgaan
-    howto: Zo krijg je de token
-    step_env: Kopieer SITE_SETUP_TOKEN uit je .env.local (genereer een willekeurige waarde als leeg).
-    step_url: Je kunt ook %path% openen en … vervangen door de token.
-    step_header: In scripts stuur je de header X-Setup-Token met dezelfde waarde.
-  reason:
-    heading: Setup is vereist
-    db_connection: De database is niet bereikbaar met de huidige DATABASE_URL (ontbreekt,
-      onjuist of de DB-service is niet beschikbaar).
-    db_connection_hint: Configureer een werkende DATABASE_URL in de databasestap voordat
-      je doorgaat. Overslaan blijft uitgeschakeld totdat de verbinding werkt.
-    db_connection_form: Databaseverbinding mislukt. Voer een geldige DATABASE_URL
-      in (wordt geschreven naar .env.local). Je kunt deze stap niet overslaan totdat
-      de database antwoordt.
-    db_schema_empty: De database verbindt wel, maar bevat nog geen tabellen - migraties
-      / import maken het schema aan.
-    db_schema_hint: Ga verder met de wizard om migraties uit te voeren (of een volledige
-      dump te importeren). Je hoeft DATABASE_URL niet te wijzigen als de verbinding
-      al werkt.
-    marker_required: Er is een setup.required-marker aanwezig (cold start of na restore).
-    marker_done_missing: setup.done ontbreekt terwijl require_done_marker is ingeschakeld.
-    incomplete: 'Wizard in uitvoering: %detail%'
-  database:
-    intro: Optioneel - leeg laten en overslaan als DATABASE_URL uit de omgeving al
-      werkt.
-  bootstrap_login_hint: Maak je liever je eigen beheerder aan?
-  bootstrap_login_link: Inloggen
-  bootstrap_register_link: Eerste beheerder registreren
-  banner:
-    title: Instantie-setup afronden
-    body: Installeer menu's/breadcrumbs en optionele demovoorbeelden voor deze Beacon-instantie.
-    cta: Setup openen
-  step_platform:
-    title: Verplicht - platformcatalogi
-    body: Installeer dashboardmenu's, breadcrumbs en het cookie-consentprofiel/-overzicht.
-      Deze stap is verplicht voordat de rest van de app werkt.
-    item_menus: Menu's (dashboard, preferences, administration)
-    item_breadcrumbs: Breadcrumbverzameling (standaard)
-    item_cookies: Cookie-consentprofiel
-    cta: Menu's, breadcrumbs en cookies installeren
-    cta_again: Platform-seed opnieuw uitvoeren
-    done: Platformcatalogi zijn geinstalleerd.
-  step_options:
-    title: Optionele volgende stappen
-    body: Maak het eerste beheerdersaccount en/of laad een volledige voorbeelddataset.
-      Je kunt beide overslaan.
-    locked: Rond eerst de verplichte platforminstallatie af.
-    register_title: Eerste gebruiker maken
-    register_body: Registreer je eigen beheerder via AuthKit (registratie alleen voor
-      de eerste gebruiker).
-    register_cta: Eerste beheerder registreren
-    register_done: Er bestaat al minstens een gebruiker.
-    sample_title: Volledige voorbeeldlading
-    sample_body: Maak indien nodig het demoproject aan en laad de grotere voorbeeldtelemetrieset
-      (load-profiel).
-    sample_cta: Volledige voorbeeldlading installeren
-    sample_note: Dit kan een minuut duren. Huge-datasets blijven alleen beschikbaar
-      via CLI (`app:seed-sample --size=huge --force`).
-    sample_requires_register: Registreer de eerste beheerder voordat je voorbeeldtelemetrie
-      laadt (het demoproject is eigendom van jouw account).
-  step_demo:
-    title: Demoproject
-    body: Maak de lokale demobeheerder aan (indien afwezig) en het demoproject met
-      een API-sleutel.
-    cta: Demoproject maken
-    exists: Demoproject is al aanwezig.
-  step_sample:
-    title: Voorbeeldtelemetrie
-    body: Laad synthetische issues voor QA. Vereist het demoproject. Huge-grootte
-      blijft alleen CLI.
-    dev: Voorbeeld laden (dev)
-    load: Voorbeeld laden (load)
-    need_demo: Maak eerst het demoproject aan.
-  step_done:
-    title: Klaar
-    body: Sluit deze wizard. Je kunt Setup op elk moment opnieuw openen vanuit Beheer.
-    cta: Setup als voltooid markeren
-  cli_hint: 'CLI-equivalent: make bootstrap && make seed && make seed-sample - zie
-    docs/INSTALL.md'
-  flash:
-    platform_ok: Navigatiecatalogi en cookie-consent bijgewerkt.
-    platform_required: Installeer eerst menu's, breadcrumbs en cookie-consent.
-    demo_ok: Demogebruiker / project gereed.
-    demo_exists: Demogebruiker en demoproject bestaan al.
-    sample_ok: Voorbeeldtelemetrie geladen. Live Mercure-meldingen zijn indien nodig
-      ingeschakeld met standaard omgevingswaarden.
-    sample_requires_user: Log in of registreer de eerste beheerder voordat je voorbeeldgegevens
-      laadt.
-    sample_demo_user: Lokale demobeheerder admin@symfony-beacon.local / admin123 gemaakt
-      als eigenaar van het demoproject.
-    complete: Setup als voltooid gemarkeerd.
-    bootstrap_ready: Setup voltooid. Log in of registreer de eerste beheerder om verder
-      te gaan.
-    unknown_action: Onbekende setup-actie.
-    failed: Setup-actie mislukt.
+    storage_body: Thema (licht/donker) en sommige lay-outkeuzes kunnen in de localStorage van de browser staan. Dat zijn geen HTTP-cookies. Ze zijn strikt noodzakelijk om de interface die u op dit apparaat koos te behouden.
 notifications:
   title: Meldingen
   intro: Stuur meldingen naar Slack, Discord, Teams, Telegram, e-mail of een generiek HTTP-endpoint wanneer

@@ -12,7 +12,7 @@ These pages are linked from AuthKit footers (and related public shells) so guest
 
 **What it is.** Operator / publisher identification and legal notices required for the self-hosted SaaS surface.
 
-**What it contributes.** Transparent ownership and contact context for the instance; replace placeholder operator text with your organisation’s details before production.
+**What it contributes.** Editable operator / publisher identification. Default seed uses placeholders (no nowo.tech identity); the deploying organisation must publish its own identification before production.
 
 ![Legal notice](images/legal-notice.png)
 

@@ -6,23 +6,24 @@ Beacon ships public **legal** pages and a GDPR-oriented **cookie consent** modal
 
 | Path | Route | Purpose |
 |------|-------|---------|
-| `/legal/notice` | `legal_notice` | Legal notice / imprint (operator identity placeholders) |
-| `/legal/privacy` | `legal_privacy` | Privacy policy template |
-| `/legal/terms` | `legal_terms` | Terms of use template |
+| `/legal/notice` | `legal_notice` | LSSI-CE art. 10 identification |
+| `/legal/privacy` | `legal_privacy` | GDPR / LOPDGDD privacy policy |
+| `/legal/terms` | `legal_terms` | Terms of use template for this instance |
 | `/legal/cookies` | `legal_cookies` | Cookie categories + inventory |
 
-All of these are **public** (`PUBLIC_ACCESS`). Copy is English by default and translated for `es` under `translations/messages.*.yaml` (`legal.*` keys).
+All of these are **public** (`PUBLIC_ACCESS`). Copy is maintained in `translations/messages.*.yaml` (`legal.*`) for every enabled locale (`en`, `es`, `de`, `nl`, `fr`, `it`, `pt`).
 
-> **Operator duty:** replace placeholders (legal name, address, contact email, registry IDs, retention schedule) before exposing the instance to the public or shipping store apps. The templates are starting points, not legal advice.
+> **Operator duty:** default seed copy is **generic and editable** (`[Operator legal name — replace]`, `privacy@example.com`). It must **not** name nowo.tech or Nowo Insurance Services, S.L. Whoever deploys this software is the provider and controller of that deployment and must replace every placeholder before processing other people’s personal data. Nowo.tech identity belongs in [`nowo-tech-web`](../../../nowo-tech-web/). This file is an engineering record of the statutory checklist, not a law-firm opinion.
 
 ## Current-law review (REQ-CC-010)
 
 | Field | Beacon |
 | ----- | ------ |
-| **Jurisdictions in scope** | EU/EEA (RGPD) + Spain (LSSI-CE / LOPDGDD) — matrix default unless a deployment docs a narrower market |
-| **Last legal review** | **Counsel pending — not production** (engineering record **2026-09-17**) |
-| **Published copy** | Operator-placeholder structure (`legal.placeholder.*` + kit-shaped notice/privacy/terms/cookies). Routes and CookieConsent chrome are in place ([REQ-CC-001](../../OTHER_FULL_SPECS_DETAILS.md#REQ-CC-001)…009). |
-| **Production gate** | Do **not** process real personal data on a public instance until counsel replaces placeholders with operator identity, processors, retention, and LSSI identification. This file is **not** legal advice. |
+| **Jurisdictions in scope** | EU/EEA (GDPR) + Spain (LSSI-CE art. 10 / LOPDGDD / AEPD) — template structure |
+| **Last legal-content review** | **2026-09-18** — default seed reverted to generic placeholders (REQ-CC-011). GDPR/LSSI headings, purposes, bases, recipients, retention, rights, AEPD, and `di_obs` stay. **Counsel pending — not production** until the operator fills identity |
+| **Controller** | **Placeholder** — `[Operator legal name — replace]` · `[privacy@example.com — replace]`. Not Nowo Insurance Services, S.L. |
+| **Published copy** | Editable template (notice / privacy / terms / cookies). Cookie table includes `di_obs` (1 hour), matching `nowo_cookie_consent.yaml` |
+| **Production gate** | **Not met** until the operator replaces placeholders. Do not process other people’s personal data on the default seed |
 
 Re-record the date in this table (and `docs/ops/ENGINEERING-AUDIT.md`) whenever AuthKit, analytics, mail, Beacon DSN, payments, or processors change.
 
