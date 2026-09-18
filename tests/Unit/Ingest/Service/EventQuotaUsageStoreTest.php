@@ -149,7 +149,7 @@ final class MemoryQuotaRedis implements \App\Ingest\Service\QuotaRedis
         return $this->values[$key] ?? false;
     }
 
-    public function incr(string $key): int|false
+    public function incr(string $key): int
     {
         $next = (int) ($this->values[$key] ?? 0) + 1;
         $this->values[$key] = (string) $next;

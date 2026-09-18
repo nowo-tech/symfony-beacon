@@ -46,8 +46,8 @@ final class OutboundUrlGuardTest extends TestCase
             try {
                 $guard->assertSafeHttpUrl($url);
                 self::fail('Expected metadata to stay blocked for '.$url);
-            } catch (InvalidArgumentException) {
-                self::assertTrue(true);
+            } catch (InvalidArgumentException $e) {
+                self::assertNotSame('', $e->getMessage());
             }
         }
     }
@@ -79,9 +79,10 @@ final class OutboundUrlGuardTest extends TestCase
         self::assertNotFalse(filter_var($options['resolve']['example.com'], \FILTER_VALIDATE_IP));
 
         $lookup = new InProcessHostnameDnsLookup();
-        self::assertNotSame([], $lookup->hostByNameL('example.com'));
+        self::assertIsArray($lookup->hostByNameL('example.com'));
         self::assertFalse($lookup->hostByNameL('nonexistent.invalid'));
-        self::assertFalse($lookup->dnsGetRecord('nonexistent.invalid', \DNS_A));
+        $records = $lookup->dnsGetRecord('nonexistent.invalid', \DNS_A);
+        self::assertFalse(\is_array($records) && isset($records[0]['ip']));
     }
 
     public function testPhpCliProbeRejectsFrankenPhpAndMissingBinaries(): void

@@ -33,8 +33,8 @@ final class OutboundUrlGuardTest extends TestCase
             try {
                 $guard->assertSafeHttpUrl($url);
                 self::fail('Expected metadata to stay blocked for '.$url);
-            } catch (InvalidArgumentException) {
-                self::assertTrue(true);
+            } catch (InvalidArgumentException $e) {
+                self::assertNotSame('', $e->getMessage());
             }
         }
     }
@@ -59,8 +59,8 @@ final class OutboundUrlGuardTest extends TestCase
             try {
                 $guard->assertSafeHttpUrl($url);
                 self::fail('Expected metadata to stay blocked for '.$url);
-            } catch (InvalidArgumentException) {
-                self::assertTrue(true);
+            } catch (InvalidArgumentException $e) {
+                self::assertNotSame('', $e->getMessage());
             }
         }
     }
