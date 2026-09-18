@@ -14,11 +14,11 @@ use Throwable;
  * the success path needs a live Redis, and CI's PHPUnit job does not run one.
  * {@see HealthController} decides when to call it.
  */
-final class RedisConnector implements RedisProbe
+final readonly class RedisConnector implements RedisProbe
 {
     public function __construct(
         #[Autowire('%env(REDIS_URL)%')]
-        private readonly string $redisUrl,
+        private string $redisUrl,
     ) {
     }
 

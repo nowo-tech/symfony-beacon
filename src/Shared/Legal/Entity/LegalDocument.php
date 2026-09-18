@@ -28,12 +28,6 @@ class LegalDocument implements AuditableInterface
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 32)]
-    private string $slug;
-
-    #[ORM\Column(length: 8)]
-    private string $locale;
-
     #[ORM\Column(length: 180)]
     private string $title = '';
 
@@ -48,10 +42,12 @@ class LegalDocument implements AuditableInterface
     #[ORM\JoinColumn(name: 'updated_by_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
     private ?User $updatedBy = null;
 
-    public function __construct(string $slug, string $locale)
-    {
-        $this->slug = $slug;
-        $this->locale = $locale;
+    public function __construct(
+        #[ORM\Column(length: 32)]
+        private string $slug,
+        #[ORM\Column(length: 8)]
+        private string $locale,
+    ) {
     }
 
     public function getId(): ?int

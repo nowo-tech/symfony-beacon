@@ -13,11 +13,11 @@ use Twig\Environment;
  *
  * Saving that HTML stores an operator copy. Until then the public page keeps using the templates.
  */
-final class LegalBuiltinHtml
+final readonly class LegalBuiltinHtml
 {
     public function __construct(
-        private readonly Environment $twig,
-        private readonly TranslatorInterface $translator,
+        private Environment $twig,
+        private TranslatorInterface $translator,
     ) {
     }
 

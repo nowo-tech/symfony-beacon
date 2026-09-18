@@ -12,10 +12,10 @@ use Nowo\Ckeditor5EditorBundle\Security\Ckeditor5HtmlSanitizerInterface;
  * kit again on save and on public render, then repeats the strip so a body that
  * bypassed the form transformer is still filtered.
  */
-final class LegalPublishedHtml
+final readonly class LegalPublishedHtml
 {
     public function __construct(
-        private readonly Ckeditor5HtmlSanitizerInterface $kitSanitizer,
+        private Ckeditor5HtmlSanitizerInterface $kitSanitizer,
     ) {
     }
 
@@ -31,12 +31,11 @@ final class LegalPublishedHtml
         $html = preg_replace('/<iframe\b[^>]*\/?>/is', '', $html) ?? $html;
         $html = preg_replace('/\ssrcdoc\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s>]+)/i', '', $html) ?? $html;
         $html = preg_replace('/\son[a-z0-9_-]+\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s>"\']+)/i', '', $html) ?? $html;
-        $html = preg_replace(
+
+        return preg_replace(
             '/\s(?:href|src)\s*=\s*(?:"\s*(?:javascript|data|vbscript):[^"]*"|\'\s*(?:javascript|data|vbscript):[^\']*\'|(?:javascript|data|vbscript):[^\s>]*)/i',
             '',
             $html,
         ) ?? $html;
-
-        return $html;
     }
 }

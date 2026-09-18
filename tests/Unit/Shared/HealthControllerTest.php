@@ -89,7 +89,7 @@ final class HealthControllerTest extends TestCase
     }
 }
 
-final class FixedRedisProbe implements \App\Shared\Health\RedisProbe
+final readonly class FixedRedisProbe implements \App\Shared\Health\RedisProbe
 {
     public function __construct(
         private bool $up,

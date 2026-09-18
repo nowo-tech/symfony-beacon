@@ -30,7 +30,7 @@ final readonly class MercureHubUrlGuard
     {
         $allowPrivate = null !== $this->opsDefaults && $this->opsDefaults->allowPrivateUrls();
 
-        return (new KitOutboundUrlGuard(allowPrivate: $allowPrivate, resolveDns: false))
+        return new KitOutboundUrlGuard(allowPrivate: $allowPrivate, resolveDns: false)
             ->inspect($value)
             ->result;
     }

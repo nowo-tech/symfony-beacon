@@ -87,21 +87,21 @@ final class OutboundUrlGuardTest extends TestCase
 
     public function testPhpCliProbeRejectsFrankenPhpAndMissingBinaries(): void
     {
-        self::assertFalse((new PhpCliProbe('', 'cli'))->supportsDashR());
-        self::assertFalse((new PhpCliProbe('/usr/local/bin/php', 'frankenphp'))->supportsDashR());
-        self::assertFalse((new PhpCliProbe('/no/such/php', 'cli'))->supportsDashR());
+        self::assertFalse(new PhpCliProbe('', 'cli')->supportsDashR());
+        self::assertFalse(new PhpCliProbe('/usr/local/bin/php', 'frankenphp')->supportsDashR());
+        self::assertFalse(new PhpCliProbe('/no/such/php', 'cli')->supportsDashR());
 
         $franken = tempnam(sys_get_temp_dir(), 'frankenphp');
         self::assertNotFalse($franken);
         $named = \dirname($franken).'/frankenphp-probe';
         rename($franken, $named);
         try {
-            self::assertFalse((new PhpCliProbe($named, 'cli'))->supportsDashR());
+            self::assertFalse(new PhpCliProbe($named, 'cli')->supportsDashR());
         } finally {
             unlink($named);
         }
 
-        self::assertTrue((new PhpCliProbe(\PHP_BINARY, 'cli'))->supportsDashR());
+        self::assertTrue(new PhpCliProbe(\PHP_BINARY, 'cli')->supportsDashR());
     }
 
     private function ops(bool $allowPrivate): InstanceOpsDefaults

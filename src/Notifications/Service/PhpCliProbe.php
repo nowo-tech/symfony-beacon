@@ -10,11 +10,11 @@ namespace App\Notifications\Service;
  * FrankenPHP HTTP requests report an empty binary or the `frankenphp` binary.
  * That binary rejects `-r`, so the outbound-url-guard DNS child never starts.
  */
-final class PhpCliProbe
+final readonly class PhpCliProbe
 {
     public function __construct(
-        private readonly ?string $binary = null,
-        private readonly ?string $sapi = null,
+        private ?string $binary = null,
+        private ?string $sapi = null,
     ) {
     }
 

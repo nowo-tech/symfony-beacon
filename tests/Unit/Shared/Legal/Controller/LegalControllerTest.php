@@ -27,12 +27,10 @@ final class LegalControllerTest extends TestCase
 
         $documents = $this->createStub(LegalDocumentRepository::class);
         $documents->method('findOneBySlugAndLocale')->willReturnCallback(
-            static function (string $slug) use ($stored, $blank): ?LegalDocument {
-                return match ($slug) {
-                    'notice' => $stored,
-                    'privacy' => $blank,
-                    default => null,
-                };
+            static fn (string $slug): ?LegalDocument => match ($slug) {
+                'notice' => $stored,
+                'privacy' => $blank,
+                default => null,
             },
         );
 
