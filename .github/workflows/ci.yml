@@ -296,7 +296,7 @@ jobs:
 
       - name: Build and start Compose stack
         run: |
-          docker compose build
+          bash .scripts/ci-compose-build.sh
           # Install vendor once before php/messenger share the bind mount (avoids concurrent composer).
           docker compose run --rm --no-deps php \
             composer install --prefer-dist --no-progress --no-interaction
@@ -426,7 +426,7 @@ jobs:
 
       - name: Build image + vendor
         run: |
-          docker compose build
+          bash .scripts/ci-compose-build.sh
           docker compose run --rm --no-deps php \
             composer install --prefer-dist --no-progress --no-interaction
 
@@ -518,7 +518,7 @@ jobs:
 
       - name: Build image + vendor
         run: |
-          docker compose build
+          bash .scripts/ci-compose-build.sh
           docker compose run --rm --no-deps php \
             composer install --prefer-dist --no-progress --no-interaction
 
