@@ -45,17 +45,17 @@ final class HttpErrorPagesTest extends DatabaseWebTestCase
     public function testMascotAndErrorAssetsArePublished(): void
     {
         $root = \dirname(__DIR__, 3);
-        self::assertRuntimePngHasTransparentCanvas($root.'/public/brand/mascot.png');
+        $this->assertRuntimePngHasTransparentCanvas($root.'/public/brand/mascot.png');
         self::assertFileExists($root.'/public/brand/beacon-mark.png');
         foreach ([400, 401, 403, 404, 408, 429, 500, 502, 503] as $code) {
-            self::assertRuntimePngHasTransparentCanvas($root.'/public/illustrations/error-'.$code.'.png');
+            $this->assertRuntimePngHasTransparentCanvas($root.'/public/illustrations/error-'.$code.'.png');
         }
     }
 
     /**
      * REQ-ERROR-001 item 9: real PNG (not JPEG named .png), IHDR color type 6, punched canvas.
      */
-    private static function assertRuntimePngHasTransparentCanvas(string $path): void
+    private function assertRuntimePngHasTransparentCanvas(string $path): void
     {
         self::assertFileExists($path);
         $bytes = file_get_contents($path);
@@ -63,12 +63,12 @@ final class HttpErrorPagesTest extends DatabaseWebTestCase
         self::assertStringStartsWith("\x89PNG\r\n\x1a\n", $bytes, $path.' must be a PNG (JPEG/JFIF payloads named .png fail REQ-ERROR-001 item 9)');
         self::assertSame(6, \ord($bytes[25]), $path.' must be PNG color type 6 (RGBA)');
         self::assertTrue(
-            self::pngFirstRowHasFullyTransparentPixel($bytes),
+            $this->pngFirstRowHasFullyTransparentPixel($bytes),
             $path.' must have a transparent canvas (alpha=0 on the first scanline)',
         );
     }
 
-    private static function pngFirstRowHasFullyTransparentPixel(string $png): bool
+    private function pngFirstRowHasFullyTransparentPixel(string $png): bool
     {
         $width = unpack('N', substr($png, 16, 4));
         if (!\is_array($width) || !isset($width[1]) || $width[1] < 1) {

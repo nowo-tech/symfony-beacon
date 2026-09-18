@@ -137,6 +137,50 @@ final class UserPreferredLocaleSubscriberTest extends TestCase
         self::assertSame('en', $translator->locale);
     }
 
+    public function testSubRequestNoopsWhenMainRequestMissing(): void
+    {
+        $translator = new RecordingTranslator();
+        $translator->locale = 'es';
+        $sub = Request::create('/_fragment');
+        $sub->setLocale('es');
+        $event = new RequestEvent(
+            $this->createStub(KernelInterface::class),
+            $sub,
+            HttpKernelInterface::SUB_REQUEST,
+        );
+
+        new UserPreferredLocaleSubscriber(new TokenStorage(), $translator, new RequestStack(), 'es')
+            ->onKernelRequest($event);
+
+        self::assertSame('es', $sub->getLocale());
+        self::assertSame('es', $translator->locale);
+    }
+
+    public function testSubRequestNoopsWhenMainLocaleIsBlank(): void
+    {
+        $translator = new RecordingTranslator();
+        $translator->locale = 'es';
+
+        $main = Request::create('/dashboard');
+        $main->setLocale('');
+        $stack = new RequestStack();
+        $stack->push($main);
+
+        $sub = Request::create('/_fragment');
+        $sub->setLocale('es');
+        $event = new RequestEvent(
+            $this->createStub(KernelInterface::class),
+            $sub,
+            HttpKernelInterface::SUB_REQUEST,
+        );
+
+        new UserPreferredLocaleSubscriber(new TokenStorage(), $translator, $stack, 'es')
+            ->onKernelRequest($event);
+
+        self::assertSame('es', $sub->getLocale());
+        self::assertSame('es', $translator->locale);
+    }
+
     private function subscriber(
         TokenStorage $tokens,
         RecordingTranslator $translator,
