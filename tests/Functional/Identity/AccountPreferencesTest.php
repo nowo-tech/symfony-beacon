@@ -439,6 +439,11 @@ final class AccountPreferencesTest extends DatabaseWebTestCase
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('[data-testid="account-area-nav"] a[aria-current="page"]');
         self::assertSelectorTextContains('[data-testid="account-area-nav"] a[aria-current="page"]', 'Display');
+
+        $client->request(Request::METHOD_GET, '/account/privacy');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('[data-testid="account-area-nav"] a[aria-current="page"]');
+        self::assertSelectorTextContains('[data-testid="account-area-nav"] a[aria-current="page"]', 'Profile');
     }
 
     public function testSecurityShowsLinkedSocialAndActivityScopedToUser(): void
