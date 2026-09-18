@@ -54,7 +54,7 @@ final class ContentSecurityPolicySubscriberTest extends TestCase
         $response = $this->dispatch('/admin/legal/notice/en', '<html><body>editor</body></html>', kernelDebug: false);
         $csp = (string) $response->headers->get('Content-Security-Policy');
         self::assertMatchesRegularExpression("/style-src-elem 'self' 'unsafe-inline'/", $csp);
-        self::assertDoesNotMatchRegularExpression("/style-src-elem[^;]*nonce-/", $csp);
+        self::assertDoesNotMatchRegularExpression('/style-src-elem[^;]*nonce-/', $csp);
         self::assertStringNotContainsString('unsafe-eval', $csp);
     }
 

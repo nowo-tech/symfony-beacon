@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-_No unreleased operator-facing changes yet._
+### Fixed
+
+- Saving a notification webhook under FrankenPHP no longer fails the DNS check. `PHP_BINARY` cannot run `php -r` there, so the lookup falls back to in-process DNS. Tag `v1.30.0` still has the broken child process.
 
 ## [1.30.0] - 2026-09-18
 

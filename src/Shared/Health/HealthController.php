@@ -7,6 +7,7 @@ namespace App\Shared\Health;
 use Doctrine\ORM\EntityManagerInterface;
 use OpenApi\Attributes as OA;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -115,7 +116,7 @@ final readonly class HealthController
             $checks['database'] = true;
             if ($redis instanceof RedisProbe && 'test' !== $this->environment) {
                 if (!$redis->ping()) {
-                    throw new \RuntimeException('Redis is unavailable.');
+                    throw new RuntimeException('Redis is unavailable.');
                 }
                 $checks['redis'] = true;
             }

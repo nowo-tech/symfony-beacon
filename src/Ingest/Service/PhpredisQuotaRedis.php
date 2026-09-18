@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Ingest\Service;
 
+use Redis;
+use RuntimeException;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\WhenNot;
@@ -16,7 +18,7 @@ use Throwable;
 #[WhenNot(env: 'test')]
 final class PhpredisQuotaRedis implements QuotaRedis
 {
-    private ?\Redis $redis = null;
+    private ?Redis $redis = null;
 
     public function __construct(
         #[Autowire('%env(REDIS_URL)%')]
@@ -46,9 +48,9 @@ final class PhpredisQuotaRedis implements QuotaRedis
         return (bool) $this->client()->expireAt($key, $timestamp);
     }
 
-    private function client(): \Redis
+    private function client(): Redis
     {
-        if ($this->redis instanceof \Redis) {
+        if ($this->redis instanceof Redis) {
             return $this->redis;
         }
 
@@ -58,11 +60,11 @@ final class PhpredisQuotaRedis implements QuotaRedis
                 'lazy' => false,
             ]);
         } catch (Throwable $e) {
-            throw new \RuntimeException('Quota Redis is unavailable.', 0, $e);
+            throw new RuntimeException('Quota Redis is unavailable.', 0, $e);
         }
 
-        if (!$client instanceof \Redis) {
-            throw new \RuntimeException('Quota Redis requires the phpredis extension.');
+        if (!$client instanceof Redis) {
+            throw new RuntimeException('Quota Redis requires the phpredis extension.');
         }
 
         $this->redis = $client;

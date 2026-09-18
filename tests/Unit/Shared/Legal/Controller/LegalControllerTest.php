@@ -70,6 +70,6 @@ final class LegalControllerTest extends TestCase
             'legal/privacy.html.twig',
             'legal/terms.html.twig',
             'legal/cookies.html.twig',
-        ], array_column(array_slice($rendered, 1), 0));
+        ], array_column(\array_slice($rendered, 1), 0));
     }
 }

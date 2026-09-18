@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Health;
 
+use Redis;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Throwable;
@@ -32,7 +33,7 @@ final class RedisConnector implements RedisProbe
                 'timeout' => 1.0,
                 'lazy' => false,
             ]);
-            if (!$client instanceof \Redis) {
+            if (!$client instanceof Redis) {
                 return false;
             }
             $pong = $client->ping();
