@@ -139,7 +139,7 @@ docker compose up -d --scale messenger=2
 docker compose up -d --scale messenger-notify=2
 ```
 
-Monitor queue depth via authenticated `GET /metrics` → `beacon_messenger_async_pending` and `beacon_messenger_failed_pending` (Redis stream counts when `MESSENGER_TRANSPORT_DSN` is Redis; Doctrine `messenger_messages` fallback otherwise). Do not rely on the public readiness probe for backlog; `/health/ready` checks the database only.
+Monitor queue depth via authenticated `GET /metrics` → `beacon_messenger_async_pending` and `beacon_messenger_failed_pending` (Redis stream counts when `MESSENGER_TRANSPORT_DSN` is Redis; Doctrine `messenger_messages` fallback otherwise). Do not rely on the public readiness probe for backlog; `/health/ready` checks the database and Redis (not in `APP_ENV=test`).
 
 **Failed transport:** messages that exhaust retries land in the Doctrine `failed` queue (`queue_name=failed`). Envelope payloads may contain application PII even after DSN scrubbing — treat the failed table as sensitive, restrict DB access, and purge periodically:
 
@@ -156,7 +156,7 @@ Do not leave failed envelopes indefinitely on shared production databases.
 | Path | Auth | Purpose |
 |------|------|---------|
 | `GET /health/live` | Public | Process is up |
-| `GET /health/ready` | Public | Database reachable |
+| `GET /health/ready` | Public | Database and Redis reachable |
 
 Use `/health/live` for liveness and `/health/ready` for readiness in Kubernetes/Compose healthchecks.
 
@@ -267,16 +267,16 @@ Use this list before exposing an instance beyond a trusted network. Details live
 | **Ingest** | `X-Beacon-Auth` or envelope DSN only (query auth removed); secrets are SHA-256 at rest | Rotate project API key secrets if leaked |
 | **Read API** | `BEACON_READ_API_RATE_LIMIT` (default 120/min); Bearer `brt_…` only | Returns 503 under maintenance (`095`) |
 | **Public hooks** | `BEACON_HOOK_IP_RATE_LIMIT` (default 120/min); Teams Assign query HMAC may appear in logs/Referer; action tokens TTL **24h** | Assign-me is session-gated and excluded from the IP throttle |
-| **Notification webhooks** | Keep allow-private-URLs off in Ops defaults; treat destination **signing secrets** as high privilege | Slack/Teams **Resolve** requires a mapped Beacon actor unless allow-anonymous-Resolve is enabled (legacy). Rotate secrets if leaked. |
+| **Notification webhooks** | Keep allow-private-URLs off in Ops defaults; treat destination **signing secrets** as high privilege | Metadata stays blocked either way, including Alibaba `100.100.100.200` and decimal / IPv4-mapped forms. Slack/Teams **Resolve** requires a mapped Beacon actor unless allow-anonymous-Resolve is enabled (legacy). Rotate secrets if leaked. |
 | **Inbound email hook** | Enable + domain + webhook secret in Ops defaults; header **`X-Beacon-Inbound-Secret` only** | Body `beacon_secret` is rejected |
 | **`/metrics`** | Set metrics token in Ops defaults; enable require-token in production (Ops Overview warns when off) | Prefer private scrape network / Caddy `remote_ip` allowlist |
-| **Health** | `/health/live` + `/health/ready` for probes | Ready checks DB only; queue depth is on `/metrics` |
+| **Health** | `/health/live` + `/health/ready` for probes | Ready checks DB and Redis; queue depth is on `/metrics` |
 | **Trusted proxies** | If TLS terminates **in front of** Caddy/FrankenPHP, set Symfony `trusted_proxies` / `SYMFONY_TRUSTED_PROXIES` to **only** the real load balancer CIDRs | Too-broad trusts let clients forge `X-Forwarded-For` and bypass ingest/hook/read **IP rate limits** and login throttle. Default Compose terminates TLS in Caddy — leave empty unless you have an outer proxy |
 | **First admin** | Complete `/setup` and/or first `/register` (**`registration_mode: first_user_only` → `ROLE_ADMIN`**) **before** publishing the HTTP(S) port | A fresh instance exposed before the first register lets anyone become admin |
 | **Demo client env** | Keep `.demo-client.env` at mode **600** (seed/dogfood now chmod); never commit it | Contains `BEACON_DSN` + demo login — gitignored, but world-writable copies on shared WSL/hosts leak credentials |
-| **Twig `\|raw`** | Appearance CSS overrides, breadcrumb HTML, kit JSON islands, Swagger boot JSON, `json_encode` in `onsubmit` | Controlled sources only; do not `|raw` user/event payload HTML |
+| **Twig `\|raw`** | Appearance CSS overrides, breadcrumb HTML, kit JSON islands, Swagger boot JSON, `json_encode` in `onsubmit`, stored legal body after `LegalPublishedHtml` | Controlled sources only; do not `|raw` user/event payload HTML |
 | **Mailer / Mercure** | Real DSN/hub in Admin; never ship Mailpit in prod Compose | Encrypted at rest via Halite |
-| **Legal / cookies** | Privacy/terms/cookies pages; consent kit for non-essential cookies | Required for public operator UX |
+| **Legal / cookies** | `/admin/legal` per locale (migration `legal_document`); consent kit for non-essential cookies | Seed stays until save. Saved HTML drops scripts and iframes. Counsel (REQ-CC-010) still required before production |
 
 ## Out of scope (intentionally)
 

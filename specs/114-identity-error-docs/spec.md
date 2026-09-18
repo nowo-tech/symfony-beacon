@@ -139,6 +139,12 @@ As an operator, the first section tab MUST NOT sit 1–2px higher or lower than 
 - Gate: `e2e/support/tab-geometry.ts` + authenticated cases in `html-twig-standardization.spec.ts` (UC-UI-14).
 - Account area current state on Privacy is `037` FR-008, not this package.
 
+## Amendment (operator legal editor is not this package, 2026-09-18)
+
+- Counsel-approved copy stays out of scope (REQ-CC-010).
+- Per-locale editing without a fork is `115-operator-legal-editor`, not YAML-only placeholders and not this identity/docs package.
+- Footer locale rules (FR-014) are unchanged.
+
 ## Cross-refs
 
 - Branded errors: `specs/063-branded-http-errors/`
@@ -147,4 +153,5 @@ As an operator, the first section tab MUST NOT sit 1–2px higher or lower than 
 - Cold setup: `specs/110-e2e-cold-start-circuit/`, `specs/056-setup-wizard/`
 - E2E stack / sharding: `specs/104-isolated-e2e-stack/`, `specs/113-e2e-product-sharding/`
 - OTHER: REQ-DOCS-APP-005, REQ-ERROR-001, REQ-CC-010, REQ-DOCS-APP-003
+- Operator legal editor: `specs/115-operator-legal-editor/`
 - Quickstart: `specs/114-identity-error-docs/quickstart.md`

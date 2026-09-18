@@ -50,7 +50,7 @@ As a project admin, I can see that a threshold fired (last fire time / failure) 
 - **FR-003**: A cooldown MUST prevent alert storms for the same rule.
 - **FR-004**: Optional filters for environment and/or release SHOULD be supported when those dimensions exist.
 - **FR-005**: Member-facing Settings UI for create/edit/enable/disable requires `project.notifications.manage` (HTTP 403 otherwise; see `002` FR-013).
-- **FR-006** (`112`): Creating a threshold rule MUST open a confirm-dialog on Settings → Alerts (`?new_threshold=1`); GET create URL MUST redirect; FormKit chrome MUST use `project_threshold_rule.*` catalogue keys.
+- **FR-006** (`112`): Creating a threshold rule MUST open a `confirm-dialog--xl` on Settings → Alerts (`?new_threshold=1`); GET create URL MUST redirect; FormKit chrome MUST use `project_threshold_rule.*` catalogue keys. Width: `112` FR-008.
 
 ## Success Criteria
 

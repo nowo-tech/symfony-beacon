@@ -65,7 +65,7 @@ Login, registration, cookies, menus, and forms are solved problems. Preferring [
 
 - Keeps Beacon focused on **telemetry** (ingest, grouping, performance, analytics).
 - Reuses tested AuthKit / UserKit / AuditKit / cookie-consent / dashboard-menu / form-kit behaviour.
-- Leaves room for operator legal pages without inventing a consent stack ([LEGAL-AND-COOKIES.md](product/LEGAL-AND-COOKIES.md)).
+- Operator legal pages are edited at `/admin/legal` (`115`); the built-in seed stays until that locale is saved. Cookie consent stays [`nowo-tech/cookie-consent-bundle`](https://packagist.org/packages/nowo-tech/cookie-consent-bundle) ([LEGAL-AND-COOKIES.md](product/LEGAL-AND-COOKIES.md)).
 
 Identity in this repo owns **User** persistence, account preferences, magic-login gating, and project membership; AuthKit owns the login/register chrome.
 

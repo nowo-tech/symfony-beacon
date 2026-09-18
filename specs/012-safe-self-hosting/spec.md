@@ -13,7 +13,7 @@ Operators can bound telemetry growth (retention), protect Envelope ingest from s
 
 - **FR-001**: Configurable retention by max age (days) and optional max events per project; purge via console command. After purge, issue aggregate recompute (`event_count` / first/last seen) MUST use SQL `COUNT` / `MIN` / `MAX` (not full event hydration).
 - **FR-002**: Per-project ingest rate limit (requests / minute); `429` when exceeded; `0` disables. Envelope body size MUST also be capped (`BEACON_ENVELOPE_MAX_BYTES`, see `003-ingest`).
-- **FR-003**: Public `GET /health/live` and `GET /health/ready` (DB + optional Messenger queue depth).
+- **FR-003**: Public `GET /health/live` and `GET /health/ready`. Readiness checks the database and Redis (Redis is skipped in `APP_ENV=test`). Messenger queue depth is **not** on this probe; it stays on authenticated `/metrics` (`035` / `106`).
 - **FR-004**: Login throttling on AuthKit form login via [`nowo-tech/login-throttle-bundle`](https://packagist.org/packages/nowo-tech/login-throttle-bundle`). Default **`storage: database`** (`login_attempts` table) so attempt counters are shared across FrankenPHP workers and multi-pod deployments. Keep `security.yaml` in sync with `nowo:login-throttle:configure-security`.
 - **FR-005**: Document backups and scaling notes in `docs/PRODUCTION.md`.
 - **FR-006**: Messenger ingest workers SHOULD run with `--memory-limit=256M` (or higher) in default Compose.
@@ -21,3 +21,7 @@ Operators can bound telemetry growth (retention), protect Envelope ingest from s
 ## Out of scope
 
 WAF, multi-region HA, SSO.
+
+## Amendment (readiness includes Redis, 2026-09-18)
+
+FR-003 no longer treats Messenger depth as part of `/health/ready`. A Redis failure outside `test` is the same generic `error: unavailable` as a database failure (`050`). Do not add `maxmemory` on the shared `compose.infra.yaml` Redis; session, cache, Messenger, and quota counters share that instance.

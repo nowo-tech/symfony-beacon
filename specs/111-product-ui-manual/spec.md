@@ -73,6 +73,7 @@ As an operator, I see the cold-install wizard flow (gate → wizard → admin �
 - **FR-015**: Dashboard home and private prefs theme shots MUST filter to the demo project (`Symfony Beacon`) so E2E/XSS seed titles do not appear in committed inventory PNGs (`114` FR-010).
 - **FR-016**: Cold setup captures MUST force English UI before writing PNGs; maintenance preview captures MUST clear leftover far-future schedules first (`114` FR-011 / FR-012).
 - **FR-017**: Admin Groups inventory shot MUST show a human demo group (`Beacon operators`, filtered) without Playwright `E2E*` row names; authenticated legal footer labels MUST match UI locale (`114` FR-013 / FR-014).
+- **FR-018**: Admin and legal chapters MUST document Legal pages with `admin-legal.png` (list, built-in badges) and `admin-legal-edit.png` (English notice, styled editor). The suite MUST wait until the editor is visible. A scroll companion that only shows open toolbar menus (`admin-legal-edit-2.png`) MUST NOT be committed (`115`).
 
 ## Success Criteria
 
@@ -118,6 +119,15 @@ As an operator, I see the cold-install wizard flow (gate → wizard → admin �
 - App chrome legal footer must stay in sync with UI locale (sub-request Translator sync + explicit footer `|trans`).
 - See `114` FR-013 / FR-014 / US7; this package FR-017.
 
+## Amendment (operator legal editor shots, 2026-09-18 / `115`)
+
+- Capture list adds `admin-legal` (`/admin/legal`) and `admin-legal-edit` (`/admin/legal/notice/en`, single viewport).
+- Editor CSS in that PNG depends on the legal-admin style policy in `053` / `115` FR-009 (no style nonce on that path).
+
+## Amendment (form dialog width, 2026-09-18 / `112`)
+
+- `project-threshold-rules-new`, `admin-roles-new`, and `admin-permissions-new` were recaptured after `112` FR-008. They MUST NOT show the scrollbar hairline. Width rules live in `112`, not here.
+
 ## Cross-refs
 
 - Warm E2E: `specs/104-isolated-e2e-stack/`
@@ -126,6 +136,7 @@ As an operator, I see the cold-install wizard flow (gate → wizard → admin �
 - Create-modal inventory: `specs/112-admin-create-modals/`
 - Branded errors: `specs/063-branded-http-errors/`
 - Identity book + errors docs package: `specs/114-identity-error-docs/`
+- Operator legal editor: `specs/115-operator-legal-editor/`
 - Manual tree: `docs/manual/`
 - Identity tree: `docs/identity/`
 - Quickstart: `specs/111-product-ui-manual/quickstart.md`

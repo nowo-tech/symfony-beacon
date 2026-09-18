@@ -147,6 +147,12 @@ As a user, I update profile/security/display preferences; as admin, I reach Appe
 - **`103` / v1.20.0**: Kit skin is imported into Vite `app` CSS (`assets/app.ts`) so ad blockers that match `/bundles/nowocookieconsent/*` cannot strip the modal. Layouts set `data-nowo-cookie-consent-external-css="true"` and MUST NOT `<link>` the kit pack stylesheet on public pages.
 - Thin host `_cookie_consent.scss` returns as a bridge only (footer clearance + position fallbacks); Tailwind `@source`s CookieConsent vendor Twig. See `103-cookie-consent-vite-e2e-security`.
 
+## Amendment (operator legal pages, 2026-09-18 / `115`)
+
+- Public `/{_locale}/legal/…` paths are unchanged. Bare `/legal/…` still redirects to the default locale.
+- Until an administrator saves that slug and locale, the page is the built-in seed. A saved document replaces only that pair. Restore returns the seed.
+- Cookie consent stays the kit modal. Details: `115-operator-legal-editor`.
+
 ## Amendment (temporary API DSN reveal, 2026-08-16)
 
 - Create/rotate still uses session `_beacon_last_api_key_dsn` (consumed once). Settings MAY attach that flash to the matching **active** key row by public key; UI uses Stimulus `temporary-reveal` (~30s, clear-on-hide) + masked `ProjectApiKey::maskDsn()` (`102`).

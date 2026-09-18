@@ -1,7 +1,7 @@
 # Engineering audit (REQ-REV)
 
 **App:** Symfony Beacon (`symfony-beacon`)  
-**Pass date:** 2026-08-15 (first pass) · **Remediation High:** 2026-08-15 · **QA-002:** 2026-08-16 · **Platform 100% close:** 2026-08-17 · **Kit-over-shim pass 40:** 2026-08-29 (**v1.24.4**) · **AUTH-005 docs:** 2026-08-29 (**v1.24.5**) · **OTHER column re-audit:** 2026-09-17 (error manual shots EN) · **CC-011:** 2026-09-18 (generic legal seed)  
+**Pass date:** 2026-08-15 (first pass) · **Remediation High:** 2026-08-15 · **QA-002:** 2026-08-16 · **Platform 100% close:** 2026-08-17 · **Kit-over-shim pass 40:** 2026-08-29 (**v1.24.4**) · **AUTH-005 docs:** 2026-08-29 (**v1.24.5**) · **OTHER column re-audit:** 2026-09-17 (error manual shots EN) · **CC-011:** 2026-09-18 (generic legal seed) · **Unreleased reaudit:** 2026-09-18 (SSRF gaps closed; shared Redis accepted — addendum)  
 **Scope:** REQ-REV-002…007 (+ BP-004 evidence)  
 **Verdict:** **✅ Pass** — Critical/High empty; Low backlog only (profiler CI budgets; residual kit chrome forks). **REQ-CC-011 ✅** / **REQ-CC-010 ⚠️** — generic editable legal placeholders (no nowo.tech identity); operator must fill facts before production ([`docs/product/LEGAL-AND-COOKIES.md`](../product/LEGAL-AND-COOKIES.md)). **REQ-DOCS-APP-005** ✅ — [`docs/identity/README.md`](../identity/README.md).
 
@@ -91,7 +91,7 @@ Strategy: `templates/kit/*_layout.html.twig` first; full page forks only for Adm
 | -- | --- | ------ | ----- |
 | N1-002 | Low | Profiler query budgets in CI | Manual / Spec Kit later (parity with BP-v2) |
 | REF-003 | Low | Shrink remaining kit page forks | Prefer upstream chrome hooks (`081`) |
-| SCALE-001 | Low | Redis not in `/health/ready` | Optional |
+| SCALE-001 | Low | Redis not in `/health/ready` | **Closed 2026-09-18** — ping outside `test`; see addendum |
 | ARCH-001 | Low | ARCHITECTURE Redis / compose.infra | Ops docs cover it |
 
 ---
@@ -105,3 +105,15 @@ rg -n "mode:" -A1 config/packages/nowo_auth_kit.yaml config/packages/prod/nowo_a
 make check-module-boundaries
 test ! -f templates/bundles/NowoPwaBundle/pwa/install_links.html.twig
 ```
+
+## Addendum (2026-09-18, unreleased)
+
+The August **Pass** above is the tagged train through generic legal seeds (REQ-CC-011). It does not cover the operator legal editor or the same-day hardening. A code re-read of that unreleased tree found no Critical and no High. The two conditional webhook SSRF gaps from that read are closed. REQ-CC-010 is still counsel-pending. Cookie consent remains `nowo-tech/cookie-consent-bundle`. Shared Redis is accepted, not a defect to fix here.
+
+| ID | Sev | Status | Notes |
+| -- | --- | ------ | ----- |
+| SEC-115 | was High | Closed | Kit `html_sanitizer: strict` (`ckeditor5-editor-bundle` 1.4.7) plus `LegalPublishedHtml` on save and public render. Regex leftovers (handler glued to a tag, entity-encoded `javascript:`) do not execute: `script-src` has a nonce and no `unsafe-inline`. |
+| SEC-WH-ALI | Medium | Closed | `100.100.100.200` is metadata, including when private URLs are off. |
+| SEC-WH-OBF | Medium | Closed | Decimal, hex, and IPv4-mapped metadata stay blocked when private URLs are on. |
+| SCALE-REDIS | Medium | Accepted | Session, `cache.app`, Messenger, and quota share `REDIS_URL`. Do not set `maxmemory` on `compose.infra.yaml` (`name: shared-infra`). |
+| SCALE-001 | Low | Closed | `/health/ready` pings Redis outside `APP_ENV=test`. |

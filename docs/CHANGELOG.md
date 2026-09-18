@@ -7,7 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-_No unreleased operator-facing changes yet._
+Not in tag `v1.29.3` (that tag is YAML-only legal placeholders).
+
+### Added
+
+- **Operator legal editor** (`115`): `ROLE_ADMIN` edits notice, privacy, terms, and cookies per locale at `/admin/legal` (CKEditor 5 via `nowo-tech/ckeditor5-editor-bundle` and FormKit). Absent row keeps the built-in Twig seed. Restore deletes that locale’s row. Migration `Version20260918160000` (`legal_document`). Cookie consent stays `nowo-tech/cookie-consent-bundle`.
+
+### Changed
+
+- Published legal HTML is filtered on save and again on the public page. `nowo-tech/ckeditor5-editor-bundle` **1.4.7** uses `html_sanitizer: strict` (no iframes). `LegalPublishedHtml` runs that sanitizer again and strips scripts, event handlers, `javascript:` / `data:` / `vbscript:` URLs, and iframes.
+- `/health/ready` checks Redis as well as the database. The Redis ping is skipped in `APP_ENV=test`. Failure stays a generic `error: unavailable`.
+- Daily/monthly quota counters use Redis `INCR` outside test. PHPUnit keeps the `cache.app` path.
+- Retention orphan-issue deletes scope the `event` subquery by `project_id`. Event deletes stay in batches of 1000.
+- Webhook and Mercure guards use `nowo-tech/outbound-url-guard-bundle` **1.0.0**. Cloud metadata stays blocked even when private notification URLs are allowed: `169.254.0.0/16`, `fe80::/10`, Alibaba `100.100.100.200`, IPv4-mapped addresses, and decimal/hex 32-bit hosts, plus `metadata` / `metadata.google.internal`. Mercure still does not resolve Docker service names.
+- Threshold, role, and permission create/edit dialogs use `confirm-dialog--xl` (`112` FR-008).
+- `make qa` and the CI quality job run Vitest. The cold Playwright image is `v1.63.0`.
+
+### Notes for integrators
+
+- **Migration required** (`doctrine:migrations:migrate`) before using the legal editor.
+- Run `assets:install` (Composer auto-scripts do this) so `ckeditor5-editor.js` is published.
+- Keep **Allow private notification URLs** off unless you need LAN webhooks. Metadata stays blocked either way (`100.100.100.200`, decimal, and IPv4-mapped forms included).
+- Do not set Redis `maxmemory` on the shared infra Compose file.
+- Counsel-approved legal copy (REQ-CC-010) is still pending. Replace placeholders before production.
+- See [UPGRADING.md](UPGRADING.md) **Unreleased (main after 1.29.3)**.
 
 ## [1.29.3] - 2026-09-18
 

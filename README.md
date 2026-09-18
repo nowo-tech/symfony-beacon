@@ -57,7 +57,7 @@ This application is **FrankenPHP worker mode friendly**.
 - Project notifications (Slack, Discord, Teams, Telegram, email, generic HTTP JSON) including **lifecycle** categories, Slack/Teams **Resolve** / **Assign**, and channel-native **Send test** — [docs/product/NOTIFICATIONS.md](docs/product/NOTIFICATIONS.md)
 - Optional **inbound email** replies → issue comments — [docs/product/INBOUND-EMAIL.md](docs/product/INBOUND-EMAIL.md)
 - **QR phone login** (AuthKit + image via `endroid/qr-code`); SMS OTP Later — pluggable **SMS Bridge** provider ready ([docs/product/SMS.md](docs/product/SMS.md))
-- Retention purge, ingest rate limits, `/health/live` + `/health/ready`
+- Retention purge, ingest rate limits, `/health/live` + `/health/ready` (database and Redis; queue depth is on `/metrics`)
 - Performance transactions/spans with **N+1** detection (`/projects/{uuid}/performance`, filter `?nplus1=1`)
 - Main nav via [`nowo-tech/dashboard-menu-bundle`](https://packagist.org/packages/nowo-tech/dashboard-menu-bundle) (admin at `/admin/menus`, Beacon shell layout)
 - Breadcrumbs via [`nowo-tech/breadcrumb-kit-bundle`](https://packagist.org/packages/nowo-tech/breadcrumb-kit-bundle) (admin at `/breadcrumb-kit-admin`, Beacon shell layout)
@@ -66,7 +66,7 @@ This application is **FrankenPHP worker mode friendly**.
 - Progressive Web App via [`nowo-tech/pwa-bundle`](https://packagist.org/packages/nowo-tech/pwa-bundle) (manifest, service worker, install prompt); **optional** member alerts (new / regression / resolve / reopen / assign / comment) — Mercure live toasts via **Administration → Mercure** ([docs/ops/MERCURE.md](docs/ops/MERCURE.md)), prefs + Web Push via **Account → Display → Notifications** ([docs/product/NOTIFICATIONS.md](docs/product/NOTIFICATIONS.md))
 - Brand: beacon mark + wordmarks under `public/brand/`; UI typeface **Montserrat**
 - **Appearance** settings for `ROLE_ADMIN` (named light/dark theme presets, brand, layout, colors) at `/admin/appearance` (`082`)
-- Public **legal** pages + GDPR cookie consent via [`nowo-tech/cookie-consent-bundle`](https://packagist.org/packages/nowo-tech/cookie-consent-bundle) — see [docs/product/LEGAL-AND-COOKIES.md](docs/product/LEGAL-AND-COOKIES.md)
+- Public **legal** pages (built-in seed until an admin saves a locale at `/admin/legal`) + GDPR cookie consent via [`nowo-tech/cookie-consent-bundle`](https://packagist.org/packages/nowo-tech/cookie-consent-bundle) — see [docs/product/LEGAL-AND-COOKIES.md](docs/product/LEGAL-AND-COOKIES.md)
 - App shell: avatar switches among Preferences / Dashboard / Administration; each area has its own sidebar menu
 - Account preferences at `/account/profile`, `/account/security`, `/account/display`
 - Admin hub at `/admin` for `ROLE_ADMIN` (users, groups, **projects** with ops stats / suspend ingest / view-as-member, Mailer, Mercure, appearance, menus, breadcrumbs); unlink projects from users (Activity) and groups (group detail)

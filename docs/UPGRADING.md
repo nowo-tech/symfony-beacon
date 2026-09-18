@@ -108,7 +108,25 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Unreleased (main after 1.29.3)
 
-_No unreleased operator-facing steps yet._
+Operator legal editor, readiness Redis check, and ingest/webhook hardening. **One migration.** Tag `v1.29.3` does not include this.
+
+1. Pull `main` (not `v1.29.3`).
+
+2. Install and migrate:
+
+   ```bash
+   composer install
+   pnpm install
+   php bin/console doctrine:migrations:migrate --no-interaction
+   php bin/console assets:install
+   php bin/console cache:clear
+   ```
+
+3. Confirm `GET /health/ready` returns `checks.database` and `checks.redis` (both true). Queue depth stays on `/metrics`.
+
+4. Open **Administration → Legal pages** (`/admin/legal`) and replace placeholders before processing other people’s personal data. The editor uses `nowo-tech/ckeditor5-editor-bundle` **1.4.7** with `html_sanitizer: strict`, so a save drops scripts and iframes (a YouTube embed will not remain). Cookie consent stays a separate screen. Counsel review (REQ-CC-010) is still required.
+
+5. Leave **Allow private notification URLs** off on Ops defaults unless a destination is on your LAN. Metadata addresses stay blocked either way, including decimal and IPv4-mapped forms. The check is `nowo-tech/outbound-url-guard-bundle` **1.0.0**. See [SECURITY.md](../SECURITY.md).
 
 See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
 
