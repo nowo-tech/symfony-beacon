@@ -2,8 +2,8 @@
 
 **Feature Branch**: `115-operator-legal-editor`  
 **Created**: 2026-09-18  
-**Status**: Implemented (unreleased; not in tag v1.29.3)  
-**Roadmap**: Phase 6 follow-up after 6.66  
+**Status**: Implemented (v1.30.0 / Phase 6.67)  
+**Roadmap**: Phase 6.67  
 
 **Input**: Each deploying operator must change the public legal notice, privacy policy, terms, and cookie page without forking the repository. YAML/Twig placeholders alone are not enough. The operator needs a stored document per page and locale, edited in administration, with the built-in seed still shown until they save.
 
@@ -141,7 +141,7 @@ As an operator reading the product manual, I see the legal-pages list and the En
 - The rich-text control is the official editor kit (`nowo-tech/ckeditor5-editor-bundle` through FormKit), not a CDN build.
 - Cookie consent remains `nowo-tech/cookie-consent-bundle`. Seed copy stays generic until counsel and the operator replace it (REQ-CC-010 / REQ-CC-011).
 - Built-in Twig bodies are the seed and the editor prefill. They are not dead templates.
-- v1.29.3 described YAML-only legal placeholders and does not include this editor. Do not treat that tag as this feature.
+- v1.29.3 described YAML-only legal placeholders and does not include this editor. This feature ships in **v1.30.0**.
 
 ## As-built notes
 

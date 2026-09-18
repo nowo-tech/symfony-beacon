@@ -7,11 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Not in tag `v1.29.3` (that tag is YAML-only legal placeholders).
+_No unreleased operator-facing changes yet._
+
+## [1.30.0] - 2026-09-18
 
 ### Added
 
-- **Operator legal editor** (`115`): `ROLE_ADMIN` edits notice, privacy, terms, and cookies per locale at `/admin/legal` (CKEditor 5 via `nowo-tech/ckeditor5-editor-bundle` and FormKit). Absent row keeps the built-in Twig seed. Restore deletes that locale’s row. Migration `Version20260918160000` (`legal_document`). Cookie consent stays `nowo-tech/cookie-consent-bundle`.
+- **Operator legal editor** (`115` / Phase 6.67): `ROLE_ADMIN` edits notice, privacy, terms, and cookies per locale at `/admin/legal` (CKEditor 5 via `nowo-tech/ckeditor5-editor-bundle` and FormKit). Absent row keeps the built-in Twig seed. Restore deletes that locale’s row. Migration `Version20260918160000` (`legal_document`). Cookie consent stays `nowo-tech/cookie-consent-bundle`.
 
 ### Changed
 
@@ -20,17 +22,18 @@ Not in tag `v1.29.3` (that tag is YAML-only legal placeholders).
 - Daily/monthly quota counters use Redis `INCR` outside test. PHPUnit keeps the `cache.app` path.
 - Retention orphan-issue deletes scope the `event` subquery by `project_id`. Event deletes stay in batches of 1000.
 - Webhook and Mercure guards use `nowo-tech/outbound-url-guard-bundle` **1.0.0**. Cloud metadata stays blocked even when private notification URLs are allowed: `169.254.0.0/16`, `fe80::/10`, Alibaba `100.100.100.200`, IPv4-mapped addresses, and decimal/hex 32-bit hosts, plus `metadata` / `metadata.google.internal`. Mercure still does not resolve Docker service names.
-- Threshold, role, and permission create/edit dialogs use `confirm-dialog--xl` (`112` FR-008).
-- `make qa` and the CI quality job run Vitest. The cold Playwright image is `v1.63.0`.
+- User, threshold, role, and permission create/edit dialogs use `confirm-dialog--xl` (`112` FR-008). Groups and projects stay `--md`.
+- `make qa` and the CI quality job run Vitest. The Playwright image is `v1.63.0`.
 
 ### Notes for integrators
 
-- **Migration required** (`doctrine:migrations:migrate`) before using the legal editor.
-- Run `assets:install` (Composer auto-scripts do this) so `ckeditor5-editor.js` is published.
+- **Migration required** (`doctrine:migrations:migrate`).
+- Run `composer install` (auto-scripts publish `ckeditor5-editor.js`) and `pnpm install`.
 - Keep **Allow private notification URLs** off unless you need LAN webhooks. Metadata stays blocked either way (`100.100.100.200`, decimal, and IPv4-mapped forms included).
 - Do not set Redis `maxmemory` on the shared infra Compose file.
 - Counsel-approved legal copy (REQ-CC-010) is still pending. Replace placeholders before production.
-- See [UPGRADING.md](UPGRADING.md) **Unreleased (main after 1.29.3)**.
+- Tag `v1.29.3` is YAML-only legal placeholders and does not include this editor.
+- See [UPGRADING.md](UPGRADING.md) **Upgrading from 1.29.3 to 1.30.0**.
 
 ## [1.29.3] - 2026-09-18
 
@@ -1821,7 +1824,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.29.3...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.30.0...HEAD
+[1.30.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.29.3...v1.30.0
 [1.29.3]: https://github.com/nowo-tech/symfony-beacon/compare/v1.29.2...v1.29.3
 [1.29.2]: https://github.com/nowo-tech/symfony-beacon/compare/v1.29.1...v1.29.2
 [1.29.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.29.0...v1.29.1

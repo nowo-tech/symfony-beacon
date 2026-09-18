@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.29.3)](#unreleased-main-after-1293)
+- [Unreleased (main after 1.30.0)](#unreleased-main-after-1300)
+- [Upgrading from 1.29.3 to 1.30.0](#upgrading-from-1293-to-1300)
 - [Upgrading from 1.29.2 to 1.29.3](#upgrading-from-1292-to-1293)
 - [Upgrading from 1.29.1 to 1.29.2](#upgrading-from-1291-to-1292)
 - [Upgrading from 1.29.0 to 1.29.1](#upgrading-from-1290-to-1291)
@@ -106,11 +107,17 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.29.3)
+## Unreleased (main after 1.30.0)
+
+_No unreleased operator-facing steps yet._
+
+See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
+
+## Upgrading from 1.29.3 to 1.30.0
 
 Operator legal editor, readiness Redis check, and ingest/webhook hardening. **One migration.** Tag `v1.29.3` does not include this.
 
-1. Pull `main` (not `v1.29.3`).
+1. Pull / checkout `v1.30.0`.
 
 2. Install and migrate:
 
@@ -128,7 +135,7 @@ Operator legal editor, readiness Redis check, and ingest/webhook hardening. **On
 
 5. Leave **Allow private notification URLs** off on Ops defaults unless a destination is on your LAN. Metadata addresses stay blocked either way, including decimal and IPv4-mapped forms. The check is `nowo-tech/outbound-url-guard-bundle` **1.0.0**. See [SECURITY.md](../SECURITY.md).
 
-See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
+See [CHANGELOG.md](CHANGELOG.md) `[1.30.0]`.
 
 ## Upgrading from 1.29.2 to 1.29.3
 
