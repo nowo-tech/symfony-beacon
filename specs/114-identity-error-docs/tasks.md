@@ -84,4 +84,4 @@ T029–T032 → T033
 1. Spec package + feature.json (this pass).
 2. Confirm working-tree deliverables match FR-001…014.
 3. Amend 063 / 111 + ROADMAP / CHANGELOG / specs README.
-4. Ship under CHANGELOG Unreleased until the next patch tag.
+4. Ship under CHANGELOG Unreleased until the next patch tag. Tab-row follow-up (FR-015) shipped as **v1.29.2**.

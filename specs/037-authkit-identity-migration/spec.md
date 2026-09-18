@@ -28,6 +28,8 @@ As a signed-in user, every Account page exposes the same top-level chrome for **
 
 1. **Given** I am on Profile, Security, or Display (any sub-tab), **When** the page renders, **Then** a shared Account nav links to the three areas.
 2. **Given** I follow Security from Profile, **When** the page loads, **Then** Security is marked active and existing security sub-tabs still work.
+3. **Given** I open Privacy (`/account/privacy`), **When** the page renders, **Then** the area nav marks **Profile** current (privacy is a profile-area page, not a fourth area).
+4. **Given** any account area or section tab strip, **When** one pill is active, **Then** siblings share the same tag, font-weight, and row (see `114` FR-015 / v1.29.2).
 
 ### User Story 2 - Linked social accounts on Security (Priority: P2)
 
@@ -66,6 +68,7 @@ As a guest completing password reset (link or OTP), pages use Beacon guest shell
 
 - **FR-001**: Spec/Status MUST describe polish only; AuthKit remains the auth UI owner; no custom login/register controllers.
 - **FR-002**: Shared Account top nav (Profile | Security | Display) on all account area pages.
+- **FR-008**: `/account/privacy` MUST mark the area nav **Profile** item `aria-current="page"` (`account_privacy` is part of the profile area). PHPUnit `AccountPreferencesTest` covers this. Section tab geometry is `114` FR-015.
 - **FR-003**: Security surface for linked social accounts (read-only list minimum; unlink only if AuthKit supports it cleanly).
 - **FR-004**: End-user security activity list for the current user from `UserAction` (allowlisted auth types) or document deferral with rationale if kit data is insufficient.
 - **FR-005**: Guest reset/OTP visual alignment with `guest_shell`; prefer config/layout over forking entire vendor pages.
@@ -96,3 +99,8 @@ As a guest completing password reset (link or OTP), pages use Beacon guest shell
 ## Amendment (Trusted browsers tab, 2026-08-25 / `105`)
 
 Account → Security adds a **Trusted browsers** sub-tab (`account_security_devices`) for explicit Device Intelligence trust/revoke. Login never auto-trusts. See `specs/105-authkit-security-kits/`.
+
+## Amendment (Privacy area current + tab row, 2026-09-18 / v1.29.2)
+
+- `_area_nav.html.twig` treats `account_privacy` as in-profile so Privacy does not leave every area tab inactive.
+- Tab pixel lock lives in `114` FR-015 (product + kit-admin CSS; Playwright `tab-geometry.ts`).

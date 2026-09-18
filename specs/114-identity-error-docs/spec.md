@@ -16,7 +16,7 @@
 | I3 | Capture | Warm manual suite captures `/_error/{code}` + `/_maintenance_preview` via gate helper; EN UI forced for error shots |
 | I4 | Art format | Runtime `public/brand/mascot.png` + `public/illustrations/error-*.png` MUST be PNG **RGBA transparent canvas** (REQ-ERROR-001 item 9); PHPUnit asserts IHDR; amend `063` FR-002 |
 | I5 | CSP | `ContentSecurityPolicySubscriber` stamps request nonce onto bare `<style>` (parity with inline scripts) so maintenance / error chrome stays CSP-safe |
-| I6 | Markup E2E | `e2e/support/html-markup.ts` + `e2e/smoke/html-twig-standardization.spec.ts` (UC-UI-13) |
+| I6 | Markup E2E | `e2e/support/html-markup.ts` + `e2e/smoke/html-twig-standardization.spec.ts` (UC-UI-13); tab pixel lock `e2e/support/tab-geometry.ts` (UC-UI-14 / FR-015, v1.29.2) |
 | I7 | Mailpit lane | `make test-e2e-mailpit` — Compose `mail` profile + `PLAYWRIGHT_MAILPIT=1` + serial workers (UC-AUTH-18/20) |
 | I8 | SiteBackup | Host Twig `kit/site_backup_panel_login.html.twig` wired as `panel_login` override |
 | I9 | Specs index | `specs/README.md` points maintainers at Spec Kit folders + constitution |
@@ -79,6 +79,12 @@ As a signed-in user with preferred locale `en`, legal footer link labels MUST be
 
 **Independent Test**: Dashboard HTML with preferred locale `en` contains `Legal notice` / `Privacy policy` (not `Aviso legal`); unit test covers sub-request locale sync on `UserPreferredLocaleSubscriber`.
 
+### User Story 8 - Section tabs share one row (P1)
+
+As an operator, the first section tab MUST NOT sit 1–2px higher or lower than its siblings when it is the active pill. Product and kit-admin strips use the same tags and classes, so computed weight and row `y` stay locked.
+
+**Independent Test**: Warm smoke `html-twig-standardization.spec.ts` calls `assertPageTabGeometry` on account, appearance, project settings/issues, cookie consent, and maintenance — including after the second tab is selected (UC-UI-14). `e2e/support/tab-geometry.ts` fails if tags, `font-weight`, height, or row `y` drift by more than 1px.
+
 ## Functional Requirements
 
 - **FR-001**: `docs/identity/` MUST document shipped Beacon moss identity (mark, tokens, type, mascot, applied screens) in English and MUST NOT duplicate the operator screenshot catalog.
@@ -95,6 +101,7 @@ As a signed-in user with preferred locale `en`, legal footer link labels MUST be
 - **FR-012**: Cold setup captures MUST force English UI (`lockSetupEnglish` / path-locale `a[hreflang=en]` / `ensureEnglishUi`) and assert `html[lang^=en]` before writing PNGs.
 - **FR-013**: Before `admin-groups` capture, the harness MUST ensure a human demo group (`Beacon operators`) and filter (`/admin/groups?q=Beacon`) so Playwright `E2E*` seed rows do not dominate the table; `make docs-manual-screenshots` MUST purge `%e2e%` groups beforehand when possible.
 - **FR-014**: Authenticated app chrome legal footer labels MUST use `app.request.locale` (explicit `|trans` locale on `_legal_footer`); `UserPreferredLocaleSubscriber` MUST sync fragment sub-requests from the main request locale so a shared Translator cannot remain on `DEFAULT_LOCALE` after `render(controller(…))`.
+- **FR-015**: Section tabs (`.beacon-tabs` / kit-admin `.nowo-ui-tabs`) MUST share one HTML tag, one computed `font-weight` (500, including the active pill), and a row `y` / height within 1px. Vendor `nowo-ui.css` bold-on-active MUST NOT win. Warm E2E MUST assert this via `e2e/support/tab-geometry.ts` (UC-UI-14) without Mailpit.
 
 ## Success Criteria
 
@@ -103,7 +110,7 @@ As a signed-in user with preferred locale `en`, legal footer link labels MUST be
 - PHPUnit rejects non-transparent runtime error/mascot PNGs.
 - Markup smoke + CSP style nonce green on warm E2E.
 - `make test-e2e-mailpit` documented in `e2e/README.md` / Makefile help.
-- ROADMAP Phase 6.66 / CHANGELOG `[1.29.0]` describe this feature.
+- ROADMAP Phase 6.66 / CHANGELOG `[1.29.0]` describe this feature. Tab-row follow-up (FR-015 / US8) shipped in CHANGELOG `[1.29.2]`.
 - Recaptured inventory passes L&F hygiene: EN setup gate, clean dashboard card, EN legal footer, clean admin-groups row, maintenance preview without absurd ETA.
 
 ## Assumptions
@@ -124,6 +131,13 @@ As a signed-in user with preferred locale `en`, legal footer link labels MUST be
 - Fix: sub-request sync in `UserPreferredLocaleSubscriber` + explicit locale on `_legal_footer` `|trans`.
 - Docs: `filterManualAdminGroups` + Makefile E2E group purge; recapture `dashboard` / prefs / `admin-groups`.
 - Amends `111` FR-017; adds FR-013 / FR-014 / US7 here.
+
+## Amendment (section tab pixel lock, 2026-09-18 / v1.29.2)
+
+- Cause: active pills used `font-weight: 600` (vendor `nowo-ui.css` and kit-admin) with `align-items: center`, so the first tab jumped 1–2px.
+- Fix: product `.beacon-tabs` and kit-admin tabs lock weight 500 and `align-items: stretch` (`assets/styles/_components.scss`, `templates/kit/_kit_admin_styles.html.twig`).
+- Gate: `e2e/support/tab-geometry.ts` + authenticated cases in `html-twig-standardization.spec.ts` (UC-UI-14).
+- Account area current state on Privacy is `037` FR-008, not this package.
 
 ## Cross-refs
 

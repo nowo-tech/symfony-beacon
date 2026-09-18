@@ -14,6 +14,7 @@
 - [x] Make / E2E lanes distinguished (smoke vs mailpit)
 - [x] Capture hygiene: dashboard filter, MM schedule clear, cold setup EN, admin Groups filter
 - [x] Footer locale: sub-request sync + explicit `_legal_footer` `|trans` locale (FR-014)
+- [x] Tab geometry: shared tag, weight 500, 1px row (FR-015 / US8 / v1.29.2)
 
 ## Close-out
 
