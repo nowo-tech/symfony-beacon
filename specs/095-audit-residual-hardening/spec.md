@@ -63,4 +63,4 @@ Operators get safer defaults (no unverified phone QR, tighter maintenance exclus
 
 ## Amendment (shared private-network SSRF, 2026-08-25 / `106`)
 
-R3 Mercure hub guard and webhook `OutboundUrlGuard` MUST use `App\Shared\Http\PrivateNetworkTarget` (private IP literals, localhost-style hosts, reserved ranges). Mercure MUST NOT DNS-resolve hostnames so Compose service `mercure` stays valid. Cloud metadata MUST stay blocked even when Ops `allowPrivateUrls` is on (`084`). See `specs/106-ops-ingest-hardening/` US5.
+R3 Mercure hub guard and webhook `OutboundUrlGuard` MUST use `nowo-tech/outbound-url-guard-bundle` (private IP literals, localhost-style hosts, reserved ranges). Mercure MUST NOT DNS-resolve hostnames so Compose service `mercure` stays valid. Cloud metadata MUST stay blocked even when Ops `allowPrivateUrls` is on (`084`). See `specs/106-ops-ingest-hardening/` US5.

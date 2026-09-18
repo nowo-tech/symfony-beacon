@@ -20,11 +20,11 @@ Prefer official Nowo.tech kits — timestamps use [`nowo-tech/audit-kit-bundle`]
 | H3 | Quotas | `EventQuotaUsageStore` caches daily/monthly usage in `cache.app`; seed from `EventRepository` on miss; bump on accepted Envelope writes (`032` / `018`) |
 | H4 | Ingest | `ProcessEnvelopeHandler` retries flush **once** after `UniqueConstraintViolationException` (fingerprint / daily-stat races); second failure poisons as before |
 | H5 | Retention | `RetentionPurger` select-then-delete by `project_id` in batches of **1000**; [docs/ops/EVENT-STORAGE.md](../../docs/ops/EVENT-STORAGE.md) records retention-first growth stages (cold table / MySQL RANGE later) |
-| H6 | SSRF | `PrivateNetworkTarget` shared by `OutboundUrlGuard` and `MercureHubUrlGuard`; private IP literals + localhost-style hosts blocked by default; Mercure does **not** DNS-resolve (Docker `mercure` stays usable); cloud metadata always rejected even when `allowPrivateUrls` is on |
+| H6 | SSRF | `nowo-tech/outbound-url-guard-bundle` shared by `OutboundUrlGuard` and `MercureHubUrlGuard`; private IP literals + localhost-style hosts blocked by default; Mercure does **not** DNS-resolve (Docker `mercure` stays usable); cloud metadata always rejected even when `allowPrivateUrls` is on |
 | H7 | API keys | `app:project:api-key-legacy-secrets` inventories Halite `secret_key`; `--apply` clears ciphertext only when `secret_hash` already exists; legacy-only keys are reported, not cleared (`096` F2) |
 | H8 | Notifications | Member alert preference / event + `PushSubscription` use AuditKit `TimestampableTrait` |
 | H9 | FormKit / Menu | FormKit **2.5.2**; Dashboard Menu **≥2.1.10** tags kit `SearchQueryType` as `form.type` (drop host `config/services/dashboard_menu.yaml` — was required on **2.1.9**) |
-| H10 | QA | PHPStan baseline empty; no `ignoreErrors` in `phpstan.neon.dist` (Doctrine association nullability via `allowNullablePropertyForRequiredField`); injectable Clock / `HostnameDnsLookup` / `HaliteSecretsFilesystem`; drop `phpstan-require-extends` on issue query traits; Rector semantic-only, CS-Fixer owns formatting; PHPUnit suite PHPStan-clean; includable coverage **100%** |
+| H10 | QA | PHPStan baseline empty; no `ignoreErrors` in `phpstan.neon.dist` (Doctrine association nullability via `allowNullablePropertyForRequiredField`); injectable Clock / bundle `HostnameDnsLookup` / `HaliteSecretsFilesystem`; drop `phpstan-require-extends` on issue query traits; Rector semantic-only, CS-Fixer owns formatting; PHPUnit suite PHPStan-clean; includable coverage **100%** |
 
 ## Non-goals
 
@@ -98,7 +98,7 @@ As an admin saving a Mercure hub URL, private IP literals and localhost-style ho
 
 **Why this priority**: Hub URL and webhook SSRF had drifted (`095` R3 vs outbound guard).
 
-**Independent Test**: `MercureHubUrlGuard` / `PrivateNetworkTarget` / `OutboundUrlGuard` unit tests; SECURITY.md notes the shared helper.
+**Independent Test**: `MercureHubUrlGuard` / `OutboundUrlGuard` unit tests (policy from `nowo-tech/outbound-url-guard-bundle`); SECURITY.md notes the shared helper.
 
 **Acceptance Scenarios**:
 
@@ -137,11 +137,11 @@ As an operator after `096` hash-at-rest, I can inventory `secret_key` rows and, 
 - **FR-004**: Daily and monthly quota usage MUST be cached (`EventQuotaUsageStore` / `cache.app`); UTC boundaries unchanged; fail-closed if cache is stale-high after purge.
 - **FR-005**: Envelope persist MUST retry flush at most once on unique-constraint races.
 - **FR-006**: Retention event deletes MUST be batched (default 1000) per project; EVENT-STORAGE MUST document growth stages without enabling partitioning in recipes.
-- **FR-007**: Mercure hub and outbound webhook guards MUST share `PrivateNetworkTarget`. Mercure MUST NOT DNS-resolve hostnames. Metadata targets MUST always be blocked.
+- **FR-007**: Mercure hub and outbound webhook guards MUST use `nowo-tech/outbound-url-guard-bundle`. Mercure MUST NOT DNS-resolve hostnames. Metadata targets MUST always be blocked.
 - **FR-008**: `app:project:api-key-legacy-secrets` MUST be dry-run by default; `--apply` MUST clear `secret_key` only when `secret_hash` is present.
 - **FR-009**: Member alert preference/event and push subscription timestamps MUST use AuditKit `TimestampableTrait` (not host-copied trait logic).
 - **FR-010**: Dashboard Menu pin MUST be **≥2.1.10** so kit `SearchQueryType` is tagged `form.type` (no host `config/services/dashboard_menu.yaml`). FormKit pin MUST be **≥2.5.2**.
-- **FR-011**: `phpstan.neon.dist` MUST NOT rely on `ignoreErrors` or a populated baseline; `src/` and `tests/` MUST pass level 6 + FrankenPHP `rules.neon`. Process-wide sleep/DNS/umask/FS in request or test paths MUST go through injectable seams (Clock, `HostnameDnsLookup`, `HaliteSecretsFilesystem`).
+- **FR-011**: `phpstan.neon.dist` MUST NOT rely on `ignoreErrors` or a populated baseline; `src/` and `tests/` MUST pass level 6 + FrankenPHP `rules.neon`. Process-wide sleep/DNS/umask/FS in request or test paths MUST go through injectable seams (Clock, `Nowo\OutboundUrlGuardBundle\Dns\HostnameDnsLookup`, `HaliteSecretsFilesystem`).
 - **FR-012**: Rector MUST NOT own PER-CS / import / native-function formatting (PHP-CS-Fixer does). `make qa-fix` MUST run Rector before CS-Fixer.
 - **FR-013**: Includable PHPUnit statement coverage MUST remain **100%** (`033` / REQ-QA-002). PHPUnit MUST cover queue health, quota store, unique retry, batched purge, SSRF helper, and legacy-secret command.
 
@@ -173,3 +173,10 @@ As an operator after `096` hash-at-rest, I can inventory `secret_key` rows and, 
 - Prior: `018`, `032`, `033`, `035`, `038`, `084`, `087`, `091`, `094`, `095`, `096`, `099`, `081`, `101`, `105`
 - Docs: [docs/ops/EVENT-STORAGE.md](../../docs/ops/EVENT-STORAGE.md), [docs/PRODUCTION.md](../../docs/PRODUCTION.md), [SECURITY.md](../../SECURITY.md)
 - Kits: AuditKit, FormKit **2.5.2**, Dashboard Menu (host type tag)
+
+## Amendment (2026-09-18, unreleased)
+
+- **H3**: outside `test`, quota counters are Redis `INCR` / `SET NX EXAT`, not a `cache.app` read-modify-write. The array-cache path remains for PHPUnit. See `032`.
+- **H5 / SC-004**: `event` deletes stay batched (1000). Orphan `issue` deletes are one statement per project; the `event` subquery filters `project_id`. Age deletes of `perf_span` and `perf_transaction` are still one statement per project.
+- **H6 / FR-007**: cloud metadata stays blocked when private URLs are allowed, including `100.100.100.200` and decimal / IPv4-mapped forms (`045`).
+- **Health**: `/health/ready` pings Redis outside `test` (`012` / `050`). Do not set `maxmemory` on the shared `compose.infra.yaml` Redis.

@@ -35,6 +35,20 @@ final class OutboundUrlGuardTest extends TestCase
         self::assertSame([], $guard->httpClientOptionsForUrl('http://127.0.0.1/hook'));
     }
 
+    public function testBlocksMetadataEvenWhenPrivateUrlsEnabled(): void
+    {
+        $guard = $this->guard(true);
+
+        foreach (['http://169.254.169.254/latest/meta-data/', 'http://metadata.google.internal/', 'http://100.100.100.200/latest/meta-data/', 'http://2852039166/latest/meta-data/', 'http://[::ffff:169.254.169.254]/latest/meta-data/'] as $url) {
+            try {
+                $guard->assertSafeHttpUrl($url);
+                self::fail('Expected metadata to stay blocked for '.$url);
+            } catch (InvalidArgumentException) {
+                self::assertTrue(true);
+            }
+        }
+    }
+
     public function testPinsPublicHostsAndRejectsUnresolvableOnes(): void
     {
         $guard = $this->guard(false);

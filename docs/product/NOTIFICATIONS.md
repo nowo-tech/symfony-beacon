@@ -62,7 +62,7 @@ Endpoints are **encrypted at rest** and **masked** in the settings list (URLs, e
 
 There are **no** global `SLACK_*` / `DISCORD_*` / `TELEGRAM_*` environment variables — each destination stores its own endpoint on the project. Email delivery uses the instance **Mailer** settings (encrypted DSN in the database); see [Email](#email).
 
-Outbound HTTP destinations (Slack / Discord / Teams / HTTP) are checked against an SSRF guard: private, link-local, and cloud-metadata addresses are blocked by default. Delivery also **pins** the validated public DNS A record via HttpClient `resolve` (anti DNS rebinding) and does not follow redirects. Enable **Allow private notification URLs** under **Administration → Ops defaults** only for local webhooks.
+Outbound HTTP destinations (Slack / Discord / Teams / HTTP) are checked against an SSRF guard: private, link-local, and cloud-metadata addresses are blocked by default. Delivery **pins** the validated public DNS answer via HttpClient `resolve` (anti DNS rebinding) and does not follow redirects. Enable **Allow private notification URLs** under **Administration → Ops defaults** only for local webhooks. That flag still blocks metadata, including `100.100.100.200` and decimal or IPv4-mapped forms of a metadata address.
 
 ---
 

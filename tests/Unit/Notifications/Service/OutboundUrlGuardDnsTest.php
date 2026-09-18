@@ -4,21 +4,19 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Notifications\Service;
 
-use App\Notifications\Service\HostnameDnsLookup;
 use App\Notifications\Service\OutboundUrlGuard;
 use App\Shared\Settings\Entity\InstanceSettings;
 use App\Shared\Settings\Repository\InstanceSettingsRepository;
 use App\Shared\Settings\Service\InstanceOpsDefaults;
 use InvalidArgumentException;
-use PHPUnit\Framework\MockObject\MockObject;
+use Nowo\OutboundUrlGuardBundle\Dns\HostnameDnsLookup;
 use PHPUnit\Framework\TestCase;
 
 final class OutboundUrlGuardDnsTest extends TestCase
 {
     public function testUsesAaaaRecordsAndFallbackResolutionAndRejectsBadAnswers(): void
     {
-        /** @var HostnameDnsLookup&MockObject $dns */
-        $dns = $this->createMock(HostnameDnsLookup::class);
+        $dns = $this->createStub(HostnameDnsLookup::class);
         $dns->method('dnsGetRecord')->willReturnCallback(
             static fn (string $host, int $type): array => match ($host) {
                 'example.test' => \DNS_AAAA === $type ? [['ipv6' => '2606:4700:4700::1111']] : [],

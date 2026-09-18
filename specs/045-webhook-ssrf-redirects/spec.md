@@ -24,4 +24,4 @@ As an operator, outbound notification HTTP clients must not follow redirects so 
 
 ## Residual risk
 
-DNS rebinding / TOCTOU after resolve remains **Planned** (extends this spec).
+DNS pin and `max_redirects: 0` shipped (`OutboundUrlGuard` + `DeliverNotificationHandler`). Literal and obfuscated cloud metadata stay blocked even when Ops allows private notification URLs: `169.254.0.0/16`, `fe80::/10`, Alibaba `100.100.100.200`, IPv4-mapped forms of those addresses, and decimal / hex 32-bit hosts (`2852039166`, `0xa9fea9fe`). Hostnames `metadata` and `metadata.google.internal` stay blocked. The private-URL flag still defaults to off and still allows LAN literals such as `127.0.0.1`.

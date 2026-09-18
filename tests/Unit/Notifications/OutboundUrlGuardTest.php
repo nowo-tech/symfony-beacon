@@ -26,8 +26,17 @@ final class OutboundUrlGuardTest extends TestCase
     {
         $guard = $this->guard(false);
 
-        $this->expectException(InvalidArgumentException::class);
-        $guard->assertSafeHttpUrl('http://169.254.169.254/latest/meta-data/');
+        foreach ([
+            'http://169.254.169.254/latest/meta-data/',
+            'http://100.100.100.200/latest/meta-data/',
+        ] as $url) {
+            try {
+                $guard->assertSafeHttpUrl($url);
+                self::fail('Expected metadata to stay blocked for '.$url);
+            } catch (InvalidArgumentException) {
+                self::assertTrue(true);
+            }
+        }
     }
 
     public function testAllowsWhenPrivateUrlsEnabled(): void
@@ -35,6 +44,25 @@ final class OutboundUrlGuardTest extends TestCase
         $guard = $this->guard(true);
         $guard->assertSafeHttpUrl('https://127.0.0.1/hook');
         self::assertSame([], $guard->httpClientOptionsForUrl('https://127.0.0.1/hook'));
+    }
+
+    public function testBlocksMetadataEvenWhenPrivateUrlsEnabled(): void
+    {
+        $guard = $this->guard(true);
+
+        foreach ([
+            'http://169.254.169.254/latest/meta-data/',
+            'http://100.100.100.200/latest/meta-data/',
+            'http://2852039166/latest/meta-data/',
+            'http://[::ffff:169.254.169.254]/latest/meta-data/',
+        ] as $url) {
+            try {
+                $guard->assertSafeHttpUrl($url);
+                self::fail('Expected metadata to stay blocked for '.$url);
+            } catch (InvalidArgumentException) {
+                self::assertTrue(true);
+            }
+        }
     }
 
     public function testAllowsPublicHttpsHostAndPinsResolve(): void
