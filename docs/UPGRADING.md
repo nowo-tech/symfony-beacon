@@ -4,7 +4,8 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ## Table of contents
 
-- [Unreleased (main after 1.29.2)](#unreleased-main-after-1292)
+- [Unreleased (main after 1.29.3)](#unreleased-main-after-1293)
+- [Upgrading from 1.29.2 to 1.29.3](#upgrading-from-1292-to-1293)
 - [Upgrading from 1.29.1 to 1.29.2](#upgrading-from-1291-to-1292)
 - [Upgrading from 1.29.0 to 1.29.1](#upgrading-from-1290-to-1291)
 - [Upgrading from 1.28.2 to 1.29.0](#upgrading-from-1282-to-1290)
@@ -105,11 +106,32 @@ This guide helps you upgrade between versions of **symfony-beacon**.
 
 ---
 
-## Unreleased (main after 1.29.2)
+## Unreleased (main after 1.29.3)
 
 _No unreleased operator-facing steps yet._
 
 See [CHANGELOG.md](CHANGELOG.md) `[Unreleased]`.
+
+## Upgrading from 1.29.2 to 1.29.3
+
+Generic legal placeholders (REQ-CC-011) and Composer / pnpm pin refresh. **No migrations.**
+
+1. Pull / checkout `v1.29.3`.
+
+2. Install refreshed pins:
+   ```bash
+   composer install
+   pnpm install
+   ```
+
+3. Before processing other people’s personal data, replace `[Operator legal name — replace]` and `privacy@example.com` on `/legal/*`. The default seed must not name Nowo Insurance Services, S.L. Nowo.tech identity belongs in `nowo-tech-web`.
+
+4. Optional — refresh legal screenshots:
+   ```bash
+   make docs-manual-screenshots
+   ```
+
+See [CHANGELOG.md](CHANGELOG.md) `[1.29.3]`.
 
 ## Upgrading from 1.29.1 to 1.29.2
 

@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _No unreleased operator-facing changes yet._
 
+## [1.29.3] - 2026-09-18
+
+### Changed
+
+- **Legal pages (REQ-CC-011):** default notice / privacy / terms / cookies are **generic editable placeholders** again (no nowo.tech / Nowo Insurance Services identity). GDPR/LSSI structure, retention, AEPD, and the `di_obs` cookie (1 hour) stay. Operators must replace `[Operator legal name — replace]` before production. Nowo.tech legal copy belongs in `nowo-tech-web`.
+- **Composer pins:** Symfony **8.1.7**, Twig **3.29.0**, Doctrine ORM **3.7.1**, `doctrine/doctrine-bundle` **3.3.2**, `nelmio/api-doc-bundle` **5.12.2**, `nowo-tech/dashboard-menu-bundle` **2.1.11**, PHPStan **2.2.14**, PHPUnit **13.3.4**, Rector **2.6.7**.
+- **pnpm:** `lucide` **1.47.0**, `morphicons` **1.7.1**, Playwright **1.63.0**, `jsdom` **30.1.0**.
+
+### Notes for integrators
+
+- **No migrations.**
+- After pull, run `composer install` and `pnpm install`.
+- Before processing other people’s personal data, replace `[Operator legal name — replace]` and `privacy@example.com` on `/legal/*`. The default seed must not name Nowo Insurance Services, S.L.
+- Spec follow-up for the 1.29.2 tab lock: `114` FR-015 / US8 and `037` FR-008.
+- See [UPGRADING.md](UPGRADING.md) **Upgrading from 1.29.2 to 1.29.3**.
+
 ## [1.29.2] - 2026-09-18
 
 ### Fixed
@@ -1782,7 +1798,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.29.2...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.29.3...HEAD
+[1.29.3]: https://github.com/nowo-tech/symfony-beacon/compare/v1.29.2...v1.29.3
 [1.29.2]: https://github.com/nowo-tech/symfony-beacon/compare/v1.29.1...v1.29.2
 [1.29.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.29.0...v1.29.1
 [1.29.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.28.2...v1.29.0
