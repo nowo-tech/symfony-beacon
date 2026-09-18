@@ -124,8 +124,8 @@ final readonly class RetentionPurger
             $events += $deleted;
             $deletedEvents = $deleted > 0;
             $issues += (int) $connection->executeStatement(
-                'DELETE FROM issue WHERE project_id = ? AND id NOT IN (SELECT DISTINCT issue_id FROM event)',
-                [$projectId],
+                'DELETE FROM issue WHERE project_id = ? AND id NOT IN (SELECT DISTINCT issue_id FROM event WHERE project_id = ?)',
+                [$projectId, $projectId],
             );
 
             $connection->executeStatement(
@@ -168,8 +168,8 @@ final readonly class RetentionPurger
                     $remaining -= \count($ids);
                 }
                 $issues += (int) $connection->executeStatement(
-                    'DELETE FROM issue WHERE project_id = ? AND id NOT IN (SELECT DISTINCT issue_id FROM event)',
-                    [$projectId],
+                    'DELETE FROM issue WHERE project_id = ? AND id NOT IN (SELECT DISTINCT issue_id FROM event WHERE project_id = ?)',
+                    [$projectId, $projectId],
                 );
             }
         }

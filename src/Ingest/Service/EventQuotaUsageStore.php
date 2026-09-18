@@ -26,6 +26,7 @@ final readonly class EventQuotaUsageStore
         private EventRepository $eventRepository,
         #[Autowire(service: 'cache.app')]
         private CacheItemPoolInterface $cache,
+        private ?QuotaRedis $quotaRedis = null,
     ) {
     }
 
@@ -38,17 +39,9 @@ final readonly class EventQuotaUsageStore
 
         $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
         $key = $this->dailyKey($projectId, $now);
-        $item = $this->cache->getItem($key);
-        if ($item->isHit()) {
-            return max(0, (int) $item->get());
-        }
+        $expiresAt = $now->modify('tomorrow')->setTime(0, 0, 0);
 
-        $count = $this->eventRepository->countReceivedTodayForProject($project);
-        $item->set($count);
-        $item->expiresAt($now->modify('tomorrow')->setTime(0, 0, 0));
-        $this->cache->save($item);
-
-        return $count;
+        return $this->read($key, $expiresAt, fn (): int => $this->eventRepository->countReceivedTodayForProject($project));
     }
 
     public function eventsReceivedThisMonth(Project $project): int
@@ -63,20 +56,16 @@ final readonly class EventQuotaUsageStore
 
         $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
         $key = $this->monthlyKey($projectId, $now);
-        $item = $this->cache->getItem($key);
-        if ($item->isHit()) {
-            return max(0, (int) $item->get());
-        }
+        $expiresAt = $now->modify('first day of next month')->setTime(0, 0, 0);
 
-        $count = $this->eventRepository->countReceivedSinceForProject(
-            $project,
-            ProjectGovernanceResolver::utcMonthStart($now),
+        return $this->read(
+            $key,
+            $expiresAt,
+            fn (): int => $this->eventRepository->countReceivedSinceForProject(
+                $project,
+                ProjectGovernanceResolver::utcMonthStart($now),
+            ),
         );
-        $item->set($count);
-        $item->expiresAt($now->modify('first day of next month')->setTime(0, 0, 0));
-        $this->cache->save($item);
-
-        return $count;
     }
 
     /**
@@ -99,11 +88,65 @@ final readonly class EventQuotaUsageStore
 
     private function bump(string $key, DateTimeImmutable $expiresAt): void
     {
+        if ($this->quotaRedis instanceof QuotaRedis) {
+            $full = $this->redisKey($key);
+            $next = $this->quotaRedis->incr($full);
+            if (1 === $next) {
+                $this->quotaRedis->expireAt($full, $expiresAt->getTimestamp());
+            }
+
+            return;
+        }
+
         $item = $this->cache->getItem($key);
         $value = $item->isHit() ? max(0, (int) $item->get()) + 1 : 1;
         $item->set($value);
         $item->expiresAt($expiresAt);
         $this->cache->save($item);
+    }
+
+    /**
+     * @param callable(): int $seed
+     */
+    private function read(string $key, DateTimeImmutable $expiresAt, callable $seed): int
+    {
+        if ($this->quotaRedis instanceof QuotaRedis) {
+            $full = $this->redisKey($key);
+            $existing = $this->quotaRedis->get($full);
+            if (is_numeric($existing)) {
+                return max(0, (int) $existing);
+            }
+
+            $count = max(0, $seed());
+            $stored = $this->quotaRedis->set($full, (string) $count, [
+                'NX',
+                'EXAT' => $expiresAt->getTimestamp(),
+            ]);
+            if (!$stored) {
+                $existing = $this->quotaRedis->get($full);
+
+                return is_numeric($existing) ? max(0, (int) $existing) : $count;
+            }
+
+            return $count;
+        }
+
+        $item = $this->cache->getItem($key);
+        if ($item->isHit()) {
+            return max(0, (int) $item->get());
+        }
+
+        $count = max(0, $seed());
+        $item->set($count);
+        $item->expiresAt($expiresAt);
+        $this->cache->save($item);
+
+        return $count;
+    }
+
+    private function redisKey(string $key): string
+    {
+        return 'symfony-beacon.'.$key;
     }
 
     private function dailyKey(int $projectId, DateTimeImmutable $at): string

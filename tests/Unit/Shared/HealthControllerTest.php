@@ -53,4 +53,51 @@ final class HealthControllerTest extends TestCase
         self::assertArrayNotHasKey('messenger_async_pending', $payload['checks']);
         self::assertSame(['database' => true], $payload['checks']);
     }
+
+    public function testReadyOutsideTestFailsClosedWhenRedisIsDown(): void
+    {
+        $controller = new HealthController($this->readyEntityManager(), new NullLogger(), 'prod', new FixedRedisProbe(false));
+
+        $response = $controller->ready();
+        $payload = json_decode($response->getContent() ?: '[]', true);
+
+        self::assertSame(Response::HTTP_SERVICE_UNAVAILABLE, $response->getStatusCode());
+        self::assertIsArray($payload);
+        self::assertSame('unavailable', $payload['error'] ?? null);
+        self::assertSame(['database' => true, 'redis' => false], $payload['checks'] ?? null);
+        self::assertStringNotContainsString('unavailable.', $response->getContent() ?: '');
+    }
+
+    public function testReadyOutsideTestReportsRedis(): void
+    {
+        $response = new HealthController($this->readyEntityManager(), new NullLogger(), 'prod', new FixedRedisProbe(true))->ready();
+        $payload = json_decode($response->getContent() ?: '[]', true);
+
+        self::assertSame(Response::HTTP_OK, $response->getStatusCode());
+        self::assertIsArray($payload);
+        self::assertSame(['database' => true, 'redis' => true], $payload['checks'] ?? null);
+    }
+
+    private function readyEntityManager(): EntityManagerInterface
+    {
+        $connection = $this->createStub(Connection::class);
+        $connection->method('executeQuery')->willReturn($this->createStub(Result::class));
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('getConnection')->willReturn($connection);
+
+        return $em;
+    }
+}
+
+final class FixedRedisProbe implements \App\Shared\Health\RedisProbe
+{
+    public function __construct(
+        private bool $up,
+    ) {
+    }
+
+    public function ping(): bool
+    {
+        return $this->up;
+    }
 }

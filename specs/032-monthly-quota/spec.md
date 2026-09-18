@@ -40,3 +40,7 @@ As a project admin, I see a warning near 80% of the monthly quota (same spirit a
 ## Amendment (quota usage cache, 2026-08-25 / `106`)
 
 Daily and monthly enforcement MUST use `EventQuotaUsageStore` (`cache.app`): seed from `EventRepository` on miss, increment on accepted Envelope writes. UTC day/month boundaries unchanged (FR-004). After retention deletes, cache MAY stay slightly high until TTL (fail-closed for quotas). Do not reintroduce per-ACK `COUNT(*)` on the hot path. See `specs/106-ops-ingest-hardening/` and [docs/ops/EVENT-STORAGE.md](../../docs/ops/EVENT-STORAGE.md).
+
+## Amendment (atomic counter outside test, 2026-09-18)
+
+Outside `APP_ENV=test`, the same store uses Redis `INCR` and `SET NX EXAT` on `REDIS_URL` (`PhpredisQuotaRedis`). `cache.app` remains the path when that client is absent (PHPUnit). A flush still re-seeds from `event` on the next miss. `INCR` and expiry are not one command: a crash between them can leave a key without a TTL.

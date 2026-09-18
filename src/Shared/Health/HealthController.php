@@ -7,6 +7,7 @@ namespace App\Shared\Health;
 use Doctrine\ORM\EntityManagerInterface;
 use OpenApi\Attributes as OA;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -16,8 +17,10 @@ use Throwable;
 /**
  * Liveness and readiness probes for orchestrators (no auth).
  *
- * Readiness checks database only. Messenger backlog is exposed via authenticated
- * {@code /metrics} ({@see \App\Ops\Metrics\MetricsController}), not the public probe.
+ * Readiness checks the database, and Redis outside the test environment
+ * (session, cache, and Messenger share REDIS_URL). The test environment skips
+ * Redis: PHPUnit has no Redis service. Messenger backlog stays on
+ * authenticated {@code /metrics}.
  */
 #[AsController]
 final readonly class HealthController
@@ -25,6 +28,9 @@ final readonly class HealthController
     public function __construct(
         private EntityManagerInterface $entityManager,
         private LoggerInterface $logger,
+        #[Autowire('%kernel.environment%')]
+        private string $environment = 'test',
+        private ?RedisProbe $redis = null,
     ) {
     }
 
@@ -61,7 +67,7 @@ final readonly class HealthController
     }
 
     #[Route('/health/ready', name: 'health_ready', methods: ['GET'])]
-    #[OA\Get(path: '/health/ready', operationId: 'healthReady', description: 'Checks database connectivity. Does not expose Messenger queue depth (use `/metrics` when authorized).', summary: 'Readiness probe', security: [], tags: ['Health'])]
+    #[OA\Get(path: '/health/ready', operationId: 'healthReady', description: 'Checks database connectivity, and Redis outside the test environment. Does not expose Messenger queue depth (use `/metrics` when authorized).', summary: 'Readiness probe', security: [], tags: ['Health'])]
     #[OA\Response(
         response: 200,
         description: 'Dependencies are ready.',
@@ -98,11 +104,21 @@ final readonly class HealthController
         $checks = [
             'database' => false,
         ];
+        $redis = $this->redis;
+        if ($redis instanceof RedisProbe && 'test' !== $this->environment) {
+            $checks['redis'] = false;
+        }
 
         try {
             $connection = $this->entityManager->getConnection();
             $connection->executeQuery('SELECT 1');
             $checks['database'] = true;
+            if ($redis instanceof RedisProbe && 'test' !== $this->environment) {
+                if (!$redis->ping()) {
+                    throw new \RuntimeException('Redis is unavailable.');
+                }
+                $checks['redis'] = true;
+            }
         } catch (Throwable $e) {
             $this->logger->error('Readiness probe failed.', [
                 'exception' => $e,

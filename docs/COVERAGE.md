@@ -39,6 +39,8 @@ Justified exclusions under `<source><exclude>` (not counted toward 100%):
 | `src/Issues/Command/BackfillEventPromotionsCommand.php` | One-shot backfill command. |
 | `src/Shared/Sms/Command/SmsSendCommand.php` | Ops SMS send CLI. |
 | `src/Setup/Command/SeedSampleCommand.php`, `src/Issues/Service/IssueSampleSeeder.php` | Sample data install (`make seed-sample`). |
+| `src/Ingest/Service/PhpredisQuotaRedis.php` | Live Redis `INCR`. The decision path is `EventQuotaUsageStore` with an in-memory fake. PHPUnit has no Redis. |
+| `src/Shared/Health/RedisConnector.php` | Live Redis ping. `HealthController` skips it in `APP_ENV=test` and is unit-tested with a fake probe. |
 
 ## TypeScript includable set (`vitest.config.ts` → `coverage.include`)
 

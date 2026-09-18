@@ -15,7 +15,7 @@ Plan a cold path when any of these are true for a long-lived project or instance
 ## Recommended stages (do not skip)
 
 1. **Retention first** — set Ops defaults + per-project retention days / max events; schedule `app:retention:purge` (cron). Keep batches at the default (1000) unless ops needs smaller chunks under replication lag.
-2. **Quota counters** — ingest already caches daily/monthly usage in `cache.app` (`EventQuotaUsageStore`); do not reintroduce per-request `COUNT(*)` on the ACK path.
+2. **Quota counters** — outside `test`, daily/monthly usage is a Redis `INCR` on `REDIS_URL` (`EventQuotaUsageStore` / `PhpredisQuotaRedis`). PHPUnit uses `cache.app`. Do not reintroduce per-request `COUNT(*)` on the ACK path. A flush re-seeds from `event` on the next miss.
 3. **Cold table (optional)** — move aged rows to `event_cold` with the same shape (or compressed payload) via a one-shot / nightly job; UI detail can fall back to cold when hot miss. Prefer this before MySQL partitioning if you need portable SQLite tests to stay simple.
 4. **RANGE partitioning (MySQL only)** — partition `event` by `received_at` (monthly). Requires dropping FKs that block partitioning or converting them to application-enforced integrity. Document operator downtime; do **not** enable in default migrations.
 5. **Object storage for payloads (Later)** — store large payloads outside MySQL; keep promoted columns + pointer. Out of scope until a dedicated spec.
@@ -29,5 +29,5 @@ Plan a cold path when any of these are true for a long-lived project or instance
 ## Related
 
 - [PRODUCTION.md](../PRODUCTION.md) — retention schedule
-- `App\Ops\Retention\RetentionPurger` — batched deletes
+- `App\Ops\Retention\RetentionPurger` — `event` deletes in batches of 1000; orphan `issue` deletes are one statement per project (subquery filtered by `project_id`); `perf_span` / `perf_transaction` age deletes are still one statement per project
 - Constitution principle VI — efficient ingest (ACK fast, persist async)

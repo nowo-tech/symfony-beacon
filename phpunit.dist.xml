@@ -105,6 +105,9 @@
             <!-- Sample/install seed commands & seeders (make seed-sample); not production runtime -->
             <file>src/Setup/Command/SeedSampleCommand.php</file>
             <file>src/Issues/Service/IssueSampleSeeder.php</file>
+            <!-- Live Redis IO. Decision logic is tested via fakes / skipped in APP_ENV=test. -->
+            <file>src/Ingest/Service/PhpredisQuotaRedis.php</file>
+            <file>src/Shared/Health/RedisConnector.php</file>
         </exclude>
 
         <deprecationTrigger>
