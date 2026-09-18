@@ -35,6 +35,15 @@ const outDir = path.join(rootDir, 'docs', 'manual', 'images');
 /** Collected during this run — fail the suite when MANUAL_REQUIRE_HEALTHY=1 (default). */
 const manualErrorShots: string[] = [];
 
+function shotWanted(name: string): boolean {
+  const only = (process.env.MANUAL_ONLY ?? '')
+    .split(',')
+    .map((item) => item.trim())
+    .filter((item) => item !== '');
+
+  return only.length === 0 || only.includes(name);
+}
+
 type Shot = { name: string; path: string; maxParts?: number };
 
 const guestShots: Shot[] = [
@@ -116,6 +125,8 @@ const adminShots: Shot[] = [
   { name: 'admin-breadcrumbs', path: '/breadcrumb-kit-admin/collections' },
   { name: 'admin-breadcrumbs-new', path: '/breadcrumb-kit-admin/collections/new' },
   { name: 'admin-cookie-consent', path: '/admin/cookie-consent', maxParts: 2 },
+  { name: 'admin-legal', path: '/admin/legal' },
+  { name: 'admin-legal-edit', path: '/admin/legal/notice/en' },
   { name: 'admin-maintenance', path: '/admin/maintenance' },
   { name: 'admin-site-backup', path: '/_site_backup', maxParts: 2 },
   { name: 'admin-site-backup-history', path: '/_site_backup/history' },
@@ -176,6 +187,9 @@ async function lockGuestEnglish(page: Page): Promise<void> {
 }
 
 async function shoot(page: Page, shot: Shot): Promise<void> {
+  if (!shotWanted(shot.name)) {
+    return;
+  }
   await gotoStable(page, shot.path);
 
   const gate = shot.name.startsWith('auth-')
@@ -201,8 +215,13 @@ async function shoot(page: Page, shot: Shot): Promise<void> {
   await captureManualScreenshot(page, outDir, shot.name, {
     theme: 'light',
     maxParts: shot.maxParts ?? 1,
+    beforeShot: shot.name === 'admin-legal-edit' ? waitForLegalEditor : undefined,
   });
   await page.goto('about:blank').catch(() => undefined);
+}
+
+async function waitForLegalEditor(page: Page): Promise<void> {
+  await page.locator('.ck-editor').first().waitFor({ state: 'visible', timeout: 20_000 });
 }
 
 async function shootOptional(page: Page, shot: Shot): Promise<void> {
@@ -320,6 +339,7 @@ test.describe('Product UI manual screenshots', () => {
 
   test('guest and legal screens', async ({ browser }) => {
     await withGuestPage(browser, async (page) => {
+      await lockGuestEnglish(page);
       for (const shot of guestShots) {
         await shoot(page, shot);
       }
@@ -424,6 +444,14 @@ test.describe('Product UI manual screenshots', () => {
       (s) => !/admin$|admin-users|admin-groups|admin-projects|admin-roles|admin-permissions/.test(s.name),
     );
     for (const shot of ops) {
+      await shoot(page, shot);
+    }
+  });
+
+  test('admin legal editor screens', async ({ page }) => {
+    await page.setViewportSize(MANUAL_VIEWPORT);
+    await lockEnglishForSession(page);
+    for (const shot of adminShots.filter((shot) => shot.name.startsWith('admin-legal'))) {
       await shoot(page, shot);
     }
   });

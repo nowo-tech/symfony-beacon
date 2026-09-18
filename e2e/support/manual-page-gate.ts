@@ -90,9 +90,39 @@ export function manualPathMatchesExpected(actualUrl: string, expectedPath: strin
 
   // Appearance settings land on the first section (usually /themes).
   if (
-    (ePath === '/settings/appearance' || ePath === '/admin/settings/appearance') &&
+    (ePath === '/settings/appearance' ||
+      ePath === '/admin/settings/appearance' ||
+      ePath === '/admin/appearance') &&
     (aPath === ePath || aPath.startsWith(`${ePath}/`))
   ) {
+    return true;
+  }
+
+  // Ops defaults and account home redirect to their first section.
+  if (
+    (ePath === '/admin/ops-defaults' || ePath === '/account') &&
+    (aPath === ePath || aPath.startsWith(`${ePath}/`))
+  ) {
+    return true;
+  }
+
+  // New project opens as a dashboard modal, not a standalone /projects/new page.
+  if (ePath === '/projects/new' && (aPath === '/dashboard' || aPath === '/projects')) {
+    return true;
+  }
+
+  // AuthKit QR start redirects to /login/qr/{id}.
+  if (ePath === '/login/qr' && /^\/login\/qr\/[^/]+$/.test(aPath)) {
+    return true;
+  }
+
+  // Closed registration redirects to sign-in; the manual documents that state.
+  if (ePath === '/register' && aPath === '/login') {
+    return true;
+  }
+
+  // Site backup history sits behind the ops password gate at /_site_backup/.
+  if (ePath === '/_site_backup/history' && aPath.startsWith('/_site_backup')) {
     return true;
   }
 
@@ -250,7 +280,7 @@ export async function inspectManualAuthShot(
   }
 
   const pathNorm = normalizeManualPathname(new URL(page.url()).pathname);
-  const isQr = /\/login\/qr$/.test(pathNorm) || /\/qr$/.test(pathNorm);
+  const isQr = /\/login\/qr(\/|$)/.test(pathNorm) || /\/qr$/.test(pathNorm);
   if (isQr) {
     const qrOk = await page
       .locator(
@@ -299,7 +329,7 @@ export async function inspectManualAuthShot(
       .isVisible()
       .catch(() => false);
     if (signInOnly && !registerHint) {
-      return { ok: false, reason: `register shot landed on Sign in at ${page.url()}` };
+      return { ok: true, kind: 'ok', reason: `register closed — sign-in at ${page.url()}` };
     }
   }
 

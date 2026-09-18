@@ -627,6 +627,8 @@ export type CaptureManualOptions = {
   theme?: ManualTheme;
   /** Extra same-size scrolls for tall pages (default 1 = only above-the-fold). Max 3. */
   maxParts?: number;
+  /** Runs after theme/locale prep, before the viewport PNG (e.g. wait for CKEditor). */
+  beforeShot?: (page: Page) => Promise<void>;
 };
 
 /**
@@ -646,6 +648,16 @@ export async function captureManualScreenshot(
   // Re-apply theme after prepare (locale switch may reload).
   await setManualTheme(page, theme);
   await page.setViewportSize(MANUAL_VIEWPORT);
+  if (options.beforeShot) {
+    await options.beforeShot(page);
+  }
+  await expect(page.locator('.page-loader.is-active')).toHaveCount(0, { timeout: 20_000 });
+  const dialogBody = page.locator('dialog[open] .confirm-dialog__content');
+  if ((await dialogBody.count()) > 0) {
+    await expect
+      .poll(async () => dialogBody.first().evaluate((el) => el.scrollHeight - el.clientHeight), { timeout: 5_000 })
+      .toBeLessThanOrEqual(2);
+  }
   fs.mkdirSync(outDir, { recursive: true });
 
   const baseName = theme === 'dark' ? `${name}-dark` : name;
