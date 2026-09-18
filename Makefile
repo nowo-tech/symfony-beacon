@@ -138,7 +138,7 @@ help:
 	@echo "  make down-e2e        Stop isolated E2E Compose project (keeps app_e2e schema)"
 	@echo "  make kit-smoke       AuthKit smoke (login, magic login, password reset, throttle)"
 	@echo "  make secrets-scan    Gitleaks secret scan (same gate as CI)"
-	@echo "  make qa              cs + twig-cs + phpstan + rector + check-module-boundaries + test"
+	@echo "  make qa              cs + twig-cs + phpstan + rector + check-module-boundaries + test + vitest"
 	@echo "  make qa-fix          rector-fix (Rector→CS) + twig-cs-fix + phpstan + test"
 	@echo "  make update-deps     bump pinned Composer deps (helper --run) + composer update + pnpm update"
 	@echo "  make composer-outdated  Suggest composer require pins (nowo-tech/composer-update-helper)"
@@ -492,7 +492,7 @@ test-unit-js-coverage: ensure-up
 # Filter:  make test-e2e ARGS='e2e/smoke/public.spec.ts'
 # Host run (needs `pnpm exec playwright install-deps`): PLAYWRIGHT_ON_HOST=1 make test-e2e
 # CI sets PLAYWRIGHT_REQUIRE_SAMPLE=1 so issue-dependent tests fail instead of skip.
-PLAYWRIGHT_IMAGE ?= mcr.microsoft.com/playwright:v1.62.1-jammy
+PLAYWRIGHT_IMAGE ?= mcr.microsoft.com/playwright:v1.63.0-jammy
 PLAYWRIGHT_BASE_URL ?= https://localhost:9447
 PLAYWRIGHT_INGEST_BASE_URL ?= http://localhost:9084
 # Mailpit UI (make mailpit) — used by UC-AUTH-18/20; skip when unreachable unless REQUIRE_MAILPIT=1
@@ -899,7 +899,7 @@ secrets-scan:
 	docker run --rm -v "$(CURDIR):/repo:ro" -w /repo "zricethezav/gitleaks:v$(GITLEAKS_VERSION)" \
 		detect --source . --verbose --redact --exit-code 1
 
-qa: cs twig-cs phpstan rector check-module-boundaries test
+qa: cs twig-cs phpstan rector check-module-boundaries test test-unit-js
 
 # Apply order: Rector first, then CS Fixer once (via rector-fix), then the rest.
 qa-fix: rector-fix twig-cs-fix phpstan test

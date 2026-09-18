@@ -121,6 +121,9 @@ jobs:
           pnpm install --frozen-lockfile
           pnpm run build
 
+      - name: Vitest
+        run: pnpm test:unit
+
       - name: Prepare environment
         run: |
           cp .env.dist .env.local
@@ -574,7 +577,7 @@ jobs:
             -e CI=1 \
             -e HOME=/tmp \
             -e XDG_CACHE_HOME=/tmp/.cache \
-            mcr.microsoft.com/playwright:v1.62.1-jammy \
+            mcr.microsoft.com/playwright:v1.63.0-jammy \
             bash -lc 'mkdir -p /tmp/.cache && ./node_modules/.bin/playwright test'
 
       - name: Upload Playwright artifacts
