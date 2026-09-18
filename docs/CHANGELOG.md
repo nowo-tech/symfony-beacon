@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _No unreleased operator-facing changes yet._
 
+## [1.29.2] - 2026-09-18
+
+### Fixed
+
+- **Section tab row (UC-UI-14):** product `.beacon-tabs` and kit-admin `.nowo-ui-tabs` keep the same font-weight (500) and `align-items: stretch`, so the active pill no longer shifts the first tab by 1–2px.
+- **Account area nav:** `/account/privacy` marks **Profile** as current (privacy sits in the profile area).
+
+### Changed
+
+- **HTML/Twig smoke:** Playwright asserts shared tab tags, identical computed weight, and a 1px row lock on account, appearance, project settings/issues, cookie consent, and maintenance — including after the second tab is selected (`e2e/support/tab-geometry.ts`).
+
+### Notes for integrators
+
+- **No migrations. No Composer pin changes.**
+- Deploy the build so operator chrome picks up the tab lock. Optional: regenerate manual screenshots with `make docs-manual-screenshots`.
+- See [UPGRADING.md](UPGRADING.md) **Upgrading from 1.29.1 to 1.29.2**.
+
 ## [1.29.1] - 2026-09-18
 
 ### Fixed
@@ -1765,7 +1782,8 @@ First **stable major** release: Phases 0–6 through **6.28** are Done. Upgrade 
 - Demo seed command (`app:seed-demo`) and PHPUnit coverage for parsers, ingest, dashboard access
 - Spec-Driven Development layout (`specs/`, constitution, Spec Kit skills)
 
-[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.29.1...HEAD
+[Unreleased]: https://github.com/nowo-tech/symfony-beacon/compare/v1.29.2...HEAD
+[1.29.2]: https://github.com/nowo-tech/symfony-beacon/compare/v1.29.1...v1.29.2
 [1.29.1]: https://github.com/nowo-tech/symfony-beacon/compare/v1.29.0...v1.29.1
 [1.29.0]: https://github.com/nowo-tech/symfony-beacon/compare/v1.28.2...v1.29.0
 [1.28.2]: https://github.com/nowo-tech/symfony-beacon/compare/v1.28.1...v1.28.2
