@@ -6,13 +6,25 @@ Deep dive: [LEGAL-AND-COOKIES.md](../product/LEGAL-AND-COOKIES.md).
 
 These pages are linked from AuthKit footers (and related public shells) so guests can review obligations before and after sign-in.
 
+## Editing without a fork
+
+**Route:** `/admin/legal` (requires `ROLE_ADMIN`)
+
+**What it is.** List of the four public pages in every enabled locale, then a CKEditor 5 form for title and HTML.
+
+**What it contributes.** Each deployment replaces the generic placeholders (`[Operator legal name — replace]`, `privacy@example.com`) in the UI. Saving stores that locale only and strips scripts, event handlers, and iframes. Other locales keep the built-in seed until they are saved too. Cookie categories and the consent modal stay on [Administration → Cookie consent](05-admin-and-ops.md#cookie-consent). Counsel must still approve the copy before production (REQ-CC-010).
+
+![Legal pages](images/admin-legal.png)
+
+![Edit legal notice](images/admin-legal-edit.png)
+
 ## Legal notice
 
 **Route:** legal notice page (locale-prefixed under `/{locale}/legal/…` when not on the default locale path set)
 
 **What it is.** Operator / publisher identification and legal notices required for the self-hosted SaaS surface.
 
-**What it contributes.** Editable operator / publisher identification. Default seed uses placeholders (no nowo.tech identity); the deploying organisation must publish its own identification before production.
+**What it contributes.** Editable operator / publisher identification. Default seed uses placeholders (no nowo.tech identity). An administrator publishes the real text at `/admin/legal` (CKEditor 5, per locale) without forking the repository. The deploying organisation must do that before production.
 
 ![Legal notice](images/legal-notice.png)
 

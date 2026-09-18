@@ -32,6 +32,7 @@ erDiagram
     user ||--o{ issue_comment : author
     user ||--o{ issue_saved_view : owns
     user ||--o{ project_share_link : created_by
+    user ||--o{ legal_document : edited
 
     user_group ||--o{ user_group_membership : has
     user_group ||--o{ project_group_access : grants
@@ -466,6 +467,29 @@ erDiagram
 ```
 
 Admin UI: **Administration → Mailer** / **Mercure** / **Ops defaults** / **Appearance**. See [MERCURE.md](../ops/MERCURE.md) and [PRODUCTION.md](../PRODUCTION.md#field-encryption-key-halite).
+
+---
+
+## Legal pages
+
+One row per public page and locale. No row means the built-in Twig seed is what visitors see. Admin: **Administration → Legal pages**.
+
+```mermaid
+erDiagram
+    legal_document {
+        int id PK
+        string slug
+        string locale
+        string title
+        text body
+        datetime created_at
+        datetime updated_at
+        int created_by_id FK
+        int updated_by_id FK
+    }
+```
+
+Unique `(slug, locale)`. Slugs: `notice`, `privacy`, `terms`, `cookies`. Locales: `en`, `es`, `de`, `nl`, `fr`, `it`, `pt`. Body is sanitized HTML, not a secret.
 
 ---
 

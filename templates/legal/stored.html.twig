@@ -1,0 +1,11 @@
+{% extends 'legal/layout.html.twig' %}
+
+{% block title %}{{ title }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block legal_body %}
+<article class="legal-doc prose-legal">
+    {# Sanitized on save and again in LegalController before this render. #}
+    {{ body|raw }}
+    {% include 'legal/_nav.html.twig' with {current: current} only %}
+</article>
+{% endblock %}

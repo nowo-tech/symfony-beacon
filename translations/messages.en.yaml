@@ -26,6 +26,7 @@ nav:
   menus: Menus
   breadcrumbs: Breadcrumbs
   cookie_consent: Cookie consent
+  legal_pages: Legal pages
   routing: Locale routes
   http_log: HTTP log
   maintenance: Maintenance
@@ -1744,6 +1745,7 @@ admin:
     menus: Edit navigation menus.
     breadcrumbs: Manage breadcrumb collections.
     cookie_consent: Edit consent modal copy, categories, and first-party cookie inventory.
+    legal_pages: Edit legal notice, privacy, terms, and cookies for this deployment. No repository fork.
     routing: Manage dual locale public paths (JSON) for Routable controllers.
     http_log: Browse captured HTTP requests (headers, status, duration) with retention
       and export.
@@ -1988,6 +1990,21 @@ tour:
         description: Re-run platform seed, demo project, or sample telemetry when
           onboarding a new environment.
 legal:
+  admin:
+    title: Legal pages
+    intro: Each deployment can publish its own notice, privacy policy, terms, and cookie page. Built-in text stays in place until you save a locale. Counsel must still approve the copy before you process other people’s personal data.
+    edit_title: '%page% (%locale%)'
+    edit_intro: The editor starts from the built-in text. Saving stores HTML for this locale only. Other locales are unchanged.
+    custom: Custom
+    builtin: Built-in
+    save: Save legal page
+    cancel: Back to list
+    back: All legal pages
+    reset: Restore built-in text
+    saved: Legal page saved for this locale.
+    reset_done: Built-in text is published again for this locale.
+    empty_body: Add some text, or use Restore built-in text to drop the custom page.
+    invalid_csrf: The form expired. Try again.
   nav:
     label: Legal
   last_updated: 'Last updated: %date%'

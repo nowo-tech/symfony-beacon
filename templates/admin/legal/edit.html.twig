@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'legal.admin.edit_title'|trans({'%page%': ('legal.' ~ slug ~ '.title')|trans, '%locale%': locale}) }} — {{ site_appearance.brandName }}{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset(nowo_ckeditor5_editor_asset_path('ckeditor5-editor.js'), nowo_ckeditor5_editor_asset_package()) }}" defer></script>
+{% endblock %}
+
+{% block body %}
+<div class="mb-4">
+    <p class="text-sm"><a class="no-underline" href="{{ path('admin_legal_index') }}">{{ 'legal.admin.back'|trans }}</a></p>
+    <h1 class="mt-2 font-[family-name:var(--font-display)] text-2xl font-semibold">
+        {{ 'legal.admin.edit_title'|trans({'%page%': ('legal.' ~ slug ~ '.title')|trans, '%locale%': locale}) }}
+    </h1>
+    <p class="mt-1 max-w-3xl text-sm text-[var(--color-ink)]/70">{{ 'legal.admin.edit_intro'|trans }}</p>
+</div>
+
+{{ form_start(form, {attr: {class: 'panel max-w-4xl space-y-4'}}) }}
+    {% include 'form/_fields.html.twig' with {form: form} only %}
+    <div class="flex flex-wrap gap-2">
+        <button class="btn-primary" type="submit">{{ 'legal.admin.save'|trans }}</button>
+        <a class="btn-ghost no-underline" href="{{ path('admin_legal_index') }}">{{ 'legal.admin.cancel'|trans }}</a>
+    </div>
+{{ form_end(form) }}
+
+{{ form_start(reset_form, {attr: {class: 'mt-4'}}) }}
+    <button class="btn-ghost" type="submit">{{ 'legal.admin.reset'|trans }}</button>
+{{ form_end(reset_form) }}
+{% endblock %}

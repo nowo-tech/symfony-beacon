@@ -188,6 +188,16 @@ Open **Administration** from the operator navigation (hub cards mirror the sideb
 
 ![Cookie consent admin](images/admin-cookie-consent.png)
 
+### Legal pages
+
+**What it is.** CKEditor 5 editor for the public legal notice, privacy policy, terms, and cookie page (`nowo-tech/ckeditor5-editor-bundle` via FormKit). One document per page and locale.
+
+**What it contributes.** The operator publishes identification and policies for this deployment without forking the repository. Built-in seed stays live until a locale is saved. Saving strips scripts and iframes. **Restore built-in text** drops that override. This does not replace cookie-consent configuration. Counsel must still approve the copy before production.
+
+![Legal pages](images/admin-legal.png)
+
+![Edit legal notice](images/admin-legal-edit.png)
+
 ### Maintenance
 
 **What it is.** Maintenance-mode and related operator controls.

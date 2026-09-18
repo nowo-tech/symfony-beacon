@@ -885,3 +885,13 @@ issue_assignee:
   assignee:
     label: Assignee
 
+legal_document:
+  title:
+    label: Title
+    placeholder: Legal notice
+    help: Shown in the browser title. The page body can include its own heading.
+  body:
+    label: Page content
+    placeholder: ''
+    help: HTML for this locale. Scripts are removed when you save.
+

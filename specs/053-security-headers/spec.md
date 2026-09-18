@@ -40,6 +40,10 @@ Debug CSP MUST NOT list `cdn.jsdelivr.net` by default. `nowo-tech/hot-reload-bun
 
 Host pin is `nowo-tech/hot-reload-bundle` **1.4.0**. CSP contract is unchanged. Dev MAY run `nowo:hot-reload:check` and use profiler environment checks. See `docs/ops/FRANKENPHP-HOT-RELOAD.md`.
 
+## Amendment (legal editor styles, 2026-09-18 / `115`)
+
+On `/admin/legal` and child paths, `style-src-elem` MUST be `'self' 'unsafe-inline'` and MUST NOT include a nonce. A nonce in that directive makes browsers ignore `'unsafe-inline'`, and the legal editor injects `<style>` from its script with no nonce. Other HTML routes keep nonce-based `style-src-elem` (debug MAY still add `'unsafe-inline'` for the profiler). `script-src` stays self + nonce; legal admin MUST NOT add `unsafe-eval`. Unit test: `ContentSecurityPolicySubscriberTest`.
+
 ## Out of scope
 
 - WAF.

@@ -49,6 +49,15 @@ final class ContentSecurityPolicySubscriberTest extends TestCase
         self::assertStringContainsString("'unsafe-eval'", $csp);
     }
 
+    public function testLegalAdminPathAllowsCkeditorInlineStylesWithoutUnsafeEval(): void
+    {
+        $response = $this->dispatch('/admin/legal/notice/en', '<html><body>editor</body></html>', kernelDebug: false);
+        $csp = (string) $response->headers->get('Content-Security-Policy');
+        self::assertMatchesRegularExpression("/style-src-elem 'self' 'unsafe-inline'/", $csp);
+        self::assertDoesNotMatchRegularExpression("/style-src-elem[^;]*nonce-/", $csp);
+        self::assertStringNotContainsString('unsafe-eval', $csp);
+    }
+
     public function testConnectSrcAddsCrossOriginMercureHub(): void
     {
         $response = $this->dispatch(

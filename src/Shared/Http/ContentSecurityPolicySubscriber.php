@@ -25,6 +25,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * {@code style-src} would ignore {@code unsafe-inline} and block those writes.
  *
  * Debug keeps {@code unsafe-inline} on {@code style-src-elem} for the Web Profiler.
+ * {@code /admin/legal} uses {@code unsafe-inline} without a nonce: a nonce would
+ * make browsers ignore {@code unsafe-inline}, and CKEditor 5 injects {@code <style>}
+ * from {@code ckeditor5-editor.js} ({@code nowo-tech/ckeditor5-editor-bundle}).
  *
  * Swagger UI needs script-src 'unsafe-eval' (JSON Schema compile).
  * Debug / Web Debug Toolbar also needs 'unsafe-eval' because toolbar_js.html.twig
@@ -120,12 +123,18 @@ final readonly class ContentSecurityPolicySubscriber
         $nonce = (string) $request->attributes->get(self::REQUEST_ATTR_NONCE, '');
         // style-src-elem: <style> / stylesheets. style-src-attr: style="" + CSSOM.
         $styleSrcElem = "style-src-elem 'self'";
-        if ('' !== $nonce) {
-            $styleSrcElem .= " 'nonce-".$nonce."'";
-        }
-        if ($this->kernelDebug) {
-            // Web Profiler injects <style> without our nonce; its listener also merges its own.
+        if ($this->isCkeditorAdminPath($path)) {
+            // No nonce here: with a nonce, browsers ignore 'unsafe-inline', and CKEditor's
+            // runtime <style> tags would not apply.
             $styleSrcElem .= " 'unsafe-inline'";
+        } else {
+            if ('' !== $nonce) {
+                $styleSrcElem .= " 'nonce-".$nonce."'";
+            }
+            if ($this->kernelDebug) {
+                // Web Profiler injects <style> without our nonce; its listener also merges its own.
+                $styleSrcElem .= " 'unsafe-inline'";
+            }
         }
 
         $styleSrcAttr = "style-src-attr 'unsafe-inline'";
@@ -285,6 +294,11 @@ final readonly class ContentSecurityPolicySubscriber
     private function isSwaggerUiPath(string $path): bool
     {
         return '/admin/api/doc' === $path || str_starts_with($path, '/admin/api/doc/');
+    }
+
+    private function isCkeditorAdminPath(string $path): bool
+    {
+        return '/admin/legal' === $path || str_starts_with($path, '/admin/legal/');
     }
 
     private function isProfilerFragmentPath(string $path): bool

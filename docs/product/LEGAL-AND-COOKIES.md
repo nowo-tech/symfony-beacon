@@ -11,9 +11,15 @@ Beacon ships public **legal** pages and a GDPR-oriented **cookie consent** modal
 | `/legal/terms` | `legal_terms` | Terms of use template for this instance |
 | `/legal/cookies` | `legal_cookies` | Cookie categories + inventory |
 
-All of these are **public** (`PUBLIC_ACCESS`). Copy is maintained in `translations/messages.*.yaml` (`legal.*`) for every enabled locale (`en`, `es`, `de`, `nl`, `fr`, `it`, `pt`).
+All of these are **public** (`PUBLIC_ACCESS`). Until an administrator saves a locale, copy comes from `translations/messages.*.yaml` (`legal.*`) for every enabled locale (`en`, `es`, `de`, `nl`, `fr`, `it`, `pt`).
 
-> **Operator duty:** default seed copy is **generic and editable** (`[Operator legal name — replace]`, `privacy@example.com`). It must **not** name nowo.tech or Nowo Insurance Services, S.L. Whoever deploys this software is the provider and controller of that deployment and must replace every placeholder before processing other people’s personal data. Nowo.tech identity belongs in [`nowo-tech-web`](../../../nowo-tech-web/). This file is an engineering record of the statutory checklist, not a law-firm opinion.
+Administrators edit the published HTML at **Administration → Legal pages** (`/admin/legal`) with CKEditor 5 (`nowo-tech/ckeditor5-editor-bundle` via FormKit). Each slug (`notice`, `privacy`, `terms`, `cookies`) is stored per locale in `legal_document`. Empty installs keep the built-in seed, so a deployment can change the text without forking the repository. **Restore built-in text** deletes that locale’s row. Cookie consent stays on `nowo-tech/cookie-consent-bundle` — this screen does not replace the consent modal.
+
+Saved HTML is filtered on save and again when the public page renders. Scripts, inline event handlers, `javascript:` / `data:` / `vbscript:` URLs, and iframes are removed (a YouTube embed will not survive). Brand name, session-cookie name, and the “manage cookies” control stay live only in the seed; a saved body is static HTML.
+
+Run `bin/console assets:install` after installing the editor bundle so `ckeditor5-editor.js` is published under `public/bundles/` (Composer `auto-scripts` does this on install/update).
+
+> **Operator duty:** default seed copy is **generic and editable** (`[Operator legal name — replace]`, `privacy@example.com`). It must **not** name nowo.tech or Nowo Insurance Services, S.L. Whoever deploys this software is the provider and controller of that deployment and must replace every placeholder before processing other people’s personal data. Nowo.tech identity belongs in [`nowo-tech-web`](../../../nowo-tech-web/). This file is an engineering record of the statutory checklist, not a law-firm opinion. The admin editor is how the operator publishes that replacement; it is not a substitute for counsel (REQ-CC-010).
 
 ## Current-law review (REQ-CC-010)
 

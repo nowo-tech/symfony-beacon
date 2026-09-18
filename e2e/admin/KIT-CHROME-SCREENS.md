@@ -20,7 +20,7 @@ Excluded on purpose: Envelope API, OTLP, Mercure, `_profiler`, `_wdt`, hooks web
 | ---- | ----- |
 | Dashboard panels | `/dashboard/activity`, `/dashboard/alerts`, `/dashboard/assignments`, `/dashboard/mentions`, `/dashboard/summary`, `/dashboard/new-in-release` |
 | Account remainder | `/account`, `/account/preferences`, `/account/projects`, `/account/groups`, `/account/security/activity`, `/account/security/devices`, `/account/security/history`, `/account/display/panels`, `/account/display/tours` |
-| Admin remainder | `/admin/ops`, `/admin/social-login`, `/admin/social-login/new`, `/admin/permissions/new`, `/breadcrumb-kit-admin/collections/new`, `/_site_backup/history`, menus **new** via `#modal-menu-new` on `/admin/menus/` (GET `/admin/menus/menu/new` is modal partial only) |
+| Admin remainder | `/admin/ops`, `/admin/legal`, `/admin/social-login`, `/admin/social-login/new`, `/admin/permissions/new`, `/breadcrumb-kit-admin/collections/new`, `/_site_backup/history`, menus **new** via `#modal-menu-new` on `/admin/menus/` (GET `/admin/menus/menu/new` is modal partial only) |
 | Project remainder | `/projects/{uuid}`, `/projects/{uuid}/analytics`, `/projects/{uuid}/performance`, `/projects/{uuid}/releases`, `/projects/{uuid}/notifications/new`, `/projects/{uuid}/threshold-rules/new`, `/projects/new` |
 | Guest / legal | `/register`, `/reset-password`, `/login/magic`, `/login/qr`, `/en/legal/privacy`, `/en/legal/terms`, `/en/legal/cookies`, `/en/legal/notice` |
 

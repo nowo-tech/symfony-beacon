@@ -471,6 +471,7 @@ const MISSING_AUTHENTICATED_STATIC = [
   '/account/display/panels',
   '/account/display/tours',
   '/admin/ops',
+  '/admin/legal',
   '/admin/social-login',
   '/admin/social-login/new',
   '/admin/permissions/new',

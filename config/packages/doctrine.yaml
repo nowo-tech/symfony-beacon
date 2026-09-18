@@ -58,6 +58,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Shared/Settings/Entity'
                 prefix: 'App\Shared\Settings\Entity'
                 alias: SharedSettings
+            SharedLegal:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Shared/Legal/Entity'
+                prefix: 'App\Shared\Legal\Entity'
+                alias: SharedLegal
             NowoBreadcrumbKitBundle:
                 type: attribute
                 is_bundle: true
