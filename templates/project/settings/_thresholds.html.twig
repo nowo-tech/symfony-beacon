@@ -10,7 +10,7 @@
         {% if thresholdCreateForm %}
             {% embed 'shared/_confirm_dialog.html.twig' with {
                 custom_form: true,
-                dialog_modifier: 'confirm-dialog--wide',
+                dialog_modifier: 'confirm-dialog--xl',
                 open_on_connect: openThresholdCreate|default(false),
                 aria_labelledby: 'project-threshold-create-title-' ~ project.id,
             } %}

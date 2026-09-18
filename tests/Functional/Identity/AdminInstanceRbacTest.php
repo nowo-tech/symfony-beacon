@@ -76,7 +76,7 @@ final class AdminInstanceRbacTest extends DatabaseWebTestCase
         self::assertSelectorTextContains('body', 'Delete project');
         self::assertSelectorExists('[data-testid="admin-permission-create"]');
         self::assertSelectorExists('[data-testid="admin-permission-edit"]');
-        self::assertSelectorExists('dialog.confirm-dialog--md');
+        self::assertSelectorExists('dialog.confirm-dialog--xl');
         // Closed dialogs must not emit open-on-connect (Stimulus Boolean treats empty attr as true).
         self::assertSelectorNotExists('[data-confirm-dialog-open-on-connect-value]');
 

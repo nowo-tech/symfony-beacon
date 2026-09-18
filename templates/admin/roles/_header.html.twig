@@ -12,7 +12,7 @@
         {% if editForm is defined %}
             {% embed 'shared/_confirm_dialog.html.twig' with {
                 custom_form: true,
-                dialog_modifier: 'confirm-dialog--md',
+                dialog_modifier: 'confirm-dialog--xl',
                 open_on_connect: open_edit|default(false),
                 aria_labelledby: 'role-edit-dialog-title',
             } %}

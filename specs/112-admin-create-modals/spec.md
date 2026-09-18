@@ -16,6 +16,7 @@
 | C3 | Threshold rules | `/projects/{id}/threshold-rules/new` → `…/settings/alerts?new_threshold=1` | `project_threshold_rule_new` | Full page |
 | C4 | i18n | FormKit `admin_group.*` / `project.*` / `project_threshold_rule.*` in `translations/form.*.yaml` | — | — |
 | C5 | Manual | Capture paths use query opens; chapters note modal UX (`111`) | — | — |
+| C6 | Width | Groups / projects stay `--md`. User create, threshold create, role create/edit, and permission create/edit use `--xl` | — | — |
 
 ## Non-goals
 
@@ -77,6 +78,7 @@ As a maintainer regenerating `docs/manual/`, create shots open the modal query U
 - **FR-005**: Visible FormKit chrome for these forms MUST resolve from `translations/form.*.yaml` (no raw `{prefix}.{field}.*` keys in EN UI).
 - **FR-006**: Product UI manual capture paths and chapter notes MUST document modal opens (`111`).
 - **FR-007**: Structured confirm chrome MUST follow `086` FR-003b/c (`confirm-dialog__header` / `__content` / `__actions`, `open_on_connect` attribute rules).
+- **FR-008**: User create, threshold-rule create, role create/edit, and permission create/edit MUST use `confirm-dialog--xl` (48rem wide, max-height `min(90vh, 52rem)`) so the body is not clipped into a native scrollbar. Group and project create MUST stay `confirm-dialog--md`. `/admin/permissions` MUST render `dialog.confirm-dialog--xl`.
 
 ## Success Criteria
 
@@ -90,3 +92,7 @@ As a maintainer regenerating `docs/manual/`, create shots open the modal query U
 - Domain: `019-admin-projects-ops`, `036-admin-identity-audit`, `027-threshold-alerts`
 - Manual: `111-product-ui-manual`
 - Roadmap: Phase 6.64
+
+## Amendment (wider form dialogs, 2026-09-18)
+
+- **FR-008**. The 1px `#101010` line on `project-threshold-rules-new`, `admin-roles-new`, and `admin-permissions-new` was the Linux scrollbar of a body capped at `40rem`, not `--color-sand`. Those three PNGs were recaptured without that line. User create uses the same `--xl` cap (the `--md` dialog overflowed by about 75px).

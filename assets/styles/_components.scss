@@ -401,6 +401,12 @@ html[data-motion='reduce'] .app-sidebar-backdrop {
     --cd-width: min(36rem, calc(100vw - 2rem));
   }
 
+  /* Tall admin forms (roles, permissions, threshold rules). Wider than --wide so fields sit in one view; taller cap avoids a clipped body scrollbar. */
+  &--xl {
+    --cd-width: min(48rem, calc(100vw - 2rem));
+    --cd-max-height: min(90vh, 52rem);
+  }
+
   /* Long operator guides (e.g. Administration → Mercure) */
   &--guide {
     --cd-width: min(48rem, calc(100vw - 2rem));
